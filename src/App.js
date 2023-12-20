@@ -14,6 +14,8 @@ import {
   setLoggedIn,
   setUsername,
 } from "./features/authenticationSlice";
+import AppBar from "./components/AppBar";
+import { Container } from "reactstrap";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -33,12 +35,26 @@ const App = () => {
 
   if (isAuthenticated) {
     return (
-      <Router>
-        <Routes>
-          <Route path="/dashboard" element={<DashboardComponent />} />
-          <Route path="/*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </Router>
+      <div
+        className="app"
+        style={{
+          backgroundColor: "#e4e5e6",
+        }}
+      >
+        <Router>
+          <AppBar style={{ width: "100%" }} />
+          <div className="app-body">
+            <main className="main">
+              <Container fluid>
+                <Routes>
+                  <Route path="/dashboard" element={<DashboardComponent />} />
+                  <Route path="/*" element={<Navigate to="/dashboard" />} />
+                </Routes>
+              </Container>
+            </main>
+          </div>
+        </Router>
+      </div>
     );
   }
 
