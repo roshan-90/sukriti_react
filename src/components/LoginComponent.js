@@ -28,9 +28,6 @@ const LoginComponent = () => {
   const handleSignIn = () => {
     signIn(email, password, dispatch)
       .then((credentials) => {
-        console.log(credentials);
-        console.log("check");
-        dispatch(setLoggedIn(credentials));
         // The signIn function has completed successfully
         dispatch(setUsername(email));
         // Additional logic with the credentials if needed

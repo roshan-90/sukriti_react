@@ -15,10 +15,8 @@ const DashboardComponent = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      // Redirect to login if not authenticated
       navigate("/login");
     } else {
-      // Invoke Lambda function when the dashboard component mounts
       invokeLambda();
     }
   }, [isAuthenticated, navigate]);

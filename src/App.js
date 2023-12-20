@@ -9,20 +9,24 @@ import {
 import LoginComponent from "./components/LoginComponent";
 import DashboardComponent from "./components/DashboardComponent";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAuthenticated, setUser } from "./features/authSlice";
+import {
+  selectIsAuthenticated,
+  setLoggedIn,
+  setUsername,
+} from "./features/authSlice";
 
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  console.log("isAuthenticated", isAuthenticated);
   useEffect(() => {
     // const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
     const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
-    console.log("sd", userFromLocalStorage);
+    const user = localStorage.getItem("user");
     if (userFromLocalStorage) {
-      dispatch(setUser(userFromLocalStorage));
+      dispatch(setLoggedIn(userFromLocalStorage));
+      dispatch(setUsername(user));
     }
-  }, [dispatch]);
+  }, []);
 
   if (isAuthenticated) {
     return (

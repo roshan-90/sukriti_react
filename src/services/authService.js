@@ -19,6 +19,7 @@ import {
   setUsername,
   setLoggedIn,
 } from "../features/authSlice";
+import { executeGetUserDetailsLambda } from "../awsClients/administrationLambdas";
 
 const userPool = new CognitoUserPool({
   UserPoolId: USER_POOL_ID,
@@ -89,25 +90,40 @@ const signIn = async (username, password, dispatch) => {
       });
 
       let cognitoUser = getCognitoUser(username);
-      console.log("cognitoUser", cognitoUser);
       const result = await new Promise((resolve, reject) => {
         cognitoUser.authenticateUser(authenticationDetails, {
           onSuccess: async (result) => {
             let token = result.getIdToken().getJwtToken();
             let credentials = await getAWSCredentials(token);
-            resolve(credentials);
-            AWS.config.credentials.get(() => {
-              var accessKeyId = AWS.config.credentials.accessKeyId;
-              var secretAccessKey = AWS.config.credentials.secretAccessKey;
-              var sessionToken = AWS.config.credentials.sessionToken;
-
-              AWS.config.update({
-                accessKeyId: accessKeyId,
-                secretAccessKey: secretAccessKey,
-                sessionToken: sessionToken,
+            console.log("check--", credentials);
+            let data = {
+              accessKeyId: credentials?.data?.Credentials?.AccessKeyId,
+              secretAccessKey: credentials?.data?.Credentials?.SecretKey,
+              sessionToken: credentials?.data?.Credentials?.SessionToken,
+            };
+            localStorage.setItem("data", JSON.stringify(data));
+            dispatch(setLoggedIn(data));
+            executeGetUserDetailsLambda(username, data)
+              .then((userDetails) => {
+                console.log("userDetails", userDetails);
+                dispatch(setUser(userDetails));
+              })
+              .catch((error) => {
+                console.error("Error fetching user details:", error);
               });
-              resolve(credentials);
-            });
+            resolve(credentials);
+            // AWS.config.credentials.get(() => {
+            //   var accessKeyId = AWS.config.credentials.accessKeyId;
+            //   var secretAccessKey = AWS.config.credentials.secretAccessKey;
+            //   var sessionToken = AWS.config.credentials.sessionToken;
+
+            //   AWS.config.update({
+            //     accessKeyId: accessKeyId,
+            //     secretAccessKey: secretAccessKey,
+            //     sessionToken: sessionToken,
+            //   });
+            //   resolve(credentials);
+            // });
           },
           onFailure: (err) => {
             console.error("onFailure:", err);
