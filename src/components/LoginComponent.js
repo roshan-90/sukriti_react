@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { signIn } from "../services/authService";
-import { setUsername, setLoggedIn } from "../features/authSlice";
+import { setUsername, setLoggedIn } from "../features/authenticationSlice";
 import {
   Button,
   Card,
@@ -19,6 +19,8 @@ import {
 import restroomImage from "../assets/img/brand/restroom.jpg";
 import logo from "../assets/img/brand/logo.png";
 import { executeGetUserDetailsLambda } from "../awsClients/administrationLambdas";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const LoginComponent = () => {
   const dispatch = useDispatch();
@@ -104,7 +106,7 @@ const LoginComponent = () => {
                       <p className="text-muted">Sign In to your account</p>
                       <InputGroup className="mb-3">
                         <InputGroupText>
-                          <i className="icon-user" />
+                          <PersonOutlineOutlinedIcon />
                         </InputGroupText>
                         <Input
                           type="text"
@@ -114,7 +116,7 @@ const LoginComponent = () => {
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupText>
-                          <i className="icon-lock" />
+                          <LockOutlinedIcon />
                         </InputGroupText>
                         <Input
                           type="password"

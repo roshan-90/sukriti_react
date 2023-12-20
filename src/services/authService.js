@@ -18,7 +18,7 @@ import {
   clearUser,
   setUsername,
   setLoggedIn,
-} from "../features/authSlice";
+} from "../features/authenticationSlice";
 import { executeGetUserDetailsLambda } from "../awsClients/administrationLambdas";
 
 const userPool = new CognitoUserPool({

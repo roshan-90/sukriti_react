@@ -13,18 +13,21 @@ import {
   selectIsAuthenticated,
   setLoggedIn,
   setUsername,
-} from "./features/authSlice";
+} from "./features/authenticationSlice";
 
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   useEffect(() => {
-    // const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
-    const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
-    const user = localStorage.getItem("user");
-    if (userFromLocalStorage) {
-      dispatch(setLoggedIn(userFromLocalStorage));
-      dispatch(setUsername(user));
+    if (!isAuthenticated) {
+      // const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
+      const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
+      const user = localStorage.getItem("user");
+      if (userFromLocalStorage) {
+        dispatch(setUsername(user));
+        dispatch(setLoggedIn(userFromLocalStorage));
+      }
+      console.log("sdsd");
     }
   }, []);
 
