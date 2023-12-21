@@ -112,7 +112,7 @@ export function executeCreateUserLambda(createUserRequest, userDetails) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1)
+        if (pullResults.status !== 1)
           reject(
             new Result(-1, undefined, "Error Alert!", pullResults.message)
           );
@@ -148,7 +148,7 @@ export function executeGetUserDetailsLambda(userName, credentials) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1) reject(pullResults);
+        if (pullResults.status !== 1) reject(pullResults);
         else resolve(pullResults.user);
       }
     });
@@ -174,7 +174,7 @@ export function executeEnableUserLambda(userName) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1) reject(pullResults);
+        if (pullResults.status !== 1) reject(pullResults);
         else resolve(pullResults.user);
       }
     });
@@ -200,7 +200,7 @@ export function executeDisableUserLambda(userName) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1) reject(pullResults);
+        if (pullResults.status !== 1) reject(pullResults);
         else resolve(pullResults.user);
       }
     });
@@ -226,7 +226,7 @@ export function executeDeleteUserLambda(userName) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1) reject(pullResults);
+        if (pullResults.status !== 1) reject(pullResults);
         else resolve(pullResults.user);
       }
     });
@@ -252,7 +252,7 @@ export function executeFetchCompletedUserAccessTree(userName, credentials) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1) reject(pullResults);
+        if (pullResults.status !== 1) reject(pullResults);
         else resolve(pullResults.accessTree);
       }
     });
@@ -277,7 +277,7 @@ export function executeDefineUserAccessLambda(request) {
       } else {
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
-        if (pullResults.status != 1) reject(pullResults);
+        if (pullResults.status !== 1) reject(pullResults);
         else resolve(pullResults.accessTree);
       }
     });
@@ -377,7 +377,7 @@ export function executePermissionUiLambda(config) {
         reject(err);
       } else {
         var pullResults = JSON.parse(data.Payload);
-        if (pullResults.result != 1) reject(pullResults);
+        if (pullResults.result !== 1) reject(pullResults);
         else resolve(pullResults);
       }
     });

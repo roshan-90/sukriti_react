@@ -33,7 +33,7 @@ const App = () => {
       }
       console.log("sdsd");
     }
-  }, []);
+  }, [isAuthenticated, dispatch]);
   const loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
   );

@@ -1,24 +1,17 @@
 // authService.js
 import {
   CognitoUserPool,
-  CognitoUserAttribute,
   CognitoUser,
   AuthenticationDetails,
 } from "amazon-cognito-identity-js";
 import AWS from "aws-sdk";
-import Result from "../Entity/Result";
 import {
   AWS_REGION,
   USER_POOL_ID,
   IDENTITY_POOL_ID,
   USER_POOL_CLIENT_ID,
 } from "../lib/environment";
-import {
-  setUser,
-  clearUser,
-  setUsername,
-  setLoggedIn,
-} from "../features/authenticationSlice";
+import { setUser, setLoggedIn } from "../features/authenticationSlice";
 import { executeGetUserDetailsLambda } from "../awsClients/administrationLambdas";
 
 const userPool = new CognitoUserPool({
@@ -90,7 +83,7 @@ const signIn = async (username, password, dispatch) => {
       });
 
       let cognitoUser = getCognitoUser(username);
-      const result = await new Promise((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         cognitoUser.authenticateUser(authenticationDetails, {
           onSuccess: async (result) => {
             let token = result.getIdToken().getJwtToken();

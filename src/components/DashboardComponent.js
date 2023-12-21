@@ -1,5 +1,5 @@
 // DashboardComponent.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectUser,
@@ -8,7 +8,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   executeFetchDashboardLambda,
-  executeGetUserDetailsLambda,
   executelistClientsLambda,
 } from "../awsClients/administrationLambdas";
 import { setClientList } from "../features/adminstrationSlice";

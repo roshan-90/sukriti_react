@@ -1,8 +1,8 @@
 // LoginComponent.js
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signIn } from "../services/authService";
-import { setUsername, setLoggedIn } from "../features/authenticationSlice";
+import { setUsername } from "../features/authenticationSlice";
 import {
   Button,
   Card,
@@ -18,16 +18,19 @@ import {
 } from "reactstrap";
 import restroomImage from "../assets/img/brand/restroom.jpg";
 import logo from "../assets/img/brand/logo.png";
-import { executeGetUserDetailsLambda } from "../awsClients/administrationLambdas";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { startLoading, stopLoading } from "../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const LoginComponent = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const isLoading = useSelector((state) => state.loading.isLoading);
 
   const handleSignIn = () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     signIn(email, password, dispatch)
       .then((credentials) => {
         // The signIn function has completed successfully
@@ -38,6 +41,7 @@ const LoginComponent = () => {
         // Handle errors from the signIn function
         console.error("Sign in failed:", error);
       });
+    dispatch(stopLoading()); // Dispatch the stopLoading action
   };
 
   const HeaderComponent = () => {
@@ -78,6 +82,14 @@ const LoginComponent = () => {
 
   return (
     <div className="col-md-12" style={styles.container}>
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }} // Set the color using the style prop
+          />
+        </div>
+      )}
       <div
         style={{
           height: "100vh",
