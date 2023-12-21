@@ -1,5 +1,5 @@
 // App.js
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -16,10 +16,12 @@ import {
 } from "./features/authenticationSlice";
 import AppBar from "./components/AppBar";
 import { Container } from "reactstrap";
+import DefaultFooter from "./components/DefaultFooter";
 
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+
   useEffect(() => {
     if (!isAuthenticated) {
       // const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
@@ -32,39 +34,49 @@ const App = () => {
       console.log("sdsd");
     }
   }, []);
+  const loading = () => (
+    <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  );
 
   if (isAuthenticated) {
     return (
-      <div
-        className="app"
-        style={{
-          backgroundColor: "#e4e5e6",
-        }}
-      >
-        <Router>
-          <AppBar style={{ width: "100%" }} />
-          <div className="app-body">
-            <main className="main">
-              <Container fluid>
-                <Routes>
-                  <Route path="/dashboard" element={<DashboardComponent />} />
-                  <Route path="/*" element={<Navigate to="/dashboard" />} />
-                </Routes>
-              </Container>
-            </main>
-          </div>
-        </Router>
-      </div>
+      <React.Suspense fallback={loading()}>
+        <div
+          className="app"
+          style={{
+            backgroundColor: "#e4e5e6",
+          }}
+        >
+          <Router>
+            <AppBar style={{ width: "100%" }} />
+            <div className="app-body">
+              <main className="main">
+                <Container fluid>
+                  <Routes>
+                    <Route path="/dashboard" element={<DashboardComponent />} />
+                    <Route path="/*" element={<Navigate to="/dashboard" />} />
+                  </Routes>
+                </Container>
+              </main>
+            </div>
+            <Suspense fallback={loading()}>
+              <DefaultFooter />
+            </Suspense>
+          </Router>
+        </div>
+      </React.Suspense>
     );
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<LoginComponent />} />
-        <Route path="/*" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <React.Suspense fallback={loading()}>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginComponent />} />
+          <Route path="/*" element={<Navigate to="/login" />} />
+        </Routes>
+      </Router>
+    </React.Suspense>
   );
 };
 

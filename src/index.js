@@ -8,24 +8,29 @@ import { configureStore } from "@reduxjs/toolkit";
 import authenticationReducer from "./features/authenticationSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
 import adminstrationReducer from "./features/adminstrationSlice";
-// import { PersistGate } from "redux-persist/integration/react"; // import store from "./store";
-// import { store, persistor } from "./store";
+import dashboardReducer from "./features/dashboardSlice";
+import loadingReducer from "./features/loadingSlice";
 
 const store = configureStore({
   reducer: {
+    loading: loadingReducer,
     authentication: authenticationReducer,
+    dashboard: dashboardReducer,
     adminstration: adminstrationReducer,
   },
 });
+const loading = () => (
+  <div className="animated fadeIn pt-1 text-center">Loading...</div>
+);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    {/* <PersistGate loading={null} persistor={persistor}> */}
     <React.StrictMode off>
-      <App />
+      <React.Suspense fallback={loading()}>
+        <App />
+      </React.Suspense>
     </React.StrictMode>
-    {/* </PersistGate> */}
   </Provider>
 );
 

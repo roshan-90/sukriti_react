@@ -32,7 +32,11 @@ export function executelistClientsLambda(credentials) {
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
-      credentials: credentials, // Pass the credentials from the Redux store
+      credentials: {
+        accessKeyId: credentials?.accessKeyId,
+        secretAccessKey: credentials?.secretAccessKey,
+        sessionToken: credentials?.sessionToken,
+      }, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_administration_listClients",
@@ -333,7 +337,11 @@ export function executeFetchDashboardLambda(
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
-      credentials: credentials, // Pass the credentials from the Redux store
+      credentials: {
+        accessKeyId: credentials?.accessKeyId,
+        secretAccessKey: credentials?.secretAccessKey,
+        sessionToken: credentials?.sessionToken,
+      }, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_adminisatration_fetchDateWaiseUsageData",

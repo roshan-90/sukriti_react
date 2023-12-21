@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  vendorList: [],
+  clientList: [],
   teamList: [],
   data: [],
 };
@@ -16,16 +16,18 @@ const adminstrationSlice = createSlice({
       console.log("setTeamList", action.payload);
       state.teamList = action.payload;
     },
-    setVendorList: (state, action) => {
-      console.log("setVendorList");
+    setClientList: (state, action) => {
+      console.log("setClientList");
+      state.clientList = action.payload;
     },
     setData: (state, action) => {
       console.log("setData");
+      state.data = action.data;
     },
   },
 });
 
-export const { setTeamList, setVendorList, setData } =
+export const { setTeamList, setClientList, setData } =
   adminstrationSlice.actions;
 export const adminstrationState = (state) => state.adminstration;
 

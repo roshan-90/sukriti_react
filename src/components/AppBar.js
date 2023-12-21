@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Collapse,
   Navbar,
@@ -12,33 +12,19 @@ import {
 } from "reactstrap";
 import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
+import { clearUser } from "../features/authenticationSlice";
 
 const AppBar = () => {
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const toggle = () => setIsOpen(!isOpen);
 
   const navLinkStyle = { cursor: "pointer", fontSize: "16px" };
-  // const { userRole } = useSelector((state) => {
-  //     return {
-  //         userRole: state.authentication.user.userRole,
-  //     };
-  // });
-  // console.log("userRole-userRole", userRole)
   const confirmSignOut = () => {
-    // store.dispatch({ type: 'LOGOUT' });
-    // // Clear the persisted store
-    // const persistor = persistStore(store);
-    // persistor.purge().then(() => {
-    //     localStorage.removeItem('persist:root');
-    //     localStorage.clear();
-    //     // Reload the page to reset the application state
-    //     window.location.reload();
-    // });
-    // props.signOut();
-    // navigate("/login"); // Use the navigate function to go to "/login"
-    navigate("/login");
+    window.location.reload();
+    dispatch(clearUser());
   };
 
   return (
