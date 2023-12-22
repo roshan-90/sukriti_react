@@ -17,6 +17,7 @@ import {
 import AppBar from "./components/AppBar";
 import { Container } from "reactstrap";
 import DefaultFooter from "./components/DefaultFooter";
+import Home from "./ui/dashboard/Home";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const App = () => {
               <main className="main">
                 <Container fluid>
                   <Routes>
-                    <Route path="/dashboard" element={<DashboardComponent />} />
+                    <Route path="/dashboard" element={<Home />} />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
                 </Container>
