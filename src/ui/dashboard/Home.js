@@ -16,6 +16,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import Summary from "./Summary";
 import Stats from "./Stats";
+import ActiveTickets from "./ActiveTickets";
+import HealthStatus from "./HealthStatus";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -105,16 +107,18 @@ const Home = () => {
           />
           <Stats
             setDurationSelection={setDurationSelection}
-            chartData={dashboard_data.data.dashboardChartData}
-            pieChartData={dashboard_data.data.pieChartData}
-            bwtChartData={dashboard_data.data.bwtdashboardChartData}
-            bwtPieChartData={dashboard_data.data.bwtpieChartData}
-            bwtDataSummary={dashboard_data.data.bwtdataSummary}
-            dashboardUpiChartData={dashboard_data.data.dashboardUpiChartData}
-            pieChartUpiData={dashboard_data.data.pieChartUpiData}
-            dataSummary={dashboard_data.data.dataSummary}
-            uiResult={dashboard_data.data.uiResult?.data}
+            chartData={dashboard_data.data?.dashboardChartData}
+            pieChartData={dashboard_data.data?.pieChartData}
+            bwtChartData={dashboard_data.data?.bwtdashboardChartData}
+            bwtPieChartData={dashboard_data.data?.bwtpieChartData}
+            bwtDataSummary={dashboard_data.data?.bwtdataSummary}
+            dashboardUpiChartData={dashboard_data.data?.dashboardUpiChartData}
+            pieChartUpiData={dashboard_data.data?.pieChartUpiData}
+            dataSummary={dashboard_data.data?.dataSummary}
+            uiResult={dashboard_data.data?.uiResult?.data}
           />
+          <ActiveTickets data={dashboard_data?.data?.activeTickets} />
+          <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
         </div>
       ) : (
         <div>No data available</div>
