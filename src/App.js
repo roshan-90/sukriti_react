@@ -18,6 +18,8 @@ import AppBar from "./components/AppBar";
 import { Container } from "reactstrap";
 import DefaultFooter from "./components/DefaultFooter";
 import Home from "./ui/dashboard/Home";
+import AdministrationHome from "./ui/administration/AdministrationHome";
+import MemberDetails from "./ui/administration/MemberDetailsHome";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -54,7 +56,23 @@ const App = () => {
               <main className="main">
                 <Container fluid>
                   <Routes>
-                    <Route path="/dashboard" element={<Home />} />
+                    <Route
+                      path={"/dashboard"}
+                      exact={true}
+                      element={<Home />}
+                    />
+                    <Route
+                      path={"/administration"}
+                      exact={true}
+                      name={"Administration"}
+                      element={<AdministrationHome />}
+                    />
+                    <Route
+                      path={"/administration/memberDetails"}
+                      exact={true}
+                      name={"Member Details"}
+                      element={<MemberDetails />}
+                    />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
                 </Container>

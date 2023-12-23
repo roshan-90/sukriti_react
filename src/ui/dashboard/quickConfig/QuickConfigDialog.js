@@ -16,11 +16,11 @@ import {
 import { whiteSurface } from "../../../jsStyles/Style";
 import QuickConfigDialogTab from "./QuickConfigDialogTab";
 
-const QuickConfigDialog = (props) => {
+const QuickConfigDialog = React.forwardRef((props, ref) => {
   const [visibility, setVisibility] = useState(false);
   const [activeTab, setActiveTab] = useState(props.activeTab);
 
-  const title = "";
+  let title = "";
   let onClickAction;
 
   const submitConfig = async () => {
@@ -75,6 +75,10 @@ const QuickConfigDialog = (props) => {
       </>
     );
   };
+  React.useImperativeHandle(ref, () => ({
+    toggleDialog,
+    showDialog,
+  }));
 
   return (
     <Modal
@@ -143,6 +147,6 @@ const QuickConfigDialog = (props) => {
       </ModalFooter>
     </Modal>
   );
-};
+});
 
 export default QuickConfigDialog;
