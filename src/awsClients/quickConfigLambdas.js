@@ -1,5 +1,5 @@
 import AWS from "aws-sdk";
-import Result from "../Entity/User/Result";
+import Result from "../Entity/Result";
 
 export function executePublishConfigLambda(topic, config, metadata) {
   return new Promise(function (resolve, reject) {

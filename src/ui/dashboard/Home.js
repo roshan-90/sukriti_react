@@ -1,5 +1,5 @@
 // DashboardComponent.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectUser,
@@ -18,7 +18,10 @@ import Summary from "./Summary";
 import Stats from "./Stats";
 import ActiveTickets from "./ActiveTickets";
 import HealthStatus from "./HealthStatus";
-
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import WaterLevelStatus from "./WaterLevelStatus";
+import QuickConfig from "./QuickConfig";
+import LiveStatus from "./LiveStatus";
 const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -28,6 +31,7 @@ const Home = () => {
   const navigate = useNavigate();
   console.log("user", user);
   const reportParms = { complex: "all", duration: "15" };
+  const [dialogData, setDialogData] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -35,6 +39,14 @@ const Home = () => {
     } else {
       fetchDashboardData(15);
     }
+    setDialogData({
+      title: "Your Dialog Title",
+      message: "Your dialog message goes here.",
+      onClickAction: () => {
+        // Handle the action when the user clicks OK
+        console.log("Dialog OK clicked!");
+      },
+    });
   }, [isAuthenticated, navigate]);
 
   if (!isAuthenticated) {
@@ -77,12 +89,11 @@ const Home = () => {
     await fetchDashboardData();
   };
 
-  console.log("dashboard_data", dashboard_data?.data);
-
   // Check if dashboard_data and its required properties exist
   if (!dashboard_data?.data) {
     return null;
   }
+  console.log("dashboard_data", dashboard_data?.data);
 
   return (
     <>
@@ -94,7 +105,7 @@ const Home = () => {
           />
         </div>
       )}
-
+      <MessageDialog data={dialogData} />
       {dashboard_data?.data ? (
         <div>
           <h1>Welcome, {user?.username}!</h1>
@@ -119,6 +130,9 @@ const Home = () => {
           />
           <ActiveTickets data={dashboard_data?.data?.activeTickets} />
           <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
+          <LiveStatus data={dashboard_data?.data?.connectionStatus} />
+          <WaterLevelStatus data={dashboard_data?.data?.lowWaterComplexes} />
+          <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
         </div>
       ) : (
         <div>No data available</div>

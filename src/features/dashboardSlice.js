@@ -14,14 +14,15 @@ const dashboardSlice = createSlice({
       state.hasData = true;
       state.data = action.payload;
     },
-  },
-  setDashboardConfig: (state, action) => {
-    state.hasData = true;
-    state.configData = action.payload.dashboardConfig;
-  },
-  setDashboardLive: (state, action) => {
-    state.hasData = true;
-    state.configData = action.payload.dashboardLive;
+    setDashboardConfig: (state, action) => {
+      state.hasData = true;
+      state.configData = action.payload.dashboardConfig;
+    },
+    setDashboardLive: (state, action) => {
+      console.log('like', action.payload);
+      state.hasData = true;
+      state.configData = action.payload;
+    },
   },
 });
 
