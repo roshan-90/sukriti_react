@@ -58,6 +58,7 @@ const App = () => {
                   <Routes>
                     <Route
                       path={"/dashboard"}
+                      name={"Dashboard"}
                       exact={true}
                       element={<Home />}
                     />
@@ -68,7 +69,7 @@ const App = () => {
                       element={<AdministrationHome />}
                     />
                     <Route
-                      path={"/administration/memberDetails"}
+                      path={"/administration/memberDetails/:id"}
                       exact={true}
                       name={"Member Details"}
                       element={<MemberDetails />}

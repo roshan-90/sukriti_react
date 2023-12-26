@@ -20,7 +20,7 @@ const MemberDetails = (props) => {
   const [userStatus, setUserStatus] = useState(
     props.user.enabled ? "enabled" : "disabled"
   );
-  var userDetails = fromUserDetails(props.user);
+  var userDetails = fromUserDetails(props?.user);
   let userDetailsNameValueList = [];
 
   Object.keys(userDetails).map((item, value) => {
@@ -35,6 +35,7 @@ const MemberDetails = (props) => {
     // loadingDialog.current.showDialog();
     try {
       const result = await executeDisableUserLambda(props.user.userName);
+      console.log("result --> executeDisableUserLambda", result);
       setUserStatus("disabled");
       //   loadingDialog.current.closeDialog();
     } catch (err) {
@@ -47,6 +48,7 @@ const MemberDetails = (props) => {
     // loadingDialog.current.showDialog();
     try {
       const result = await executeEnableUserLambda(props.user.userName);
+      console.log("result --> executeEnableUserLambda", result);
       setUserStatus("enabled");
       //   loadingDialog.current.closeDialog();
     } catch (err) {
@@ -85,7 +87,7 @@ const MemberDetails = (props) => {
   useEffect(() => {
     return () => {
       console.log("_memberDetails", "_restoreProps-saved", props);
-      props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
+      // props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
     };
   }, []);
 

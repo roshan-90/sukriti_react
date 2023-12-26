@@ -1,7 +1,7 @@
-const createNameValue = (name, value, icon) => ({
+const NameValue = (name, value, icon = null) => ({
   name,
   value,
   icon,
 });
 
-export default createNameValue;
+export default NameValue;

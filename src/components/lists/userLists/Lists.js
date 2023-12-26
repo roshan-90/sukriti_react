@@ -39,7 +39,7 @@ const List = (props) => {
             <div className={"row justify-content-center"}>
               <Link
                 to={{
-                  pathname: "/administration/memberDetails",
+                  pathname: `/administration/memberDetails/${item}`,
                   data: props.data[rowIndex],
                 }}
               >

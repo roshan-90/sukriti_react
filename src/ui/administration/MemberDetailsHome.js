@@ -10,10 +10,17 @@ import {
 } from "reactstrap";
 import MemberDetails from "./MemberDetails";
 import MemberAccess from "./MemberAccess";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 const MemberDetailsHome = (props) => {
   const [activeTab, setActiveTab] = useState(new Array(2).fill("1"));
+  const { id } = useParams();
+  let data = useSelector((state) => state.adminstration.teamList);
 
+  let user_data = data.filter((data) => data.userName == id);
+
+  console.log("props", user_data[0]);
   const toggle = (tabPane, tab) => {
     const newArray = activeTab.slice();
     newArray[tabPane] = tab;
@@ -21,17 +28,16 @@ const MemberDetailsHome = (props) => {
   };
 
   const tabPane = () => {
-    if (!props.location || !props.location.data) {
-      return null; // Render nothing if data is not available
-    }
-
+    // if (!props.location || !props.location.data) {
+    //   return null; // Render nothing if data is not available
+    // }
     return (
       <>
         <TabPane tabId="2">
-          <MemberAccess user={props.location.data} history={props.history} />
+          <MemberAccess user={user_data[0]} />
         </TabPane>
         <TabPane tabId="1">
-          <MemberDetails history={props.history} user={props.location.data} />
+          <MemberDetails user={user_data[0]} />
         </TabPane>
       </>
     );

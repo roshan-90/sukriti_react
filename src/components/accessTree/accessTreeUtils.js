@@ -58,11 +58,11 @@ export function getAccessSummary(accessTree) {
     });
 
   return [
-    new NameValue("State", stateCount),
-    new NameValue("District", districtCount),
-    new NameValue("City", cityCount),
-    new NameValue("Complex", complexCount),
-    new NameValue("displayComplex", displayComplex),
+    NameValue("State", stateCount),
+    NameValue("District", districtCount),
+    NameValue("City", cityCount),
+    NameValue("Complex", complexCount),
+    NameValue("displayComplex", displayComplex),
   ];
 }
 

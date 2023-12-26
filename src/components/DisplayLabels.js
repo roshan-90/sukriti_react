@@ -1,26 +1,33 @@
 import React from "react";
 import { useState } from "react";
-import { cabinDetailsStyle } from "../jsStyles/Style"
-import Dropdown from "../components/DropDown"
+import { cabinDetailsStyle } from "../jsStyles/Style";
+import Dropdown from "../components/DropDown";
 import icSmile from "../assets/img/icons/ic_smile.png";
 import icToilet from "../assets/img/icons/ic_toilet.png";
-import { dashboardStyle, whiteCircleSurface, colorTheme, whiteSurfaceCircularBorder } from "../jsStyles/Style"
+import {
+  dashboardStyle,
+  whiteCircleSurface,
+  colorTheme,
+  whiteSurfaceCircularBorder,
+} from "../jsStyles/Style";
 
 export function NameValueList(props) {
-  var labelStyle = {}
+  var labelStyle = {};
 
-  if ('labelStyle' in props) {
-    labelStyle = props.labelStyle
+  if ("labelStyle" in props) {
+    labelStyle = props.labelStyle;
   }
 
-  if ('withPadding' in props) {
-    labelStyle = { ...labelStyle, margin: "20px" }
+  if ("withPadding" in props) {
+    labelStyle = { ...labelStyle, margin: "20px" };
   }
 
   return (
     <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
       {props.data.map((item, index) => {
-        return <NameValueLabel data={item} labelStyle={labelStyle} />
+        return (
+          <NameValueLabel key={index} data={item} labelStyle={labelStyle} />
+        );
       })}
     </div>
   );
@@ -29,10 +36,7 @@ export function NameValueList(props) {
 function NameValueLabel(props) {
   return (
     <div className="row" style={props.labelStyle}>
-
-      <div
-        className="col-md-6"
-        style={{ textAlign: "right", padding: "0" }}>
+      <div className="col-md-6" style={{ textAlign: "right", padding: "0" }}>
         {props.data.name} :
       </div>
 
@@ -41,7 +45,7 @@ function NameValueLabel(props) {
         style={{
           textAlign: "left",
           padding: "0",
-          paddingLeft: "2px"
+          paddingLeft: "2px",
         }}
       >
         <b> {props.data.value}</b>
@@ -52,20 +56,22 @@ function NameValueLabel(props) {
 
 // VENDOR
 export function NameVendorList(props) {
-  var labelStyle = {}
+  var labelStyle = {};
 
-  if ('labelStyle' in props) {
-    labelStyle = props.labelStyle
+  if ("labelStyle" in props) {
+    labelStyle = props.labelStyle;
   }
 
-  if ('withPadding' in props) {
-    labelStyle = { ...labelStyle, margin: "20px" }
+  if ("withPadding" in props) {
+    labelStyle = { ...labelStyle, margin: "20px" };
   }
 
   return (
     <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
       {props.data.map((item, index) => {
-        return <NameValueLabel2 data={item} labelStyle={labelStyle} />
+        return (
+          <NameValueLabel2 key={index} data={item} labelStyle={labelStyle} />
+        );
       })}
     </div>
   );
@@ -73,20 +79,26 @@ export function NameVendorList(props) {
 
 function NameValueLabel2(props) {
   return (
-    <div className="row" style={{ margin: "20px", display: "flex", justifyContent: "space-between", padding: "10px", border: "1px solid #4dbd74", borderRadius: "10px" }}>
-
-      <div
-        style={{ textAlign: "right", padding: "0" }}>
-        <b>
-          {props.data.name}
-        </b>
+    <div
+      className="row"
+      style={{
+        margin: "20px",
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px",
+        border: "1px solid #4dbd74",
+        borderRadius: "10px",
+      }}
+    >
+      <div style={{ textAlign: "right", padding: "0" }}>
+        <b>{props.data.name}</b>
       </div>
 
       <div
         style={{
           textAlign: "left",
           padding: "0",
-          paddingLeft: "2px"
+          paddingLeft: "2px",
         }}
       >
         {props.data.value}
@@ -99,7 +111,7 @@ export function IconNameValuelList(props) {
   return (
     <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
       {props.data.map((item, index) => {
-        return <IconNameValuelLabel data={item} />
+        return <IconNameValuelLabel data={item} />;
       })}
     </div>
   );
@@ -109,12 +121,22 @@ function IconNameValuelLabel(props) {
   return (
     <div
       className="row"
-      style={{ display: 'flex', alignItems: 'center', padding: "0", margin: '20px' }}>
-
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "0",
+        margin: "20px",
+      }}
+    >
       <div
         className="col-md-2"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: "0" }}>
-
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          padding: "0",
+        }}
+      >
         <img
           src={props.data.icon}
           alt=""
@@ -122,18 +144,16 @@ function IconNameValuelLabel(props) {
             width: "30px",
             height: "30px",
             borderRadius: "5%",
-          }} />
-
+          }}
+        />
 
         <div
           style={{
             ...cabinDetailsStyle.cabinHealth.itemTitle,
-          }}>
+          }}
+        >
           {props.data.name} :
         </div>
-
-
-
       </div>
 
       <div
@@ -142,7 +162,7 @@ function IconNameValuelLabel(props) {
           ...cabinDetailsStyle.cabinHealth.itemValue,
           textAlign: "left",
           padding: "0",
-          paddingLeft: "2px"
+          paddingLeft: "2px",
         }}
       >
         <b> {props.data.value}</b>
@@ -152,65 +172,81 @@ function IconNameValuelLabel(props) {
 }
 
 export function DropDownLabel(props) {
-
   const [paymentMode, setPaymentMode] = useState(0);
 
   return (
     <div
       className="row"
-      style={{ display: 'flex', alignItems: 'center', padding: "0", margin: '0px 0px 30px 0px' }}>
-
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "0",
+        margin: "0px 0px 30px 0px",
+      }}
+    >
       <div
         className="col-md-2"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: "0" }}>
-
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          padding: "0",
+        }}
+      >
         <div
           style={{
             ...cabinDetailsStyle.cabinHealth.itemTitle,
-            textAlign: 'end'
-          }}>
+            textAlign: "end",
+          }}
+        >
           {props.label}
         </div>
-
       </div>
 
       <div
         className="col-md-1"
         style={{
-          marginLeft: '12px'
+          marginLeft: "12px",
         }}
-      >
-
-
-      </div>
+      ></div>
       <div
         className="col-md-6"
         style={{
-          marginLeft: '8px'
+          marginLeft: "8px",
         }}
       >
         <Dropdown
           options={props.options}
           onSelection={(index, value) => {
             setPaymentMode(value);
-            props.handleUpdate(props.label, value)
-
+            props.handleUpdate(props.label, value);
           }}
         />
-
       </div>
-
     </div>
   );
 }
 
 export function NoFaultElement(props) {
   return (
-    <table style={{ background: colorTheme.primary, width: "100%", height: '190px', padding: '0px' }}>
+    <table
+      style={{
+        background: colorTheme.primary,
+        width: "100%",
+        height: "190px",
+        padding: "0px",
+      }}
+    >
       <tbody>
         <tr>
-          <td style={{ width: '30%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <td style={{ width: "30%" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <div
                 style={{
                   ...whiteCircleSurface,
@@ -218,8 +254,9 @@ export function NoFaultElement(props) {
                   float: "right",
                   padding: "10px",
                   width: "160px",
-                  height: "160px"
-                }}>
+                  height: "160px",
+                }}
+              >
                 <img
                   src={props.icon}
                   alt=""
@@ -232,39 +269,51 @@ export function NoFaultElement(props) {
               </div>
             </div>
           </td>
-          <td style={{ width: '70%' }}>
-            <div style={{ ...dashboardStyle.itemTitleLa, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <td style={{ width: "70%" }}>
+            <div
+              style={{
+                ...dashboardStyle.itemTitleLa,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               {props.title}
             </div>
           </td>
         </tr>
       </tbody>
-
     </table>
-  )
+  );
 }
 
 export function FaultHeader(props) {
   return (
     <div style={{}}>
-
-      <div style={{ ...dashboardStyle.title, float: 'left' }}>
+      <div style={{ ...dashboardStyle.title, float: "left" }}>
         {props.title}
       </div>
 
-      <div style={{ ...dashboardStyle.label, float: 'right', margin: '4px 80px 0px 10px' }}>
+      <div
+        style={{
+          ...dashboardStyle.label,
+          float: "right",
+          margin: "4px 80px 0px 10px",
+        }}
+      >
         {props.label}
       </div>
 
-      <div >
+      <div>
         <div
           style={{
             ...whiteSurfaceCircularBorder,
             float: "right",
             padding: "10px",
             width: "30px",
-            height: "30px"
-          }}>
+            height: "30px",
+          }}
+        >
           <img
             src={icToilet}
             alt=""
@@ -276,32 +325,37 @@ export function FaultHeader(props) {
           />
         </div>
       </div>
-
     </div>
-  )
+  );
 }
 
 export function NoFaultHeader(props) {
   return (
     <div style={{}}>
-
-      <div style={{ ...dashboardStyle.title, float: 'left' }}>
+      <div style={{ ...dashboardStyle.title, float: "left" }}>
         {props.title}
       </div>
 
-      <div style={{ ...dashboardStyle.label, float: 'right', margin: '4px 80px 0px 10px' }}>
+      <div
+        style={{
+          ...dashboardStyle.label,
+          float: "right",
+          margin: "4px 80px 0px 10px",
+        }}
+      >
         {props.label}
       </div>
 
-      <div >
+      <div>
         <div
           style={{
             ...whiteSurfaceCircularBorder,
             float: "right",
             padding: "10px",
             width: "30px",
-            height: "30px"
-          }}>
+            height: "30px",
+          }}
+        >
           <img
             src={icSmile}
             alt=""
@@ -313,7 +367,6 @@ export function NoFaultHeader(props) {
           />
         </div>
       </div>
-
     </div>
-  )
+  );
 }

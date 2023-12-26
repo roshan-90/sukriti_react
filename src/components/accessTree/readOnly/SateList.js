@@ -27,6 +27,7 @@ const StateList = ({ listData }) => {
   const renderRow = (item, index) => {
     return (
       <TreeItem
+        key={index}
         stateIndex={index}
         type={TreeItemType.State}
         recursiveAccess={item.recursive === 1}
@@ -39,7 +40,9 @@ const StateList = ({ listData }) => {
   };
 
   const getListComponent = (item, index) => {
-    return <DistrictList stateIndex={index} listData={item.districts} />;
+    return (
+      <DistrictList key={index} stateIndex={index} listData={item.districts} />
+    );
   };
 
   return (
@@ -55,10 +58,6 @@ const StateList = ({ listData }) => {
       })}
     </div>
   );
-};
-
-StateList.propTypes = {
-  listData: PropTypes.array,
 };
 
 export default StateList;
