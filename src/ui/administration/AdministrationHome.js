@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardBody, CardHeader, Col, Row, Button } from "reactstrap";
 import List from "../../components/lists/userLists/Lists";
 // import { removeComponentProps } from "../../store/actions/history-actions";
@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setTeamList } from "../../features/adminstrationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const AdministrationHome = (props) => {
   //   const mDataSummaryComponent = useRef();
@@ -23,6 +24,7 @@ const AdministrationHome = (props) => {
   const teamList = useSelector((state) => state.adminstration.teamList);
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   console.log("sdf-->", user?.username);
 
@@ -38,7 +40,14 @@ const AdministrationHome = (props) => {
     } catch (err) {
       //   loadingDialog.current.closeDialog();
       //   messageDialog.current.showDialog("Error Alert!", err.message);
-      console.log("error");
+      setDialogData({
+        title: "Error",
+        message: "Something went wrong",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("closse error", err);
+        },
+      });
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -141,6 +150,7 @@ const AdministrationHome = (props) => {
           />
         </div>
       )}
+      <MessageDialog data={dialogData} />
       <Row>
         <Col xs="12" sm="12" lg="12">
           <Card>

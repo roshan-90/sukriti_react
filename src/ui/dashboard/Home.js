@@ -22,6 +22,7 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import WaterLevelStatus from "./WaterLevelStatus";
 import QuickConfig from "./QuickConfig";
 import LiveStatus from "./LiveStatus";
+
 const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -34,19 +35,19 @@ const Home = () => {
   const [dialogData, setDialogData] = useState(null);
 
   useEffect(() => {
+    const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+    if (lastVisitedPage) {
+      navigate(lastVisitedPage);
+    }
+    localStorage.removeItem("lastVisitedPage");
+  }, [navigate]);
+
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
     } else {
       fetchDashboardData(15);
     }
-    setDialogData({
-      title: "Your Dialog Title",
-      message: "Your dialog message goes here.",
-      onClickAction: () => {
-        // Handle the action when the user clicks OK
-        console.log("Dialog OK clicked!");
-      },
-    });
   }, [isAuthenticated, navigate]);
 
   if (!isAuthenticated) {
@@ -67,7 +68,14 @@ const Home = () => {
       dispatch(setDashboardData(result));
       console.log("fetchDashboardData", result);
     } catch (err) {
-      console.log("fetchDashboardData Error:->", err);
+      setDialogData({
+        title: "Error",
+        message: "SomeThing Went Wrong",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("fetchDashboardData Error:->", err);
+        },
+      });
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -79,7 +87,14 @@ const Home = () => {
       console.log("fetchAndInitClientList", result);
       dispatch(setClientList(result.clientList));
     } catch (error) {
-      console.error("fetchAndInitClientList Error", error);
+      setDialogData({
+        title: "Error",
+        message: "SomeThing Went Wrong",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.error("fetchAndInitClientList Error", error);
+        },
+      });
     }
   };
 

@@ -70,17 +70,17 @@ export function fromUserDetails(mUser) {
   console.log("_fromUserDetails", mUser);
   var item = {};
   item = {
-    "User Name": mUser.userName,
-    Role: mUser.userRole,
-    Gender: mUser.gender,
-    "Client Name": mUser.clientName,
-    Organisation: mUser.organisation,
-    Email: mUser.email,
-    "Phone Number": mUser.phoneNumber,
-    "Access Defined By": mUser.assignedBy,
-    "Access Defined Date": mUser.assignedOn,
-    Created: mUser.createdOn,
-    Status: mUser.userStatus,
+    "User Name": mUser?.userName,
+    Role: mUser?.userRole,
+    Gender: mUser?.gender,
+    "Client Name": mUser?.clientName,
+    Organisation: mUser?.organisation,
+    Email: mUser?.email,
+    "Phone Number": mUser?.phoneNumber,
+    "Access Defined By": mUser?.assignedBy,
+    "Access Defined Date": mUser?.assignedOn,
+    Created: mUser?.createdOn,
+    Status: mUser?.userStatus,
   };
 
   return item;

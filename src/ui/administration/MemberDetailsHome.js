@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Col,
   Nav,
@@ -12,11 +12,54 @@ import MemberDetails from "./MemberDetails";
 import MemberAccess from "./MemberAccess";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../features/authenticationSlice";
+import { setTeamList } from "../../features/adminstrationSlice";
+import { executelistTeamLambda } from "../../awsClients/administrationLambdas";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog";
 
 const MemberDetailsHome = (props) => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(new Array(2).fill("1"));
   const { id } = useParams();
+  const user = useSelector(selectUser);
   let data = useSelector((state) => state.adminstration.teamList);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
+
+  const fetchAndInitTeam = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      var result = await executelistTeamLambda(
+        user?.username,
+        user?.credentials
+      );
+      console.log("result--->", result);
+      dispatch(setTeamList(result.teamDetails));
+    } catch (err) {
+      //   loadingDialog.current.closeDialog();
+      //   messageDialog.current.showDialog("Error Alert!", err.message);
+      setDialogData({
+        title: "Error",
+        message: "Something went wrong",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("closse error", err);
+        },
+      });
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
+
+  useEffect(() => {
+    // props.removeComponentProps(UiAdminDestinations.MemberAccess);
+    // props.removeComponentProps(UiAdminDestinations.MemberDetails);
+    fetchAndInitTeam();
+  }, []);
+
+  console.log("found data", data);
 
   let user_data = data.filter((data) => data.userName == id);
 
@@ -45,6 +88,15 @@ const MemberDetailsHome = (props) => {
 
   return (
     <div className="animated fadeIn">
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
       <Row>
         <Col xs="12" md="12">
           <Nav tabs>

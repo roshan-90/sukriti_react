@@ -49,6 +49,18 @@ const App = () => {
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
   );
 
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      localStorage.setItem("lastVisitedPage", window.location.pathname);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   if (isAuthenticated) {
     return (
       <React.Suspense fallback={loading()}>
