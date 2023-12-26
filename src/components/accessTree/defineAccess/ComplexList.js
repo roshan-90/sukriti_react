@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import TreeItem from "./TreeItem";
 import { complexFont } from "../../../jsStyles/Style";
 import TreeEdge from "../../../Entity/TreeEdge";
+import { TreeItemType } from "../../../nomenclature/nomenclature";
 
 const ComplexList = (props) => {
   const [text, setText] = useState("");

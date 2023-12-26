@@ -209,20 +209,4 @@ const GrantPermissions = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    userDetails: state.authentication.user,
-    clientList: state.administration.clientList,
-    data: state.administration.data,
-    x: 1,
-  };
-};
-
-const mapActionsToProps = {
-  addMember: addTeamMember,
-  setClientList: setClientList,
-  setUiList: setUiList,
-  setUiReset: setUiReset,
-};
-
 export default GrantPermissions;

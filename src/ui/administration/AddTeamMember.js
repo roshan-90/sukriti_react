@@ -49,8 +49,8 @@ const AddTeamMember = ({
     organisationName: "",
   });
 
-  const messageDialog = useRef();
-  const loadingDialog = useRef();
+  // const messageDialog = useRef();
+  // const loadingDialog = useRef();
   const organisationNameRef = useRef();
 
   useEffect(() => {
@@ -58,35 +58,35 @@ const AddTeamMember = ({
   }, []);
 
   const fetchAndInitClientList = async () => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       var result = await executelistClientsLambda();
       setClientList(result.clientList);
-      loadingDialog.current.closeDialog();
+      // loadingDialog.current.closeDialog();
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
   const initCreateUserRequest = async (createUserRequest) => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       var roleName = getRoleName(createUserRequest.userRole);
       var requestCopy = { ...createUserRequest, userRole: roleName };
       await executeCreateUserLambda(requestCopy, userDetails);
-      messageDialog.current.showDialog(
-        "Success",
-        "User added successfully",
-        () => {
-          // Navigate back after success
-          // this.props.history.goBack();
-        }
-      );
-      loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog(
+      //   "Success",
+      //   "User added successfully",
+      //   () => {
+      //     // Navigate back after success
+      //     // this.props.history.goBack();
+      //   }
+      // );
+      // loadingDialog.current.closeDialog();
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -120,15 +120,15 @@ const AddTeamMember = ({
 
   const onSubmit = () => {
     if (formDetails.current.userName === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please enter a valid user name."
-      );
+      // messageDialog.current.showDialog(
+      //   "Validation Error",
+      //   "Please enter a valid user name."
+      // );
     } else if (formDetails.current.tempPassword === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please enter a valid temporary password."
-      );
+      // messageDialog.current.showDialog(
+      //   "Validation Error",
+      //   "Please enter a valid temporary password."
+      // );
     } else {
       initCreateUserRequest(formDetails.current);
     }
@@ -136,8 +136,8 @@ const AddTeamMember = ({
 
   return (
     <div className="col-md-12">
-      <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} />
+      {/* <MessageDialog ref={messageDialog} />
+      <LoadingDialog ref={loadingDialog} /> */}
 
       <Container>{/* Rest of your component JSX */}</Container>
     </div>
@@ -149,11 +149,6 @@ const mapStateToProps = (state) => {
     userDetails: state.authentication.user,
     clientList: state.administration.clientList,
   };
-};
-
-const mapActionsToProps = {
-  addMember: addTeamMember,
-  setClientList: setClientList,
 };
 
 export default AddTeamMember;

@@ -4,6 +4,7 @@ import TreeItem from "./TreeItem";
 import ComplexList from "./ComplexList";
 import { cityFont } from "../../../jsStyles/Style";
 import TreeEdge from "../../../Entity/TreeEdge";
+import { TreeItemType } from "../../../nomenclature/nomenclature";
 
 const CityList = (props) => {
   const [text, setText] = useState("");

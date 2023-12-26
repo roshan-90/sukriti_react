@@ -18,7 +18,7 @@ import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 
 const MemberDetails = (props) => {
   const [userStatus, setUserStatus] = useState(
-    props.user.enabled ? "enabled" : "disabled"
+    props?.user?.enabled ? "enabled" : "disabled"
   );
   var userDetails = fromUserDetails(props?.user);
   let userDetailsNameValueList = [];
