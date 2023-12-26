@@ -1,5 +1,5 @@
 // App.js
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, lazy } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -20,6 +20,14 @@ import DefaultFooter from "./components/DefaultFooter";
 import Home from "./ui/dashboard/Home";
 import AdministrationHome from "./ui/administration/AdministrationHome";
 import MemberDetails from "./ui/administration/MemberDetailsHome";
+
+const DefineMemberAccess = lazy(() =>
+  import("./ui/administration/DefineMemberAccess")
+);
+const AddTeamMember = lazy(() => import("./ui/administration/AddTeamMember"));
+const GrantPermissions = lazy(() =>
+  import("./ui/administration/GrantPermissions")
+);
 
 const App = () => {
   const dispatch = useDispatch();
@@ -73,6 +81,24 @@ const App = () => {
                       exact={true}
                       name={"Member Details"}
                       element={<MemberDetails />}
+                    />
+                    <Route
+                      path={"/administration/addTeamMember"}
+                      exact={true}
+                      name={"Add Team Member"}
+                      element={<AddTeamMember />}
+                    />
+                    <Route
+                      path={"/administration/grantPermissions"}
+                      exact={true}
+                      name={"Grant Permissions"}
+                      element={<GrantPermissions />}
+                    />
+                    <Route
+                      path={"/administration/defineAccess"}
+                      exact={true}
+                      name={"Define Access"}
+                      element={<DefineMemberAccess />}
                     />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
