@@ -40,14 +40,26 @@ const MemberDetailsHome = (props) => {
     } catch (err) {
       //   loadingDialog.current.closeDialog();
       //   messageDialog.current.showDialog("Error Alert!", err.message);
-      setDialogData({
-        title: "Error",
-        message: "Something went wrong",
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log("closse error", err);
-        },
-      });
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
