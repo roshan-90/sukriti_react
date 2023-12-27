@@ -1,4 +1,4 @@
-import React, { useEffect, forwardRef } from "react";
+import React, { useEffect, useImperativeHandle } from "react";
 // import { connect } from "react-redux";
 // import { pushComplexComposition, updateSelectedCabin } from "../../store/actions/complex-actions";
 import { Button } from "reactstrap";
@@ -14,18 +14,23 @@ import {
 } from "../../jsStyles/Style";
 import icToilet from "../../assets/img/icons/ic_toilet.png";
 import "./ComplexComposition.css";
+import { selectUser } from "../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const ComplexComposition = (props, ref) => {
+const ComplexComposition = React.forwardRef((props, ref) => {
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   console.log("complex composition -->", props);
   const fetchComplexComposition = async () => {
     // loadingDialog.current.showDialog();
     try {
       const result = await executeGetComplexCompositionLambda(
-        props.complex.name,
-        props.credentials
+        user?.username,
+        user?.credentials
       );
+      console.log("complex postion lamda", result);
       props.pushComplexComposition(props.hierarchy, props.complex, result);
       // loadingDialog.current.closeDialog();
     } catch (err) {
@@ -41,6 +46,15 @@ const ComplexComposition = (props, ref) => {
     )
       fetchComplexComposition();
   }, [props.complex]);
+
+  React.useImperativeHandle(ref, () => ({
+    Cabin,
+    cabinPayload,
+    complex,
+    complexStore,
+    hierarchy,
+    updatedCabinPayload,
+  }));
 
   const ComponentSelector = () => {
     const complex = props.complexStore[props.complex.name];
@@ -274,6 +288,6 @@ const ComplexComposition = (props, ref) => {
       <ComponentSelector />
     </div>
   );
-};
+});
 
-export default forwardRef(ComplexComposition);
+export default ComplexComposition;
