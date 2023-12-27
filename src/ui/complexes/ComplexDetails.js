@@ -6,8 +6,8 @@ import React, {
   lazy,
   useCallback,
 } from "react";
-import { connect } from "react-redux";
-import { mqtt5, auth, iot } from "aws-iot-device-sdk-v2";
+// import { connect } from "react-redux";
+// import { mqtt5, auth, iot } from "aws-iot-device-sdk-v2";
 import {
   AWS_REGION,
   IDENTITY_POOL_ID,
@@ -17,21 +17,20 @@ import {
   AWS_IOT_PASSWORD,
 } from "../../lib/environment";
 import ComplexComposition from "./ComplexComposition";
-import ComplexNavigationCompact from "./utils/ComplexNavigationCompact";
+import ComplexNavigationCompact from "./ComplexNavigationCompact";
 import CabinDetails from "./CabinDetails";
 // import MessageDialog from "../../dialogs/MessageDialog";
 // import { savePayload } from "../../store/actions/complex-actions";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
 import AWS from "aws-sdk";
-import * as mqtt from "mqtt";
-import Mqtt5 from "./Mqtt";
+// import * as mqtt from "mqtt";
 
-const LazyMqtt = lazy(() => import("./Mqtt"));
+// const LazyMqtt = lazy(() => import("./Mqtt"));
 
 function ComplexDetails(props) {
   const complexComposition = useRef();
-  const messageDialog = useRef();
+  // const messageDialog = useRef();
 
   // const [messages, setMessages] = useState([]);
 
@@ -137,10 +136,10 @@ function ComplexDetails(props) {
   return (
     <ErrorBoundary>
       <div className="animated fadeIn" style={{ padding: "10px" }}>
-        <Mqtt5 />
+        {/* <Mqtt5 /> */}
         <div className="row">
           <div className="col-md-2" style={{}}>
-            <MessageDialog ref={messageDialog} />
+            {/* <MessageDialog ref={messageDialog} /> */}
             <ErrorBoundary>
               <ComplexNavigationCompact />
             </ErrorBoundary>

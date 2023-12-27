@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, forwardRef } from "react";
 // import { connect } from "react-redux";
 // import { pushComplexComposition, updateSelectedCabin } from "../../store/actions/complex-actions";
 import { Button } from "reactstrap";
@@ -15,22 +15,22 @@ import {
 import icToilet from "../../assets/img/icons/ic_toilet.png";
 import "./ComplexComposition.css";
 
-const ComplexComposition = (props) => {
-  const messageDialog = useRef();
-  const loadingDialog = useRef();
-
+const ComplexComposition = (props, ref) => {
+  // const messageDialog = useRef();
+  // const loadingDialog = useRef();
+  console.log("complex composition -->", props);
   const fetchComplexComposition = async () => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       const result = await executeGetComplexCompositionLambda(
         props.complex.name,
         props.credentials
       );
       props.pushComplexComposition(props.hierarchy, props.complex, result);
-      loadingDialog.current.closeDialog();
+      // loadingDialog.current.closeDialog();
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -269,11 +269,11 @@ const ComplexComposition = (props) => {
       className="row"
       style={{ marginTop: "10px", background: "white", padding: "5px" }}
     >
-      <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} />
+      {/* <MessageDialog ref={messageDialog} />
+      <LoadingDialog ref={loadingDialog} /> */}
       <ComponentSelector />
     </div>
   );
 };
 
-export default ComplexComposition;
+export default forwardRef(ComplexComposition);

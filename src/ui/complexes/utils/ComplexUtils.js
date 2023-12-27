@@ -10,45 +10,41 @@ export function getCabinHealthData(rawData) {
   if (rawData.uiResult.air_dryer_health === "true") {
     var value = rawData.cabinHealth.data["airDryerHealth"];
     healthList.push(
-      new NameValue("Air Dryer", getStatusName(value), getStatusIcon(value))
+      NameValue("Air Dryer", getStatusName(value), getStatusIcon(value))
     );
   }
   if (rawData.uiResult.choke_health === "true") {
     value = rawData.cabinHealth.data["chokeHealth"];
     healthList.push(
-      new NameValue("Choke", getStatusName(value), getStatusIcon(value))
+      NameValue("Choke", getStatusName(value), getStatusIcon(value))
     );
   }
   if (rawData.uiResult.tap_health === "true") {
     value = rawData.cabinHealth.data["tapHealth"];
     healthList.push(
-      new NameValue("Tap", getStatusName(value), getStatusIcon(value))
+      NameValue("Tap", getStatusName(value), getStatusIcon(value))
     );
   }
   value = rawData.cabinHealth.data["fanHealth"];
-  healthList.push(
-    new NameValue("Fan", getStatusName(value), getStatusIcon(value))
-  );
+  healthList.push(NameValue("Fan", getStatusName(value), getStatusIcon(value)));
   value = rawData.cabinHealth.data["floorCleanHealth"];
   healthList.push(
-    new NameValue("Floor Clean", getStatusName(value), getStatusIcon(value))
+    NameValue("Floor Clean", getStatusName(value), getStatusIcon(value))
   );
   value = rawData.cabinHealth.data["flushHealth"];
   healthList.push(
-    new NameValue("Flush", getStatusName(value), getStatusIcon(value))
+    NameValue("Flush", getStatusName(value), getStatusIcon(value))
   );
   value = rawData.cabinHealth.data["lightHealth"];
   healthList.push(
-    new NameValue("Light", getStatusName(value), getStatusIcon(value))
+    NameValue("Light", getStatusName(value), getStatusIcon(value))
   );
   value = rawData.cabinHealth.data["lockHealth"];
   healthList.push(
-    new NameValue("Lock", getStatusName(value), getStatusIcon(value))
+    NameValue("Lock", getStatusName(value), getStatusIcon(value))
   );
   value = rawData.cabinHealth.data["odsHealth"];
-  healthList.push(
-    new NameValue("ODS", getStatusName(value), getStatusIcon(value))
-  );
+  healthList.push(NameValue("ODS", getStatusName(value), getStatusIcon(value)));
 
   return healthList;
 }
@@ -77,45 +73,45 @@ function getStatusName(status) {
 
 export function getUcemsConfigData(rawData) {
   var value = rawData["Entrychargeamount"];
-  var entryCharge = new NameValue("Entry Charge", value);
+  var entryCharge = NameValue("Entry Charge", value);
   value = rawData["Cabinpaymentmode"];
-  var paymentMode = new NameValue("Payment Mode", value);
+  var paymentMode = NameValue("Payment Mode", value);
 
   var criticalityConfig = [];
   value = rawData["Edis_airDryr"];
-  criticalityConfig.push(new NameValue("Air Dryer", value));
+  criticalityConfig.push(NameValue("Air Dryer", value));
   value = rawData["Edis_choke"];
-  criticalityConfig.push(new NameValue("Choke", value));
+  criticalityConfig.push(NameValue("Choke", value));
   value = rawData["Edis_cms"];
-  criticalityConfig.push(new NameValue("CMS", value));
+  criticalityConfig.push(NameValue("CMS", value));
   value = rawData["Edis_fan"];
-  criticalityConfig.push(new NameValue("Fan", value));
+  criticalityConfig.push(NameValue("Fan", value));
   value = rawData["Edis_floor"];
-  criticalityConfig.push(new NameValue("Floor", value));
+  criticalityConfig.push(NameValue("Floor", value));
   value = rawData["Edis_flush"];
-  criticalityConfig.push(new NameValue("Flush", value));
+  criticalityConfig.push(NameValue("Flush", value));
   value = rawData["Edis_freshWtr"];
-  criticalityConfig.push(new NameValue("Fresh Water", value));
+  criticalityConfig.push(NameValue("Fresh Water", value));
   value = rawData["Edis_recWtr"];
-  criticalityConfig.push(new NameValue("Recycled Water", value));
+  criticalityConfig.push(NameValue("Recycled Water", value));
   value = rawData["Edis_light"];
-  criticalityConfig.push(new NameValue("Light", value));
+  criticalityConfig.push(NameValue("Light", value));
   value = rawData["Edis_lock"];
-  criticalityConfig.push(new NameValue("Lock", value));
+  criticalityConfig.push(NameValue("Lock", value));
   value = rawData["Edis_ods"];
-  criticalityConfig.push(new NameValue("ODS", value));
+  criticalityConfig.push(NameValue("ODS", value));
   value = rawData["Edis_tap"];
-  criticalityConfig.push(new NameValue("Tap", value));
+  criticalityConfig.push(NameValue("Tap", value));
 
   var timerConfig = [];
   value = rawData["Exitdoortriggertimer"];
-  timerConfig.push(new NameValue("Exit Door Trigger Timmer", value));
+  timerConfig.push(NameValue("Exit Door Trigger Timmer", value));
   value = rawData["Feedbackexpirytime"];
-  timerConfig.push(new NameValue("Feedback Expiry Time", value));
+  timerConfig.push(NameValue("Feedback Expiry Time", value));
   value = rawData["Occwaitexpirytime"];
-  timerConfig.push(new NameValue("Occ Wait Expiry Time", value));
+  timerConfig.push(NameValue("Occ Wait Expiry Time", value));
   value = rawData["Collexpirytime"];
-  timerConfig.push(new NameValue("Collect Expiry Time", value));
+  timerConfig.push(NameValue("Collect Expiry Time", value));
 
   var data = {
     entryCharge: entryCharge,
@@ -190,50 +186,50 @@ export function getPublishMetaCommanddata(commandName, complex, cabin, user) {
 export function getCmsConfigData(rawData) {
   var airDryerConfig = [];
   var value = rawData["Airdryerautoontimer"];
-  airDryerConfig.push(new NameValue("Air Dryer Auto On Timer", value));
+  airDryerConfig.push(NameValue("Air Dryer Auto On Timer", value));
   value = rawData["Airdryerdurationtimer"];
-  airDryerConfig.push(new NameValue("Air Dryer Duration Timer", value));
+  airDryerConfig.push(NameValue("Air Dryer Duration Timer", value));
 
   var enabledConfig = [];
   value = rawData["Autoairdryerenabled"];
-  enabledConfig.push(new NameValue("Auto Air Dryer Enabled", value));
+  enabledConfig.push(NameValue("Auto Air Dryer Enabled", value));
   value = rawData["Autofanenabled"];
-  enabledConfig.push(new NameValue("Auto Fan Enabled", value));
+  enabledConfig.push(NameValue("Auto Fan Enabled", value));
   value = rawData["Autofloorenabled"];
-  enabledConfig.push(new NameValue("Auto Floor Enabled", value));
+  enabledConfig.push(NameValue("Auto Floor Enabled", value));
   value = rawData["Autofullflushenabled"];
-  enabledConfig.push(new NameValue("Auto Full Flush Enabled", value));
+  enabledConfig.push(NameValue("Auto Full Flush Enabled", value));
   value = rawData["Autolightenabled"];
-  enabledConfig.push(new NameValue("Auto Light Enabled", value));
+  enabledConfig.push(NameValue("Auto Light Enabled", value));
   value = rawData["Autominiflushenabled"];
-  enabledConfig.push(new NameValue("Auto Mini Flush Enabled", value));
+  enabledConfig.push(NameValue("Auto Mini Flush Enabled", value));
   value = rawData["Autopreflush"];
-  enabledConfig.push(new NameValue("Auto Pre Flush Enabled", value));
+  enabledConfig.push(NameValue("Auto Pre Flush Enabled", value));
 
   var timerConfig = [];
   value = rawData["Exitafterawaytimer"];
-  timerConfig.push(new NameValue("Exit After Away Time", value));
+  timerConfig.push(NameValue("Exit After Away Time", value));
   value = rawData["Fanautoofftimer"];
-  timerConfig.push(new NameValue("Fan Auto Off Time", value));
+  timerConfig.push(NameValue("Fan Auto Off Time", value));
   value = rawData["Fanautoofftimer"];
-  timerConfig.push(new NameValue("Fan Auto On Time", value));
+  timerConfig.push(NameValue("Fan Auto On Time", value));
   value = rawData["Floorcleandurationtimer"];
-  timerConfig.push(new NameValue("Floor Clean Duration", value));
+  timerConfig.push(NameValue("Floor Clean Duration", value));
   value = rawData["fullflushactivationtimer"];
-  timerConfig.push(new NameValue("Full Flush Activation Timer", value));
+  timerConfig.push(NameValue("Full Flush Activation Timer", value));
   value = rawData["fullflushdurationtimer"];
-  timerConfig.push(new NameValue("Full Flush Duration Timer", value));
+  timerConfig.push(NameValue("Full Flush Duration Timer", value));
   value = rawData["Lightautoofftime"];
-  timerConfig.push(new NameValue("Light Auto Off Timer", value));
+  timerConfig.push(NameValue("Light Auto Off Timer", value));
   value = rawData["Lightautoontimer"];
-  timerConfig.push(new NameValue("Light Auto On Timer", value));
+  timerConfig.push(NameValue("Light Auto On Timer", value));
   value = rawData["Miniflushactivationtimer"];
-  timerConfig.push(new NameValue("Mini Flush Activation Timer", value));
+  timerConfig.push(NameValue("Mini Flush Activation Timer", value));
   value = rawData["Miniflushdurationtimer"];
-  timerConfig.push(new NameValue("Mini Flush Duration Timer", value));
+  timerConfig.push(NameValue("Mini Flush Duration Timer", value));
 
   value = rawData["Floorcleancount"];
-  var floorCleanCount = new NameValue("Floor Clean Count", value);
+  var floorCleanCount = NameValue("Floor Clean Count", value);
 
   return {
     airDryerConfig: airDryerConfig,
@@ -285,13 +281,13 @@ export function getOdsConfigData(rawData) {
   // console.log('_odsConfig', 'odsConfig')
   var odsConfig = [];
   var value = rawData["Ambientfloorfactor"];
-  odsConfig.push(new NameValue("Ambient Floor Factor", value));
+  odsConfig.push(NameValue("Ambient Floor Factor", value));
   value = rawData["Ambientseatfactor"];
-  odsConfig.push(new NameValue("Ambient Seat Factor", value));
+  odsConfig.push(NameValue("Ambient Seat Factor", value));
   value = rawData["Seatfloorratio"];
-  odsConfig.push(new NameValue("Seat Floor Ratio", value));
+  odsConfig.push(NameValue("Seat Floor Ratio", value));
   value = rawData["Seatthreshold"];
-  odsConfig.push(new NameValue("Seat Threshold", value));
+  odsConfig.push(NameValue("Seat Threshold", value));
 
   // console.log('_odsConfig', odsConfig)
   return { odsConfig: odsConfig };
@@ -510,20 +506,20 @@ export function getTopicName(type, complex, cabin, complexHierarchy) {
 
 export function getCommand(commandName) {
   var commandList = [];
-  commandList.push(new NameValue("Light", 0, 1));
-  commandList.push(new NameValue("Fan", 0, 2));
-  commandList.push(new NameValue("Flush", 0, 3));
-  commandList.push(new NameValue("Floor Clean", 0, 4));
-  commandList.push(new NameValue("Air Dryer", 0, 5));
-  commandList.push(new NameValue("CMS Reset", 1, 6));
-  commandList.push(new NameValue("CMS Clear Fault", 1, 7));
-  commandList.push(new NameValue("Door Lock", 0, 8));
-  commandList.push(new NameValue("Play Exit Audio", 0, 9));
-  commandList.push(new NameValue("Play Cabin Audio", 0, 10));
-  commandList.push(new NameValue("UCEMS Reset", 1, 11));
-  commandList.push(new NameValue("UCEMS Clear Fault", 1, 12));
-  commandList.push(new NameValue("ODS Reset", 1, 13));
-  commandList.push(new NameValue("ODS Stat Reset", 1, 14));
+  commandList.push(NameValue("Light", 0, 1));
+  commandList.push(NameValue("Fan", 0, 2));
+  commandList.push(NameValue("Flush", 0, 3));
+  commandList.push(NameValue("Floor Clean", 0, 4));
+  commandList.push(NameValue("Air Dryer", 0, 5));
+  commandList.push(NameValue("CMS Reset", 1, 6));
+  commandList.push(NameValue("CMS Clear Fault", 1, 7));
+  commandList.push(NameValue("Door Lock", 0, 8));
+  commandList.push(NameValue("Play Exit Audio", 0, 9));
+  commandList.push(NameValue("Play Cabin Audio", 0, 10));
+  commandList.push(NameValue("UCEMS Reset", 1, 11));
+  commandList.push(NameValue("UCEMS Clear Fault", 1, 12));
+  commandList.push(NameValue("ODS Reset", 1, 13));
+  commandList.push(NameValue("ODS Stat Reset", 1, 14));
 
   var commanad = {};
   for (var i = 0; i < commandList.length; i++) {

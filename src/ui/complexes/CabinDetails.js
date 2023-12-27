@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, forwardRef } from "react";
 // import { connect } from "react-redux";
 import UCEMSConfig from "./cabinActions/UCEMSConfig";
 import CMSConfig from "./cabinActions/CMSConfig";
@@ -30,7 +30,7 @@ import {
   executeGetBWTComplexCompositionLambda,
 } from "../../awsClients/complexLambdas";
 
-const CabinDetails = (props) => {
+const CabinDetails = (props, ref) => {
   const [cabinDetails, setCabinDetails] = useState();
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
@@ -49,13 +49,13 @@ const CabinDetails = (props) => {
       currentCabinThingName !== props.cabin.thingName
     ) {
       currentCabinThingName = props.cabin.thingName;
-      loadingDialog.current.showDialog();
+      // loadingDialog.current.showDialog();
       fetchCabinDetails();
     }
   }, [props.cabin, currentCabinThingName]);
 
   const fetchCabinDetails = async () => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     let thingGroupName = props.cabin.thingName;
     try {
       if (thingGroupName.includes("BWT")) {
@@ -64,7 +64,7 @@ const CabinDetails = (props) => {
           props.credentials,
           props.user.clientName
         );
-        loadingDialog.current.closeDialog();
+        // loadingDialog.current.closeDialog();
         setCabinDetails(result);
       } else {
         var result = await executeGetCabinDetailsLambda(
@@ -72,13 +72,13 @@ const CabinDetails = (props) => {
           props.credentials,
           props.user.clientName
         );
-        loadingDialog.current.closeDialog();
+        // loadingDialog.current.closeDialog();
         setCabinDetails(result);
       }
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -97,7 +97,7 @@ const CabinDetails = (props) => {
             uiResult={cabinDetails.uiResult.data}
           />
           <BWTCabinCommandsContainer
-            loadingDialog={loadingDialog}
+            // loadingDialog={loadingDialog}
             bwtConfig={bwtConfig}
             bwtCommands={bwtCommands}
             cabinDetails={cabinDetails}
@@ -136,7 +136,7 @@ const CabinDetails = (props) => {
             uiResult={cabinDetails.uiResult.data}
           />
           <CabinCommandsContainer
-            loadingDialog={loadingDialog}
+            // loadingDialog={loadingDialog}
             ucemsConfig={ucemsConfig}
             cmsConfig={cmsConfig}
             odsConfig={odsConfig}
@@ -168,48 +168,48 @@ const CabinDetails = (props) => {
       <LoadingDialog ref={loadingDialog} /> */}
       <UCEMSConfig
         ref={ucemsConfig}
-        loadingDialog={loadingDialog}
-        messageDialog={messageDialog}
+        // loadingDialog={loadingDialog}
+        // messageDialog={messageDialog}
         complex={props.complex}
         cabin={props.cabin}
         user={props.user}
       />
       <CMSConfig
         ref={cmsConfig}
-        loadingDialog={loadingDialog}
-        messageDialog={messageDialog}
+        // loadingDialog={loadingDialog}
+        // messageDialog={messageDialog}
         complex={props.complex}
         cabin={props.cabin}
         user={props.user}
       />
       <ODSConfig
         ref={odsConfig}
-        loadingDialog={loadingDialog}
-        messageDialog={messageDialog}
+        // loadingDialog={loadingDialog}
+        // messageDialog={messageDialog}
         complex={props.complex}
         cabin={props.cabin}
         user={props.user}
       />
       <BWTConfig
         ref={bwtConfig}
-        loadingDialog={loadingDialog}
-        messageDialog={messageDialog}
+        // loadingDialog={loadingDialog}
+        // messageDialog={messageDialog}
         complex={props.complex}
         cabin={props.cabin}
         user={props.user}
       />
       <CabinCommands
         ref={cabinCommands}
-        loadingDialog={loadingDialog}
-        messageDialog={messageDialog}
+        // loadingDialog={loadingDialog}
+        // messageDialog={messageDialog}
         complex={props.complex}
         cabin={props.cabin}
         user={props.user}
       />
       <BwtCommands
         ref={bwtCommands}
-        loadingDialog={loadingDialog}
-        messageDialog={messageDialog}
+        // loadingDialog={loadingDialog}
+        // messageDialog={messageDialog}
         complex={props.complex}
         cabin={props.cabin}
         user={props.user}
@@ -219,4 +219,4 @@ const CabinDetails = (props) => {
   );
 };
 
-export default CabinDetails;
+export default forwardRef(CabinDetails);

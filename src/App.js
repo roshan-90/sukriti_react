@@ -28,6 +28,10 @@ const AddTeamMember = lazy(() => import("./ui/administration/AddTeamMember"));
 const GrantPermissions = lazy(() =>
   import("./ui/administration/GrantPermissions")
 );
+const ComplexNavigation = lazy(() =>
+  import("./ui/complexes/ComplexNavigation")
+);
+const ComplexDetails = lazy(() => import("./ui/complexes/ComplexDetails"));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -81,6 +85,18 @@ const App = () => {
                       name={"Dashboard"}
                       exact={true}
                       element={<Home />}
+                    />
+                    <Route
+                      path="/complex/complexTree"
+                      exact={true}
+                      name={"Complex Tree"}
+                      element={<ComplexNavigation />}
+                    />
+                    <Route
+                      path="/complex/details"
+                      exact={true}
+                      name={"Complex Details"}
+                      element={<ComplexDetails />}
                     />
                     <Route
                       path={"/administration"}

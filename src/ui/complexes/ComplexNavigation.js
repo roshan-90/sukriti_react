@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { connect } from "react-redux";
-import { setOwnAccessTree } from "../../store/actions/authentication";
+// import { setOwnAccessTree } from "../../store/actions/authentication";
 import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
-import MessageDialog from "../../dialogs/MessageDialog";
-import LoadingDialog from "../../dialogs/LoadingDialog";
+// import MessageDialog from "../../dialogs/MessageDialog";
+// import LoadingDialog from "../../dialogs/LoadingDialog";
 import RxAccessSummary from "../../components/RxAccessSummary";
 import StateList from "../../components/accessTree/complexNav/SateList";
 import NoDataComponent from "../../components/NoDataComponent";
@@ -14,8 +14,8 @@ import {
 } from "../../components/accessTree/accessTreeUtils";
 
 const ComplexNavigation = (props) => {
-  const messageDialog = useRef();
-  const loadingDialog = useRef();
+  // const messageDialog = useRef();
+  // const loadingDialog = useRef();
   const selectionSummary = useRef();
   const stateList = useRef();
 
@@ -44,18 +44,18 @@ const ComplexNavigation = (props) => {
   };
 
   const initFetchCompletedUserAccessTreeAction = async () => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       const result = await executeFetchCompletedUserAccessTree(
         props.user.userName,
         props.credentials
       );
       props.setOwnAccessTree(result);
-      loadingDialog.current.closeDialog();
+      // loadingDialog.current.closeDialog();
     } catch (err) {
       console.log("_err", err);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -66,8 +66,8 @@ const ComplexNavigation = (props) => {
         padding: "10px",
       }}
     >
-      <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} />
+      {/* <MessageDialog ref={messageDialog} />
+      <LoadingDialog ref={loadingDialog} /> */}
 
       <Row>
         <Col xs="12" sm="12" lg="12">
