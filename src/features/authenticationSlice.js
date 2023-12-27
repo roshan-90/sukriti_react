@@ -26,6 +26,9 @@ const authSlice = createSlice({
       console.log("User set in Redux:", action.payload);
       state.user = action.payload;
     },
+    setAccessTree: (state, action) => {
+      state.accessTree = action.payload;
+    },
     clearUser: (state) => {
       state.username = null;
       state.credentials = null;

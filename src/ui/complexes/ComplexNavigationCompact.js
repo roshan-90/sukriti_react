@@ -15,12 +15,15 @@ import {
   getAccessSummary,
   getComplexHierarchy,
 } from "../../components/accessTree/accessTreeUtils";
+import { useDispatch, useSelector } from "react-redux";
+import { setAccessTree } from "../../features/authenticationSlice";
 
 const ComplexNavigationCompact = (props) => {
   //   const messageDialog = useRef();
   //   const loadingDialog = useRef();
   const selectionSummary = useRef();
   const stateList = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (props.accessTree == undefined) {

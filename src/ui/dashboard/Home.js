@@ -22,6 +22,7 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import WaterLevelStatus from "./WaterLevelStatus";
 import QuickConfig from "./QuickConfig";
 import LiveStatus from "./LiveStatus";
+import { clearUser } from "../../features/authenticationSlice";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -107,6 +108,8 @@ const Home = () => {
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log("fetchDashboardData Error:->", err);
+            window.location.reload();
+            dispatch(clearUser());
           },
         });
       } else {
@@ -116,6 +119,8 @@ const Home = () => {
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.error("fetchAndInitClientList Error", err);
+            window.location.reload();
+            dispatch(clearUser());
           },
         });
       }
