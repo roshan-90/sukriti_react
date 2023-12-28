@@ -5,6 +5,8 @@ import {
   complexSelectedCircleSurface,
 } from "../../../jsStyles/Style";
 import { Col, Row, Label, Input, Button } from "reactstrap";
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
 
 export function ExpandedRowRoot(props) {
   return (
@@ -19,7 +21,7 @@ export function ExpandedRowRoot(props) {
         }}
         onClick={() => props.treeRowProps.handleToggle()}
       >
-        <i class="fa fa-minus-square"></i>
+        <IndeterminateCheckBoxIcon />
       </div>
 
       <div className="col-md-8" style={props.treeRowProps.displayDataStyle}>
@@ -44,7 +46,7 @@ export function CollapsedRowRoot(props) {
         }}
         onClick={() => props.treeRowProps.handleToggle()}
       >
-        <i class="fa fa-plus-square"></i>
+        <AddBoxIcon />
       </div>
 
       <div className="col-md-8" style={props.treeRowProps.displayDataStyle}>
@@ -67,7 +69,7 @@ export function ExpandedRow(props) {
         }}
         onClick={() => props.treeRowProps.handleToggle()}
       >
-        <i class="fa fa-minus-square"></i>
+        <IndeterminateCheckBoxIcon />
       </div>
 
       <div className="col-md-8" style={props.treeRowProps.displayDataStyle}>
@@ -92,7 +94,7 @@ export function CollapsedRow(props) {
         }}
         onClick={() => props.treeRowProps.handleToggle()}
       >
-        <i class="fa fa-plus-square"></i>
+        <AddBoxIcon />
       </div>
 
       <div className="col-md-8" style={props.treeRowProps.displayDataStyle}>

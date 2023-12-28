@@ -16,7 +16,12 @@ import {
   getComplexHierarchy,
 } from "../../components/accessTree/accessTreeUtils";
 import { useDispatch, useSelector } from "react-redux";
-import { setAccessTree } from "../../features/authenticationSlice";
+import {
+  setAccessTree,
+  selectUser,
+  authState,
+} from "../../features/authenticationSlice";
+import { updateSelectedComplex } from "../../features/complesStoreSlice";
 
 const ComplexNavigationCompact = (props) => {
   //   const messageDialog = useRef();
@@ -24,12 +29,33 @@ const ComplexNavigationCompact = (props) => {
   const selectionSummary = useRef();
   const stateList = useRef();
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const authStated = useSelector(authState);
 
-  useEffect(() => {
-    if (props.accessTree == undefined) {
-      initFetchCompletedUserAccessTreeAction();
+  const initFetchCompletedUserAccessTreeAction = async () => {
+    try {
+      const result = await executeFetchCompletedUserAccessTree(
+        user?.username,
+        user?.credentials
+      );
+      console.log("complexNavigationCompact-->", result);
+      dispatch(setAccessTree(result));
+    } catch (err) {
+      console.log("_defineAccess", "_err", err);
     }
-  }, [props.accessTree]);
+  };
+
+  console.log("auth state ---", authStated?.accessTree);
+  if (authStated?.accessTree == undefined) {
+    initFetchCompletedUserAccessTreeAction();
+  }
+
+  // useEffect(() => {
+  //   if (!authStated?.accessTree) {
+  //     initFetchCompletedUserAccessTreeAction();
+  //   }
+  //   console.log("complexNavigationcompact--2");
+  // }, []);
 
   const handleComplexSelection = (treeEdge) => {
     const stateIndex = treeEdge.stateIndex;
@@ -38,33 +64,21 @@ const ComplexNavigationCompact = (props) => {
     const complexIndex = treeEdge.complexIndex;
 
     const complex =
-      props.accessTree.country.states[stateIndex].districts[districtIndex]
+      authStated?.accessTree.country.states[stateIndex].districts[districtIndex]
         .cities[cityIndex].complexes[complexIndex];
 
-    const hierarchy = getComplexHierarchy(props.accessTree, treeEdge);
-    props.updateSelectedComplex(complex, hierarchy);
-  };
-
-  const initFetchCompletedUserAccessTreeAction = async () => {
-    try {
-      const result = await executeFetchCompletedUserAccessTree(
-        props.user.userName,
-        props.credentials
-      );
-      props.setOwnAccessTree(result);
-    } catch (err) {
-      console.log("_defineAccess", "_err", err);
-    }
+    const hierarchy = getComplexHierarchy(authStated?.accessTree, treeEdge);
+    dispatch(updateSelectedComplex(complex, hierarchy));
   };
 
   const ComponentSelector = () => {
-    if (props.accessTree == undefined) {
+    if (authStated?.accessTree == undefined) {
       return <NoDataComponent />;
     } else {
       return (
         <StateList
           ref={stateList}
-          listData={props.accessTree}
+          listData={authStated?.accessTree}
           handleComplexSelection={handleComplexSelection}
         />
       );

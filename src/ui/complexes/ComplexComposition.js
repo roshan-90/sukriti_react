@@ -1,6 +1,4 @@
 import React, { useEffect, useImperativeHandle } from "react";
-// import { connect } from "react-redux";
-// import { pushComplexComposition, updateSelectedCabin } from "../../store/actions/complex-actions";
 import { Button } from "reactstrap";
 // import MessageDialog from "../../dialogs/MessageDialog";
 // import LoadingDialog from "../../dialogs/LoadingDialog";
@@ -16,12 +14,18 @@ import icToilet from "../../assets/img/icons/ic_toilet.png";
 import "./ComplexComposition.css";
 import { selectUser } from "../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  setPushComplexPosition,
+  updateSelectedCabin,
+  complexStore,
+} from "../../features/complesStoreSlice";
 
 const ComplexComposition = React.forwardRef((props, ref) => {
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const complex_store = useSelector(complexStore);
   console.log("complex composition -->", props);
   const fetchComplexComposition = async () => {
     // loadingDialog.current.showDialog();
@@ -31,7 +35,13 @@ const ComplexComposition = React.forwardRef((props, ref) => {
         user?.credentials
       );
       console.log("complex postion lamda", result);
-      props.pushComplexComposition(props.hierarchy, props.complex, result);
+      dispatch(
+        setPushComplexPosition(
+          complex_store?.hierarchy,
+          complex_store.complex,
+          result
+        )
+      );
       // loadingDialog.current.closeDialog();
     } catch (err) {
       // loadingDialog.current.closeDialog();
@@ -40,24 +50,30 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   useEffect(() => {
+    console.log("complex-compostion--->");
     if (
-      props.complex !== undefined &&
-      props.complexStore[props.complex.name] == undefined
+      complex_store.complex !== undefined &&
+      complex_store.complexStore[complex_store.complex?.name] == undefined
     )
-      fetchComplexComposition();
-  }, [props.complex]);
+      console.log("complex-compostion--->");
+    fetchComplexComposition();
+  }, [complex_store.complex]);
 
-  React.useImperativeHandle(ref, () => ({
-    Cabin,
-    cabinPayload,
-    complex,
-    complexStore,
-    hierarchy,
-    updatedCabinPayload,
-  }));
+  // React.useImperativeHandle(ref, () => ({
+  //   Cabin,
+  //   cabinPayload,
+  //   complex,
+  //   complexStore,
+  //   hierarchy,
+  //   updatedCabinPayload,
+  // }));
 
+  if(!complex_store.complexStore) {
+    return null;
+  }
   const ComponentSelector = () => {
-    const complex = props.complexStore[props.complex.name];
+    const complex =
+      complex_store?.complexStore[complex_store?.complex?.name] ?? undefined;
     if (complex !== undefined) {
       return (
         <>
@@ -66,11 +82,11 @@ const ComplexComposition = React.forwardRef((props, ref) => {
         </>
       );
     }
-    return null;
+    return <div></div>;
   };
 
   const ComplexHeader = () => {
-    const complex = props.complexStore[props.complex.name];
+    const complex = complex_store.complexStore[complex_store.complex.name];
     return (
       <div
         style={{
@@ -121,7 +137,7 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   const CabinList = () => {
-    const complex = props.complexStore[props.complex.name];
+    const complex = complex_store.complexStore[complex_store.complex.name];
     const cabinList = [];
 
     const pushCabinDetails = (cabinDetails) => {
@@ -146,8 +162,8 @@ const ComplexComposition = React.forwardRef((props, ref) => {
     if (cabinList.length !== 0)
       return cabinList.map((cabinDetails, index) => {
         if (
-          props.cabin !== undefined &&
-          props.cabin.thingName === cabinDetails.thingName
+          complex_store.cabin !== undefined &&
+          complex_store.cabin.thingName === cabinDetails.thingName
         )
           return <CabinSelected cabin={cabinDetails} />;
         return <Cabin cabin={cabinDetails} />;
@@ -215,14 +231,14 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   const setSelectedCabin = (cabin) => {
-    props.updateSelectedCabin(cabin);
+    dispatch(updateSelectedCabin(cabin));
   };
 
   const renderConnectionStatus = (cabin) => {
     if (
-      props.cabinPayload !== undefined &&
-      props.cabinPayload.clientId === cabin.thingName &&
-      props.cabinPayload.eventType === "connected"
+      complex_store.cabinPayload !== undefined &&
+      complex_store.cabinPayload.clientId === cabin.thingName &&
+      complex_store.cabinPayload.eventType === "connected"
     ) {
       return (
         <div
@@ -236,9 +252,9 @@ const ComplexComposition = React.forwardRef((props, ref) => {
         ></div>
       );
     } else if (
-      props.cabinPayload !== undefined &&
-      props.cabinPayload.clientId === cabin.thingName &&
-      props.cabinPayload.eventType === "disconnected"
+      complex_store.cabinPayload !== undefined &&
+      complex_store.cabinPayload.clientId === cabin.thingName &&
+      complex_store.cabinPayload.eventType === "disconnected"
     ) {
       return (
         <div

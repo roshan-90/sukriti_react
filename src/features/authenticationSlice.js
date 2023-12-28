@@ -38,7 +38,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser, setUsername, setLoggedIn } =
+export const { setUser, clearUser, setUsername, setLoggedIn, setAccessTree } =
   authSlice.actions;
 export const selectUser = (state) => state.authentication;
 export const selectIsAuthenticated = (state) =>

@@ -29,9 +29,13 @@ import {
   executeGetCabinDetailsLambda,
   executeGetBWTComplexCompositionLambda,
 } from "../../awsClients/complexLambdas";
+import { complexStore } from "../../features/complesStoreSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const CabinDetails = (props, ref) => {
   const [cabinDetails, setCabinDetails] = useState();
+  const dispatch = useDispatch();
+  const complex_store = useSelector(complexStore);
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const ucemsConfig = useRef();
@@ -45,32 +49,32 @@ const CabinDetails = (props, ref) => {
 
   useEffect(() => {
     if (
-      props.cabin !== undefined &&
-      currentCabinThingName !== props.cabin.thingName
+      complex_store.cabin !== undefined &&
+      currentCabinThingName !== complex_store.cabin.thingName
     ) {
-      currentCabinThingName = props.cabin.thingName;
+      currentCabinThingName = complex_store.cabin.thingName;
       // loadingDialog.current.showDialog();
       fetchCabinDetails();
     }
-  }, [props.cabin, currentCabinThingName]);
+  }, [complex_store.cabin, currentCabinThingName]);
 
   const fetchCabinDetails = async () => {
     // loadingDialog.current.showDialog();
-    let thingGroupName = props.cabin.thingName;
+    let thingGroupName = complex_store.cabin.thingName;
     try {
       if (thingGroupName.includes("BWT")) {
         var result = await executeGetBWTComplexCompositionLambda(
-          props.cabin.thingName,
-          props.credentials,
-          props.user.clientName
+          complex_store.cabin.thingName,
+          complex_store.credentials,
+          complex_store.user.clientName
         );
         // loadingDialog.current.closeDialog();
         setCabinDetails(result);
       } else {
         var result = await executeGetCabinDetailsLambda(
-          props.cabin.thingName,
-          props.credentials,
-          props.user.clientName
+          complex_store.cabin.thingName,
+          complex_store.credentials,
+          complex_store.user.clientName
         );
         // loadingDialog.current.closeDialog();
         setCabinDetails(result);
@@ -85,7 +89,7 @@ const CabinDetails = (props, ref) => {
   const ComponenetSelector = () => {
     if (cabinDetails == undefined) {
       return <div />;
-    } else if (props.cabin.cabinType === "BWT") {
+    } else if (complex_store.cabin.cabinType === "BWT") {
       return (
         <div style={{ width: "95%", margin: "auto" }}>
           <TurbidityAndWaterRecycled
@@ -170,53 +174,53 @@ const CabinDetails = (props, ref) => {
         ref={ucemsConfig}
         // loadingDialog={loadingDialog}
         // messageDialog={messageDialog}
-        complex={props.complex}
-        cabin={props.cabin}
-        user={props.user}
+        complex={complex_store.complex}
+        cabin={complex_store.cabin}
+        user={complex_store.user}
       />
       <CMSConfig
         ref={cmsConfig}
         // loadingDialog={loadingDialog}
         // messageDialog={messageDialog}
-        complex={props.complex}
-        cabin={props.cabin}
-        user={props.user}
+        complex={complex_store.complex}
+        cabin={complex_store.cabin}
+        user={complex_store.user}
       />
       <ODSConfig
         ref={odsConfig}
         // loadingDialog={loadingDialog}
         // messageDialog={messageDialog}
-        complex={props.complex}
-        cabin={props.cabin}
-        user={props.user}
+        complex={complex_store.complex}
+        cabin={complex_store.cabin}
+        user={complex_store.user}
       />
       <BWTConfig
         ref={bwtConfig}
         // loadingDialog={loadingDialog}
         // messageDialog={messageDialog}
-        complex={props.complex}
-        cabin={props.cabin}
-        user={props.user}
+        complex={complex_store.complex}
+        cabin={complex_store.cabin}
+        user={complex_store.user}
       />
       <CabinCommands
         ref={cabinCommands}
         // loadingDialog={loadingDialog}
         // messageDialog={messageDialog}
-        complex={props.complex}
-        cabin={props.cabin}
-        user={props.user}
+        complex={complex_store.complex}
+        cabin={complex_store.cabin}
+        user={complex_store.user}
       />
       <BwtCommands
         ref={bwtCommands}
         // loadingDialog={loadingDialog}
         // messageDialog={messageDialog}
-        complex={props.complex}
-        cabin={props.cabin}
-        user={props.user}
+        complex={complex_store.complex}
+        cabin={complex_store.cabin}
+        user={complex_store.user}
       />
       <ComponenetSelector />
     </div>
   );
 };
 
-export default forwardRef(CabinDetails);
+export default CabinDetails;

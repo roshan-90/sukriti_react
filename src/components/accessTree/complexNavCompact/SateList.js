@@ -20,7 +20,7 @@ const StateList = (props) => {
   const renderRow = (item, stateIndex) => {
     return (
       <TreeItem
-        treeEdge={new TreeEdge(stateIndex)}
+        treeEdge={TreeEdge(stateIndex)}
         type={TreeItemType.State}
         expanded={false}
         displayData={item.name}
@@ -34,7 +34,7 @@ const StateList = (props) => {
   const getListComponent = (item, stateIndex) => {
     return (
       <DistrictList
-        treeEdge={new TreeEdge(stateIndex)}
+        treeEdge={TreeEdge(stateIndex)}
         listData={item.districts}
         handleComplexSelection={props.handleComplexSelection}
       />
@@ -48,10 +48,6 @@ const StateList = (props) => {
       )}
     </div>
   );
-};
-
-StateList.propTypes = {
-  stateListData: PropTypes.array,
 };
 
 export default StateList;

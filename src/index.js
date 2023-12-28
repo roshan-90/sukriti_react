@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import adminstrationReducer from "./features/adminstrationSlice";
 import dashboardReducer from "./features/dashboardSlice";
 import loadingReducer from "./features/loadingSlice";
+import complexStoreReducer from "./features/complesStoreSlice";
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     authentication: authenticationReducer,
     dashboard: dashboardReducer,
     adminstration: adminstrationReducer,
+    complexStore: complexStoreReducer,
   },
 });
 const loading = () => (
