@@ -1,7 +1,4 @@
-import React, { useEffect, useRef } from "react";
-// import { connect } from "react-redux";
-// import { setOwnAccessTree } from "../../store/actions/authentication";
-// import { updateSelectedComplex } from "../../store/actions/complex-actions";
+import React, { useState, useEffect, useRef } from "react";
 import {
   colorTheme,
   whiteSurfaceCircularBorder,
@@ -22,17 +19,21 @@ import {
   authState,
 } from "../../features/authenticationSlice";
 import { updateSelectedComplex } from "../../features/complesStoreSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const ComplexNavigationCompact = (props) => {
-  //   const messageDialog = useRef();
-  //   const loadingDialog = useRef();
   const selectionSummary = useRef();
   const stateList = useRef();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const authStated = useSelector(authState);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   const initFetchCompletedUserAccessTreeAction = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchCompletedUserAccessTree(
         user?.username,
@@ -41,7 +42,28 @@ const ComplexNavigationCompact = (props) => {
       console.log("complexNavigationCompact-->", result);
       dispatch(setAccessTree(result));
     } catch (err) {
-      console.log("_defineAccess", "_err", err);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("initFetchCompletedUserAccessTreeAction Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("initFetchCompletedUserAccessTreeAction Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -126,10 +148,22 @@ const ComplexNavigationCompact = (props) => {
   };
 
   return (
-    <div className="row" style={{ background: "white", padding: "5px" }}>
-      <Header />
-      <ComponentSelector />
-    </div>
+    <>
+      {" "}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
+      <div className="row" style={{ background: "white", padding: "5px" }}>
+        <Header />
+        <ComponentSelector />
+      </div>
+    </>
   );
 };
 

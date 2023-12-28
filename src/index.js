@@ -11,6 +11,12 @@ import adminstrationReducer from "./features/adminstrationSlice";
 import dashboardReducer from "./features/dashboardSlice";
 import loadingReducer from "./features/loadingSlice";
 import complexStoreReducer from "./features/complesStoreSlice";
+import iccc_dataReducer from "./features/iccc-dashboard-reducer";
+import historyReducer from "./features/historySlice";
+import incidenceReducer from "./features/incidenceSlice";
+import reportReducer from "./features/reportSlice";
+import extraReducer from "./features/extraSlice";
+import vendorSlice from "./features/vendorSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,7 +24,13 @@ const store = configureStore({
     authentication: authenticationReducer,
     dashboard: dashboardReducer,
     adminstration: adminstrationReducer,
+    clientData: iccc_dataReducer,
+    historyStore: historyReducer,
     complexStore: complexStoreReducer,
+    incidenece: incidenceReducer,
+    report: reportReducer,
+    extra: extraReducer,
+    vendor: vendorSlice,
   },
 });
 const loading = () => (
