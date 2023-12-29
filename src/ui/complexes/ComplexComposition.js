@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle } from "react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
 import { Button } from "reactstrap";
 // import MessageDialog from "../../dialogs/MessageDialog";
 // import LoadingDialog from "../../dialogs/LoadingDialog";
@@ -23,10 +23,23 @@ import {
 const ComplexComposition = React.forwardRef((props, ref) => {
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
+  const prevProps = useRef(props);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const complex_store = useSelector(complexStore);
   console.log("first complex composition -->", props);
+  console.log("second complex composition -->", complex_store);
+
+  // useEffect(() => {
+  //   console.log("111complex-compostion--->");
+  //   if (
+  //     complex_store?.complex !== undefined &&
+  //     complex_store?.complexStore[complex_store.complex?.name] == undefined
+  //   )
+  //     console.log(" props complex-compostion--->", props);
+  //   fetchComplexComposition();
+  // }, [props]);
+  let name;
   const fetchComplexComposition = async () => {
     // loadingDialog.current.showDialog();
     try {
@@ -49,16 +62,22 @@ const ComplexComposition = React.forwardRef((props, ref) => {
       // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
-
-  useEffect(() => {
-    if (
-      props?.complex !== undefined &&
-      props?.complexStore[complex_store.complex?.name] == undefined
-    )
-      console.log("111complex-compostion--->", complex_store);
+  if (Object.keys(complex_store)[2] == undefined) {
     console.log(" props complex-compostion--->", props);
     fetchComplexComposition();
-  }, [props]);
+    console.log("props is changed", complex_store?.complex?.name);
+  }
+
+  // useEffect(() => {
+  //   // Check if specific props have changed
+  //   if (prevProps) {
+  //     // Execute your desired function
+  //     console.log("props is changed", complex_store?.complex?.name);
+  //     console.log("props is 222", complex_store[complex_store.complex]);
+  //   }
+  //   // Update prevProps for the next render
+  //   prevProps.current = props;
+  // }, [props]);
 
   // React.useImperativeHandle(ref, () => ({
   //   Cabin,
@@ -69,12 +88,18 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   //   updatedCabinPayload,
   // }));
 
-  if (!complex_store.complexStore) {
+  // if (!complex_store.complexStore) {
+  //   return null;
+  // }
+  if (Object.keys(complex_store)[2] == undefined) {
     return null;
   }
+  name = complex_store?.complex?.name;
+
+  console.log("checking new value", complex_store?.[name]);
+
   const ComponentSelector = () => {
-    const complex =
-      complex_store?.complexStore[complex_store?.complex?.name] ?? undefined;
+    const complex = complex_store?.[name];
     if (complex !== undefined) {
       return (
         <>
@@ -87,7 +112,8 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   const ComplexHeader = () => {
-    const complex = complex_store.complexStore[complex_store.complex.name];
+    console.log("complex header is working--->");
+    const complex = complex_store?.[name];
     return (
       <div
         style={{
@@ -138,7 +164,7 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   const CabinList = () => {
-    const complex = complex_store.complexStore[complex_store.complex.name];
+    const complex = complex_store?.[name];
     const cabinList = [];
 
     const pushCabinDetails = (cabinDetails) => {
