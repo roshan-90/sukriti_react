@@ -20,14 +20,12 @@ const ComplexList = (props) => {
     return (
       <TreeItem
         type={TreeItemType.Complex}
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            props.treeEdge.cityIndex,
-            complexIndex
-          )
-        }
+        treeEdge={TreeEdge(
+          props.treeEdge.stateIndex,
+          props.treeEdge.districtIndex,
+          props.treeEdge.cityIndex,
+          complexIndex
+        )}
         displayData={item.name}
         displayDataStyle={compactComplexnavStyle.complexFont}
         handleComplexSelection={props.handleComplexSelection}

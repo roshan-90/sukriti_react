@@ -21,7 +21,7 @@ const DistrictList = (props) => {
     return (
       <TreeItem
         type={TreeItemType.District}
-        treeEdge={new TreeEdge(props.treeEdge.stateIndex, districtIndex)}
+        treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
         expanded={false}
         displayData={item.name}
         displayDataStyle={compactComplexnavStyle.districtFont}
@@ -35,7 +35,7 @@ const DistrictList = (props) => {
     return (
       <CityList
         listData={item.cities}
-        treeEdge={new TreeEdge(props.treeEdge.stateIndex, districtIndex)}
+        treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
         handleComplexSelection={props.handleComplexSelection}
       />
     );

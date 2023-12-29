@@ -20,13 +20,11 @@ const CityList = (props) => {
   const renderRow = (item, cityIndex) => {
     return (
       <TreeItem
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            cityIndex
-          )
-        }
+        treeEdge={TreeEdge(
+          props.treeEdge.stateIndex,
+          props.treeEdge.districtIndex,
+          cityIndex
+        )}
         type={TreeItemType.City}
         recursiveAccess={item.recursive === 1}
         expanded={false}
@@ -42,13 +40,11 @@ const CityList = (props) => {
     return (
       <ComplexList
         listData={item.complexes}
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            cityIndex
-          )
-        }
+        treeEdge={TreeEdge(
+          props.treeEdge.stateIndex,
+          props.treeEdge.districtIndex,
+          cityIndex
+        )}
         handleComplexSelection={props.handleComplexSelection}
       />
     );
