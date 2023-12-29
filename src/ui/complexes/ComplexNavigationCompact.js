@@ -42,7 +42,7 @@ const ComplexNavigationCompact = (props) => {
       console.log("complexNavigationCompact-->", result);
       dispatch(setAccessTree(result));
     } catch (err) {
-      let text = err.message.includes("expired");
+      let text = err.message ? err.message.includes("expired") : null;
       if (text) {
         setDialogData({
           title: "Error",
@@ -68,16 +68,12 @@ const ComplexNavigationCompact = (props) => {
   };
 
   console.log("auth state ---", authStated?.accessTree);
-  if (authStated?.accessTree == undefined) {
-    initFetchCompletedUserAccessTreeAction();
-  }
 
-  // useEffect(() => {
-  //   if (!authStated?.accessTree) {
-  //     initFetchCompletedUserAccessTreeAction();
-  //   }
-  //   console.log("complexNavigationcompact--2");
-  // }, []);
+  useEffect(() => {
+    if (authStated?.accessTree == undefined) {
+      initFetchCompletedUserAccessTreeAction();
+    }
+  }, []);
 
   const handleComplexSelection = (treeEdge) => {
     console.log("complexNavigationcompact treeEdge --> ", treeEdge);
@@ -92,7 +88,7 @@ const ComplexNavigationCompact = (props) => {
     console.log("complexNavigationcompact complex --> 22 ", complex);
     const hierarchy = getComplexHierarchy(authStated?.accessTree, treeEdge);
     console.log("complexNavigationcompact hierarchy --> 22 ", hierarchy);
-    dispatch(updateSelectedComplex(complex, hierarchy));
+    dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
   };
 
   const ComponentSelector = () => {

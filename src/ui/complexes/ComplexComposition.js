@@ -26,21 +26,22 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const complex_store = useSelector(complexStore);
-  console.log("complex composition -->", props);
+  console.log("first complex composition -->", props);
   const fetchComplexComposition = async () => {
     // loadingDialog.current.showDialog();
     try {
       const result = await executeGetComplexCompositionLambda(
-        "BRIJWASAN_TERM_IOCL",
+        complex_store?.complex?.name,
         user?.credentials
       );
       console.log("complex postion lamda", result);
+      console.log("complex-store", complex_store?.complex?.name);
       dispatch(
-        setPushComplexPosition(
-          complex_store?.hierarchy,
-          complex_store.complex,
-          result
-        )
+        setPushComplexPosition({
+          hierarchy: complex_store?.hierarchy,
+          complexDetails: complex_store?.complex,
+          complexComposition: result,
+        })
       );
       // loadingDialog.current.closeDialog();
     } catch (err) {
@@ -50,14 +51,14 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    console.log("complex-compostion--->");
     if (
-      complex_store.complex !== undefined &&
-      complex_store.complexStore[complex_store.complex?.name] == undefined
+      props?.complex !== undefined &&
+      props?.complexStore[complex_store.complex?.name] == undefined
     )
-      console.log("complex-compostion--->");
+      console.log("111complex-compostion--->", complex_store);
+    console.log(" props complex-compostion--->", props);
     fetchComplexComposition();
-  }, [complex_store.complex]);
+  }, [props]);
 
   // React.useImperativeHandle(ref, () => ({
   //   Cabin,
