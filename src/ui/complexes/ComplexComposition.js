@@ -31,7 +31,7 @@ const ComplexComposition = React.forwardRef((props, ref) => {
     // loadingDialog.current.showDialog();
     try {
       const result = await executeGetComplexCompositionLambda(
-        user?.username,
+        "BRIJWASAN_TERM_IOCL",
         user?.credentials
       );
       console.log("complex postion lamda", result);
@@ -68,7 +68,7 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   //   updatedCabinPayload,
   // }));
 
-  if(!complex_store.complexStore) {
+  if (!complex_store.complexStore) {
     return null;
   }
   const ComponentSelector = () => {

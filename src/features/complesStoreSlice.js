@@ -21,17 +21,34 @@ const complexStoreSlice = createSlice({
     },
     updateSelectedComplex: (state, action) => {
       const { complex, hierarchy } = action.payload;
-      state.complex = complex;
-      state.hierarchy = hierarchy;
+      console.log("state --> updateSelectedComplex-->", action.payload);
+      // Create a new state object
+      return {
+        ...state,
+        complex: complex,
+        hierarchy: hierarchy,
+      };
     },
     updateSelectedCabin: (state, action) => {
-      state.cabin = action.payload.cabin;
+      const cabin = action.payload.cabin;
+      return {
+        ...state,
+        cabin: cabin,
+      };
     },
     savePayload: (state, action) => {
-      state.cabinPayload = action.payload.cabinPayload;
+      const cabinPayload = action.payload.cabinPayload;
+      return {
+        ...state,
+        cabinPayload: cabinPayload,
+      };
     },
     updatedSavePayload: (state, action) => {
-      state.updatedCabinPayload = action.payload.updatedCabinPayload;
+      const updatedCabinPayload = action.payload.updatedCabinPayload;
+      return {
+        ...state,
+        updatedCabinPayload: updatedCabinPayload,
+      };
     },
   },
 });

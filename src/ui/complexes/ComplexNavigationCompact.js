@@ -80,6 +80,7 @@ const ComplexNavigationCompact = (props) => {
   // }, []);
 
   const handleComplexSelection = (treeEdge) => {
+    console.log("complexNavigationcompact treeEdge --> ", treeEdge);
     const stateIndex = treeEdge.stateIndex;
     const districtIndex = treeEdge.districtIndex;
     const cityIndex = treeEdge.cityIndex;
@@ -88,8 +89,9 @@ const ComplexNavigationCompact = (props) => {
     const complex =
       authStated?.accessTree.country.states[stateIndex].districts[districtIndex]
         .cities[cityIndex].complexes[complexIndex];
-
+    console.log("complexNavigationcompact complex --> 22 ", complex);
     const hierarchy = getComplexHierarchy(authStated?.accessTree, treeEdge);
+    console.log("complexNavigationcompact hierarchy --> 22 ", hierarchy);
     dispatch(updateSelectedComplex(complex, hierarchy));
   };
 
