@@ -31,11 +31,13 @@ import {
 } from "../../awsClients/complexLambdas";
 import { complexStore } from "../../features/complesStoreSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../features/authenticationSlice";
 
 const CabinDetails = (props, ref) => {
   const [cabinDetails, setCabinDetails] = useState();
   const dispatch = useDispatch();
   const complex_store = useSelector(complexStore);
+  const user = useSelector(selectUser);
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const ucemsConfig = useRef();
@@ -61,20 +63,22 @@ const CabinDetails = (props, ref) => {
   const fetchCabinDetails = async () => {
     // loadingDialog.current.showDialog();
     let thingGroupName = complex_store.cabin.thingName;
+    console.log("cabinDetails", thingGroupName);
+    console.log("cabinDetails", complex_store);
     try {
       if (thingGroupName.includes("BWT")) {
         var result = await executeGetBWTComplexCompositionLambda(
-          complex_store.cabin.thingName,
-          complex_store.credentials,
-          complex_store.user.clientName
+          complex_store?.cabin?.thingName,
+          user?.credentials,
+          user?.user.clientName
         );
         // loadingDialog.current.closeDialog();
         setCabinDetails(result);
       } else {
         var result = await executeGetCabinDetailsLambda(
-          complex_store.cabin.thingName,
-          complex_store.credentials,
-          complex_store.user.clientName
+          complex_store?.cabin?.thingName,
+          user?.credentials,
+          user?.user.clientName
         );
         // loadingDialog.current.closeDialog();
         setCabinDetails(result);

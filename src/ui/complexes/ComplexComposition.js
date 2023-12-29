@@ -258,7 +258,8 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   const setSelectedCabin = (cabin) => {
-    dispatch(updateSelectedCabin(cabin));
+    console.log("updateSelectedCabin", cabin);
+    dispatch(updateSelectedCabin({ cabin: cabin }));
   };
 
   const renderConnectionStatus = (cabin) => {
