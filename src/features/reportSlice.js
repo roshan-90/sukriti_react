@@ -10,8 +10,9 @@ const reportSlice = createSlice({
   initialState,
   reducers: {
     setReportData: (state, action) => {
+      console.log("setReportData slice -->", action.payload);
       state.hasData = true;
-      state.data = action.payload.reportData;
+      state.data = action.payload;
     },
     setReportReset: (state) => {
       state.hasData = false;
@@ -21,4 +22,5 @@ const reportSlice = createSlice({
 });
 
 export const { setReportData, setReportReset } = reportSlice.actions;
+export const hasData = (state) => state.report.hasData;
 export default reportSlice.reducer;

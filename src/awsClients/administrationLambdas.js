@@ -334,14 +334,11 @@ export function executeFetchDashboardLambda(
 ) {
   return new Promise(function (resolve, reject) {
     var request = { userName: userName, duration: duration, complex: complex };
+    console.log("checking value executeFetchDashboardLambda-->", request);
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
-      credentials: {
-        accessKeyId: credentials?.accessKeyId,
-        secretAccessKey: credentials?.secretAccessKey,
-        sessionToken: credentials?.sessionToken,
-      }, // Pass the credentials from the Redux store
+      credentials: credentials, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_adminisatration_fetchDateWaiseUsageData",

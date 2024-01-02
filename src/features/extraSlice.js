@@ -21,4 +21,6 @@ const extraSlice = createSlice({
 });
 
 export const { setComplexData, setResetData } = extraSlice.actions;
+
+export const extraData = (state) => state.extra.data
 export default extraSlice.reducer;
