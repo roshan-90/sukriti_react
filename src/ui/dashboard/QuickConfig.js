@@ -83,6 +83,8 @@ const QuickConfig = (props) => {
     try {
       payload = JSON.stringify(payload);
       metadata = JSON.stringify(metadata);
+      console.log("submit config", payload, metadata);
+      return;
       const result = await executePublishConfigLambda(
         topic,
         payload,
@@ -114,6 +116,7 @@ const QuickConfig = (props) => {
   };
 
   const handleSubmitConfig = (configType) => {
+    console.log("handlesubmitconfig", configType, configViewData);
     const validationResult = validateConfigData(configType, configViewData);
     console.log("_validateConfigData", "validationResult", validationResult);
 

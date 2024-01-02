@@ -41,4 +41,7 @@ export const {
   updateSelectedIncidenceComplex,
   updateIncidenceSelectedCabin,
 } = incidenceSlice.actions;
+
+export const incidenceList = (state) => state.incidenece;
+
 export default incidenceSlice.reducer;

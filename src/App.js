@@ -33,6 +33,10 @@ const ComplexNavigation = lazy(() =>
 );
 const ComplexDetails = lazy(() => import("./ui/complexes/ComplexDetails"));
 
+const IncidenceTicket = React.lazy(() =>
+  import("./ui/incidence/IncidenceHome")
+);
+
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -97,6 +101,12 @@ const App = () => {
                       exact={true}
                       name={"Complex Details"}
                       element={<ComplexDetails />}
+                    />
+                    <Route
+                      path={"/incidence/tickets"}
+                      exact={true}
+                      name={"Incidence"}
+                      element={<IncidenceTicket />}
                     />
                     <Route
                       path={"/administration"}
