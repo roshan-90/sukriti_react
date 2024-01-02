@@ -15,8 +15,8 @@ import {
 // import { setDashboardData } from "../features/dashboardSlice";
 import { setReportData, hasData } from "../../features/reportSlice";
 import { setResetData, extraData } from "../../features/extraSlice";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { executeFetchDashboardLambda } from "../../awsClients/administrationLambdas";
 import {
   // executeDeleteUserSchedulerLambda,
@@ -32,6 +32,7 @@ import moment from "moment";
 import "../complexes/ComplexComposition.css";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { selectUser } from "../../features/authenticationSlice";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const ReportsHome = () => {
   const [visibility, setVisibility] = useState(false);
@@ -59,6 +60,8 @@ const ReportsHome = () => {
   const [bwtStats, setBwtStats] = useState(false);
   const [minEndDate, setMinEndDate] = useState(null);
   const [isEndDateEnabled, setIsEndDateEnabled] = useState(false);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   const complexComposition = useRef();
   // const messageDialog = useRef();
@@ -91,6 +94,7 @@ const ReportsHome = () => {
 
   const fetchDashboardData = async () => {
     try {
+      dispatch(startLoading()); // Dispatch the startLoading action
       console.log("fetchDashboardData--> 1111");
       var result = await executeFetchDashboardLambda(
         user?.username,
@@ -101,11 +105,28 @@ const ReportsHome = () => {
       console.log("fetchDashboardData-->", result);
       dispatch(setReportData(result));
     } catch (err) {
-      console.log("_lambda", err);
-      // loadingDialog.current.closeDialog();
-      // if (messageDialog.current !== null) {
-      //   messageDialog.current.showDialog("Error Alert!", err.message);
-      // }
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -419,15 +440,20 @@ const ReportsHome = () => {
 
   console.log(hasReportData, "hasReportData");
   console.log("reportData", reportData);
-  if (!reportData) {
-    return null;
-  }
+
   if (hasReportData) {
     return (
       <ErrorBoundary fallback={<div>Something went wrong</div>}>
         <div className="animated fadeIn" style={{}}>
-          {/* <MessageDialog ref={this.messageDialog} />
-          <LoadingDialog ref={this.loadingDialog} /> */}
+          {isLoading && (
+            <div className="loader-container">
+              <CircularProgress
+                className="loader"
+                style={{ color: "rgb(93 192 166)" }}
+              />
+            </div>
+          )}
+          <MessageDialog data={dialogData} />
 
           <table style={{ width: "100%", height: "100%", padding: "0px" }}>
             <tbody>
@@ -904,7 +930,19 @@ const ReportsHome = () => {
       </ErrorBoundary>
     );
   }
-  return <></>;
+  return (
+    <>
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
+    </>
+  );
 };
 
 export default ReportsHome;
