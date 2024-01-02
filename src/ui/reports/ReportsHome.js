@@ -268,18 +268,26 @@ const ReportsHome = () => {
 
     try {
       if (!complexData.length) {
-        // this.messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Please Select Complex."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Complex.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("ReportHome complexdata length");
+          },
+        });
         return;
       }
 
       if (duration === null) {
-        // this.messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Please Select Past Date."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Past Date.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("ReportHome duration");
+          },
+        });
         return;
       }
 
@@ -290,10 +298,14 @@ const ReportsHome = () => {
         !feedbackStats &&
         !bwtStats
       ) {
-        // this.messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Please Select at least one stat."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select at least one stat.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("ReportHome");
+          },
+        });
         return;
       }
 
@@ -306,30 +318,51 @@ const ReportsHome = () => {
           ScheduleEndDate === "")
       ) {
         if (rateValue === "") {
-          // this.messageDialog.current.showDialog(
-          //   "Validation Error",
-          //   "Please Select Schedule Rate Value."
-          // );
+          setDialogData({
+            title: "Validation Error",
+            message: "Please Select Schedule Rate Value.",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("ReportHome rate value");
+            },
+          });
         } else if (scheduleDuration === "") {
-          // this.messageDialog.current.showDialog(
-          //   "Validation Error",
-          //   "Please Select Schedule Duration."
-          // );
+          setDialogData({
+            title: "Validation Error",
+            message: "Please Select Schedule Duration.",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("reporthome schedule duration");
+            },
+          });
         } else if (ScheduleStartDate === "") {
-          // this.messageDialog.current.showDialog(
-          //   "Validation Error",
-          //   "Please Select Schedule Start Date."
-          // );
+          setDialogData({
+            title: "Validation Error",
+            message: "Please Select Schedule Start Date.",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("reporthome schedule startDate");
+            },
+          });
         } else if (email === "") {
-          // this.messageDialog.current.showDialog(
-          //   "Validation Error",
-          //   "Please enter an email address if you wish to schedule a report."
-          // );
+          setDialogData({
+            title: "Validation Error",
+            message:
+              "Please enter an email address if you wish to schedule a report.",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("report home email");
+            },
+          });
         } else if (ScheduleEndDate === "") {
-          // this.messageDialog.current.showDialog(
-          //   "Validation Error",
-          //   "Please Select Schedule End Date."
-          // );
+          setDialogData({
+            title: "Validation Error",
+            message: "Please Select Schedule End Date.",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("report home schedulenddate");
+            },
+          });
         }
         return;
       }
@@ -419,13 +452,15 @@ const ReportsHome = () => {
         userName,
         user?.credentials
       );
-      // messageDialog.current.showDialog(
-      //   "Success",
-      //   "User deleted successfully",
-      //   () => {
-      //     // ... (perform any necessary actions after user deletion)
-      //   }
-      // );
+      setDialogData({
+        title: "Success",
+        message: "User deleted successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("reporthome User deleted successfully");
+        },
+      });
+
       // loadingDialog.current.closeDialog();
     } catch (err) {
       console.log("_lambda", err);
