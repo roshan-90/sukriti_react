@@ -30,6 +30,9 @@ import {
 // import { removeComponentProps } from "../../store/actions/history-actions";
 import { selectUser } from "../../features/authenticationSlice";
 import { setTicketList, incidenceList } from "../../features/incidenceSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog";
 
 const IncidenceHome = (props) => {
   const [currentActiveTab, setCurrentActiveTab] = useState("1");
@@ -37,13 +40,15 @@ const IncidenceHome = (props) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const incidence = useSelector((state) => state.incidenece);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   const toggle = (tab) => {
     if (currentActiveTab !== tab) setCurrentActiveTab(tab);
   };
 
   const fetchAndInitTeam = async () => {
-    // props.loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       console.log("_user", user);
       var result = await executeFetchIncidenceLambda(
@@ -56,8 +61,28 @@ const IncidenceHome = (props) => {
       console.log("IncidenceHome fetchAndInitTeam", result);
       //   props.loadingDialog.current.closeDialog();
     } catch (err) {
-      //   props.loadingDialog.current.closeDialog();
-      //   props.messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -241,7 +266,7 @@ const IncidenceHome = (props) => {
                   <Col sm="12">
                     <RaisedTickets
                       data={incidence?.ticketList?.allTickets}
-                      name={user}
+                      name={user?.user}
                     />
                   </Col>
                 </Row>
@@ -260,8 +285,8 @@ const IncidenceHome = (props) => {
                   <Col sm="12">
                     <SelfAssigned
                       data={incidence?.ticketList?.allTickets}
-                      name={user.userName}
-                      role={user.userRole}
+                      name={user?.user.userName}
+                      role={user?.user.userRole}
                     />
                   </Col>
                 </Row>
@@ -271,8 +296,8 @@ const IncidenceHome = (props) => {
                   <Col sm="12">
                     <TeamAssigned
                       data={incidence?.ticketList?.allTickets}
-                      name={user.userName}
-                      role={user.userRole}
+                      name={user?.user.userName}
+                      role={user?.user.userRole}
                     />
                   </Col>
                 </Row>
@@ -307,8 +332,15 @@ const IncidenceHome = (props) => {
         padding: "10px",
       }}
     >
-      {/* <MessageDialog ref={props.messageDialog} />
-      <LoadingDialog ref={props.loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
 
       <Row>
         <Col xs="12" sm="12" lg="12">
