@@ -73,7 +73,7 @@ const ReportsHome = () => {
   const complexData = useSelector(extraData);
   const reportData = useSelector((state) => state.report);
   const reportParms = { complex: "all", duration: "15" };
-  const title = "";
+  let title = "";
 
   const toggleDialog = () => {
     setVisibility(!visibility);
@@ -95,7 +95,7 @@ const ReportsHome = () => {
   const fetchDashboardData = async () => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
-      console.log("fetchDashboardData--> 1111");
+      console.log("fetchDashboardData--> 1111", reportParms);
       var result = await executeFetchDashboardLambda(
         user?.username,
         reportParms.duration,
@@ -132,6 +132,7 @@ const ReportsHome = () => {
 
   const setComplexSelection = (selectedComplex) => {
     reportParms.complex = selectedComplex.name;
+    console.log("setComplexselection---> clicked", reportParms);
     fetchDashboardData();
   };
 
@@ -260,11 +261,6 @@ const ReportsHome = () => {
       StartDate,
       EndDate,
     } = assignDetails;
-    const usageStats = usageStats;
-    const collectionStats = collectionStats;
-    const upiStats = upiStats;
-    const feedbackStats = feedbackStats;
-    const bwtStats = bwtStats;
 
     try {
       if (!complexData.length) {
@@ -840,7 +836,7 @@ const ReportsHome = () => {
                                 onChange={(event) => {
                                   const inputValue = event.target.value;
                                   if (inputValue >= 0) {
-                                    this.updateAssignDetailsField(
+                                    updateAssignDetailsField(
                                       "rateValue",
                                       inputValue
                                     );

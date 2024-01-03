@@ -17,7 +17,7 @@ import {
   getComplexHierarchy,
 } from "../../components/accessTree/accessTreeUtils";
 
-const ComplexNavigationFullHeight = () => {
+const ComplexNavigationFullHeight = (props) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   // const messageDialog = useRef();
@@ -45,6 +45,7 @@ const ComplexNavigationFullHeight = () => {
   }, [user?.accessTree]);
 
   const handleComplexSelection = (treeEdge) => {
+    console.log("complexnavigationfullheight -->clicke");
     console.log("_handleComplexSelection", treeEdge);
     const stateIndex = treeEdge.stateIndex;
     const districtIndex = treeEdge.districtIndex;
@@ -53,9 +54,10 @@ const ComplexNavigationFullHeight = () => {
     const complex =
       user?.accessTree.country.states[stateIndex].districts[districtIndex]
         .cities[cityIndex].complexes[complexIndex];
-
     const hierarchy = getComplexHierarchy(user?.accessTree, treeEdge);
-    dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
+    // dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
+    console.log("checking value complexNavigationfullheight", complex);
+    props.setComplexSelection(complex);
   };
 
   const Header = () => {
