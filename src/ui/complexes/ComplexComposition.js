@@ -19,16 +19,19 @@ import {
   updateSelectedCabin,
   complexStore,
 } from "../../features/complesStoreSlice";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
 
 const ComplexComposition = React.forwardRef((props, ref) => {
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
+  const isLoading = useSelector((state) => state.loading.isLoading);
   const prevProps = useRef(props);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const complex_store = useSelector(complexStore);
   console.log("first complex composition -->", props);
   console.log("second complex composition -->", complex_store);
+  // dispatch(startLoading()); // Dispatch the startLoading action
 
   // useEffect(() => {
   //   console.log("111complex-compostion--->");
@@ -42,6 +45,7 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   let name;
   const fetchComplexComposition = async () => {
     // loadingDialog.current.showDialog();
+    console.log("fetchcomplexcompostion start");
     try {
       const result = await executeGetComplexCompositionLambda(
         complex_store?.complex?.name,
@@ -56,8 +60,11 @@ const ComplexComposition = React.forwardRef((props, ref) => {
           complexComposition: result,
         })
       );
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+
       // loadingDialog.current.closeDialog();
     } catch (err) {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
       // loadingDialog.current.closeDialog();
       // messageDialog.current.showDialog("Error Alert!", err.message);
     }
@@ -258,6 +265,8 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   };
 
   const setSelectedCabin = (cabin) => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+
     console.log("updateSelectedCabin", cabin);
     dispatch(updateSelectedCabin({ cabin: cabin }));
   };

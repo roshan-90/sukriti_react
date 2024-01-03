@@ -76,6 +76,7 @@ const ComplexNavigationCompact = (props) => {
   }, []);
 
   const handleComplexSelection = (treeEdge) => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     console.log("complexNavigationcompact treeEdge --> ", treeEdge);
     const stateIndex = treeEdge.stateIndex;
     const districtIndex = treeEdge.districtIndex;

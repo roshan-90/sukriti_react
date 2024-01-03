@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Table } from "reactstrap";
 import Button from "reactstrap/lib/Button";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function UsageProfileList(props) {
   console.log(props.data[0], "PROPS-PROPS.data[0]");
@@ -37,6 +39,10 @@ export default function UsageProfileList(props) {
 }
 
 function TableHeader(rowData) {
+  const dispatch = useDispatch();
+  setTimeout(() => {
+    dispatch(stopLoading()); // Dispatch the stopLoading action
+  }, "2000");
   console.log("rowData-TableHeader", rowData);
   var tableLabels = Object.keys(rowData);
 
