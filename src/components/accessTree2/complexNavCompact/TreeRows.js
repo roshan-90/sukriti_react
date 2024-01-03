@@ -116,7 +116,9 @@ export function ComplexRow(props) {
   });
   const handleChange = (event) => {
     let data = event.target.value;
-    dispatch(setComplexData(data));
+    console.log("check handleChange ", data);
+
+    dispatch(setComplexData({ complexData: data }));
   };
 
   return (
