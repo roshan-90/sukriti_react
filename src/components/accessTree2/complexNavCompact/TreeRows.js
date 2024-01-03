@@ -109,11 +109,6 @@ export function CollapsedRow(props) {
 export function ComplexRow(props) {
   const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => {
-    return {
-      user: state,
-    };
-  });
   const handleChange = (event) => {
     let data = event.target.value;
     console.log("check handleChange ", data);

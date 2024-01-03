@@ -183,8 +183,10 @@ export function executeFetchReportLambda2(
   rateValue,
   rateUnit,
   scheduleDuration,
-  startDate,
   endDate,
+  startDate,
+  ScheduleStartDate,
+  ScheduleEndDate,
   usageStats,
   collectionStats,
   upiStats,
@@ -213,6 +215,7 @@ export function executeFetchReportLambda2(
       bwtStats: bwtStats,
       complex: complex,
     };
+    console.log("credentials check in incidenceLamdas", request);
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",

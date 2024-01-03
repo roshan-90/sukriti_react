@@ -151,6 +151,19 @@ const ReportsHome = () => {
 
   const _handleChange = (event) => {
     const { name, checked } = event.target;
+    console.log("name-->", name);
+    console.log("name-->", checked);
+    if (name === "usageStats") {
+      setUsageStats(checked);
+    } else if (name === "collectionStats") {
+      setCollectionStats(checked);
+    } else if (name === "upiStats") {
+      setUpiStats(checked);
+    } else if (name === "feedbackStats") {
+      setFeedbackStats(checked);
+    } else if (name === "bwtStats") {
+      setBwtStats(checked);
+    }
     setButtonOne({ [name]: checked });
   };
 
@@ -364,7 +377,7 @@ const ReportsHome = () => {
       }
 
       // this.loadingDialog.current.showDialog();
-
+      console.log("executeFetchReportLambda2 triggered");
       var result = await executeFetchReportLambda2(
         user?.user.userName,
         user?.user.clientName,
