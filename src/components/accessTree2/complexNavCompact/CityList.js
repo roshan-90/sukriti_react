@@ -2,27 +2,23 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TreeItem from "./TreeItem";
 import ComplexList from "./ComplexList";
-import { compactComplexnavStyle } from "../../../jsStyles/Style";
 import { TreeItemType } from "../../../nomenclature/nomenclature";
+import { compactComplexnavStyle } from "../../../jsStyles/Style";
 import TreeEdge from "../../../Entity/TreeEdge";
 
-const CityList = (props) => {
+const CityList = ({ listData, treeEdge, handleComplexSelection }) => {
   const [text, setText] = useState("");
 
   useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const handleToggle = () => {
-    console.log("_toggle");
-  };
+    setText(listData.text);
+  }, [listData.text]);
 
   const renderRow = (item, cityIndex) => {
     return (
       <TreeItem
         treeEdge={TreeEdge(
-          props.treeEdge.stateIndex,
-          props.treeEdge.districtIndex,
+          treeEdge.stateIndex,
+          treeEdge.districtIndex,
           cityIndex
         )}
         type={TreeItemType.City}
@@ -31,7 +27,7 @@ const CityList = (props) => {
         displayData={item.name}
         displayDataStyle={compactComplexnavStyle.cityFont}
         listComponent={getListComponent(item, cityIndex)}
-        handleComplexSelection={props.handleComplexSelection}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
@@ -41,30 +37,31 @@ const CityList = (props) => {
       <ComplexList
         listData={item.complexes}
         treeEdge={TreeEdge(
-          props.treeEdge.stateIndex,
-          props.treeEdge.districtIndex,
+          treeEdge.stateIndex,
+          treeEdge.districtIndex,
           cityIndex
         )}
-        handleComplexSelection={props.handleComplexSelection}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
 
   // Create an array of objects
-  const jsonObject = props.listData.map(JSON.stringify);
+  const jsonObject = listData.map(JSON.stringify);
   const uniqueSet = new Set(jsonObject);
   const uniqueArray = Array.from(uniqueSet).map(JSON.parse);
 
   return (
     <div style={{ padding: "10px 10px 10px 10px", overflow: "auto" }}>
-      {uniqueArray.map((item, index) => renderRow(item, index))}
+      {uniqueArray.map((item, index) => {
+        return renderRow(item, index);
+      })}
     </div>
   );
 };
 
 CityList.propTypes = {
   listData: PropTypes.array,
-  text: PropTypes.string,
   treeEdge: PropTypes.object,
   handleComplexSelection: PropTypes.func,
 };

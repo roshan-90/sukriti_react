@@ -95,7 +95,7 @@ const ComplexNavigationFullHeight = (props) => {
 
         <div style={{ float: "left", marginLeft: "10px" }}>
           <div style={{ ...complexCompositionStyle.complexTitleClient }}>
-            {"User Access Tree"}
+            {"User Access Tree "}
           </div>
         </div>
       </div>

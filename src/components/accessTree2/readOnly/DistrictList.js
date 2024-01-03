@@ -1,62 +1,81 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import TreeItem from "./TreeItem";
-import CityList from "./CityList";
-import { districtFont } from "../../../jsStyles/Style";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
+import CityList from "./CityList"
+import { districtFont } from "../../../jsStyles/Style"
+import {TreeItemType} from "../../../nomenclature/nomenclature"
 
-const DistrictList = ({ listData }) => {
-  const [text, setText] = useState("");
+class DistrictList extends React.Component {
 
-  useEffect(() => {
-    setText(text);
-  }, [text]);
-
-  const getText = () => {
-    return text;
+  state = {
+    text: ""
   };
 
-  const SetText = (newText) => {
-    setText(newText);
-  };
+  constructor(props) {
+    super(props);
+    console.log("_identify","DistrictList: constructor(2)");
+  }
 
-  const handleToggle = () => {
-    console.log("_toggle");
-  };
+  componentDidMount() {
+    this.setState({
+      text: this.props.text
+    });
+  }
 
-  const renderRow = (item, index) => {
+
+  getText() {
+    return this.state.text;
+  }
+
+  setText(text) {
+    this.setState({
+      text: text
+    });
+  }
+
+
+  render() {
+    console.log("_identify","DistrictList: render(2)");
+    return (
+      <div style={{ padding: "10px 10px 10px 10px", overflow:"auto" }}>
+        {this.props.listData.map((item, index) => {
+          return this.renderRow(item, index);
+          // return <this.DetailsElement data={item} />;
+
+        })}
+      </div>
+
+    );
+  }
+
+  handleToggle = () => {
+    console.log("_toggle")
+  }
+
+  renderRow = (item, index) => {
     return (
       <TreeItem
-        stateIndex={index}
-        type={TreeItemType.District}
-        recursiveAccess={item.recursive === 1}
-        expanded={false}
-        displayData={item.name}
-        displayDataStyle={districtFont}
-        listComponent={getListComponent(item)}
-      />
+      stateIndex = {index}
+      type = {TreeItemType.District}
+      recursiveAccess={item.recursive==1}
+      expanded={false}
+      displayData={item.name}
+      displayDataStyle={districtFont}
+      listComponent={this.getListComponent(item)}/>
+    )
+  }
+
+  getListComponent = (item) => {
+  
+    return (
+          < CityList listData={item.cities}/>
+          
     );
-  };
-
-  const getListComponent = (item) => {
-    return <CityList listData={item.cities} />;
-  };
-
-  const jsonObject = listData.map(JSON.stringify);
-  const uniqueSet = new Set(jsonObject);
-  const uniqueArray = Array.from(uniqueSet).map(JSON.parse);
-
-  return (
-    <div style={{ padding: "10px 10px 10px 10px", overflow: "auto" }}>
-      {uniqueArray.map((item, index) => {
-        return renderRow(item, index);
-      })}
-    </div>
-  );
-};
+  }
+}
 
 DistrictList.propTypes = {
-  listData: PropTypes.array,
+  listData: PropTypes.array
 };
 
 export default DistrictList;

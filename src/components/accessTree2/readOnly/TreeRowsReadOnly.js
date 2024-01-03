@@ -6,8 +6,8 @@ import {
 } from "../../../jsStyles/Style";
 import { Col, Row, Label, Input, Button } from "reactstrap";
 import RxInputCheckbox from "../../RxInputCheckbox";
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 
 export function ExpandedRowRoot(props) {
   return (

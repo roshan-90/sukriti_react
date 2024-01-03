@@ -5,44 +5,41 @@ import { TreeItemType } from "../../../nomenclature/nomenclature";
 import { compactComplexnavStyle } from "../../../jsStyles/Style";
 import TreeEdge from "../../../Entity/TreeEdge";
 
-const ComplexList = (props) => {
+const ComplexList = ({ listData, treeEdge, handleComplexSelection }) => {
   const [text, setText] = useState("");
 
   useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const handleToggle = () => {
-    console.log("_toggle");
-  };
+    setText(listData.text);
+  }, [listData.text]);
 
   const renderRow = (item, complexIndex) => {
     return (
       <TreeItem
         type={TreeItemType.Complex}
         treeEdge={TreeEdge(
-          props.treeEdge.stateIndex,
-          props.treeEdge.districtIndex,
-          props.treeEdge.cityIndex,
+          treeEdge.stateIndex,
+          treeEdge.districtIndex,
+          treeEdge.cityIndex,
           complexIndex
         )}
         displayData={item.name}
         displayDataStyle={compactComplexnavStyle.complexFont}
-        handleComplexSelection={props.handleComplexSelection}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
 
   return (
     <div style={{ padding: "10px 10px 10px 10px", overflow: "auto" }}>
-      {props.listData.map((item, index) => renderRow(item, index))}
+      {listData.map((item, index) => {
+        return renderRow(item, index);
+      })}
     </div>
   );
 };
 
 ComplexList.propTypes = {
   listData: PropTypes.array,
-  text: PropTypes.string,
   treeEdge: PropTypes.object,
   handleComplexSelection: PropTypes.func,
 };

@@ -1,88 +1,83 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import TreeItem from "./TreeItem";
+import {TreeItemType} from "../../../nomenclature/nomenclature";
 import ComplexList from "./ComplexList";
 import { cityFont } from "../../../jsStyles/Style";
 import TreeEdge from "../../../Entity/TreeEdge";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
 
-const CityList = (props) => {
-  const [text, setText] = useState("");
+class CityList extends React.Component {
 
-  useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const getText = () => {
-    return text;
+  state = {
+    text: ""
   };
 
-  const setTextState = (newText) => {
-    setText(newText);
-  };
+  constructor(props) {
+    super(props);
+  }
 
-  const handleToggle = () => {};
+  componentDidMount() {
+    this.setState({
+      text: this.props.text
+    });
+  }
 
-  const renderRow = (item, cityIndex) => {
-    const treeEdge = new TreeEdge(
-      props.treeEdge.stateIndex,
-      props.treeEdge.districtIndex,
-      cityIndex
+
+  getText() {
+    return this.state.text;
+  }
+
+  setText(text) {
+    this.setState({
+      text: text
+    });
+  }
+
+
+  render() {
+    return (
+      <div style={{ padding: "10px 10px 10px 10px", overflow:"auto" }}>
+        {this.props.listData.map((item, cityIndex) => {
+          return this.renderRow(item, cityIndex);
+          // return <this.DetailsElement data={item} />;
+
+        })}
+      </div>
+
     );
+  }
+
+  handleToggle = () => {
+  }
+
+  renderRow = (item, cityIndex) => {
+    var treeEdge = new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,cityIndex);
     return (
       <TreeItem
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            cityIndex
-          )
-        }
-        type={TreeItemType.City}
-        recursiveAccess={item.recursive === 1}
-        selected={item.selected}
-        expanded={false}
-        displayData={item.name}
-        displayDataStyle={cityFont}
-        listComponent={getListComponent(item, cityIndex)}
-        handleUserSelection={props.handleUserSelection}
-      />
-    );
-  };
+      treeEdge = {new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,cityIndex)}
+      type = {TreeItemType.City}
+      recursiveAccess={item.recursive==1}
+      selected = {item.selected}
+      expanded={false}
+      displayData={item.name}
+      displayDataStyle={cityFont}
+      listComponent={this.getListComponent(item,cityIndex)}
+      handleUserSelection = {this.props.handleUserSelection}/>
+    )
+  }
 
-  const getListComponent = (item, cityIndex) => {
+  getListComponent = (item,cityIndex) => {
     return (
-      <ComplexList
-        listData={item.complexes}
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            cityIndex
-          )
-        }
-        handleUserSelection={props.handleUserSelection}
-      />
+          < ComplexList 
+          listData={item.complexes}
+          treeEdge = {new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,cityIndex)}
+          handleUserSelection = {this.props.handleUserSelection}/>
     );
-  };
-
-  console.log("_identify", "DistrictList: render(2)");
-  const jsonObject = props.listData.map(JSON.stringify);
-  console.log(jsonObject);
-  const uniqueSet = new Set(jsonObject);
-  const uniqueArray = Array.from(uniqueSet).map(JSON.parse);
-
-  return (
-    <div style={{ padding: "10px 10px 10px 10px", overflow: "auto" }}>
-      {uniqueArray.map((item, cityIndex) => {
-        return renderRow(item, cityIndex);
-      })}
-    </div>
-  );
-};
+  }
+}
 
 CityList.propTypes = {
-  listData: PropTypes.array,
+  listData: PropTypes.array
 };
 
 export default CityList;

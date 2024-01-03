@@ -1,53 +1,79 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import DistrictList from "./DistrictList";
+import DistrictList from "./DistrictList"
 import TreeItem from "./TreeItem";
-import { compactComplexnavStyle } from "../../../jsStyles/Style";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
-import TreeEdge from "../../../Entity/TreeEdge";
+import { compactComplexnavStyle } from "../../../jsStyles/Style"
+import {TreeItemType} from "../../../nomenclature/nomenclature"
+import TreeEdge from "../../../Entity/TreeEdge"; 
 
-const StateList = (props) => {
-  const [text, setText] = useState("");
+class SateList extends React.Component {
 
-  useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const handleToggle = () => {
-    console.log("_toggle");
+  state = {
+    text: ""
   };
 
-  const renderRow = (item, stateIndex) => {
+  constructor(props) {
+    super(props);
+    console.log("_stateList")
+  }
+
+  componentDidMount() {
+    this.setState({
+      text: this.props.text
+    });
+  }
+
+
+  getText() {
+    return this.state.text;
+  }
+
+  setText(text) {
+    this.setState({
+      text: text
+    });
+  }
+
+
+  render() {
     return (
-      <TreeItem
-        treeEdge={TreeEdge(stateIndex)}
-        type={TreeItemType.State}
-        expanded={false}
-        displayData={item.name}
-        displayDataStyle={compactComplexnavStyle.stateFont}
-        listComponent={getListComponent(item, stateIndex)}
-        handleComplexSelection={props.handleComplexSelection}
-      />
+      <div style={{overflowY:"auto", height:"35vh", width:'100%'}}>
+        {this.props.listData.country.states.map((item, index) => {
+          return this.renderRow(item, index);
+        })}
+      </div>
     );
-  };
+  }
 
-  const getListComponent = (item, stateIndex) => {
+  handleToggle = () => {
+    console.log("_toggle")
+  }
+
+  renderRow = (item, stateIndex) => {
     return (
-      <DistrictList
-        treeEdge={TreeEdge(stateIndex)}
-        listData={item.districts}
-        handleComplexSelection={props.handleComplexSelection}
-      />
-    );
-  };
+      <TreeItem  
+      treeEdge = {new TreeEdge(stateIndex)}
+      type = {TreeItemType.State}
+      expanded={false}
+      displayData={item.name}
+      displayDataStyle={compactComplexnavStyle.stateFont}
+      listComponent={this.getListComponent(item,stateIndex)}
+      handleComplexSelection = {this.props.handleComplexSelection}/>
+    )
+  }
 
-  return (
-    <div style={{ overflowY: "auto", height: "35vh", width: "100%" }}>
-      {props.listData.country.states.map((item, index) =>
-        renderRow(item, index)
-      )}
-    </div>
-  );
+  getListComponent = (item,stateIndex) => {
+    return (
+          < DistrictList 
+          treeEdge = {new TreeEdge(stateIndex)}  
+          listData={item.districts}
+          handleComplexSelection = {this.props.handleComplexSelection}/>
+    );
+  }
+}
+
+SateList.propTypes = {
+  stateListData: PropTypes.array
 };
 
-export default StateList;
+export default SateList;

@@ -1,71 +1,73 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import TreeItem from "./TreeItem";
+import {TreeItemType} from "../../../nomenclature/nomenclature";
 import { complexFont } from "../../../jsStyles/Style";
 import TreeEdge from "../../../Entity/TreeEdge";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
 
-const ComplexList = (props) => {
-  const [text, setText] = useState("");
+class ComplexList extends React.Component {
 
-  useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const getText = () => {
-    return text;
+  state = {
+    text: ""
   };
 
-  const setTextState = (newText) => {
-    setText(newText);
-  };
+  constructor(props) {
+    super(props);
+  }
 
-  const handleToggle = () => {};
+  componentDidMount() {
+    this.setState({
+      text: this.props.text
+    });
+  }
 
-  const renderRow = (item, complexIndex) => {
-    const treeEdge = new TreeEdge(
-      props.treeEdge.stateIndex,
-      props.treeEdge.districtIndex,
-      props.treeEdge.cityIndex,
-      complexIndex
-    );
-    console.log(props, "THIS_props_P");
+
+  getText() {
+    return this.state.text;
+  }
+
+  setText(text) {
+    this.setState({
+      text: text
+    });
+  }
+
+
+  render() {
+    console.log("_storeUpdatedState","render: ComplexList");
     return (
-      <TreeItem
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            props.treeEdge.cityIndex,
-            complexIndex
-          )
-        }
-        type={TreeItemType.Complex}
-        selected={item.selected}
-        displayData={item.name}
-        displayDataStyle={complexFont}
-        handleUserSelection={props.handleUserSelection}
-      />
+      <div style={{ padding: "10px 10px 10px 10px", overflow:"auto" }}>
+        {this.props.listData.map((item, complexIndex) => {
+          return this.renderRow(item, complexIndex);
+          // return <this.DetailsElement data={item} />;
+
+        })}
+      </div>
+
     );
-  };
+  }
 
-  console.log("_storeUpdatedState", "render: ComplexList");
-  const jsonObject = props.listData.map(JSON.stringify);
-  console.log(jsonObject);
-  const uniqueSet = new Set(jsonObject);
-  const uniqueArray = Array.from(uniqueSet).map(JSON.parse);
+  handleToggle = () => {
+  }
 
-  return (
-    <div style={{ padding: "10px 10px 10px 10px", overflow: "auto" }}>
-      {uniqueArray.map((item, complexIndex) => {
-        return renderRow(item, complexIndex);
-      })}
-    </div>
-  );
-};
+  renderRow = (item, complexIndex) => {
+    var treeEdge = new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,this.props.treeEdge.cityIndex,complexIndex);
+    
+    return (
+      <TreeItem  
+      treeEdge = {new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,this.props.treeEdge.cityIndex,complexIndex)}
+      type = {TreeItemType.Complex}
+      selected = {item.selected}
+      displayData={item.name}
+      displayDataStyle={complexFont}
+      handleUserSelection = {this.props.handleUserSelection}/>
+    )
+  }
+
+}
 
 ComplexList.propTypes = {
-  listData: PropTypes.array,
+  listData: PropTypes.array
 };
 
 export default ComplexList;

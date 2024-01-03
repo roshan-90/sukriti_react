@@ -6,27 +6,23 @@ import { compactComplexnavStyle } from "../../../jsStyles/Style";
 import { TreeItemType } from "../../../nomenclature/nomenclature";
 import TreeEdge from "../../../Entity/TreeEdge";
 
-const DistrictList = (props) => {
+const DistrictList = ({ listData, treeEdge, handleComplexSelection }) => {
   const [text, setText] = useState("");
 
   useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const handleToggle = () => {
-    console.log("_toggle");
-  };
+    setText(listData.text);
+  }, [listData.text]);
 
   const renderRow = (item, districtIndex) => {
     return (
       <TreeItem
         type={TreeItemType.District}
-        treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
+        treeEdge={TreeEdge(treeEdge.stateIndex, districtIndex)}
         expanded={false}
         displayData={item.name}
         displayDataStyle={compactComplexnavStyle.districtFont}
         listComponent={getListComponent(item, districtIndex)}
-        handleComplexSelection={props.handleComplexSelection}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
@@ -35,26 +31,30 @@ const DistrictList = (props) => {
     return (
       <CityList
         listData={item.cities}
-        treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
-        handleComplexSelection={props.handleComplexSelection}
+        treeEdge={TreeEdge(treeEdge.stateIndex, districtIndex)}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
 
   // Create an array of objects
-  const jsonObject = props.listData.map(JSON.stringify);
-  const uniqueSet = new Set(jsonObject);
-  const uniqueArray = Array.from(uniqueSet).map(JSON.parse);
+  let jsonObject = listData.map(JSON.stringify);
+  let uniqueSet = new Set(jsonObject);
+  let uniqueArray = Array.from(uniqueSet).map(JSON.parse);
 
   return (
     <div style={{ overflow: "auto" }}>
-      {uniqueArray.map((item, index) => renderRow(item, index))}
+      {uniqueArray.map((item, index) => {
+        return renderRow(item, index);
+      })}
     </div>
   );
 };
 
 DistrictList.propTypes = {
   listData: PropTypes.array,
+  treeEdge: PropTypes.object,
+  handleComplexSelection: PropTypes.func,
 };
 
 export default DistrictList;

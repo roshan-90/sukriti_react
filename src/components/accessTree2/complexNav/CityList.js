@@ -1,70 +1,86 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import TreeItem from "./TreeItem";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
-import ComplexList from "./ComplexList";
-import { cityFont } from "../../../jsStyles/Style";
-import TreeEdge from "../../../Entity/TreeEdge";
+import {TreeItemType} from "../../../nomenclature/nomenclature"
+import ComplexList from "./ComplexList"
+import { cityFont } from "../../../jsStyles/Style"
+import TreeEdge from "../../../Entity/TreeEdge"; 
 
-const CityList = (props) => {
-  const [text, setText] = useState("");
+class CityList extends React.Component {
 
-  useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const handleToggle = () => {
-    console.log("_toggle");
+  state = {
+    text: ""
   };
 
-  const renderRow = (item, cityIndex) => {
+  constructor(props) {
+    super(props);
+    console.log("_stateList")
+  }
+
+  componentDidMount() {
+    this.setState({
+      text: this.props.text
+    });
+  }
+
+
+  getText() {
+    return this.state.text;
+  }
+
+  setText(text) {
+    this.setState({
+      text: text
+    });
+  }
+
+
+  render() {
+    return (
+      <div style={{ padding: "10px 10px 10px 10px", overflow:"auto" }}>
+        {this.props.listData.map((item, index) => {
+          return this.renderRow(item, index);
+          // return <this.DetailsElement data={item} />;
+
+        })}
+      </div>
+
+    );
+  }
+
+  handleToggle = () => {
+    console.log("_toggle")
+  }
+
+  renderRow = (item, cityIndex) => {
     return (
       <TreeItem
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            cityIndex
-          )
-        }
-        type={TreeItemType.City}
-        recursiveAccess={item.recursive === 1}
-        expanded={false}
-        displayData={item.name}
-        displayDataStyle={cityFont}
-        listComponent={getListComponent(item, cityIndex)}
-        handleComplexSelection={props.handleComplexSelection}
-      />
-    );
-  };
+      type = {TreeItemType.District}
+      treeEdge = {new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,cityIndex)}
+      type = {TreeItemType.City}
+      recursiveAccess={item.recursive==1}
+      expanded={false}
+      displayData={item.name}
+      displayDataStyle={cityFont}
+      listComponent={this.getListComponent(item,cityIndex)}
+      handleComplexSelection = {this.props.handleComplexSelection}/>
+    )
+  }
 
-  const getListComponent = (item, cityIndex) => {
+  getListComponent = (item,cityIndex) => {
+  
     return (
-      <ComplexList
-        listData={item.complexes}
-        treeEdge={
-          new TreeEdge(
-            props.treeEdge.stateIndex,
-            props.treeEdge.districtIndex,
-            cityIndex
-          )
-        }
-        handleComplexSelection={props.handleComplexSelection}
-      />
+          < ComplexList 
+          listData={item.complexes}
+          treeEdge = {new TreeEdge(this.props.treeEdge.stateIndex,this.props.treeEdge.districtIndex,cityIndex)}
+          handleComplexSelection = {this.props.handleComplexSelection}
+          />
     );
-  };
-
-  return (
-    <div style={{ padding: "10px 10px 10px 10px", overflow: "auto" }}>
-      {props.listData.map((item, index) => {
-        return renderRow(item, index);
-      })}
-    </div>
-  );
-};
+  }
+}
 
 CityList.propTypes = {
-  listData: PropTypes.array,
+  listData: PropTypes.array
 };
 
 export default CityList;

@@ -7,16 +7,12 @@ import { TreeItemType } from "../../../nomenclature/nomenclature";
 import TreeEdge from "../../../Entity/TreeEdge";
 import "../../../ui/complexes/ComplexComposition.css";
 
-const SateListReport = (props) => {
+const StateListReport = ({ listData, handleComplexSelection }) => {
   const [text, setText] = useState("");
 
   useEffect(() => {
-    setText(props.text);
-  }, [props.text]);
-
-  const handleToggle = () => {
-    console.log("_toggle");
-  };
+    setText(listData.text);
+  }, [listData.text]);
 
   const renderRow = (item, stateIndex) => {
     return (
@@ -27,7 +23,7 @@ const SateListReport = (props) => {
         displayData={item.name}
         displayDataStyle={compactComplexnavStyle.stateFont}
         listComponent={getListComponent(item, stateIndex)}
-        handleComplexSelection={props.handleComplexSelection}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
@@ -37,7 +33,7 @@ const SateListReport = (props) => {
       <DistrictList
         treeEdge={TreeEdge(stateIndex)}
         listData={item.districts}
-        handleComplexSelection={props.handleComplexSelection}
+        handleComplexSelection={handleComplexSelection}
       />
     );
   };
@@ -47,11 +43,26 @@ const SateListReport = (props) => {
       className="stateListReport"
       style={{ overflowY: "auto", height: "36vh", width: "100%" }}
     >
-      {props.listData.country.states.map((item, index) => {
+      {listData.country.states.map((item, index) => {
         return renderRow(item, index);
       })}
     </div>
   );
 };
 
-export default SateListReport;
+StateListReport.propTypes = {
+  listData: PropTypes.shape({
+    text: PropTypes.string,
+    country: PropTypes.shape({
+      states: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string,
+          districts: PropTypes.array,
+        })
+      ),
+    }),
+  }),
+  handleComplexSelection: PropTypes.func,
+};
+
+export default StateListReport;

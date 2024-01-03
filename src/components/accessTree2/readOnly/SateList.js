@@ -1,63 +1,76 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import DistrictList from "./DistrictList";
+import DistrictList from "./DistrictList"
 import TreeItem from "./TreeItem";
-import { stateFont } from "../../../jsStyles/Style";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
+import { stateFont } from "../../../jsStyles/Style"
+import {TreeItemType} from "../../../nomenclature/nomenclature"
 
-const StateList = ({ listData }) => {
-  const [text, setText] = useState("");
+class SateList extends React.Component {
 
-  useEffect(() => {
-    setText(text);
-  }, [text]);
-
-  const getText = () => {
-    return text;
+  state = {
+    text: ""
   };
 
-  const SetText = (newText) => {
-    setText(newText);
-  };
+  constructor(props) {
+    super(props);
+    console.log("_stateList")
+  }
 
-  const handleToggle = () => {
-    console.log("_toggle");
-  };
+  componentDidMount() {
+    this.setState({
+      text: this.props.text
+    });
+  }
 
-  const renderRow = (item, index) => {
+
+  getText() {
+    return this.state.text;
+  }
+
+  setText(text) {
+    this.setState({
+      text: text
+    });
+  }
+
+
+  render() {
     return (
-      <TreeItem
-        key={index}
-        stateIndex={index}
-        type={TreeItemType.State}
-        recursiveAccess={item.recursive === 1}
-        expanded={false}
-        displayData={item.name}
-        displayDataStyle={stateFont}
-        listComponent={getListComponent(item, index)}
-      />
+      <div style={{ padding: "10px 10px 10px 10px", overflowY:"auto", height:"500px"}}>
+        {this.props.listData.map((item, index) => {
+          return this.renderRow(item, index);
+        })}
+      </div>
     );
-  };
+  }
 
-  const getListComponent = (item, index) => {
+  handleToggle = () => {
+    console.log("_toggle")
+  }
+
+  renderRow = (item, index) => {
     return (
-      <DistrictList key={index} stateIndex={index} listData={item.districts} />
-    );
-  };
+      <TreeItem  
+      stateIndex = {index}
+      type = {TreeItemType.State}
+      recursiveAccess={item.recursive==1}
+      expanded={false}
+      displayData={item.name}
+      displayDataStyle={stateFont}
+      listComponent={this.getListComponent(item,index)}/>
+    )
+  }
 
-  return (
-    <div
-      style={{
-        padding: "10px 10px 10px 10px",
-        overflowY: "auto",
-        height: "500px",
-      }}
-    >
-      {listData.map((item, index) => {
-        return renderRow(item, index);
-      })}
-    </div>
-  );
+  getListComponent = (item,index) => {
+    return (
+          < DistrictList stateIndex = {index} listData={item.districts}/>
+    );
+  }
+
+}
+
+SateList.propTypes = {
+  stateListData: PropTypes.array
 };
 
-export default StateList;
+export default SateList;

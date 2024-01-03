@@ -1,89 +1,108 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { whiteSurface } from "../../../jsStyles/Style";
+import { whiteSurface } from "../../../jsStyles/Style"
 import { Col, Row, Label, Input, Button } from "reactstrap";
-import {
-  ExpandedRowRoot,
-  CollapsedRowRoot,
-  CollapsedRowRootRecursive,
-  ExpandedRow,
-  CollapsedRow,
-  CollapsedRowRecursive,
-  ComplexRowSelected,
-  ComplexRow,
-} from "./TreeRowsReadOnly";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
+import { ExpandedRowRoot, CollapsedRowRoot,CollapsedRowRootRecursive, ExpandedRow, CollapsedRow,CollapsedRowRecursive, ComplexRowSelected, ComplexRow } from "./TreeRowsReadOnly"
+import { TreeItemType } from "../../../nomenclature/nomenclature"
 
-const TreeItemRoot = (props) => {
-  const [state, setState] = useState({
-    expanded: props.expanded,
-    displayData: props.displayData,
-    listData: props.listData,
-  });
+class TreeItemRoot extends React.Component {
 
-  useEffect(() => {
-    // componentDidMount logic here
-  }, []);
-
-  const onCheckboxChange = (e) => {
-    console.log("_check", props.type, props.stateIndex);
+  state = {
   };
 
-  const handleToggle = () => {
-    if (!props.recursiveAccess) {
-      setState((prevState) => ({
-        ...prevState,
-        expanded: !prevState.expanded,
-      }));
-    }
-  };
+  constructor(props) {
 
-  const DisplayRow = () => {
-    const treeRowProps = {
+    super(props);
+    console.log("_render", props)
+    this.state = {
+      expanded: props.expanded,
       displayData: props.displayData,
-      displayDataStyle: props.displayDataStyle,
-      onCheckboxChange: onCheckboxChange,
-      handleToggle: handleToggle,
-      listComponent: props.listComponent,
+      listData: props.listData
     };
 
-    if (props.type === TreeItemType.State) {
-      if (state.expanded) {
+  }
+
+  componentDidMount() {
+
+  }
+
+  render() {
+    return (
+      <this.DisplayRow expanded={this.state.expanded} />
+    );
+  }
+
+
+  onCheckboxChange = (e) => {
+    console.log("_check", this.props.type, this.props.stateIndex)
+  }
+
+  handleToggle = () => {
+    if (!this.props.recursiveAccess) {
+      
+      var expanded = this.state.expanded
+      this.setState({
+        expanded: !expanded
+      })
+    }
+  }
+
+  DisplayRow = (props) => {
+
+    var treeRowProps = {
+      displayData: this.props.displayData,
+      displayDataStyle: this.props.displayDataStyle,
+      onCheckboxChange: this.onCheckboxChange,
+      handleToggle: this.handleToggle,
+      listComponent: this.props.listComponent
+    }
+
+    if (this.props.type === TreeItemType.State) {
+      if (props.expanded) {
+
         return <ExpandedRowRoot treeRowProps={treeRowProps} />;
       }
 
-      if (props.recursiveAccess)
+      if(this.props.recursiveAccess)
         return <CollapsedRowRootRecursive treeRowProps={treeRowProps} />;
 
       return <CollapsedRowRoot treeRowProps={treeRowProps} />;
-    } else if (props.type === TreeItemType.District) {
-      if (state.expanded) {
+    }
+
+    else if (this.props.type === TreeItemType.District) {
+      if (props.expanded) {
+
         return <ExpandedRow treeRowProps={treeRowProps} />;
       }
 
-      if (props.recursiveAccess)
+      if(this.props.recursiveAccess)
         return <CollapsedRowRecursive treeRowProps={treeRowProps} />;
 
       return <CollapsedRow treeRowProps={treeRowProps} />;
-    } else if (props.type === TreeItemType.City) {
-      if (state.expanded) {
+    }
+
+    else if (this.props.type === TreeItemType.City) {
+      if (props.expanded) {
+
         return <ExpandedRow treeRowProps={treeRowProps} />;
       }
 
-      if (props.recursiveAccess)
+      if(this.props.recursiveAccess)
         return <CollapsedRowRecursive treeRowProps={treeRowProps} />;
 
       return <CollapsedRow treeRowProps={treeRowProps} />;
-    } else if (props.type === TreeItemType.Complex) {
+    }
+
+    else if (this.props.type === TreeItemType.Complex) {
+
       return <ComplexRowSelected treeRowProps={treeRowProps} />;
     }
-  };
 
-  return <DisplayRow />;
-};
+  }
+}
 
-TreeItemRoot.propTypes = {
-  // Add your prop types here
-};
+// TreeItem.propTypes = {
+//   stateListData: PropTypes.array
+// };
 
 export default TreeItemRoot;

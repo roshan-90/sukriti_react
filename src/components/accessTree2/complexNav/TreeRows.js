@@ -4,9 +4,9 @@ import {
   treeItemBox,
   complexSelectedCircleSurface,
 } from "../../../jsStyles/Style";
-import { Col, Row, Label, Input, Button } from "reactstrap";
+import { Button } from "reactstrap";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 
 export function ExpandedRowRoot(props) {
   return (

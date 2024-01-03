@@ -1,74 +1,109 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
-  ExpandedRowRoot,
-  CollapsedRowRoot,
-  CollapsedRowRootWithRecursive,
-  ExpandedRow,
-  CollapsedRow,
-  CollapsedRowWithRecursive,
-  ComplexRow,
-} from "./TreeRowsDefineAccess";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
+  ExpandedRowRoot, CollapsedRowRoot, CollapsedRowRootWithRecursive,
+  ExpandedRow, CollapsedRow, CollapsedRowWithRecursive,
+  ComplexRow
+} from "./TreeRowsDefineAccess"
+import { TreeItemType } from "../../../nomenclature/nomenclature"
 
-const TreeItemRoot = (props) => {
-  const [expanded, setExpanded] = useState(props.expanded);
+class TreeItemRoot extends React.Component {
 
-  useEffect(() => {
-    setExpanded(props.expanded);
-  }, [props.expanded]);
-
-  const onCheckboxChange = (e) => {
-    console.log("_check", e);
-    props.handleUserSelection(props.type, props.treeEdge, e);
+  state = {
   };
 
-  const handleToggle = () => {
-    console.log("_itemExpansion", "" + props.selected);
+  constructor(props) {
 
-    if (!props.selected) {
-      setExpanded(!expanded);
-    }
-  };
-
-  const DisplayRow = () => {
-    const treeRowProps = {
+    super(props);
+    console.log("_render", props)
+    this.state = {
+      expanded: props.expanded,
       displayData: props.displayData,
-      displayDataStyle: props.displayDataStyle,
-      onCheckboxChange: onCheckboxChange,
-      handleToggle: handleToggle,
-      listComponent: props.listComponent,
-      selected: props.selected,
+      listData: props.listData
     };
+  }
 
-    if (props.type === TreeItemType.State) {
-      if (expanded) {
+  componentDidMount() {
+
+  }
+
+  render() {
+    return (
+      <this.DisplayRow expanded={this.state.expanded} />
+    );
+  }
+
+
+  onCheckboxChange = (e) => {
+    console.log("_check", e);
+    this.props.handleUserSelection(this.props.type,this.props.treeEdge,e);
+  }
+
+  handleToggle = () => {
+    console.log("_itemExpansion",""+this.props.selected);
+
+    if (!this.props.selected) {
+      var expanded = this.state.expanded
+      this.setState({
+        expanded: !expanded
+      })
+    }
+  }
+
+  DisplayRow = (props) => {
+    var treeRowProps = {
+      displayData: this.props.displayData,
+      displayDataStyle: this.props.displayDataStyle,
+      onCheckboxChange: this.onCheckboxChange,
+      handleToggle: this.handleToggle,
+      listComponent: this.props.listComponent,
+      selected: this.props.selected
+    }
+
+    if (this.props.type === TreeItemType.State) {
+      if (props.expanded) {
+
         return <ExpandedRowRoot treeRowProps={treeRowProps} />;
       }
 
-      if (props.recursiveAccess) {
+      if (this.props.recursiveAccess)
         return <CollapsedRowRootWithRecursive treeRowProps={treeRowProps} />;
-      }
 
       return <CollapsedRowRoot treeRowProps={treeRowProps} />;
-    } else if (
-      props.type === TreeItemType.District ||
-      props.type === TreeItemType.City
-    ) {
-      if (expanded) {
+    }
+
+    else if (this.props.type === TreeItemType.District) {
+      if (props.expanded) {
+
         return <ExpandedRow treeRowProps={treeRowProps} />;
       }
 
-      if (props.recursiveAccess) {
+      if (this.props.recursiveAccess)
         return <CollapsedRowWithRecursive treeRowProps={treeRowProps} />;
-      }
 
       return <CollapsedRow treeRowProps={treeRowProps} />;
-    } else if (props.type === TreeItemType.Complex) {
+    }
+
+    else if (this.props.type === TreeItemType.City) {
+      if (props.expanded) {
+
+        return <ExpandedRow treeRowProps={treeRowProps} />;
+      }
+
+      if (this.props.recursiveAccess)
+        return <CollapsedRowWithRecursive treeRowProps={treeRowProps} />;
+
+      return <CollapsedRow treeRowProps={treeRowProps} />;
+    }
+
+    else if (this.props.type === TreeItemType.Complex) {
       return <ComplexRow treeRowProps={treeRowProps} />;
     }
-  };
 
-  return <DisplayRow />;
-};
+  }
+}
+
+// TreeItem.propTypes = {
+//   stateListData: PropTypes.array
+// };
 
 export default TreeItemRoot;

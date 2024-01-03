@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { whiteSurface } from "../../../jsStyles/Style";
-import { Col, Row, Label, Input, Button } from "reactstrap";
 import {
   ExpandedRowRoot,
   CollapsedRowRoot,
@@ -37,13 +36,10 @@ const TreeItemRoot = (props) => {
       ) : (
         <CollapsedRowRoot treeRowProps={treeRowProps} />
       );
-    } else if (props.type === TreeItemType.District) {
-      return expanded ? (
-        <ExpandedRow treeRowProps={treeRowProps} />
-      ) : (
-        <CollapsedRow treeRowProps={treeRowProps} />
-      );
-    } else if (props.type === TreeItemType.City) {
+    } else if (
+      props.type === TreeItemType.District ||
+      props.type === TreeItemType.City
+    ) {
       return expanded ? (
         <ExpandedRow treeRowProps={treeRowProps} />
       ) : (
@@ -63,13 +59,13 @@ const TreeItemRoot = (props) => {
 };
 
 TreeItemRoot.propTypes = {
-  type: PropTypes.string,
   expanded: PropTypes.bool,
   displayData: PropTypes.string,
   displayDataStyle: PropTypes.object,
   listComponent: PropTypes.element,
-  handleComplexSelection: PropTypes.func,
+  type: PropTypes.string,
   treeEdge: PropTypes.object,
+  handleComplexSelection: PropTypes.func,
 };
 
 export default TreeItemRoot;

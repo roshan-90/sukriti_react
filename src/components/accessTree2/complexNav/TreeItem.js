@@ -1,81 +1,100 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { whiteSurface } from "../../../jsStyles/Style";
+import { whiteSurface } from "../../../jsStyles/Style"
 import { Col, Row, Label, Input, Button } from "reactstrap";
-import {
-  ExpandedRowRoot,
+import { 
+  ExpandedRowRoot, 
   CollapsedRowRoot,
-  ExpandedRow,
+  ExpandedRow, 
   CollapsedRow,
-  ComplexRow,
-} from "./TreeRows";
-import { TreeItemType } from "../../../nomenclature/nomenclature";
+  ComplexRow, 
+  } from "./TreeRows"
+import { TreeItemType } from "../../../nomenclature/nomenclature"
 
-const TreeItemRoot = (props) => {
-  const [state, setState] = useState({
-    expanded: props.expanded,
-    displayData: props.displayData,
-    listData: props.listData,
-  });
+class TreeItemRoot extends React.Component {
 
-  const handleToggle = () => {
-    setState((prevState) => ({
-      ...prevState,
-      expanded: !prevState.expanded,
-    }));
+  state = {
   };
 
-  const handleComplexSelection = () => {
-    props.handleComplexSelection(props.treeEdge);
-  };
+  constructor(props) {
 
-  const DisplayRow = (props) => {
-    const treeRowProps = {
+    super(props);
+    console.log("_render", props)
+    this.state = {
+      expanded: props.expanded,
       displayData: props.displayData,
-      displayDataStyle: props.displayDataStyle,
-      handleToggle: handleToggle,
-      listComponent: props.listComponent,
+      listData: props.listData
     };
 
-    if (props.type === TreeItemType.State) {
-      return props.expanded ? (
-        <ExpandedRowRoot treeRowProps={treeRowProps} />
-      ) : (
-        <CollapsedRowRoot treeRowProps={treeRowProps} />
-      );
-    } else if (
-      props.type === TreeItemType.District ||
-      props.type === TreeItemType.City
-    ) {
-      return props.expanded ? (
-        <ExpandedRow treeRowProps={treeRowProps} />
-      ) : (
-        <CollapsedRow treeRowProps={treeRowProps} />
-      );
-    } else if (props.type === TreeItemType.Complex) {
-      return (
-        <ComplexRow
-          treeRowProps={treeRowProps}
-          handleComplexSelection={handleComplexSelection}
-        />
-      );
+  }
+
+  componentDidMount() {
+
+  }
+
+  render() {
+    return (
+      <this.DisplayRow expanded={this.state.expanded} />
+    );
+  }
+
+  handleToggle = () => {
+    var expanded = this.state.expanded
+      this.setState({
+        expanded: !expanded
+      })
+  }
+
+  handleComplexSelection = () =>{
+    this.props.handleComplexSelection(this.props.treeEdge);
+  }
+
+  DisplayRow = (props) => {
+
+    var treeRowProps = {
+      displayData: this.props.displayData,
+      displayDataStyle: this.props.displayDataStyle,
+      handleToggle: this.handleToggle,
+      listComponent: this.props.listComponent
     }
-  };
 
-  console.log("_render", props);
+    if (this.props.type === TreeItemType.State) {
+      if (props.expanded) {
 
-  return <DisplayRow expanded={state.expanded} />;
-};
+        return <ExpandedRowRoot treeRowProps={treeRowProps} />;
+      }
 
-TreeItemRoot.propTypes = {
-  expanded: PropTypes.bool,
-  displayData: PropTypes.any,
-  listData: PropTypes.array,
-  type: PropTypes.string,
-  treeEdge: PropTypes.object,
-  displayDataStyle: PropTypes.object,
-  listComponent: PropTypes.element,
-  handleComplexSelection: PropTypes.func,
-};
+      return <CollapsedRowRoot treeRowProps={treeRowProps} />;
+    }
+
+    else if (this.props.type === TreeItemType.District) {
+      if (props.expanded) {
+
+        return <ExpandedRow treeRowProps={treeRowProps} />;
+      }
+
+      return <CollapsedRow treeRowProps={treeRowProps} />;
+    }
+
+    else if (this.props.type === TreeItemType.City) {
+      if (props.expanded) {
+
+        return <ExpandedRow treeRowProps={treeRowProps} />;
+      }
+
+      return <CollapsedRow treeRowProps={treeRowProps} />;
+    }
+
+    else if (this.props.type === TreeItemType.Complex) {
+
+      return <ComplexRow treeRowProps={treeRowProps} handleComplexSelection={this.handleComplexSelection}/>;
+    }
+
+  }
+}
+
+// TreeItem.propTypes = {
+//   stateListData: PropTypes.array
+// };
 
 export default TreeItemRoot;

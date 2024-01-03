@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   whiteSurface,
   treeItemBox,
   complexSelectedCircleSurface,
 } from "../../../jsStyles/Style";
 import { Col, Row, Label, Input, Button } from "reactstrap";
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
+import { useSelector, useDispatch } from "react-redux";
+import { setComplexData } from "../../../features/extraSlice";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 
 export function ExpandedRowRoot(props) {
   return (
@@ -105,9 +107,21 @@ export function CollapsedRow(props) {
 }
 
 export function ComplexRow(props) {
+  const dispatch = useDispatch();
+
+  const { user } = useSelector((state) => {
+    return {
+      user: state,
+    };
+  });
+  const handleChange = (event) => {
+    let data = event.target.value;
+    dispatch(setComplexData(data));
+  };
+
   return (
     <div
-      onClick={props.handleComplexSelection}
+      // onClick={props.handleComplexSelection}
       className="row"
       style={{ ...treeItemBox, cursor: "pointer" }}
     >
@@ -133,7 +147,21 @@ export function ComplexRow(props) {
       >
         {props.treeRowProps.displayData}
       </div>
-
+      <div
+        className="col-md-2"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "0",
+        }}
+      >
+        <input
+          type="checkbox"
+          value={props.treeRowProps.displayData}
+          onChange={handleChange}
+        ></input>
+      </div>
       {/* <div className="col-md-2" style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "0" }}>
         <Button
           outline
