@@ -83,6 +83,9 @@ const MemberDetailsHome = (props) => {
   };
 
   const tabPane = () => {
+    if (user_data.length == 0) {
+      return null;
+    }
     // if (!props.location || !props.location.data) {
     //   return null; // Render nothing if data is not available
     // }

@@ -94,7 +94,7 @@ const AdministrationHome = (props) => {
             <i>{teamSize}</i>
           </div>
         </div>
-        {/* {props.user.userRole === "Super Admin" ? (
+        {user?.user?.userRole === "Super Admin" ? (
           <div
             className={"col-md-4"}
             style={{
@@ -145,7 +145,7 @@ const AdministrationHome = (props) => {
               Add Team Member
             </Button>
           </div>
-        )} */}
+        )}
       </div>
     );
   };
