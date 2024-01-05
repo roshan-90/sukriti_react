@@ -80,15 +80,88 @@ const ConfigureUser = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (userDetailsFormData.name == "") {
-      setDialogData({
-        title: "Validation Error",
-        message: "Please Fill Valid Name",
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log("validation");
-        },
-      });
+
+    switch (true) {
+      case userDetailsFormData.name == "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Fill Valid Name",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("validation");
+          },
+        });
+        return null;
+        break;
+      case userDetailsFormData.password === "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Fill Valid Password",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("password validation");
+          },
+        });
+        return null;
+        break;
+      case userDetailsFormData.gender === "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Valid Gender",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("gender validation");
+          },
+        });
+        return null;
+        break;
+      case userDetailsFormData.repeat_password === "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Enter valid Repeat Password",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("gender validation");
+          },
+        });
+        return null;
+        break;
+      case userDetailsFormData.address === "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Enter valid Address",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("gender validation");
+          },
+        });
+        return null;
+        break;
+      case userDetailsFormData.phone_number === "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Enter Phone Number",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("Phone Number");
+          },
+        });
+        return null;
+        break;
+      case userDetailsFormData.email === "":
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Enter valid Email",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("Email");
+          },
+        });
+        return null;
+        break;
+      default:
+        // All validations passed, proceed with your logic
+        break;
     }
     console.log("userDetailsFormData");
     console.log(userDetailsFormData);
@@ -101,7 +174,7 @@ const ConfigureUser = () => {
       <Container
         fluid
         className="d-flex justify-content-center"
-        style={{ height: "560px" }} // Set a fixed height here
+        style={{ height: "580px" }} // Set a fixed height here
       >
         <Card>
           <CardBody>
@@ -261,7 +334,7 @@ const ConfigureUser = () => {
           </CardBody>
           <Button
             color="primary"
-            style={{ width: "18%" }}
+            style={{ width: "18%", margin: "4px" }}
             type="submit"
             onClick={handleSubmit}
           >
