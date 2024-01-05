@@ -21,6 +21,7 @@ import DefaultFooter from "./components/DefaultFooter";
 import Home from "./ui/dashboard/Home";
 import AdministrationHome from "./ui/administration/AdministrationHome";
 import MemberDetails from "./ui/administration/MemberDetailsHome";
+import ConfigureUser from "./components/ConfigureUser";
 
 const DefineMemberAccess = lazy(() =>
   import("./ui/administration/DefineMemberAccess")
@@ -56,6 +57,7 @@ const App = () => {
       console.log("sdsd");
     }
   }, [isAuthenticated, dispatch]);
+
   const loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
   );
@@ -167,6 +169,7 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<LoginComponent />} />
           <Route path="/*" element={<Navigate to="/login" />} />
+          <Route path="/activation_user" element={<ConfigureUser />} />
         </Routes>
       </Router>
     </React.Suspense>
