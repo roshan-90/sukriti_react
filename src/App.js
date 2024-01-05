@@ -13,6 +13,7 @@ import {
   selectIsAuthenticated,
   setLoggedIn,
   setUsername,
+  setUser,
 } from "./features/authenticationSlice";
 import AppBar from "./components/AppBar";
 import { Container } from "reactstrap";
@@ -45,9 +46,12 @@ const App = () => {
       // const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
       const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
       const user = localStorage.getItem("user");
+      const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+
       if (userFromLocalStorage) {
         dispatch(setUsername(user));
         dispatch(setLoggedIn(userFromLocalStorage));
+        dispatch(setUser(userDetails));
       }
       console.log("sdsd");
     }

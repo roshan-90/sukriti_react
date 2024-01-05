@@ -99,6 +99,10 @@ const signIn = async (username, password, dispatch) => {
             executeGetUserDetailsLambda(username, data)
               .then((userDetails) => {
                 console.log("userDetails", userDetails);
+                localStorage.setItem(
+                  "userDetails",
+                  JSON.stringify(userDetails)
+                );
                 dispatch(setUser(userDetails));
               })
               .catch((error) => {
