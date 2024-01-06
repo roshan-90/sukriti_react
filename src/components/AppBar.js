@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Collapse,
   Navbar,
@@ -12,10 +12,11 @@ import {
 } from "reactstrap";
 import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
-import { clearUser } from "../features/authenticationSlice";
+import { clearUser, selectUser } from "../features/authenticationSlice";
 
 const AppBar = () => {
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -92,20 +93,18 @@ const AppBar = () => {
                 Administration
               </NavLink>
             </NavItem>
-            {/* {
-                  userRole === "Super Admin" ?
-                      <NavItem>
-                          <NavLink
-                              style={navLinkStyle}
-                              onClick={() => {
-                                  props.history.push("/vendor");
-                              }}
-                          >
-                              Vendor
-                          </NavLink>
-                      </NavItem>
-                      : null
-              } */}
+            {user?.user?.userRole === "Super Admin" ? (
+              <NavItem>
+                <NavLink
+                  style={navLinkStyle}
+                  onClick={() => {
+                    navigate("/vendor");
+                  }}
+                >
+                  Vendor
+                </NavLink>
+              </NavItem>
+            ) : null}
           </Nav>
 
           <Button

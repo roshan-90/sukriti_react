@@ -1,0 +1,85 @@
+import React, { useEffect, useState, useRef } from "react";
+import { Table } from "reactstrap";
+import Button from "reactstrap/lib/Button";
+import TableHeader from "./TableHeader";
+import { Link } from "react-router-dom";
+import { fromUserList, fromVendorList } from "../../../parsers/listDataParsers";
+
+const List = (props) => {
+  const [dataList, setDataList] = useState([]);
+  const tableHeaderRef = useRef(null);
+
+  useEffect(() => {
+    setDataList(fromVendorList(props.data));
+  }, [props.data]);
+
+  const loadRows = (index, rowData) => {
+    const data = Object.values(rowData);
+    return <tr key={index}>{getData(data, index)}</tr>;
+  };
+
+  const getData = (data, rowIndex) => {
+    console.log("_getRowData", data);
+    return data.map((item, index) => {
+      if (index !== 0) {
+        return (
+          <td key={index}>
+            <div className={"col-md-12"}>
+              <div className={"row justiy-content-center"}>{item}</div>
+            </div>
+          </td>
+        );
+      }
+      return (
+        <td key={index}>
+          <div className={"col-md-12"}>
+            <div className={"row justiy-content-center"}>
+              <Link
+                to={{
+                  pathname: "/vendor/vendorDetails",
+                  data: props.data[rowIndex],
+                }}
+              >
+                {item}
+              </Link>
+            </div>
+          </div>
+        </td>
+      );
+    });
+  };
+
+  const getHeaderData = () => {
+    const row = dataList[0];
+    console.log("_getHeaderData", row);
+    if (row !== undefined) {
+      const data = Object.keys(row);
+      console.log("_getHeaderData", data);
+      return data;
+    } else return [];
+  };
+
+  return (
+    <div>
+      <Table
+        hover
+        bordered
+        striped
+        responsive
+        size="sm"
+        style={{ tableLayout: "fixed", width: "100%" }}
+      >
+        <thead>
+          <tr>
+            <TableHeader ref={tableHeaderRef} data={getHeaderData()} />
+          </tr>
+        </thead>
+        <tbody>
+          {dataList.map((rowData, index) => loadRows(index, rowData))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
+
+export default List;

@@ -174,7 +174,7 @@ const ConfigureUser = () => {
       <Container
         fluid
         className="d-flex justify-content-center"
-        style={{ height: "580px" }} // Set a fixed height here
+        style={{ height: "580px", backgroundColor: "rgb(228, 229, 230)" }} // Set a fixed height here
       >
         <Card>
           <CardBody>
