@@ -37,7 +37,7 @@ const ComplexDetails = lazy(() => import("./ui/complexes/ComplexDetails"));
 
 const IncidenceTicket = lazy(() => import("./ui/incidence/IncidenceHome"));
 const ReportsHome = lazy(() => import("./ui/reports/ReportsHome"));
-// const VendorHome = React.lazy(() => import("./ui/vendor/VendorHome"));
+const VendorHome = React.lazy(() => import("./ui/vendor/VendorHome"));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -150,12 +150,12 @@ const App = () => {
                       name={"Define Access"}
                       element={<DefineMemberAccess />}
                     />
-                    {/* <Route
+                    <Route
                       path={"/vendor"}
                       exact={true}
                       name={"Vendor"}
                       element={<VendorHome />}
-                    /> */}
+                    />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
                 </Container>
