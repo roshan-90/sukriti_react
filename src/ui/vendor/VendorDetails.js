@@ -180,9 +180,7 @@ const VendorDetails = (props) => {
         >
           <Link
             to={{
-              pathname: `/vendor/updateVendor/${props.user?.userName}`,
-              data: props.user,
-              vendorList: vendorList,
+              pathname: `/vendor/updateVendor/${props.user?.vendor_name}`,
             }}
           >
             Update Vendor Details

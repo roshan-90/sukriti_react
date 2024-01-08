@@ -14,7 +14,7 @@ const VendorDetailsHome = (props) => {
 
   console.log("id-->", id);
   console.log("List -->", List);
-  const [teamList] = List.filter((data) => data?.userName === id);
+  const [teamList] = List.filter((data) => data?.vendor_name === id);
   console.log("teamlist-->", teamList);
 
   return (

@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { connect } from "react-redux";
+import React, { useCallback, useState, useRef, useEffect } from "react";
+// import { connect } from "react-redux";
 import {
   Button,
   Card,
@@ -16,25 +16,87 @@ import { whiteSurface } from "../../jsStyles/Style";
 // import LoadingDialog from "../../dialogs/LoadingDialog";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import { executeUpdateVendorLambda } from "../../awsClients/vendorLambda";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import { useNavigate } from "react-router-dom";
+import { selectUser } from "../../features/authenticationSlice";
+import { executeReadVendorLambda } from "../../awsClients/vendorLambda";
+import { setTeamList } from "../../features/vendorSlice";
 
-const UpdateVendorMember = ({ location, credentials, history }) => {
+const UpdateVendorMember = () => {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  let List = useSelector((state) => state.vendor.teamList);
+  let vendorList = useSelector((state) => state.vendor.vendorList);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
+  const navigate = useNavigate();
+  const [teamList] = List.filter((data) => data?.vendor_name === id);
+  const user = useSelector(selectUser);
+
+  const fetchAndInitTeam = useCallback(async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      const result = await executeReadVendorLambda(
+        user?.user?.userName,
+        user?.credentials
+      );
+      console.log("Updatevendormember -:👉", result);
+      console.log("UpdateVendorMember -:👉", result);
+      dispatch(setTeamList({ teamList: result.teamDetails }));
+    } catch (err) {
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }, [dispatch, executeReadVendorLambda, user]);
+
+  useEffect(() => {
+    fetchAndInitTeam();
+  }, []);
+
+  console.log("update member vendorList", teamList);
+  console.log("update member data", vendorList);
+
   const [formDetails, setFormDetails] = useState({
-    vendor_id: location.data.vendor_id,
-    vendor_name: location.data.vendor_name,
-    admin: "ssf_developer",
-    adminRole: "Super Admin",
-    assigned_by: "ssf_developer",
-    beneficiary: location.data.beneficiary,
-    buisnessName: location.data.buisnessName,
-    contact: location.data.contact,
-    email: location.data.email,
-    gstNumber: location.data.gstNumber,
-    ifsc_code: location.data.ifsc_code,
-    userName: location.data.userName,
-    vendor_admin: location.data.vendor_admin,
-    accountNumber: location.data.accountNumber,
-    prev_admin: location.data.vendor_name,
-    account_id: location.data.account_id,
+    vendor_id: teamList?.vendor_id,
+    vendor_name: teamList?.vendor_name,
+    admin: user?.user?.userName,
+    adminRole: user?.user?.userRole,
+    assigned_by: user?.user?.userName,
+    beneficiary: teamList?.beneficiary,
+    buisnessName: teamList?.buisnessName,
+    contact: teamList?.contact,
+    email: teamList?.email,
+    gstNumber: teamList?.gstNumber,
+    ifsc_code: teamList?.ifsc_code,
+    userName: teamList?.userName,
+    vendor_admin: teamList?.vendor_admin,
+    accountNumber: teamList?.accountNumber,
+    prev_admin: teamList?.vendor_name,
+    account_id: teamList?.account_id,
   });
 
   // const messageDialog = useRef(null);
@@ -42,26 +104,48 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
   const confirmationDialog = useRef(null);
 
   const initCreateVendorRequest = async (createUserRequest) => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      await executeUpdateVendorLambda(createUserRequest);
-      // messageDialog.current.showDialog(
-      //   "Success",
-      //   "Vendor updated successfully",
-      //   () => {
-      //     history.goBack();
-      //   }
-      // );
-      // loadingDialog.current.closeDialog();
+      console.log("checking request", createUserRequest);
+      await executeUpdateVendorLambda(createUserRequest, user?.credentials);
+      setDialogData({
+        title: "Success",
+        message: "Vendor updated successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("executeUpdateVendorLambda clicked");
+          navigate("/vendor");
+        },
+      });
     } catch (err) {
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const onClientSelected = (index, value) => {
     console.log("index-index -:👉", index);
-    if (location.data.vendor_name) {
+    if (teamList.vendor_name) {
       // Do something
     }
     setFormDetails((prevDetails) => ({ ...prevDetails, vendor_admin: value }));
@@ -69,8 +153,8 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
 
   const populateClientList = () => {
     var clientNameList = [];
-    if (location.vendorList != undefined) {
-      for (let mClient of location.vendorList) {
+    if (vendorList != undefined) {
+      for (let mClient of vendorList) {
         clientNameList.push(mClient);
       }
     }
@@ -86,6 +170,16 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
     console.log(e.target.value);
   };
 
+  const handleUpdateVendorMember = (e) => {
+    console.log("handleUpdateVendorMember", e.target.name, e.target.value);
+    setFormDetails({
+      ...formDetails,
+      [e.target.name]: e.target.value,
+    });
+  };
+  if (teamList == null || teamList == undefined) {
+    return null;
+  }
   return (
     <div
       className="col-md-10 offset-md-2"
@@ -96,9 +190,16 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
         background: "white",
       }}
     >
-      {/* <MessageDialog ref={this.messageDialog} />
-      <LoadingDialog ref={this.loadingDialog} /> */}
-      <ConfirmationDialog ref={this.confirmationDialog} />
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
+      <ConfirmationDialog ref={confirmationDialog} />
 
       <div className="" style={{ margin: "50px", clear: "both" }}>
         <Row className="justify-content-center">
@@ -115,10 +216,11 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                     <Input
                       type="text"
                       placeholder="Linked Account"
-                      defaultValue={this.props.location.data.account_id}
+                      name="account_id"
+                      defaultValue={teamList.account_id}
                       disabled="true"
                       // onChange={(event) =>
-                      //     (this.formDetails.account_id = event.target.value)
+                      //     (formDetails.account_id = event.target.value)
                       // }
                     />
                   </InputGroup>
@@ -140,41 +242,37 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                   <InputGroup className="mb-3">
                     <Input
                       type="text"
+                      name="vendor_name"
                       placeholder="Contact Name"
-                      onChange={(event) =>
-                        (this.formDetails.vendor_name = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.vendor_name}
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.vendor_name}
                     />
                   </InputGroup>
                   <InputGroup className="mb-4">
                     <Input
                       type="text"
                       placeholder="Contact Email"
-                      onChange={(event) =>
-                        (this.formDetails.email = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.email}
+                      name="email"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.email}
                     />
                   </InputGroup>
                   <InputGroup className="mb-4">
                     <Input
                       type="text"
                       placeholder="Contact Number"
-                      onChange={(event) =>
-                        (this.formDetails.contact = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.contact}
+                      name="contact"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.contact}
                     />
                   </InputGroup>
                   <InputGroup>
                     <Input
                       type="text"
+                      name="buisnessName"
                       placeholder="Business Name"
-                      onChange={(event) =>
-                        (this.formDetails.buisnessName = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.buisnessName}
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.buisnessName}
                     />
                   </InputGroup>
                 </Form>
@@ -196,40 +294,36 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                     <Input
                       type="text"
                       placeholder="IFSC Code"
-                      onChange={(event) =>
-                        (this.formDetails.ifsc_code = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.ifsc_code}
+                      name="ifsc_code"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.ifsc_code}
                     />
                   </InputGroup>
                   <InputGroup className="mb-4">
                     <Input
                       type="text"
                       placeholder="Account Number"
-                      onChange={(event) =>
-                        (this.formDetails.accountNumber = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.accountNumber}
+                      name="accountNumber"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.accountNumber}
                     />
                   </InputGroup>
                   <InputGroup className="mb-4">
                     <Input
                       type="text"
                       placeholder="Beneficiary"
-                      onChange={(event) =>
-                        (this.formDetails.beneficiary = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.beneficiary}
+                      name="beneficiary"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.beneficiary}
                     />
                   </InputGroup>
                   <InputGroup>
                     <Input
                       type="text"
                       placeholder="User Name"
-                      onChange={(event) =>
-                        (this.formDetails.userName = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.userName}
+                      name="userName"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.userName}
                     />
                   </InputGroup>
                 </Form>
@@ -251,10 +345,9 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                     <Input
                       type="text"
                       placeholder="GST Number"
-                      onChange={(event) =>
-                        (this.formDetails.gstNumber = event.target.value)
-                      }
-                      defaultValue={this.props.location.data.gstNumber}
+                      name="gstNumber"
+                      onChange={handleUpdateVendorMember}
+                      defaultValue={teamList.gstNumber}
                     />
                   </InputGroup>
                 </Form>
@@ -275,12 +368,11 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                   <InputGroup>
                     <Input
                       type="select"
-                      onChange={(event) =>
-                        (this.formDetails.vendor_admin = event.target.value)
-                      }
+                      name="vendor_admin"
+                      onChange={handleUpdateVendorMember}
                     >
-                      <option>{this.props.location.data.vendor_admin}</option>
-                      {this.props.location.vendorList.map((alluserrole) => {
+                      <option>{teamList.vendor_admin}</option>
+                      {vendorList.map((alluserrole) => {
                         return (
                           <option key={alluserrole} value={alluserrole}>
                             {alluserrole}
@@ -289,9 +381,9 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                       })}
                     </Input>
                     {/* <select
-                                                // value={this.props.location.vendorList.includes(this.props.location.data.vendor_admin) && this.props.location.data.vendor_admin
+                                                // value={this.props.location.vendorList.includes(teamList.vendor_admin) && teamList.vendor_admin
                                                 // }
-                                                defaultValue={this.props.location.data.vendor_admin}
+                                                defaultValue={teamList.vendor_admin}
                                             // onChange={(e) => this.changeRole(e)}
                                             >
                                                 {this.props.location.vendorList.map((alluserrole) => {
@@ -299,7 +391,7 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
                                                         <option
                                                             key={alluserrole}
                                                             value={alluserrole}
-                                                            selected={this.props.location.data.vendor_admin}
+                                                            selected={teamList.vendor_admin}
                                                         >
                                                             {alluserrole}
                                                         </option>
@@ -317,7 +409,7 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
             style={{ margin: "auto" }}
             color="primary"
             className="px-4"
-            onClick={this.onSubmit}
+            onClick={onSubmit}
           >
             Submit
           </Button>
