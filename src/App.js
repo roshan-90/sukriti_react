@@ -34,10 +34,11 @@ const ComplexNavigation = lazy(() =>
   import("./ui/complexes/ComplexNavigation")
 );
 const ComplexDetails = lazy(() => import("./ui/complexes/ComplexDetails"));
-
 const IncidenceTicket = lazy(() => import("./ui/incidence/IncidenceHome"));
 const ReportsHome = lazy(() => import("./ui/reports/ReportsHome"));
-const VendorHome = React.lazy(() => import("./ui/vendor/VendorHome"));
+const VendorHome = lazy(() => import("./ui/vendor/VendorHome"));
+const VendorDetails = lazy(() => import("./ui/vendor/VendorDetailsHome"));
+const UpdateVendorMember = lazy(() => import("./ui/vendor/UpdateVendorMember"));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -155,6 +156,18 @@ const App = () => {
                       exact={true}
                       name={"Vendor"}
                       element={<VendorHome />}
+                    />
+                    <Route
+                      path={"/vendor/vendorDetails/:id"}
+                      exact={true}
+                      name={"Vendor Details"}
+                      element={<VendorDetails />}
+                    />
+                    <Route
+                      path={"/vendor/updateVendor/:id"}
+                      exact={true}
+                      name={"Update Vendor Member"}
+                      element={<UpdateVendorMember />}
                     />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>

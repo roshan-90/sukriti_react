@@ -12,8 +12,8 @@ import {
   CardHeader,
 } from "reactstrap";
 import { whiteSurface } from "../../jsStyles/Style";
-import MessageDialog from "../../dialogs/MessageDialog";
-import LoadingDialog from "../../dialogs/LoadingDialog";
+// import MessageDialog from "../../dialogs/MessageDialog";
+// import LoadingDialog from "../../dialogs/LoadingDialog";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import { executeUpdateVendorLambda } from "../../awsClients/vendorLambda";
 
@@ -37,25 +37,25 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
     account_id: location.data.account_id,
   });
 
-  const messageDialog = useRef(null);
-  const loadingDialog = useRef(null);
+  // const messageDialog = useRef(null);
+  // const loadingDialog = useRef(null);
   const confirmationDialog = useRef(null);
 
   const initCreateVendorRequest = async (createUserRequest) => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       await executeUpdateVendorLambda(createUserRequest);
-      messageDialog.current.showDialog(
-        "Success",
-        "Vendor updated successfully",
-        () => {
-          history.goBack();
-        }
-      );
-      loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog(
+      //   "Success",
+      //   "Vendor updated successfully",
+      //   () => {
+      //     history.goBack();
+      //   }
+      // );
+      // loadingDialog.current.closeDialog();
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -96,8 +96,8 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
         background: "white",
       }}
     >
-      <MessageDialog ref={this.messageDialog} />
-      <LoadingDialog ref={this.loadingDialog} />
+      {/* <MessageDialog ref={this.messageDialog} />
+      <LoadingDialog ref={this.loadingDialog} /> */}
       <ConfirmationDialog ref={this.confirmationDialog} />
 
       <div className="" style={{ margin: "50px", clear: "both" }}>
@@ -327,12 +327,12 @@ const UpdateVendorMember = ({ location, credentials, history }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    credentials: state.authentication.credentials,
-  };
-};
+// const mapStateToProps = (state) => {
+//   return {
+//     credentials: state.authentication.credentials,
+//   };
+// };
 
-const mapActionsToProps = {};
+// const mapActionsToProps = {};
 
-export default connect(mapStateToProps, mapActionsToProps)(UpdateVendorMember);
+export default UpdateVendorMember;

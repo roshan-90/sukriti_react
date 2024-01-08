@@ -1,31 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
-import { connect } from "react-redux";
 import { Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import { NameVendorList } from "../../components/DisplayLabels";
 import NameValue from "../../Entity/NameValue";
 import { whiteSurface } from "../../jsStyles/Style";
 import { fromVendorDetails } from "../../parsers/listDataParsers";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
-import { pushComponentProps } from "../../store/actions/history-actions";
+// import { pushComponentProps } from "../../store/actions/history-actions";
 import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 import {
   executeDeleteVendorLambda,
   executelistVendorAdminsLambda,
 } from "../../awsClients/vendorLambda";
-import { setVendorList } from "../../store/actions/vendor-actions";
+import { setVendorList } from "../../features/vendorSlice";
 import "./VendorDetails.css";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../features/authenticationSlice";
 
 const VendorDetails = (props) => {
   const [userDetailsNameValueList, setUserDetailsNameValueList] = useState([]);
   const messageDialog = useRef();
-  const loadingDialog = useRef();
   const confirmationDialog = useRef();
+  const dispatch = useDispatch();
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const user = useSelector(selectUser);
+  const vendorList = useSelector((state) => state.vendor.vendorList);
 
   const initAdminDeleteAction = async () => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       let vendorDetailsData = {
         vendor_name: props.user.vendor_name,
@@ -35,30 +41,51 @@ const VendorDetails = (props) => {
       };
       var result = await executeDeleteVendorLambda(
         vendorDetailsData,
-        props.credentials
+        user?.credentials
       );
       console.log("result", result);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog(
-        "Success",
-        "User deleted successfully",
-        () => {
-          props.history.goBack();
-        }
-      );
+      console.log("executeDeleteVendorLambda -->", result);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog(
+      //   "Success",
+      //   "User deleted successfully",
+      //   () => {
+      //     props.history.goBack();
+      //   }
+      // );
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("executeDeleteVendorLambda Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("executeDeleteVendorLambda Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const handleDeleteAction = () => {
-    confirmationDialog.current.showDialog(
-      "Confirm Action",
-      "To delete the Vendor Details permenently, type 'DELETE' below",
-      "DELETE",
-      initAdminDeleteAction
-    );
+    // confirmationDialog.current.showDialog(
+    //   "Confirm Action",
+    //   "To delete the Vendor Details permenently, type 'DELETE' below",
+    //   "DELETE",
+    //   initAdminDeleteAction
+    // );
   };
 
   useEffect(() => {
@@ -66,20 +93,40 @@ const VendorDetails = (props) => {
   }, []);
 
   const fetchAndInitVendorAdminsList = async () => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      var result = await executelistVendorAdminsLambda(props.credentials);
-      props.setVendorList(result.vendorList);
-      loadingDialog.current.closeDialog();
+      var result = await executelistVendorAdminsLambda(user?.credentials);
+      console.log("executelistVendorAdminsLambda -->");
+      dispatch(setVendorList({ vendorList: result.vendorList }));
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchAndInitVendorAdminsList Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitVendorAdminsList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   useEffect(() => {
     console.log("_memberDetails", "_restoreProps-saved", props);
-    props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
+    // props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
     return () => {
       // Cleanup logic, equivalent to componentWillUnmount
     };
@@ -88,8 +135,8 @@ const VendorDetails = (props) => {
   useEffect(() => {
     // componentDidUpdate logic
     setUserDetailsNameValueList(
-      Object.keys(fromVendorDetails(props.user)).map(
-        (item) => new NameValue(item, fromVendorDetails(props.user)[item])
+      Object.keys(fromVendorDetails(props.user)).map((item) =>
+        NameValue(item, fromVendorDetails(props.user)[item])
       )
     );
   }, [props.user]);
@@ -105,8 +152,15 @@ const VendorDetails = (props) => {
         marginTop: "20px",
       }}
     >
-      <MessageDialog ref={messageDialog} />
-      {/* <LoadingDialog ref={loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
       <ConfirmationDialog ref={confirmationDialog} />
       <ActionButtons />
       <div style={{ margin: "50px 150px", clear: "both" }}>
@@ -126,9 +180,9 @@ const VendorDetails = (props) => {
         >
           <Link
             to={{
-              pathname: "/vendor/updateVendor",
+              pathname: `/vendor/updateVendor/${props.user?.userName}`,
               data: props.user,
-              vendorList: props.vendorList,
+              vendorList: vendorList,
             }}
           >
             Update Vendor Details
