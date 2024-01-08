@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { connect } from "react-redux";
+// import { connect } from "react-redux";
 import {
   Button,
   Card,
@@ -14,32 +14,33 @@ import {
   FormGroup,
 } from "reactstrap";
 import { whiteSurface } from "../../jsStyles/Style";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog";
-import LoadingDialog from "../../dialogs/LoadingDialog";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import {
   executelistVendorAdminsLambda,
   executeCreateVendorLambda,
   executeRazorpayLambda,
 } from "../../awsClients/vendorLambda";
-import { pushComponentProps } from "../../store/actions/history-actions";
+// import { pushComponentProps } from "../../store/actions/history-actions";
 import { UiAdminDestinations } from "../../nomenclature/nomenclature";
-import { setVendorList } from "../../store/actions/vendor-actions";
+import { setVendorList } from "../../features/vendorSlice";
 import DropDown from "../../components/DropDown";
+import { selectUser } from "../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const AddVendorMember = ({
-  vendorList,
-  user,
-  credentials,
-  setVendorList,
-  pushComponentProps,
-}) => {
+const AddVendorMember = () => {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const vendorList = useSelector((state) => state.vendor.vendorList);
   const [linkedResponse, setLinkedResponse] = useState("");
   const [formDetails, setFormDetails] = useState({
     vendor_name: "",
-    admin: "ssf_developer",
-    adminRole: "Super Admin",
-    assigned_by: "ssf_developer",
+    admin: user?.user?.userName,
+    adminRole: user?.user?.userRole,
+    assigned_by: user?.user?.userName,
     beneficiary: "asdf",
     buisnessName: "TOKYO",
     contact: "",
@@ -51,6 +52,7 @@ const AddVendorMember = ({
     accountNumber: "",
     account_id: "",
   });
+  const [dialogData, setDialogData] = useState(null);
 
   const messageDialog = useRef(null);
   const loadingDialog = useRef(null);
@@ -61,14 +63,36 @@ const AddVendorMember = ({
   }, []);
 
   const fetchAndInitClientList = async () => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      var result = await executelistVendorAdminsLambda(credentials);
-      setVendorList(result.vendorList);
-      loadingDialog.current.closeDialog();
+      var result = await executelistVendorAdminsLambda(user?.credentials);
+      dispatch(setVendorList({ vendorList: result.vendorList }));
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "AddVendorMemeber fetchAndInitClientList Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" AddVendorMember fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -77,7 +101,7 @@ const AddVendorMember = ({
     try {
       let result = await executeCreateVendorLambda(
         createUserRequest,
-        credentials
+        user?.credentials
       );
       messageDialog.current.showDialog(
         result.message,
@@ -88,7 +112,7 @@ const AddVendorMember = ({
           : result.status === -2 &&
             "Vendor Admin is already assigned to other complexes. Please choose other Admin",
         () => {
-          pushComponentProps(history.goBack());
+          // pushComponentProps(history.goBack());
         }
       );
       loadingDialog.current.closeDialog();
@@ -102,8 +126,8 @@ const AddVendorMember = ({
     confirmationDialog.current.showDialog(
       "Confirm Action",
       "To delete the user permanently, type 'DELETE' below",
-      "DELETE",
-      initAdminDeleteAction
+      "DELETE"
+      // initAdminDeleteAction
     );
   };
 
@@ -123,7 +147,10 @@ const AddVendorMember = ({
     loadingDialog.current.showDialog();
     try {
       let linkedAccountId = formDetails.account_id;
-      let result = await executeRazorpayLambda(linkedAccountId, credentials);
+      let result = await executeRazorpayLambda(
+        linkedAccountId,
+        user?.credentials
+      );
       setLinkedResponse(result);
       loadingDialog.current.closeDialog();
     } catch (err) {
@@ -145,10 +172,14 @@ const AddVendorMember = ({
 
   const onSubmit = () => {
     if (formDetails.account_id === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please enter a valid Linked Account ID."
-      );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid Linked Account ID",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddVendorMemeber fetchAndInitClientList Error:->");
+        },
+      });
     } else if (linkedResponse.message !== "success") {
       messageDialog.current.showDialog(
         "Validation Error",
@@ -174,6 +205,14 @@ const AddVendorMember = ({
     }
   };
 
+  const handleAddVendorMember = (e) => {
+    console.log("handleAddVendorMember", e.target.name, e.target.value);
+    setFormDetails({
+      ...formDetails,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
     <div
       className="col-md-10 offset-md-2"
@@ -184,10 +223,16 @@ const AddVendorMember = ({
         background: "white",
       }}
     >
-      <MessageDialog ref={this.messageDialog} />
-      <LoadingDialog ref={this.loadingDialog} />
-      <ConfirmationDialog ref={this.confirmationDialog} />
-
+      <ConfirmationDialog ref={confirmationDialog} />
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
       <div className="" style={{ margin: "50px", clear: "both" }}>
         <Row className="justify-content-center">
           <Col md="8">
@@ -209,26 +254,19 @@ const AddVendorMember = ({
                       <Input
                         type="text"
                         placeholder="Linked Account"
-                        onChange={(event) =>
-                          (this.formDetails.account_id = event.target.value)
-                        }
+                        name="account_id"
+                        onChange={handleAddVendorMember}
                         valid={
-                          this.state.linkedResponse.message === "success"
-                            ? true
-                            : false
+                          linkedResponse.message === "success" ? true : false
                         }
                         invalid={
-                          this.state.linkedResponse.message === "failure"
-                            ? true
-                            : false
+                          linkedResponse.message === "failure" ? true : false
                         }
                       />
                       <FormFeedback
                         tooltip
                         valid={
-                          this.state.linkedResponse.message === "success"
-                            ? true
-                            : false
+                          linkedResponse.message === "success" ? true : false
                         }
                       >
                         This is a verified account
@@ -236,9 +274,7 @@ const AddVendorMember = ({
                       <FormFeedback
                         tooltip
                         invalid={
-                          this.state.linkedResponse.message === "failure"
-                            ? true
-                            : false
+                          linkedResponse.message === "failure" ? true : false
                         }
                       >
                         Try Again! that I'd is not valid
@@ -251,7 +287,7 @@ const AddVendorMember = ({
                   outline
                   color="primary"
                   className="px-4"
-                  onClick={this.onVerify}
+                  onClick={onVerify}
                 >
                   Verify
                 </Button>
@@ -274,36 +310,32 @@ const AddVendorMember = ({
                       <Input
                         type="text"
                         placeholder="Contact Name"
-                        onChange={(event) =>
-                          (this.formDetails.vendor_name = event.target.value)
-                        }
+                        name="vendor_name"
+                        onChange={handleAddVendorMember}
                       />
                     </InputGroup>
                     <InputGroup className="mb-4">
                       <Input
                         type="text"
                         placeholder="Contact Email"
-                        onChange={(event) =>
-                          (this.formDetails.email = event.target.value)
-                        }
+                        name="email"
+                        onChange={handleAddVendorMember}
                       />
                     </InputGroup>
                     <InputGroup className="mb-4">
                       <Input
                         type="text"
                         placeholder="Contact Number"
-                        onChange={(event) =>
-                          (this.formDetails.contact = event.target.value)
-                        }
+                        name="contact"
+                        onChange={handleAddVendorMember}
                       />
                     </InputGroup>
                     <InputGroup>
                       <Input
                         type="text"
                         placeholder="Business Name"
-                        onChange={(event) =>
-                          (this.formDetails.buisnessName = event.target.value)
-                        }
+                        name="buisnessName"
+                        onChange={handleAddVendorMember}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -326,36 +358,32 @@ const AddVendorMember = ({
                     <Input
                       type="text"
                       placeholder="IFSC Code"
-                      onChange={(event) =>
-                        (this.formDetails.ifsc_code = event.target.value)
-                      }
+                      name="ifsc_code"
+                      onChange={handleAddVendorMember}
                     />
                   </InputGroup>
                   <InputGroup className="mb-4">
                     <Input
                       type="text"
                       placeholder="Account Number"
-                      onChange={(event) =>
-                        (this.formDetails.accountNumber = event.target.value)
-                      }
+                      name="accountNumber"
+                      onChange={handleAddVendorMember}
                     />
                   </InputGroup>
                   <InputGroup className="mb-4">
                     <Input
                       type="text"
                       placeholder="Beneficiary"
-                      onChange={(event) =>
-                        (this.formDetails.beneficiary = event.target.value)
-                      }
+                      name="beneficiary"
+                      onChange={handleAddVendorMember}
                     />
                   </InputGroup>
                   <InputGroup>
                     <Input
                       type="text"
                       placeholder="User Name"
-                      onChange={(event) =>
-                        (this.formDetails.userName = event.target.value)
-                      }
+                      name="userName"
+                      onChange={handleAddVendorMember}
                     />
                   </InputGroup>
                 </Form>
@@ -377,9 +405,8 @@ const AddVendorMember = ({
                     <Input
                       type="text"
                       placeholder="GST Number"
-                      onChange={(event) =>
-                        (this.formDetails.gstNumber = event.target.value)
-                      }
+                      name="gstNumber"
+                      onChange={handleAddVendorMember}
                     />
                   </InputGroup>
                 </Form>
@@ -399,8 +426,8 @@ const AddVendorMember = ({
                 <Form>
                   <InputGroup>
                     <DropDown
-                      options={this.populateClientList()}
-                      onSelection={this.onClientSelected}
+                      options={populateClientList()}
+                      onSelection={onClientSelected}
                     />
                   </InputGroup>
                 </Form>
@@ -423,7 +450,7 @@ const AddVendorMember = ({
             style={{ margin: "auto" }}
             color="primary"
             className="px-4"
-            onClick={this.onSubmit}
+            onClick={onSubmit}
           >
             Create
           </Button>
@@ -433,22 +460,4 @@ const AddVendorMember = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  var lastProps = state.historyStore[UiAdminDestinations.MemberDetails];
-  if (lastProps != undefined) {
-    return lastProps;
-  }
-
-  return {
-    vendorList: state.vendor.vendorList,
-    user: state.authentication.user,
-    credentials: state.authentication.credentials,
-  };
-};
-
-const mapActionsToProps = {
-  pushComponentProps: pushComponentProps,
-  setVendorList: setVendorList,
-};
-
-export default connect(mapStateToProps, mapActionsToProps)(AddVendorMember);
+export default AddVendorMember;

@@ -177,6 +177,7 @@ const UpdateVendorMember = () => {
       [e.target.name]: e.target.value,
     });
   };
+  
   if (teamList == null || teamList == undefined) {
     return null;
   }

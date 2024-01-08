@@ -92,7 +92,7 @@ const VendorHome = () => {
             <i>{teamSize}</i>
           </div>
         </div>
-        {user.userRole === "Super Admin" && (
+        {user.user?.userRole === "Super Admin" && (
           <div
             className={"col-md-4"}
             style={{ display: "flex", justifyContent: "space-around" }}

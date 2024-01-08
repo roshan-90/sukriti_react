@@ -39,6 +39,7 @@ const ReportsHome = lazy(() => import("./ui/reports/ReportsHome"));
 const VendorHome = lazy(() => import("./ui/vendor/VendorHome"));
 const VendorDetails = lazy(() => import("./ui/vendor/VendorDetailsHome"));
 const UpdateVendorMember = lazy(() => import("./ui/vendor/UpdateVendorMember"));
+const AddVendorMember = lazy(() => import("./ui/vendor/AddVendorMember"));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -156,6 +157,12 @@ const App = () => {
                       exact={true}
                       name={"Vendor"}
                       element={<VendorHome />}
+                    />
+                    <Route
+                      path={"/vendor/addVendorMember"}
+                      exact={true}
+                      name={"Add Vendor Member"}
+                      element={<AddVendorMember />}
                     />
                     <Route
                       path={"/vendor/vendorDetails/:id"}
