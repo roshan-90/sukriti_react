@@ -1,28 +1,32 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Col, Row, Button } from "reactstrap";
 import List from "../../components/lists/vendorList/List";
 import { setTeamList } from "../../features/vendorSlice";
 import { selectUser } from "../../features/authenticationSlice";
 // import { removeComponentProps } from "../../store/actions/history-actions";
-import MessageDialog from "../../dialogs/MessageDialog";
 // import LoadingDialog from "../../dialogs/LoadingDialog";
 import NoDataComponent from "../../components/NoDataComponent";
 import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 import { executeReadVendorLambda } from "../../awsClients/vendorLambda";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const VendorHome = () => {
   const dispatch = useDispatch();
   const teamList = useSelector((state) => state.vendor.teamList);
   const user = useSelector(selectUser);
   const navigate = useNavigate();
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
 
   const messageDialog = useRef();
   // const loadingDialog = useRef();
 
   const fetchAndInitTeam = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeReadVendorLambda(
         user?.user?.userName,
@@ -31,10 +35,29 @@ const VendorHome = () => {
       console.log("result -:👉", result);
       console.log("vendor home data -:👉", result);
       dispatch(setTeamList({ teamList: result.teamDetails }));
-      // loadingDialog.current.closeDialog();
     } catch (err) {
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -96,8 +119,15 @@ const VendorHome = () => {
 
   return (
     <div className="animated fadeIn" style={{ padding: "10px" }}>
-      <MessageDialog ref={messageDialog} />
-      {/* <LoadingDialog ref={loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
 
       <Row>
         <Col xs="12" sm="12" lg="12">
