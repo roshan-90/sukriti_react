@@ -24,10 +24,14 @@ const adminstrationSlice = createSlice({
       console.log("setData");
       state.data = action.data;
     },
+    setResetData: (state, action) => {
+      console.log("setResetData");
+      state.data = [];
+    },
   },
 });
 
-export const { setTeamList, setClientList, setData } =
+export const { setTeamList, setClientList, setData, setResetData } =
   adminstrationSlice.actions;
 export const adminstrationState = (state) => state.adminstration;
 

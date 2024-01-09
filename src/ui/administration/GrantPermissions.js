@@ -32,20 +32,30 @@ import {
 } from "reactstrap";
 import "./GrantPermissions.css";
 import icToilet from "../../assets/img/icons/ic_toilet.png";
-
-const GrantPermissions = ({
+import { selectUser } from "../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import ValidationMessageDialog from "../../dialogs/MessageDialog";
+import { useNavigate } from "react-router-dom";
+import {
   setClientList,
-  setUiList,
-  setUiReset,
-  clientList,
-  data,
-  history,
-}) => {
+  setData,
+  setResetData,
+} from "../../features/adminstrationSlice";
+
+const GrantPermissions = () => {
   const [selectedRole, setSelectedRole] = useState(UserRoles.Undefined);
   const uiDetails = useRef({});
   const selectedClient = useRef({});
   const messageDialog = useRef(null);
   const loadingDialog = useRef(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const clientList = useSelector((state) => state.adminstration.clientList);
 
   useEffect(() => {
     fetchAndInitClientList();
@@ -55,75 +65,144 @@ const GrantPermissions = ({
   }, []);
 
   const initializeUiDetails = () => {
-    uiDetails.current = {
-      clientName: "",
-      collection_stats: data.collection_stats,
-      methane: data.methane,
-      ammonia: data.ammonia,
-      luminous: data.luminous,
-      usage_charge: data.usage_charge,
-      carbon_monooxide: data.carbon_monooxide,
-      air_dryer_health: data.air_dryer_health,
-      choke_health: data.choke_health,
-      tap_health: data.tap_health,
-      usage_charge_profile: data.usage_charge_profile,
-      air_dryer_profile: data.air_dryer_profile,
-      rfid_profile: data.rfid_profile,
-      alp: data.alp,
-      mp1_valve: data.mp1_valve,
-      mp2_valve: data.mp2_valve,
-      mp3_valve: data.mp3_valve,
-      mp4_valve: data.mp4_valve,
-      turbidity_value: data.turbidity_value,
-      total_usage: data.total_usage,
-      average_feedback: data.average_feedback,
-      water_saved: data.water_saved,
-      bwt_stats: data.bwt_stats,
-    };
+    // uiDetails.current = {
+    //   clientName: "",
+    //   collection_stats: data.collection_stats,
+    //   methane: data.methane,
+    //   ammonia: data.ammonia,
+    //   luminous: data.luminous,
+    //   usage_charge: data.usage_charge,
+    //   carbon_monooxide: data.carbon_monooxide,
+    //   air_dryer_health: data.air_dryer_health,
+    //   choke_health: data.choke_health,
+    //   tap_health: data.tap_health,
+    //   usage_charge_profile: data.usage_charge_profile,
+    //   air_dryer_profile: data.air_dryer_profile,
+    //   rfid_profile: data.rfid_profile,
+    //   alp: data.alp,
+    //   mp1_valve: data.mp1_valve,
+    //   mp2_valve: data.mp2_valve,
+    //   mp3_valve: data.mp3_valve,
+    //   mp4_valve: data.mp4_valve,
+    //   turbidity_value: data.turbidity_value,
+    //   total_usage: data.total_usage,
+    //   average_feedback: data.average_feedback,
+    //   water_saved: data.water_saved,
+    //   bwt_stats: data.bwt_stats,
+    // };
   };
 
   const fetchAndInitClientList = async () => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executelistClientsLambda();
-      setClientList(result.clientList);
+      dispatch(setClientList(result.clientList));
       fetchClientWiseUI("SSF");
-      loadingDialog.current.closeDialog();
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "AddVendorMemeber fetchAndInitClientList Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" AddVendorMember fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const fetchClientWiseUI = async (clientData) => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchUILambda(clientData);
-      setUiList(result.data);
-      loadingDialog.current.closeDialog();
+      dispatch(setData(result.data));
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("GrantPermission fetchClientWiseUI Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" GrantPermission fetchClientWiseUI Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const initCreatePermissionRequest = async (createUserRequest) => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const requestCopy = { ...createUserRequest };
       await executePermissionUiLambda(requestCopy);
-      setUiReset();
-      messageDialog.current.showDialog(
-        "Success",
-        "UI added successfully",
-        () => {
-          history.goBack();
-        }
-      );
-      loadingDialog.current.closeDialog();
+      dispatch(setResetData());
+      setDialogData({
+        title: "Success",
+        message: "UI added successfully",
+        onClickAction: () => {
+          navigate("/administration");
+          // Handle the action when the user clicks OK
+          console.error(" AddTeamMember initCreateVendorRequest");
+        },
+      });
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "GrantPermission initCreatePermissionRequest Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(
+              " GrantPermission initCreatePermissionRequest Error",
+              err
+            );
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -139,6 +218,15 @@ const GrantPermissions = ({
   return (
     <div>
       <div className="animated fadeIn" style={{ padding: "10px" }}>
+        {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
+        <ValidationMessageDialog data={dialogData} />
         <div className="col-md-13">
           <div
             style={{

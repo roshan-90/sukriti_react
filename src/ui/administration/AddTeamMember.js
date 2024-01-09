@@ -40,6 +40,8 @@ import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import ValidationMessageDialog from "../../dialogs/MessageDialog";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const AddTeamMember = () => {
   const navigate = useNavigate();
@@ -171,12 +173,27 @@ const AddTeamMember = () => {
   };
 
   const populateClientList = () => {
-    console.log("populateCLientList");
     const clientLists = isClientSpecificRole(formDetails.current.userRole)
       ? clientList
       : [Client.getSSF()];
 
     const clientNameList = clientLists.map((mClient) => mClient.name);
+
+    // Update formDetails.current with the selected client data
+    const selectedClient =
+      clientLists.length > 0 ? clientLists[0] : Client.getInstance();
+    formDetails.current.clientName = selectedClient.name;
+    formDetails.current.organisationName = selectedClient.organisation;
+
+    // Check if organisationNameRef.current is defined before accessing setText
+    if (organisationNameRef.current) {
+      // Update the text using the RxInputText component's setText method
+      organisationNameRef.current.setText(formDetails.current.organisationName);
+
+      // Manually trigger a change event to force a re-render
+      const changeEvent = new Event("input", { bubbles: true });
+      organisationNameRef.current.dispatchEvent(changeEvent);
+    }
 
     return clientNameList;
   };
@@ -226,7 +243,7 @@ const AddTeamMember = () => {
                   <p style={Styles.formLabel}>User Details</p>
                   <InputGroup className="mb-3">
                     <InputGroupText>
-                      <i className="icon-user"></i>
+                      <PersonOutlineOutlinedIcon />
                     </InputGroupText>
                     <Input
                       type="text"
@@ -239,7 +256,7 @@ const AddTeamMember = () => {
 
                   <InputGroup className="mb-4">
                     <InputGroupText>
-                      <i className="icon-lock"></i>
+                      <LockOutlinedIcon />
                     </InputGroupText>
                     <Input
                       type="text"
@@ -253,7 +270,7 @@ const AddTeamMember = () => {
                   <p className="text-muted">User Role</p>
                   <InputGroup className="mb-4">
                     <InputGroupText>
-                      <i className="icon-lock"></i>
+                      <LockOutlinedIcon />
                     </InputGroupText>
                     <Dropdown
                       options={getCreateUserRoleList(user?.user?.userRole)}
@@ -274,7 +291,7 @@ const AddTeamMember = () => {
                   <p style={Styles.formLabel}>Client Selection</p>
                   <InputGroup className="mb-4">
                     <InputGroupText>
-                      <i className="icon-lock"></i>
+                      <LockOutlinedIcon />
                     </InputGroupText>
                     <Dropdown
                       options={populateClientList()}
@@ -284,7 +301,7 @@ const AddTeamMember = () => {
 
                   <InputGroup className="mb-3">
                     <InputGroupText>
-                      <i className="icon-user"></i>
+                      <PersonOutlineOutlinedIcon />
                     </InputGroupText>
                     <RxInputText
                       ref={organisationNameRef}
