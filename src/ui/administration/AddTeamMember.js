@@ -105,7 +105,7 @@ const AddTeamMember = () => {
     try {
       var roleName = getRoleName(createUserRequest.userRole);
       var requestCopy = { ...createUserRequest, userRole: roleName };
-      await executeCreateUserLambda(requestCopy, user?.user);
+      await executeCreateUserLambda(requestCopy, user?.user, user?.credentials);
       setDialogData({
         title: "Success",
         message: "User added successfully",

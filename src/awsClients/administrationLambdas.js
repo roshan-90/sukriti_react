@@ -55,7 +55,11 @@ export function executelistClientsLambda(credentials) {
   });
 }
 
-export function executeCreateUserLambda(createUserRequest, userDetails) {
+export function executeCreateUserLambda(
+  createUserRequest,
+  userDetails,
+  credentials
+) {
   // {
   //   "userName": "test_user_lambda",
   //   "temporaryPassword": "Changeme11!",
@@ -72,6 +76,11 @@ export function executeCreateUserLambda(createUserRequest, userDetails) {
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: {
+        accessKeyId: credentials?.accessKeyId,
+        secretAccessKey: credentials?.secretAccessKey,
+        sessionToken: credentials?.sessionToken,
+      },
     });
     var pullParams = {
       FunctionName: "mis_create_user",
