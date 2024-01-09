@@ -16,7 +16,7 @@ import {
 import { whiteSurface } from "../../jsStyles/Style";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
-import MessageDialog from "../../dialogs/MessageDialog";
+import ValidationMessageDialog from "../../dialogs/MessageDialog";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import {
   executelistVendorAdminsLambda,
@@ -97,28 +97,52 @@ const AddVendorMember = () => {
   };
 
   const initCreateVendorRequest = async (createUserRequest) => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       let result = await executeCreateVendorLambda(
         createUserRequest,
         user?.credentials
       );
-      messageDialog.current.showDialog(
-        result.message,
-        result.status === 1
-          ? "Vendor added successfully"
-          : result.status === -1
-          ? "Please try again!"
-          : result.status === -2 &&
-            "Vendor Admin is already assigned to other complexes. Please choose other Admin",
-        () => {
-          // pushComponentProps(history.goBack());
-        }
-      );
-      loadingDialog.current.closeDialog();
+      setDialogData({
+        title: result.message,
+        message:
+          result.status === 1
+            ? "Vendor added successfully"
+            : result.status === -1
+            ? "Please try again!"
+            : result.status === -2 &&
+              "Vendor Admin is already assigned to other complexes. Please choose other Admin",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.error(" AddVendorMember initCreateVendorRequest");
+        },
+      });
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "AddVendorMemeber fetchAndInitClientList Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" AddVendorMember fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -144,7 +168,7 @@ const AddVendorMember = () => {
   };
 
   const fetchRazorpayLinkedAcc = async () => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       let linkedAccountId = formDetails.account_id;
       let result = await executeRazorpayLambda(
@@ -152,19 +176,45 @@ const AddVendorMember = () => {
         user?.credentials
       );
       setLinkedResponse(result);
-      loadingDialog.current.closeDialog();
     } catch (err) {
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "AddVendorMemeber fetchAndInitClientList Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" AddVendorMember fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const onVerify = () => {
     if (formDetails.account_id === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please enter a valid Linked Account ID."
-      );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid Linked Account ID.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddVendorMemeber onVerify");
+        },
+      });
     } else {
       fetchRazorpayLinkedAcc();
     }
@@ -181,25 +231,41 @@ const AddVendorMember = () => {
         },
       });
     } else if (linkedResponse.message !== "success") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please verify your Linked Account ID."
-      );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please verify your Linked Account ID.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddVendorMemeber fetchAndInitClientList Error:->");
+        },
+      });
     } else if (formDetails.vendor_admin === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please select a Vendor Admin."
-      );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please select a Vendor Admin",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddVendorMemeber fetchAndInitClientList Error:->");
+        },
+      });
     } else if (formDetails.accountNumber === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please enter a valid Account Number."
-      );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid Account Number.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddVendorMemeber fetchAndInitClientList Error:->");
+        },
+      });
     } else if (formDetails.gstNumber === "") {
-      messageDialog.current.showDialog(
-        "Validation Error",
-        "Please enter a GST Number."
-      );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a GST Number.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddVendorMemeber fetchAndInitClientList Error:->");
+        },
+      });
     } else {
       initCreateVendorRequest(formDetails);
     }
@@ -232,7 +298,7 @@ const AddVendorMember = () => {
           />
         </div>
       )}
-      <MessageDialog data={dialogData} />
+      <ValidationMessageDialog data={dialogData} />
       <div className="" style={{ margin: "50px", clear: "both" }}>
         <Row className="justify-content-center">
           <Col md="8">
@@ -447,7 +513,7 @@ const AddVendorMember = () => {
                     </div> */}
         <div className={"row justiy-content-center"} style={{ width: "100%" }}>
           <Button
-            style={{ margin: "auto" }}
+            style={{ margin: "auto", width: "100px" }}
             color="primary"
             className="px-4"
             onClick={onSubmit}

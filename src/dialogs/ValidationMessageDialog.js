@@ -25,6 +25,10 @@ const ValidationMessageDialog = ({ data }) => {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleButtonClick = () => {
+    handleClose();
     if (onClickAction !== undefined) {
       onClickAction();
     }
@@ -44,7 +48,7 @@ const ValidationMessageDialog = ({ data }) => {
         </div>
       </DialogContent>
       <DialogActions>
-        <Button color="primary" onClick={handleClose}>
+        <Button color="primary" onClick={handleButtonClick}>
           OK
         </Button>
       </DialogActions>
