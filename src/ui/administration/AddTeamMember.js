@@ -16,6 +16,8 @@ import * as Styles from "../../jsStyles/Style";
 // } from "../../store/actions/administration-actions";
 // import MessageDialog from "../../dialogs/MessageDialog";
 // import LoadingDialog from "../../dialogs/LoadingDialog";
+import { useNavigate } from "react-router-dom";
+import { setClientList } from "../../features/adminstrationSlice";
 import {
   executelistClientsLambda,
   executeCreateUserLambda,
@@ -33,18 +35,24 @@ import {
   Row,
 } from "reactstrap";
 import Client from "../../Entity/User/Client";
+import { selectUser } from "../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import ValidationMessageDialog from "../../dialogs/MessageDialog";
 
-const AddTeamMember = ({
-  userDetails,
-  clientList,
-  addMember,
-  setClientList,
-}) => {
+const AddTeamMember = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const clientList = useSelector((state) => state.adminstration.clientList);
   const [selectedRole, setSelectedRole] = useState(UserRoles.Undefined);
+  const [dialogData, setDialogData] = useState(null);
   const formDetails = useRef({
     userName: "",
     tempPassword: "",
-    userRole: getRole(getCreateUserRoleList(userDetails.userRole)[0]),
+    userRole: getRole(getCreateUserRoleList(user?.user?.userRole)[0]),
     clientName: "",
     organisationName: "",
   });
@@ -58,35 +66,81 @@ const AddTeamMember = ({
   }, []);
 
   const fetchAndInitClientList = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      var result = await executelistClientsLambda();
-      setClientList(result.clientList);
-      // loadingDialog.current.closeDialog();
+      var result = await executelistClientsLambda(user?.credentials);
+      console.log("AddTeamMember fetchAndInitClientList", result);
+      dispatch(setClientList(result.clientList));
     } catch (err) {
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "AddVendorMemeber fetchAndInitClientList Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" AddVendorMember fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const initCreateUserRequest = async (createUserRequest) => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var roleName = getRoleName(createUserRequest.userRole);
       var requestCopy = { ...createUserRequest, userRole: roleName };
-      await executeCreateUserLambda(requestCopy, userDetails);
-      // messageDialog.current.showDialog(
-      //   "Success",
-      //   "User added successfully",
-      //   () => {
-      //     // Navigate back after success
-      //     // this.props.history.goBack();
-      //   }
-      // );
-      // loadingDialog.current.closeDialog();
+      await executeCreateUserLambda(requestCopy, user?.user);
+      setDialogData({
+        title: "Success",
+        message: "User added successfully",
+        onClickAction: () => {
+          navigate("/administration");
+          // Handle the action when the user clicks OK
+          console.error(" AddTeamMember initCreateVendorRequest");
+        },
+      });
     } catch (err) {
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(
+              "AddVendorMemeber fetchAndInitClientList Error:->",
+              err
+            );
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error(" AddVendorMember fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -97,38 +151,56 @@ const AddTeamMember = ({
   };
 
   const onClientSelected = (index, value) => {
+    console.log("onClientSelected", index, value);
     const selectedRole = formDetails.current.userRole;
     const selectedClient = isClientSpecificRole(selectedRole)
       ? clientList[index]
       : Client.getSSF();
 
+    console.log("selectedClient", selectedClient);
+    console.log("selectedClient organization", selectedClient.organisation);
+
+    // Update formDetails.current with the selected client data
     formDetails.current.clientName = selectedClient.name;
     formDetails.current.organisationName = selectedClient.organisation;
 
-    organisationNameRef.current.setText(formDetails.current.organisationName);
+    // Check if organisationNameRef.current is defined before accessing setText
+    // if (organisationNameRef.current) {
+    //   organisationNameRef.current.setText(formDetails.current.organisationName);
+    // }
   };
 
   const populateClientList = () => {
-    const clientList = isClientSpecificRole(formDetails.current.userRole)
+    console.log("populateCLientList");
+    const clientLists = isClientSpecificRole(formDetails.current.userRole)
       ? clientList
       : [Client.getSSF()];
 
-    const clientNameList = clientList.map((mClient) => mClient.name);
+    const clientNameList = clientLists.map((mClient) => mClient.name);
 
     return clientNameList;
   };
 
   const onSubmit = () => {
+    console.log("formDetails", formDetails);
     if (formDetails.current.userName === "") {
-      // messageDialog.current.showDialog(
-      //   "Validation Error",
-      //   "Please enter a valid user name."
-      // );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid user name.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddTeamMemeber onsubmit Error:->");
+        },
+      });
     } else if (formDetails.current.tempPassword === "") {
-      // messageDialog.current.showDialog(
-      //   "Validation Error",
-      //   "Please enter a valid temporary password."
-      // );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid temporary password.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("AddTeamMemeber onsubmit Error:->");
+        },
+      });
     } else {
       initCreateUserRequest(formDetails.current);
     }
@@ -136,19 +208,113 @@ const AddTeamMember = ({
 
   return (
     <div className="col-md-12">
-      {/* <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <ValidationMessageDialog data={dialogData} />
+      <Container>
+        <Row className="justify-content-center">
+          <Col md="8">
+            <Card className="p-4">
+              <CardBody>
+                <Form>
+                  <p style={Styles.formLabel}>User Details</p>
+                  <InputGroup className="mb-3">
+                    <InputGroupText>
+                      <i className="icon-user"></i>
+                    </InputGroupText>
+                    <Input
+                      type="text"
+                      placeholder="Username"
+                      onChange={(event) =>
+                        (formDetails.current.userName = event.target.value)
+                      }
+                    />
+                  </InputGroup>
 
-      <Container>{/* Rest of your component JSX */}</Container>
+                  <InputGroup className="mb-4">
+                    <InputGroupText>
+                      <i className="icon-lock"></i>
+                    </InputGroupText>
+                    <Input
+                      type="text"
+                      placeholder="Temporary Password"
+                      onChange={(event) =>
+                        (formDetails.current.tempPassword = event.target.value)
+                      }
+                    />
+                  </InputGroup>
+
+                  <p className="text-muted">User Role</p>
+                  <InputGroup className="mb-4">
+                    <InputGroupText>
+                      <i className="icon-lock"></i>
+                    </InputGroupText>
+                    <Dropdown
+                      options={getCreateUserRoleList(user?.user?.userRole)}
+                      onSelection={onRoleSelected}
+                    />
+                  </InputGroup>
+                </Form>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row className="justify-content-center">
+          <Col md="8">
+            <Card className="p-4">
+              <CardBody>
+                <Form>
+                  <p style={Styles.formLabel}>Client Selection</p>
+                  <InputGroup className="mb-4">
+                    <InputGroupText>
+                      <i className="icon-lock"></i>
+                    </InputGroupText>
+                    <Dropdown
+                      options={populateClientList()}
+                      onSelection={onClientSelected}
+                    />
+                  </InputGroup>
+
+                  <InputGroup className="mb-3">
+                    <InputGroupText>
+                      <i className="icon-user"></i>
+                    </InputGroupText>
+                    <RxInputText
+                      ref={organisationNameRef}
+                      text={formDetails.current.organisationName}
+                      placeholder="Organisation Name"
+                      onChange={(event) =>
+                        (formDetails.current.organisationName =
+                          event.target.value)
+                      }
+                    />
+                  </InputGroup>
+                </Form>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <div className={"row justiy-content-center"}>
+          <Button
+            style={{ margin: "auto", width: "100px" }}
+            color="primary"
+            className="px-4"
+            onClick={onSubmit}
+          >
+            Submit
+          </Button>
+        </div>
+      </Container>
     </div>
   );
-};
-
-const mapStateToProps = (state) => {
-  return {
-    userDetails: state.authentication.user,
-    clientList: state.administration.clientList,
-  };
 };
 
 export default AddTeamMember;

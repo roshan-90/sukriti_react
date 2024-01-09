@@ -16,6 +16,7 @@ code {
 
 .app-body {
   flex-grow: 1;
+  margin-bottom: 70px;
 }
 
 .loader-container {
@@ -39,4 +40,3 @@ code {
 .loader {
   color: #ff007b; /* Change the color of the loader to blue (adjust as needed) */
 }
-
