@@ -9,7 +9,7 @@ import {
   Input,
 } from "reactstrap";
 
-const ConfirmationDialog = () => {
+const ConfirmationDialog = React.forwardRef((props, ref) => {
   const [confirmAction, setConfirmAction] = useState(false);
   const [visibility, setVisibility] = useState(false);
   const [message, setMessage] = useState("");
@@ -45,9 +45,15 @@ const ConfirmationDialog = () => {
   useEffect(() => {
     if (visibility) {
       setConfirmAction(false);
-      inputRef.current.focus();
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
   }, [visibility]);
+
+  React.useImperativeHandle(ref, () => ({
+    showDialog,
+  }));
 
   return (
     <Modal
@@ -87,6 +93,6 @@ const ConfirmationDialog = () => {
       </ModalFooter>
     </Modal>
   );
-};
+});
 
 export default ConfirmationDialog;

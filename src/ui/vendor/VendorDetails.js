@@ -80,12 +80,14 @@ const VendorDetails = (props) => {
   };
 
   const handleDeleteAction = () => {
-    // confirmationDialog.current.showDialog(
-    //   "Confirm Action",
-    //   "To delete the Vendor Details permenently, type 'DELETE' below",
-    //   "DELETE",
-    //   initAdminDeleteAction
-    // );
+    setTimeout(() => {
+      confirmationDialog.current.showDialog(
+        "Confirm Action",
+        "To delete the Vendor Details permanently, type 'DELETE' below",
+        "DELETE",
+        initAdminDeleteAction
+      );
+    }, 0);
   };
 
   useEffect(() => {
