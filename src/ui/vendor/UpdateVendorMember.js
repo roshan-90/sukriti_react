@@ -177,7 +177,7 @@ const UpdateVendorMember = () => {
       [e.target.name]: e.target.value,
     });
   };
-  
+
   if (teamList == null || teamList == undefined) {
     return null;
   }
@@ -407,7 +407,7 @@ const UpdateVendorMember = () => {
         </Row>
         <div className={"row justiy-content-center"} style={{ width: "100%" }}>
           <Button
-            style={{ margin: "auto" }}
+            style={{ margin: "auto", width: "100px" }}
             color="primary"
             className="px-4"
             onClick={onSubmit}

@@ -29,9 +29,11 @@ import { setVendorList } from "../../features/vendorSlice";
 import DropDown from "../../components/DropDown";
 import { selectUser } from "../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const AddVendorMember = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(selectUser);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const vendorList = useSelector((state) => state.vendor.vendorList);
@@ -113,6 +115,7 @@ const AddVendorMember = () => {
             : result.status === -2 &&
               "Vendor Admin is already assigned to other complexes. Please choose other Admin",
         onClickAction: () => {
+          navigate("/vendor");
           // Handle the action when the user clicks OK
           console.error(" AddVendorMember initCreateVendorRequest");
         },

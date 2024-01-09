@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import { NameVendorList } from "../../components/DisplayLabels";
@@ -19,16 +19,76 @@ import { setVendorList } from "../../features/vendorSlice";
 import "./VendorDetails.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/authenticationSlice";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { setTeamList } from "../../features/vendorSlice";
+import { executeReadVendorLambda } from "../../awsClients/vendorLambda";
 
 const VendorDetails = (props) => {
+  const { id } = useParams();
   const [userDetailsNameValueList, setUserDetailsNameValueList] = useState([]);
   const messageDialog = useRef();
   const confirmationDialog = useRef();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const user = useSelector(selectUser);
   const vendorList = useSelector((state) => state.vendor.vendorList);
+
+  const fetchAndInitTeam = useCallback(async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      const result = await executeReadVendorLambda(
+        user?.user?.userName,
+        user?.credentials
+      );
+      console.log("Updatevendormember -:👉", result);
+      console.log("UpdateVendorMember -:👉", result);
+      dispatch(setTeamList({ teamList: result.teamDetails }));
+      let [teamList] = result.teamDetails.filter(
+        (data) => data?.vendor_name === id
+      );
+      setUserDetailsNameValueList(
+        Object.keys(fromVendorDetails(teamList)).map((item) =>
+          NameValue(item, fromVendorDetails(teamList)[item])
+        )
+      );
+    } catch (err) {
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }, [dispatch, executeReadVendorLambda, user]);
+
+  useEffect(() => {
+    fetchAndInitTeam();
+    console.log("_memberDetails", "_restoreProps-saved");
+    // props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
+    return () => {
+      // Cleanup logic, equivalent to componentWillUnmount
+      console.log("teamlist in vendordetail");
+    };
+  }, []);
 
   const initAdminDeleteAction = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -49,6 +109,7 @@ const VendorDetails = (props) => {
         title: "Success",
         message: "User deleted successfully",
         onClickAction: () => {
+          navigate("/vendor");
           // Handle the action when the user clicks OK
           console.log("initAdminDeleteAction onclicked:->");
         },
@@ -126,22 +187,14 @@ const VendorDetails = (props) => {
     }
   };
 
-  useEffect(() => {
-    console.log("_memberDetails", "_restoreProps-saved", props);
-    // props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
-    return () => {
-      // Cleanup logic, equivalent to componentWillUnmount
-    };
-  }, []);
-
-  useEffect(() => {
-    // componentDidUpdate logic
-    setUserDetailsNameValueList(
-      Object.keys(fromVendorDetails(props.user)).map((item) =>
-        NameValue(item, fromVendorDetails(props.user)[item])
-      )
-    );
-  }, [props.user]);
+  // useEffect(() => {
+  //   // componentDidUpdate logic
+  //   setUserDetailsNameValueList(
+  //     Object.keys(fromVendorDetails(teamList)).map((item) =>
+  //       NameValue(item, fromVendorDetails(teamList)[item])
+  //     )
+  //   );
+  // }, [props.user]);
 
   return (
     <div
