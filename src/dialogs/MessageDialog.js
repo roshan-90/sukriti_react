@@ -18,7 +18,7 @@ const MessageDialog = ({ data }) => {
     if (data) {
       setTitle(data.title);
       setMessage(data.message);
-      setOnClickAction(data.onClickAction);
+      setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
     }
   }, [data]);

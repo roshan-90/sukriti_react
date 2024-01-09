@@ -27,14 +27,14 @@ const ConfirmationDialog = React.forwardRef((props, ref) => {
     setAction(newAction);
     setTitle(newTitle);
     setMessage(newMessage);
-    setOnClickAction(newOnClickAction || undefined);
+    setOnClickAction(() => newOnClickAction || undefined);
     setVisibility((prevVisibility) => !prevVisibility);
   };
 
   const onClick = () => {
     toggle();
     if (onClickAction !== undefined) {
-      onClickAction();
+      onClickAction(); // Execute the callback when Confirm is clicked
     }
   };
 

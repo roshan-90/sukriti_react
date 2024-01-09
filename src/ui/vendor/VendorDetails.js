@@ -45,14 +45,14 @@ const VendorDetails = (props) => {
       );
       console.log("result", result);
       console.log("executeDeleteVendorLambda -->", result);
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog(
-      //   "Success",
-      //   "User deleted successfully",
-      //   () => {
-      //     props.history.goBack();
-      //   }
-      // );
+      setDialogData({
+        title: "Success",
+        message: "User deleted successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("initAdminDeleteAction onclicked:->");
+        },
+      });
     } catch (err) {
       let text = err.message.includes("expired");
       if (text) {
