@@ -17,7 +17,7 @@ const RxInputCheckbox = ({
   const onCheckboxChange = (e) => {
     console.log("_check", e.target.checked);
     console.log("checking type of", e.target.checked);
-    // onChange(e.target.checked);
+    onChange(e.target.checked);
   };
 
   const ComponentSelector = () => {

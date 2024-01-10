@@ -99,10 +99,10 @@ export function getSelectionSummary(accessTree) {
     });
 
   return [
-    new NameValue("State", stateCount),
-    new NameValue("District", districtCount),
-    new NameValue("City", cityCount),
-    new NameValue("Complex", complexCount),
+    NameValue("State", stateCount),
+    NameValue("District", districtCount),
+    NameValue("City", cityCount),
+    NameValue("Complex", complexCount),
   ];
 }
 
@@ -182,7 +182,7 @@ export async function getTrimmedAccessTree(accessTree) {
                               ].districts[districtIndex].cities[cityIndex]
                                 .complexes[complexIndex];
                               emptyNodes.push(
-                                new TreeEdge(
+                                TreeEdge(
                                   stateIndex,
                                   districtIndex,
                                   cityIndex,
@@ -205,7 +205,7 @@ export async function getTrimmedAccessTree(accessTree) {
                           delete trimmedAccessTree.country.states[stateIndex]
                             .districts[districtIndex].cities[cityIndex];
                           emptyNodes.push(
-                            new TreeEdge(stateIndex, districtIndex, cityIndex)
+                            TreeEdge(stateIndex, districtIndex, cityIndex)
                           );
                         }
                       } else {
@@ -221,7 +221,7 @@ export async function getTrimmedAccessTree(accessTree) {
                     //Remove District
                     delete trimmedAccessTree.country.states[stateIndex]
                       .districts[districtIndex];
-                    emptyNodes.push(new TreeEdge(stateIndex, districtIndex));
+                    emptyNodes.push(TreeEdge(stateIndex, districtIndex));
                     //trimmedAccessTree[stateIndex].districts.splice(districtIndex,1);
                   }
                 } else {
@@ -232,7 +232,7 @@ export async function getTrimmedAccessTree(accessTree) {
 
           if (activeDistrictCount == 0) {
             //Remove State
-            emptyNodes.push(new TreeEdge(stateIndex));
+            emptyNodes.push(TreeEdge(stateIndex));
             delete trimmedAccessTree.country.states[stateIndex];
             //trimmedAccessTree.splice(stateIndex,1);
           } else {

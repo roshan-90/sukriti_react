@@ -86,8 +86,8 @@ const MemberAccess = (props) => {
       const accessKeys = await getAccessKeys(trimmedAccessTree);
 
       const defineAccessRequest = {
-        userName: user?.user.userName,
-        userRole: user?.user.userRole,
+        // userName: user?.user.userName,
+        // userRole: user?.user.userRole,
         accessTree: trimmedAccessTree,
         accessKeys: accessKeys,
       };
@@ -137,11 +137,20 @@ const MemberAccess = (props) => {
     const districtIndex = treeEdge.districtIndex;
     const cityIndex = treeEdge.cityIndex;
     const complexIndex = treeEdge.complexIndex;
-
+    console.log("checking handleUserSelection", nodeType);
+    console.log("checking handleUserSelection1", treeEdge);
+    console.log("checking handleUserSelection2", selected);
+    console.log("checking", nodeType === TreeItemType.State);
     if (nodeType === TreeItemType.State) {
+      console.log("checking state");
       setAccessTree((prevTree) => {
         const updatedTree = { ...prevTree };
+        console.log("checking updatedTree", updatedTree);
         updatedTree.country.states[stateIndex].selected = selected;
+        console.log(
+          "checking updatedTree2",
+          updatedTree.country.states[stateIndex]
+        );
         return updatedTree;
       });
     } else if (nodeType === TreeItemType.District) {
@@ -172,8 +181,8 @@ const MemberAccess = (props) => {
     }
 
     setAccessSummary(getSelectionSummary(accessTree));
-    selectionSummary.current.setAccessSummary(accessSummary);
-    stateList.current.updateData(accessTree);
+    selectionSummary.current?.setAccessSummary(accessSummary);
+    stateList.current?.updateData(accessTree);
   };
 
   useEffect(() => {
