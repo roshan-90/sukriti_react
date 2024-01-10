@@ -367,12 +367,13 @@ export function executeFetchDashboardLambda(
   });
 }
 
-export function executePermissionUiLambda(config) {
+export function executePermissionUiLambda(config, credentials) {
   return new Promise(function (resolve, reject) {
     var payload = { payload: config };
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_administration_ui",
@@ -390,12 +391,17 @@ export function executePermissionUiLambda(config) {
   });
 }
 
-export function executeFetchUILambda(CLIENT) {
+export function executeFetchUILambda(CLIENT, credentials) {
   return new Promise(function (resolve, reject) {
     var request = { CLIENT: CLIENT };
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: {
+        accessKeyId: credentials?.accessKeyId,
+        secretAccessKey: credentials?.secretAccessKey,
+        sessionToken: credentials?.sessionToken,
+      }, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_administration_getpermission_ui",

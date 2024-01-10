@@ -43,6 +43,7 @@ import {
   setData,
   setResetData,
 } from "../../features/adminstrationSlice";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const GrantPermissions = () => {
   const [selectedRole, setSelectedRole] = useState(UserRoles.Undefined);
@@ -164,7 +165,7 @@ const GrantPermissions = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const requestCopy = { ...createUserRequest };
-      await executePermissionUiLambda(requestCopy);
+      await executePermissionUiLambda(requestCopy, user?.credentials);
       dispatch(setResetData());
       setDialogData({
         title: "Success",
@@ -256,7 +257,7 @@ const GrantPermissions = () => {
               <p style={Styles.formLabel}>Client Selection</p>
               <InputGroup className="mb-4">
                 <InputGroupText>
-                  <i className="icon-lock"></i>
+                  <LockOutlinedIcon />
                 </InputGroupText>
                 <Input
                   type="select"
@@ -360,9 +361,9 @@ const GrantPermissions = () => {
                       }
                       name="Average Feedback"
                       defaultChecked={
-                        data.average_feedback === "false"
+                        data?.average_feedback === "false"
                           ? false
-                          : data.average_feedback
+                          : data?.average_feedback
                       }
                     />
                     <span class="slider round"></span>
@@ -376,7 +377,9 @@ const GrantPermissions = () => {
                       }
                       name="Water Saved"
                       defaultChecked={
-                        data.water_saved === "false" ? false : data.water_saved
+                        data?.water_saved === "false"
+                          ? false
+                          : data?.water_saved
                       }
                     />
                     <span class="slider round"></span>
@@ -401,9 +404,9 @@ const GrantPermissions = () => {
                       }
                       name="Collection"
                       defaultChecked={
-                        data.collection_stats === "false"
+                        data?.collection_stats === "false"
                           ? false
-                          : data.collection_stats
+                          : data?.collection_stats
                       }
                     />
                     <span class="slider round"></span>
@@ -417,9 +420,9 @@ const GrantPermissions = () => {
                       }
                       name="usage_charge"
                       defaultChecked={
-                        data.usage_charge === "false"
+                        data?.usage_charge === "false"
                           ? false
-                          : data.usage_charge
+                          : data?.usage_charge
                       }
                     />
                     <span class="slider round"></span>
@@ -433,9 +436,9 @@ const GrantPermissions = () => {
                       }
                       name="usage_charge_profile"
                       defaultChecked={
-                        data.usage_charge_profile === "false"
+                        data?.usage_charge_profile === "false"
                           ? false
-                          : data.usage_charge_profile
+                          : data?.usage_charge_profile
                       }
                     />
                     <span class="slider round"></span>
@@ -460,7 +463,7 @@ const GrantPermissions = () => {
                       }
                       name="Collection"
                       defaultChecked={
-                        data.bwt_stats === "false" ? false : data.bwt_stats
+                        data?.bwt_stats === "false" ? false : data?.bwt_stats
                       }
                     />
                     <span class="slider round"></span>
@@ -536,9 +539,9 @@ const GrantPermissions = () => {
                       }
                       name="Carbon monooxide"
                       defaultChecked={
-                        data.carbon_monooxide === "false"
+                        data?.carbon_monooxide === "false"
                           ? false
-                          : data.carbon_monooxide
+                          : data?.carbon_monooxide
                       }
                     />
                     <span class="slider round"></span>
@@ -552,7 +555,7 @@ const GrantPermissions = () => {
                       }
                       name="Methane"
                       defaultChecked={
-                        data.methane === "false" ? false : data.methane
+                        data?.methane === "false" ? false : data?.methane
                       }
                     />
                     <span class="slider round"></span>
@@ -566,7 +569,7 @@ const GrantPermissions = () => {
                       }
                       name="Ammonia"
                       defaultChecked={
-                        data.ammonia === "false" ? false : data.ammonia
+                        data?.ammonia === "false" ? false : data?.ammonia
                       }
                     />
                     <span class="slider round"></span>
@@ -580,7 +583,7 @@ const GrantPermissions = () => {
                       }
                       name="Luminous"
                       defaultChecked={
-                        data.luminous === "false" ? false : data.luminous
+                        data?.luminous === "false" ? false : data?.luminous
                       }
                     />
                     <span class="slider round"></span>
@@ -605,9 +608,9 @@ const GrantPermissions = () => {
                       }
                       name="Air Dryer"
                       defaultChecked={
-                        data.air_dryer_health === "false"
+                        data?.air_dryer_health === "false"
                           ? false
-                          : data.air_dryer_health
+                          : data?.air_dryer_health
                       }
                     />
                     <span class="slider round"></span>
@@ -621,9 +624,9 @@ const GrantPermissions = () => {
                       }
                       name="Choke"
                       defaultChecked={
-                        data.choke_health === "false"
+                        data?.choke_health === "false"
                           ? false
-                          : data.choke_health
+                          : data?.choke_health
                       }
                     />
                     <span class="slider round"></span>
@@ -637,7 +640,7 @@ const GrantPermissions = () => {
                       }
                       name="Tap"
                       defaultChecked={
-                        data.tap_health === "false" ? false : data.tap_health
+                        data?.tap_health === "false" ? false : data?.tap_health
                       }
                     />
                     <span class="slider round"></span>
@@ -674,9 +677,9 @@ const GrantPermissions = () => {
                       }
                       name="Air Dryer"
                       defaultChecked={
-                        data.air_dryer_profile === "false"
+                        data?.air_dryer_profile === "false"
                           ? false
-                          : data.air_dryer_profile
+                          : data?.air_dryer_profile
                       }
                     />
                     <span class="slider round"></span>
@@ -690,9 +693,9 @@ const GrantPermissions = () => {
                       }
                       name="RFID"
                       defaultChecked={
-                        data.rfid_profile === "false"
+                        data?.rfid_profile === "false"
                           ? false
-                          : data.rfid_profile
+                          : data?.rfid_profile
                       }
                     />
                     <span class="slider round"></span>
@@ -767,7 +770,7 @@ const GrantPermissions = () => {
                         (uiDetails.alp = event.target.checked)
                       }
                       name="ALP"
-                      defaultChecked={data.alp === "false" ? false : data.alp}
+                      defaultChecked={data?.alp === "false" ? false : data?.alp}
                     />
                     <span class="slider round"></span>
                   </label>
@@ -780,7 +783,7 @@ const GrantPermissions = () => {
                       }
                       name="MP1 Valve"
                       defaultChecked={
-                        data.mp1_valve === "false" ? false : data.mp1_valve
+                        data?.mp1_valve === "false" ? false : data?.mp1_valve
                       }
                     />
                     <span class="slider round"></span>
@@ -794,7 +797,7 @@ const GrantPermissions = () => {
                       }
                       name="MP2 Valve"
                       defaultChecked={
-                        data.mp2_valve === "false" ? false : data.mp2_valve
+                        data?.mp2_valve === "false" ? false : data?.mp2_valve
                       }
                     />
                     <span class="slider round"></span>
@@ -808,7 +811,7 @@ const GrantPermissions = () => {
                       }
                       name="MP2 Valve"
                       defaultChecked={
-                        data.mp3_valve === "false" ? false : data.mp3_valve
+                        data?.mp3_valve === "false" ? false : data?.mp3_valve
                       }
                     />
                     <span class="slider round"></span>
@@ -822,7 +825,7 @@ const GrantPermissions = () => {
                       }
                       name="MP2 Valve"
                       defaultChecked={
-                        data.mp4_valve === "false" ? false : data.mp4_valve
+                        data?.mp4_valve === "false" ? false : data?.mp4_valve
                       }
                     />
                     <span class="slider round"></span>
@@ -847,9 +850,9 @@ const GrantPermissions = () => {
                       }
                       name="Turbidity Value"
                       defaultChecked={
-                        data.turbidity_value === "false"
+                        data?.turbidity_value === "false"
                           ? false
-                          : data.turbidity_value
+                          : data?.turbidity_value
                       }
                     />
                     <span class="slider round"></span>
@@ -863,7 +866,7 @@ const GrantPermissions = () => {
       <Container>
         <div
           className={"row justiy-content-center"}
-          style={{ width: "100%", padding: "20px" }}
+          style={{ width: "20%", padding: "20px", margin: "auto" }}
         >
           <Button
             style={{ margin: "auto" }}

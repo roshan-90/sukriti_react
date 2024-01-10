@@ -22,7 +22,7 @@ const adminstrationSlice = createSlice({
     },
     setData: (state, action) => {
       console.log("setData");
-      state.data = action.data;
+      state.data = action.payload;
     },
     setResetData: (state, action) => {
       console.log("setResetData");
