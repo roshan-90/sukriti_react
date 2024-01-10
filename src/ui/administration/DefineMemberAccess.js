@@ -26,9 +26,11 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
-import MessageDialog from "../../dialogs/MessageDialog";
+import ValidationMessageDialog from "../../dialogs/ValidationMessageDialog";
+import { useNavigate } from "react-router-dom";
 
 const MemberAccess = (props) => {
+  const navigate = useNavigate();
   const [accessSummary, setAccessSummary] = useState([]);
   const [accessTree, setAccessTree] = useState(undefined);
   const messageDialog = useRef(null);
@@ -78,7 +80,7 @@ const MemberAccess = (props) => {
   const handleSubmitAction = async () => {
     // console.log("_trimmedAccess", props.location.bundle);
 
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
       const accessKeys = await getAccessKeys(trimmedAccessTree);
@@ -95,19 +97,38 @@ const MemberAccess = (props) => {
         user?.credentials
       );
       console.log("_defineAccess", JSON.stringify(defineAccessResult));
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog(
-      //   "Success",
-      //   "User access tree updated",
-      //   () => {
-      //     props.history.goBack();
-      //     props.history.goBack();
-      //   }
-      // );
+      setDialogData({
+        title: "Success",
+        message: "User access tree updated",
+        onClickAction: () => {
+          navigate("/administration");
+          // Handle the action when the user clicks OK
+          console.log("DefineMemberAccess clicked to handleSubmitAction-->");
+        },
+      });
     } catch (err) {
-      console.log("_err", err);
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("initFetchCompletedUserAccessTreeAction Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("initFetchCompletedUserAccessTreeAction Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -185,35 +206,45 @@ const MemberAccess = (props) => {
   };
 
   return (
-    <div
-      className="col-md-10 offset-md-2"
-      style={{ ...whiteSurface, width: "80%", margin: "auto" }}
-    >
-      {/* <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} /> */}
-      <div>
-        <Button
-          style={{ float: "left", margin: "10px" }}
-          outline
-          color="primary"
-          className="px-4"
-          onClick={handleSubmitAction}
-        >
-          Define Access
-        </Button>
-
-        <div className="col-md-2" style={{ float: "right" }}>
-          <RxAccessSummary
-            ref={selectionSummary}
-            accessSummary={accessSummary}
+    <>
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
           />
         </div>
-      </div>
+      )}
+      <ValidationMessageDialog data={dialogData} />
 
-      <div className="col-md-8 offset-md-1" style={{ clear: "both" }}>
-        <ComponentSelector />
+      <div
+        className="col-md-10 offset-md-2"
+        style={{ ...whiteSurface, width: "80%", margin: "auto" }}
+      >
+        <div>
+          <Button
+            style={{ float: "left", margin: "10px" }}
+            outline
+            color="primary"
+            className="px-4"
+            onClick={handleSubmitAction}
+          >
+            Define Access
+          </Button>
+
+          <div className="col-md-2" style={{ float: "right" }}>
+            <RxAccessSummary
+              ref={selectionSummary}
+              accessSummary={accessSummary}
+            />
+          </div>
+        </div>
+
+        <div className="col-md-8 offset-md-1" style={{ clear: "both" }}>
+          <ComponentSelector />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
