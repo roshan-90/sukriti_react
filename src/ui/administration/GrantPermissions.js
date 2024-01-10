@@ -56,6 +56,7 @@ const GrantPermissions = () => {
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const clientList = useSelector((state) => state.adminstration.clientList);
+  const data = useSelector((state) => state.adminstration.data);
 
   useEffect(() => {
     fetchAndInitClientList();
@@ -65,37 +66,37 @@ const GrantPermissions = () => {
   }, []);
 
   const initializeUiDetails = () => {
-    // uiDetails.current = {
-    //   clientName: "",
-    //   collection_stats: data.collection_stats,
-    //   methane: data.methane,
-    //   ammonia: data.ammonia,
-    //   luminous: data.luminous,
-    //   usage_charge: data.usage_charge,
-    //   carbon_monooxide: data.carbon_monooxide,
-    //   air_dryer_health: data.air_dryer_health,
-    //   choke_health: data.choke_health,
-    //   tap_health: data.tap_health,
-    //   usage_charge_profile: data.usage_charge_profile,
-    //   air_dryer_profile: data.air_dryer_profile,
-    //   rfid_profile: data.rfid_profile,
-    //   alp: data.alp,
-    //   mp1_valve: data.mp1_valve,
-    //   mp2_valve: data.mp2_valve,
-    //   mp3_valve: data.mp3_valve,
-    //   mp4_valve: data.mp4_valve,
-    //   turbidity_value: data.turbidity_value,
-    //   total_usage: data.total_usage,
-    //   average_feedback: data.average_feedback,
-    //   water_saved: data.water_saved,
-    //   bwt_stats: data.bwt_stats,
-    // };
+    uiDetails.current = {
+      clientName: "",
+      collection_stats: data?.collection_stats,
+      methane: data?.methane,
+      ammonia: data?.ammonia,
+      luminous: data?.luminous,
+      usage_charge: data?.usage_charge,
+      carbon_monooxide: data?.carbon_monooxide,
+      air_dryer_health: data?.air_dryer_health,
+      choke_health: data?.choke_health,
+      tap_health: data?.tap_health,
+      usage_charge_profile: data?.usage_charge_profile,
+      air_dryer_profile: data?.air_dryer_profile,
+      rfid_profile: data?.rfid_profile,
+      alp: data?.alp,
+      mp1_valve: data?.mp1_valve,
+      mp2_valve: data?.mp2_valve,
+      mp3_valve: data?.mp3_valve,
+      mp4_valve: data?.mp4_valve,
+      turbidity_value: data?.turbidity_value,
+      total_usage: data?.total_usage,
+      average_feedback: data?.average_feedback,
+      water_saved: data?.water_saved,
+      bwt_stats: data?.bwt_stats,
+    };
   };
 
   const fetchAndInitClientList = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      const result = await executelistClientsLambda();
+      const result = await executelistClientsLambda(user?.credentials);
       dispatch(setClientList(result.clientList));
       fetchClientWiseUI("SSF");
       dispatch(stopLoading()); // Dispatch the stopLoading action
@@ -131,7 +132,7 @@ const GrantPermissions = () => {
   const fetchClientWiseUI = async (clientData) => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      const result = await executeFetchUILambda(clientData);
+      const result = await executeFetchUILambda(clientData, user?.credentials);
       dispatch(setData(result.data));
     } catch (err) {
       let text = err.message.includes("expired");
@@ -274,8 +275,589 @@ const GrantPermissions = () => {
           </div>
         </div>
         <div className="row">
-          {/* Rest of your component content */}
-          {/* ... */}
+          <div className="col-md-4">
+            {/* <MessageDialog ref={this.messageDialog} />
+            <LoadingDialog ref={this.loadingDialog} /> */}
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                background: colorTheme.primary,
+                padding: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <div
+                style={{
+                  ...whiteSurfaceCircularBorder,
+                  float: "left",
+                  padding: "10px",
+                  width: "50px",
+                  height: "50px",
+                }}
+              >
+                <img
+                  src={icToilet}
+                  alt=""
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "5%",
+                  }}
+                />
+              </div>
+
+              <div style={{ float: "left", marginLeft: "10px" }}>
+                <div
+                  style={{ ...complexCompositionStyle.complexTitleClientMax }}
+                >
+                  {"Dashboard"}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                ...whiteSurface3,
+                background: "white",
+                padding: "10px 10px 10px 10px",
+                height: "450px",
+              }}
+            >
+              <Form>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>Total Indicator</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    Total Usage
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.total_usage = event.target.checked)
+                      }
+                      name="Total Usage"
+                      defaultChecked={
+                        data?.total_usage === "false"
+                          ? false
+                          : data?.total_usage
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Average Feedback
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.average_feedback = event.target.checked)
+                      }
+                      name="Average Feedback"
+                      defaultChecked={
+                        data.average_feedback === "false"
+                          ? false
+                          : data.average_feedback
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Water Saved
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.water_saved = event.target.checked)
+                      }
+                      name="Water Saved"
+                      defaultChecked={
+                        data.water_saved === "false" ? false : data.water_saved
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>Collection</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    Collection Stats
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.collection_stats = event.target.checked)
+                      }
+                      name="Collection"
+                      defaultChecked={
+                        data.collection_stats === "false"
+                          ? false
+                          : data.collection_stats
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Usage QuickConfig
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.usage_charge = event.target.checked)
+                      }
+                      name="usage_charge"
+                      defaultChecked={
+                        data.usage_charge === "false"
+                          ? false
+                          : data.usage_charge
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Usage Profile
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.usage_charge_profile = event.target.checked)
+                      }
+                      name="usage_charge_profile"
+                      defaultChecked={
+                        data.usage_charge_profile === "false"
+                          ? false
+                          : data.usage_charge_profile
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>BWT</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    Re-Water Stats
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.bwt_stats = event.target.checked)
+                      }
+                      name="Collection"
+                      defaultChecked={
+                        data.bwt_stats === "false" ? false : data.bwt_stats
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </Form>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                background: colorTheme.primary,
+                padding: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <div
+                style={{
+                  ...whiteSurfaceCircularBorder,
+                  float: "left",
+                  padding: "10px",
+                  width: "50px",
+                  height: "50px",
+                }}
+              >
+                <img
+                  src={icToilet}
+                  alt=""
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "5%",
+                  }}
+                />
+              </div>
+
+              <div style={{ float: "left", marginLeft: "10px" }}>
+                <div
+                  style={{ ...complexCompositionStyle.complexTitleClientMax }}
+                >
+                  {"Complex"}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                ...whiteSurface3,
+                background: "white",
+                padding: "10px 10px 10px 10px",
+                height: "450px",
+              }}
+            >
+              <Form>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>Cabin Status</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    Carbon monooxide
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.carbon_monooxide = event.target.checked)
+                      }
+                      name="Carbon monooxide"
+                      defaultChecked={
+                        data.carbon_monooxide === "false"
+                          ? false
+                          : data.carbon_monooxide
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Methane
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.methane = event.target.checked)
+                      }
+                      name="Methane"
+                      defaultChecked={
+                        data.methane === "false" ? false : data.methane
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Ammonia
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.ammonia = event.target.checked)
+                      }
+                      name="Ammonia"
+                      defaultChecked={
+                        data.ammonia === "false" ? false : data.ammonia
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Luminous
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.luminous = event.target.checked)
+                      }
+                      name="Luminous"
+                      defaultChecked={
+                        data.luminous === "false" ? false : data.luminous
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>Cabin Health</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    Air Dryer
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.air_dryer_health = event.target.checked)
+                      }
+                      name="Air Dryer"
+                      defaultChecked={
+                        data.air_dryer_health === "false"
+                          ? false
+                          : data.air_dryer_health
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Choke
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.choke_health = event.target.checked)
+                      }
+                      name="Choke"
+                      defaultChecked={
+                        data.choke_health === "false"
+                          ? false
+                          : data.choke_health
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    Tap
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.tap_health = event.target.checked)
+                      }
+                      name="Tap"
+                      defaultChecked={
+                        data.tap_health === "false" ? false : data.tap_health
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>Usage Profile</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* <label class="switch">Usage Charges
+                        <input
+                          type="checkbox"
+                          onClick={(event) =>
+                            (uiDetails.usage_charge_profile = event.target.checked)
+                          }
+                          name="Usage Charges"
+  
+                          defaultChecked={uiDetails.collection_stats}
+                        />
+                        <span class="slider round"></span>
+                      </label> */}
+                  <label class="switch">
+                    Air Dryer
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.air_dryer_profile = event.target.checked)
+                      }
+                      name="Air Dryer"
+                      defaultChecked={
+                        data.air_dryer_profile === "false"
+                          ? false
+                          : data.air_dryer_profile
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    RFID
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.rfid_profile = event.target.checked)
+                      }
+                      name="RFID"
+                      defaultChecked={
+                        data.rfid_profile === "false"
+                          ? false
+                          : data.rfid_profile
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </Form>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                background: colorTheme.primary,
+                padding: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <div
+                style={{
+                  ...whiteSurfaceCircularBorder,
+                  float: "left",
+                  padding: "10px",
+                  width: "50px",
+                  height: "50px",
+                }}
+              >
+                <img
+                  src={icToilet}
+                  alt=""
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "5%",
+                  }}
+                />
+              </div>
+
+              <div style={{ float: "left", marginLeft: "10px" }}>
+                <div
+                  style={{ ...complexCompositionStyle.complexTitleClientMax }}
+                >
+                  {"BWT"}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                ...whiteSurface3,
+                background: "white",
+                padding: "10px 10px 10px 10px",
+                height: "450px",
+              }}
+            >
+              <Form>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>System Health</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    ALP
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.alp = event.target.checked)
+                      }
+                      name="ALP"
+                      defaultChecked={data.alp === "false" ? false : data.alp}
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    MP1 Valve
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.mp1_valve = event.target.checked)
+                      }
+                      name="MP1 Valve"
+                      defaultChecked={
+                        data.mp1_valve === "false" ? false : data.mp1_valve
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    MP2 Valve
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.mp2_valve = event.target.checked)
+                      }
+                      name="MP2 Valve"
+                      defaultChecked={
+                        data.mp2_valve === "false" ? false : data.mp2_valve
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    MP3 Valve
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.mp3_valve = event.target.checked)
+                      }
+                      name="MP2 Valve"
+                      defaultChecked={
+                        data.mp3_valve === "false" ? false : data.mp3_valve
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <label class="switch">
+                    MP4 Valve
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.mp4_valve = event.target.checked)
+                      }
+                      name="MP2 Valve"
+                      defaultChecked={
+                        data.mp4_valve === "false" ? false : data.mp4_valve
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <p style={{ ...statsStyle.cardLabel }}>Usage</p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <label class="switch">
+                    Turbidity Value
+                    <input
+                      type="checkbox"
+                      onClick={(event) =>
+                        (uiDetails.turbidity_value = event.target.checked)
+                      }
+                      name="Turbidity Value"
+                      defaultChecked={
+                        data.turbidity_value === "false"
+                          ? false
+                          : data.turbidity_value
+                      }
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </Form>
+            </div>
+          </div>
         </div>
       </div>
       <Container>
