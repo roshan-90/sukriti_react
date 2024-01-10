@@ -12,10 +12,15 @@ import { getAccessSummary } from "../../components/accessTree/accessTreeUtils";
 import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 import { selectUser } from "../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const MemberAccess = (props) => {
+  const navigate = useNavigate();
+  console.log("checked memeber access", props);
   const accessSummary = useRef(getAccessSummary(props.user?.permissions));
+  console.log("checked memeber accessSummary", accessSummary);
   const user = useSelector(selectUser);
+  console.log("checking for user data", user);
   //   const messageDialog = useRef();
   //   const loadingDialog = useRef();
 
@@ -34,12 +39,13 @@ const MemberAccess = (props) => {
   };
 
   const handleDefineAccessAction = () => {
-    const bundle = {
-      user: props.user,
-      history: props.history,
-    };
-    props.pushComponentProps(UiAdminDestinations.MemberAccess, props);
-    props.history.push({ pathname: "/administration/defineAccess", bundle });
+    // const bundle = {
+    //   user: props.user,
+    //   history: props.history,
+    // };
+    // props.pushComponentProps(UiAdminDestinations.MemberAccess, props);
+    // props.history.push({ pathname: "/administration/defineAccess", bundle });
+    navigate("/administration/defineAccess");
   };
 
   const ComponentSelector = () => {

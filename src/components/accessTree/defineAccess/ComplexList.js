@@ -23,7 +23,7 @@ const ComplexList = (props) => {
   const handleToggle = () => {};
 
   const renderRow = (item, complexIndex) => {
-    const treeEdge = new TreeEdge(
+    const treeEdge = TreeEdge(
       props.treeEdge.stateIndex,
       props.treeEdge.districtIndex,
       props.treeEdge.cityIndex,
@@ -33,7 +33,7 @@ const ComplexList = (props) => {
     return (
       <TreeItem
         treeEdge={
-          new TreeEdge(
+          TreeEdge(
             props.treeEdge.stateIndex,
             props.treeEdge.districtIndex,
             props.treeEdge.cityIndex,

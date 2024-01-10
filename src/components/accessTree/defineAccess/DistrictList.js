@@ -24,12 +24,12 @@ const DistrictList = (props) => {
   const handleToggle = () => {};
 
   const renderRow = (item, districtIndex) => {
-    const treeEdge = new TreeEdge(props.treeEdge.stateIndex, districtIndex);
+    const treeEdge = TreeEdge(props.treeEdge.stateIndex, districtIndex);
 
     return (
       <TreeItem
         type={TreeItemType.District}
-        treeEdge={new TreeEdge(props.treeEdge.stateIndex, districtIndex)}
+        treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
         recursiveAccess={item.recursive === 1}
         expanded={false}
         selected={item.selected}
@@ -45,7 +45,7 @@ const DistrictList = (props) => {
     return (
       <CityList
         listData={item.cities}
-        treeEdge={new TreeEdge(props.treeEdge.stateIndex, districtIndex)}
+        treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
         handleUserSelection={props.handleUserSelection}
       />
     );

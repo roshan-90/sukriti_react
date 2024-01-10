@@ -12,9 +12,16 @@ import MemberDetails from "./MemberDetails";
 import MemberAccess from "./MemberAccess";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser } from "../../features/authenticationSlice";
+import {
+  selectUser,
+  setAccessTree,
+  authState,
+} from "../../features/authenticationSlice";
 import { setTeamList } from "../../features/adminstrationSlice";
-import { executelistTeamLambda } from "../../awsClients/administrationLambdas";
+import {
+  executelistTeamLambda,
+  executeFetchCompletedUserAccessTree,
+} from "../../awsClients/administrationLambdas";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog";
@@ -27,6 +34,7 @@ const MemberDetailsHome = (props) => {
   let data = useSelector((state) => state.adminstration.teamList);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
+  const authStated = useSelector(authState);
 
   const fetchAndInitTeam = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -64,11 +72,51 @@ const MemberDetailsHome = (props) => {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
+  const initFetchCompletedUserAccessTreeAction = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      const result = await executeFetchCompletedUserAccessTree(
+        user?.username,
+        user?.credentials
+      );
+      console.log(
+        "MemberDetail Home initFetchCompletedUserAccessTreeAction-->",
+        result
+      );
+      dispatch(setAccessTree(result));
+    } catch (err) {
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("initFetchCompletedUserAccessTreeAction Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("initFetchCompletedUserAccessTreeAction Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
 
   useEffect(() => {
     // props.removeComponentProps(UiAdminDestinations.MemberAccess);
     // props.removeComponentProps(UiAdminDestinations.MemberDetails);
     fetchAndInitTeam();
+    if (authStated?.accessTree == undefined) {
+      initFetchCompletedUserAccessTreeAction();
+    }
   }, []);
 
   console.log("found data", data);

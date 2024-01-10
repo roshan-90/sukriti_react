@@ -18,6 +18,15 @@ import { getSelectionSummary } from "../../components/accessTree/accessTreeUtils
 // import { setOwnAccessTree } from "../../store/actions/authentication";
 import { TreeItemType } from "../../nomenclature/nomenclature";
 import RxAccessSummary from "../../components/RxAccessSummary";
+import {
+  selectUser,
+  setAccessTree,
+  authState,
+} from "../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog";
 
 const MemberAccess = (props) => {
   const [accessSummary, setAccessSummary] = useState([]);
@@ -26,54 +35,79 @@ const MemberAccess = (props) => {
   const loadingDialog = useRef(null);
   const selectionSummary = useRef(null);
   const stateList = useRef(null);
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   const initFetchCompletedUserAccessTreeAction = async () => {
-    loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      const result = await executeFetchCompletedUserAccessTree(props.userName);
-      props.setOwnAccessTree(result);
-      loadingDialog.current.closeDialog();
-      console.log("_defineAccess", JSON.stringify(result));
+      const result = await executeFetchCompletedUserAccessTree(
+        user?.username,
+        user?.credentials
+      );
+      console.log("define initFetchCompletedUserAccessTreeAction-->", result);
+      setAccessTree(result);
     } catch (err) {
-      console.log("_err", err);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("initFetchCompletedUserAccessTreeAction Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("initFetchCompletedUserAccessTreeAction Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const handleSubmitAction = async () => {
-    console.log("_trimmedAccess", props.location.bundle);
+    // console.log("_trimmedAccess", props.location.bundle);
 
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
       const accessKeys = await getAccessKeys(trimmedAccessTree);
 
-      const user = props.location.bundle.user;
       const defineAccessRequest = {
-        userName: user.userName,
-        userRole: user.userRole,
+        userName: user?.user.userName,
+        userRole: user?.user.userRole,
         accessTree: trimmedAccessTree,
         accessKeys: accessKeys,
       };
       console.log("_defineAccess", JSON.stringify(defineAccessRequest));
       const defineAccessResult = await executeDefineUserAccessLambda(
-        defineAccessRequest
+        defineAccessRequest,
+        user?.credentials
       );
       console.log("_defineAccess", JSON.stringify(defineAccessResult));
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog(
-        "Success",
-        "User access tree updated",
-        () => {
-          props.history.goBack();
-          props.history.goBack();
-        }
-      );
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog(
+      //   "Success",
+      //   "User access tree updated",
+      //   () => {
+      //     props.history.goBack();
+      //     props.history.goBack();
+      //   }
+      // );
     } catch (err) {
       console.log("_err", err);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -126,8 +160,13 @@ const MemberAccess = (props) => {
       initFetchCompletedUserAccessTreeAction();
   }, [props.accessTree]);
 
+  console.log("checked accesstree", accessTree);
+  if (!accessTree) {
+    return null;
+  }
+
   const ComponentSelector = () => {
-    if (props.accessTree === undefined) {
+    if (accessTree === undefined) {
       return <NoDataComponent />;
     } else {
       if (accessTree === undefined) {

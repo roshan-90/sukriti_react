@@ -268,11 +268,12 @@ export function executeFetchCompletedUserAccessTree(userName, credentials) {
   });
 }
 
-export function executeDefineUserAccessLambda(request) {
+export function executeDefineUserAccessLambda(request, credentials) {
   return new Promise(function (resolve, reject) {
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_administration_defineAccess",

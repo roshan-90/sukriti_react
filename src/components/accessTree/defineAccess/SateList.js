@@ -17,11 +17,11 @@ const SateList = (props) => {
   const handleToggle = () => {};
 
   const renderRow = (item, stateIndex) => {
-    const treeEdge = new TreeEdge(stateIndex);
+    const treeEdge = TreeEdge(stateIndex);
 
     return (
       <TreeItem
-        treeEdge={new TreeEdge(stateIndex)}
+        treeEdge={TreeEdge(stateIndex)}
         type={TreeItemType.State}
         recursiveAccess={item.recursive === 1}
         expanded={false}
@@ -37,7 +37,7 @@ const SateList = (props) => {
   const getListComponent = (item, stateIndex) => {
     return (
       <DistrictList
-        treeEdge={new TreeEdge(stateIndex)}
+        treeEdge={TreeEdge(stateIndex)}
         listData={item.districts}
         handleUserSelection={props.handleUserSelection}
       />
