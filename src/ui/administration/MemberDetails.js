@@ -5,18 +5,26 @@ import { NameValueList } from "../../components/DisplayLabels";
 import NameValue from "../../Entity/NameValue";
 import { whiteSurface } from "../../jsStyles/Style";
 import { fromUserDetails } from "../../parsers/listDataParsers";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import {
   executeEnableUserLambda,
   executeDisableUserLambda,
   executeDeleteUserLambda,
 } from "../../awsClients/administrationLambdas";
-// import { pushComponentProps } from "../../store/actions/history-actions";
+import CircularProgress from "@mui/material/CircularProgress";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import MessageDialog from "../../dialogs/MessageDialog";
 import { UiAdminDestinations } from "../../nomenclature/nomenclature";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { selectUser } from "../../features/authenticationSlice";
 
 const MemberDetails = (props) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const user = useSelector(selectUser);
+  const [dialogData, setDialogData] = useState(null);
   const [userStatus, setUserStatus] = useState(
     props?.user?.enabled ? "enabled" : "disabled"
   );
@@ -27,33 +35,75 @@ const MemberDetails = (props) => {
     userDetailsNameValueList.push(NameValue(item, userDetails[item]));
   });
 
-  //   const messageDialog = useRef();
-  //   const loadingDialog = useRef();
   const confirmationDialog = useRef();
 
   const initAdminDisableAction = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      const result = await executeDisableUserLambda(props.user.userName);
+      const result = await executeDisableUserLambda(
+        props.user.userName,
+        user?.credentials
+      );
       console.log("result --> executeDisableUserLambda", result);
       setUserStatus("disabled");
-      //   loadingDialog.current.closeDialog();
     } catch (err) {
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog("Error Alert!", err.result.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const initAdminEnableAction = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      const result = await executeEnableUserLambda(props.user.userName);
+      const result = await executeEnableUserLambda(
+        props.user.userName,
+        user?.credentials
+      );
       console.log("result --> executeEnableUserLambda", result);
       setUserStatus("enabled");
-      //   loadingDialog.current.closeDialog();
     } catch (err) {
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog("Error Alert!", err.result.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -69,18 +119,42 @@ const MemberDetails = (props) => {
   const initAdminDeleteAction = async () => {
     // loadingDialog.current.showDialog();
     try {
-      const result = await executeDeleteUserLambda(props.user.userName);
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog(
-      //     "Success",
-      //     "User deleted successfully",
-      //     () => {
-      //       props.history.goBack();
-      //     }
-      //   );
+      const result = await executeDeleteUserLambda(
+        props.user.userName,
+        user?.credentials
+      );
+      setDialogData({
+        title: "Success",
+        message: "User deleted successfully",
+        onClickAction: () => {
+          navigate("/administration");
+          // Handle the action when the user clicks OK
+          console.log("initAdminDeleteAction:->");
+        },
+      });
     } catch (err) {
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -96,8 +170,15 @@ const MemberDetails = (props) => {
       className="col-md-10 offset-md-2"
       style={{ ...whiteSurface, width: "80%", margin: "auto" }}
     >
-      {/* <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
       <ConfirmationDialog ref={confirmationDialog} />
       {userStatus === "enabled" ? (
         <EnabledUserActions />

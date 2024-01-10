@@ -164,11 +164,16 @@ export function executeGetUserDetailsLambda(userName, credentials) {
   });
 }
 
-export function executeEnableUserLambda(userName) {
+export function executeEnableUserLambda(userName, credentials) {
   return new Promise(function (resolve, reject) {
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: {
+        accessKeyId: credentials?.accessKeyId,
+        secretAccessKey: credentials?.secretAccessKey,
+        sessionToken: credentials?.sessionToken,
+      }, // Pass the credentials from the Redux store
     });
     var pullParams = {
       FunctionName: "mis_adminisatration_actions",
@@ -190,11 +195,12 @@ export function executeEnableUserLambda(userName) {
   });
 }
 
-export function executeDisableUserLambda(userName) {
+export function executeDisableUserLambda(userName, credentials) {
   return new Promise(function (resolve, reject) {
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: credentials,
     });
     var pullParams = {
       FunctionName: "mis_adminisatration_actions",
@@ -216,11 +222,12 @@ export function executeDisableUserLambda(userName) {
   });
 }
 
-export function executeDeleteUserLambda(userName) {
+export function executeDeleteUserLambda(userName, credentials) {
   return new Promise(function (resolve, reject) {
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: credentials,
     });
     var pullParams = {
       FunctionName: "mis_adminisatration_actions",
