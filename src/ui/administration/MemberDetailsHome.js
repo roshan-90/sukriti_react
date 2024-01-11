@@ -114,9 +114,7 @@ const MemberDetailsHome = (props) => {
     // props.removeComponentProps(UiAdminDestinations.MemberAccess);
     // props.removeComponentProps(UiAdminDestinations.MemberDetails);
     fetchAndInitTeam();
-    if (authStated?.accessTree == undefined) {
-      initFetchCompletedUserAccessTreeAction();
-    }
+    initFetchCompletedUserAccessTreeAction();
   }, []);
 
   console.log("found data", data);

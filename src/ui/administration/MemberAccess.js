@@ -58,20 +58,20 @@ const MemberAccess = (props) => {
 
   const ComponentSelector = () => {
     if (props.user !== undefined) {
-      if (props.user.permissions.country.recursive === 1) {
-        return <SuperAdminAcceess />;
-      } else if (props.user.permissions.country.states.length === 0) {
-        return <NoDataComponent />;
-      } else {
-        console.log("_accessTree", props.user.permissions.country.states);
-        return (
-          <StateList
-            ref={stateList}
-            listData={accessTree}
-            handleComplexSelection={handleComplexSelection}
-          />
-        );
-      }
+      // if (props.user.permissions.country.recursive === 1) {
+      //   return <SuperAdminAcceess />;
+      // } else if (props.user.permissions.country.states.length === 0) {
+      //   return <NoDataComponent />;
+      // } else {
+      // console.log("_accessTree", props.user.permissions.country.states);
+      return (
+        <StateList
+          ref={stateList}
+          listData={accessTree}
+          handleComplexSelection={handleComplexSelection}
+        />
+      );
+      // }
     } else {
       return <NoDataComponent />;
     }
@@ -106,9 +106,9 @@ const MemberAccess = (props) => {
           Define Access
         </Button>
 
-        <div className="col-md-2" style={{ float: "right" }}>
+        {/* <div className="col-md-2" style={{ float: "right" }}>
           <NameValueList data={accessSummary.current} />
-        </div>
+        </div> */}
       </div>
 
       <div className="col-md-8 offset-md-1" style={{ clear: "both" }}>
