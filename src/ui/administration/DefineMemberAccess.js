@@ -6,6 +6,7 @@ import { whiteSurface } from "../../jsStyles/Style";
 import {
   executeFetchCompletedUserAccessTree,
   executeDefineUserAccessLambda,
+  executelistTeamLambda,
 } from "../../awsClients/administrationLambdas";
 import {
   getTrimmedAccessTree,
@@ -30,6 +31,7 @@ import ValidationMessageDialog from "../../dialogs/ValidationMessageDialog";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
+import { setTeamList } from "../../features/adminstrationSlice";
 
 const MemberAccess = (props) => {
   const { id } = useParams();
@@ -46,6 +48,43 @@ const MemberAccess = (props) => {
   const [dialogData, setDialogData] = useState(null);
   let data = useSelector((state) => state.adminstration.teamList);
   const confirmationDialog = useRef();
+
+  const fetchAndInitTeam = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      var result = await executelistTeamLambda(
+        user?.username,
+        user?.credentials
+      );
+      console.log("result--->", result);
+      dispatch(setTeamList(result.teamDetails));
+    } catch (err) {
+      //   loadingDialog.current.closeDialog();
+      //   messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
 
   const initFetchCompletedUserAccessTreeAction = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -83,12 +122,12 @@ const MemberAccess = (props) => {
   };
 
   const handleSubmitAction = async () => {
-    console.log("define meeber cliced");
-    return;
+    console.log("define meeber cliced", data);
     // console.log("_trimmedAccess", props.location.bundle);
     let [user_data] = data.filter((data) => data.userName == id);
+    console.log("checking handlesubmitaction", user_data);
+    console.log(user_data.length);
     if (user_data.length == 0) {
-      console.log("checking handlesubmitaction", user_data);
       return null;
     }
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -208,6 +247,10 @@ const MemberAccess = (props) => {
   useEffect(() => {
     if (props.accessTree === undefined)
       initFetchCompletedUserAccessTreeAction();
+
+    if (data == undefined || data == null) {
+      fetchAndInitTeam();
+    }
   }, [props.accessTree]);
 
   console.log("checked accesstree", accessTree);
