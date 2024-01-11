@@ -5,7 +5,7 @@ import { whiteSurface } from "../../jsStyles/Style";
 import { Button } from "reactstrap";
 import { NameValueList } from "../../components/DisplayLabels";
 import { executeDisableUserLambda } from "../../awsClients/administrationLambdas";
-import StateList from "../../components/accessTree/readOnly/SateList";
+import StateList from "../../components/accessTree/complexNavCompact/SateList";
 import NoDataComponent from "../../components/NoDataComponent";
 import { getAccessSummary } from "../../components/accessTree/accessTreeUtils";
 // import { pushComponentProps } from "../../store/actions/history-actions";
@@ -13,15 +13,19 @@ import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 import { selectUser } from "../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const MemberAccess = (props) => {
   const navigate = useNavigate();
+  const { id } = useParams();
   let accessTree = useSelector((state) => state.authentication.accessTree);
   console.log("checked memeber access", props);
   const accessSummary = useRef(getAccessSummary(props.user?.permissions));
   console.log("checked memeber accessSummary", accessSummary);
   const user = useSelector(selectUser);
   console.log("checking for user data", user);
+  const stateList = useRef();
+
   //   const messageDialog = useRef();
   //   const loadingDialog = useRef();
   console.log("member access tree", accessTree);
@@ -38,6 +42,9 @@ const MemberAccess = (props) => {
       //   messageDialog.current.showDialog("Error Alert!", err.result.message);
     }
   };
+  const handleComplexSelection = (treeEdge) => {
+    console.log("handlecomplexSelection data");
+  };
 
   const handleDefineAccessAction = () => {
     // const bundle = {
@@ -46,7 +53,7 @@ const MemberAccess = (props) => {
     // };
     // props.pushComponentProps(UiAdminDestinations.MemberAccess, props);
     // props.history.push({ pathname: "/administration/defineAccess", bundle });
-    navigate("/administration/defineAccess");
+    navigate(`/administration/defineAccess/${id}`);
   };
 
   const ComponentSelector = () => {
@@ -57,7 +64,13 @@ const MemberAccess = (props) => {
         return <NoDataComponent />;
       } else {
         console.log("_accessTree", props.user.permissions.country.states);
-        return <StateList listData={props.user.permissions.country.states} />;
+        return (
+          <StateList
+            ref={stateList}
+            listData={accessTree}
+            handleComplexSelection={handleComplexSelection}
+          />
+        );
       }
     } else {
       return <NoDataComponent />;

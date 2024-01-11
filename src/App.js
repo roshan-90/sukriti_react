@@ -147,7 +147,7 @@ const App = () => {
                       element={<GrantPermissions />}
                     />
                     <Route
-                      path={"/administration/defineAccess"}
+                      path={"/administration/defineAccess/:id"}
                       exact={true}
                       name={"Define Access"}
                       element={<DefineMemberAccess />}

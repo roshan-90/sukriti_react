@@ -98,7 +98,7 @@ const MemberDetailsHome = (props) => {
       } else {
         setDialogData({
           title: "Error",
-          message: "SomeThing Went Wrong",
+          message: err.errorMessage,
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.error("initFetchCompletedUserAccessTreeAction Error", err);

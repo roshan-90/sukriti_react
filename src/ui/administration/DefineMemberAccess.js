@@ -28,8 +28,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import ValidationMessageDialog from "../../dialogs/ValidationMessageDialog";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 
 const MemberAccess = (props) => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [accessSummary, setAccessSummary] = useState([]);
   const [accessTree, setAccessTree] = useState(undefined);
@@ -41,6 +44,8 @@ const MemberAccess = (props) => {
   const user = useSelector(selectUser);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
+  let data = useSelector((state) => state.adminstration.teamList);
+  const confirmationDialog = useRef();
 
   const initFetchCompletedUserAccessTreeAction = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -78,16 +83,22 @@ const MemberAccess = (props) => {
   };
 
   const handleSubmitAction = async () => {
+    console.log("define meeber cliced");
+    return;
     // console.log("_trimmedAccess", props.location.bundle);
-
+    let [user_data] = data.filter((data) => data.userName == id);
+    if (user_data.length == 0) {
+      console.log("checking handlesubmitaction", user_data);
+      return null;
+    }
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
       const accessKeys = await getAccessKeys(trimmedAccessTree);
 
       const defineAccessRequest = {
-        // userName: user?.user.userName,
-        // userRole: user?.user.userRole,
+        userName: user_data?.userName,
+        userRole: user_data?.userRole,
         accessTree: trimmedAccessTree,
         accessKeys: accessKeys,
       };
@@ -130,6 +141,15 @@ const MemberAccess = (props) => {
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
+  };
+
+  const onSubmit = () => {
+    confirmationDialog.current.showDialog(
+      "Confirm Action",
+      "To update the user permanently, type 'UPDATE' below",
+      "UPDATE",
+      handleSubmitAction
+    );
   };
 
   const handleUserSelection = (nodeType, treeEdge, selected) => {
@@ -225,6 +245,7 @@ const MemberAccess = (props) => {
         </div>
       )}
       <ValidationMessageDialog data={dialogData} />
+      <ConfirmationDialog ref={confirmationDialog} />
 
       <div
         className="col-md-10 offset-md-2"
@@ -236,7 +257,7 @@ const MemberAccess = (props) => {
             outline
             color="primary"
             className="px-4"
-            onClick={handleSubmitAction}
+            onClick={onSubmit}
           >
             Define Access
           </Button>

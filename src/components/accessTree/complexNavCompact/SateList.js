@@ -43,7 +43,7 @@ const StateList = (props) => {
 
   return (
     <div style={{ overflowY: "auto", height: "35vh", width: "100%" }}>
-      {props.listData.country.states.map((item, index) =>
+      {props.listData?.country?.states.map((item, index) =>
         renderRow(item, index)
       )}
     </div>

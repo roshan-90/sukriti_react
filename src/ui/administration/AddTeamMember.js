@@ -107,16 +107,33 @@ const AddTeamMember = () => {
     try {
       var roleName = getRoleName(createUserRequest.userRole);
       var requestCopy = { ...createUserRequest, userRole: roleName };
-      await executeCreateUserLambda(requestCopy, user?.user, user?.credentials);
-      setDialogData({
-        title: "Success",
-        message: "User added successfully",
-        onClickAction: () => {
-          navigate("/administration");
-          // Handle the action when the user clicks OK
-          console.error(" AddTeamMember initCreateVendorRequest");
-        },
-      });
+      let result = await executeCreateUserLambda(
+        requestCopy,
+        user?.user,
+        user?.credentials
+      );
+      console.log("initcreateuserRequest respone", result);
+      if (result.status == "-1") {
+        setDialogData({
+          title: "Error",
+          message: result.result.message,
+          onClickAction: () => {
+            navigate("/administration");
+            // Handle the action when the user clicks OK
+            console.error(" AddTeamMember initCreateVendorRequest");
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Success",
+          message: "User added successfully",
+          onClickAction: () => {
+            navigate("/administration");
+            // Handle the action when the user clicks OK
+            console.error(" AddTeamMember initCreateVendorRequest");
+          },
+        });
+      }
     } catch (err) {
       let text = err.message.includes("expired");
       if (text) {
@@ -134,7 +151,7 @@ const AddTeamMember = () => {
       } else {
         setDialogData({
           title: "Error",
-          message: "SomeThing Went Wrong",
+          message: err.message,
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.error(" AddVendorMember fetchAndInitClientList Error", err);
