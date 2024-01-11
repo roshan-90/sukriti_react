@@ -76,7 +76,7 @@ const MemberDetailsHome = (props) => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchCompletedUserAccessTree(
-        user?.username,
+        id,
         user?.credentials
       );
       console.log(

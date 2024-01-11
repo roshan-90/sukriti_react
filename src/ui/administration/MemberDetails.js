@@ -40,7 +40,6 @@ const MemberDetails = (props) => {
   const initAdminDisableAction = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      return;
       const result = await executeDisableUserLambda(
         props.user.userName,
         user?.credentials
@@ -76,7 +75,6 @@ const MemberDetails = (props) => {
   const initAdminEnableAction = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      return;
       const result = await executeEnableUserLambda(
         props.user.userName,
         user?.credentials
@@ -119,9 +117,8 @@ const MemberDetails = (props) => {
   };
 
   const initAdminDeleteAction = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      return;
       const result = await executeDeleteUserLambda(
         props.user.userName,
         user?.credentials

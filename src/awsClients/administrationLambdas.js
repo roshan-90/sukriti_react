@@ -113,7 +113,7 @@ export function executeCreateUserLambda(
         '"' +
         "}",
     };
-
+    console.log("check createuserlamda", pullParams);
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);
@@ -180,7 +180,7 @@ export function executeEnableUserLambda(userName, credentials) {
       Payload:
         '{ "action": "actionEnableUser", "userName":"' + userName + '" }',
     };
-
+    console.log("executeEnableUserLambda pullParams", pullParams);
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);
@@ -207,7 +207,7 @@ export function executeDisableUserLambda(userName, credentials) {
       Payload:
         '{ "action": "actionDisableUser", "userName":"' + userName + '" }',
     };
-
+    console.log("executeDisableUserLambda pullParams", pullParams);
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);
@@ -234,7 +234,7 @@ export function executeDeleteUserLambda(userName, credentials) {
       Payload:
         '{ "action": "actionDeleteUser", "userName":"' + userName + '" }',
     };
-
+    console.log("executeDeleteUserLambda pullParams", pullParams);
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);

@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 const MemberAccess = (props) => {
   const navigate = useNavigate();
+  let accessTree = useSelector((state) => state.authentication.accessTree);
   console.log("checked memeber access", props);
   const accessSummary = useRef(getAccessSummary(props.user?.permissions));
   console.log("checked memeber accessSummary", accessSummary);
@@ -23,7 +24,7 @@ const MemberAccess = (props) => {
   console.log("checking for user data", user);
   //   const messageDialog = useRef();
   //   const loadingDialog = useRef();
-
+  console.log("member access tree", accessTree);
   const initAdminDisableAction = async () => {
     // loadingDialog.current.showDialog();
     try {
