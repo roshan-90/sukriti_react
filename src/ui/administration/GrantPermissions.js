@@ -61,14 +61,12 @@ const GrantPermissions = () => {
 
   useEffect(() => {
     fetchAndInitClientList();
-    setTimeout(() => {
-      initializeUiDetails();
-    }, 5000);
   }, []);
 
-  const initializeUiDetails = () => {
+  const initializeUiDetails = (data) => {
+    console.log("initializeUiDetail value ---", data);
     uiDetails.current = {
-      clientName: "",
+      clientName: data?.CLIENT,
       collection_stats: data?.collection_stats,
       methane: data?.methane,
       ammonia: data?.ammonia,
@@ -135,6 +133,8 @@ const GrantPermissions = () => {
     try {
       const result = await executeFetchUILambda(clientData, user?.credentials);
       dispatch(setData(result.data));
+      console.log("result.data", result.data);
+      initializeUiDetails(result.data);
     } catch (err) {
       let text = err.message.includes("expired");
       if (text) {
@@ -165,6 +165,7 @@ const GrantPermissions = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const requestCopy = { ...createUserRequest };
+      console.log("check for request copy-->", requestCopy);
       await executePermissionUiLambda(requestCopy, user?.credentials);
       dispatch(setResetData());
       setDialogData({
@@ -209,11 +210,14 @@ const GrantPermissions = () => {
   };
 
   const onClientSelected = (event) => {
+    console.log("onClientSelected value-->", event.target.value);
     uiDetails.current.clientName = event.target.value;
     fetchClientWiseUI(event.target.value);
   };
 
   const onSubmit = () => {
+    console.log("check for request copy--> 11", uiDetails);
+    console.log("check for request copy--> 12", uiDetails.current);
     initCreatePermissionRequest(uiDetails.current);
   };
 
@@ -341,7 +345,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.total_usage = event.target.checked)
+                        (uiDetails.current.total_usage = event.target.checked)
                       }
                       name="Total Usage"
                       defaultChecked={
@@ -357,7 +361,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.average_feedback = event.target.checked)
+                        (uiDetails.current.average_feedback =
+                          event.target.checked)
                       }
                       name="Average Feedback"
                       defaultChecked={
@@ -373,7 +378,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.water_saved = event.target.checked)
+                        (uiDetails.current.water_saved = event.target.checked)
                       }
                       name="Water Saved"
                       defaultChecked={
@@ -400,7 +405,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.collection_stats = event.target.checked)
+                        (uiDetails.current.collection_stats =
+                          event.target.checked)
                       }
                       name="Collection"
                       defaultChecked={
@@ -416,7 +422,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.usage_charge = event.target.checked)
+                        (uiDetails.current.usage_charge = event.target.checked)
                       }
                       name="usage_charge"
                       defaultChecked={
@@ -432,7 +438,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.usage_charge_profile = event.target.checked)
+                        (uiDetails.current.usage_charge_profile =
+                          event.target.checked)
                       }
                       name="usage_charge_profile"
                       defaultChecked={
@@ -459,7 +466,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.bwt_stats = event.target.checked)
+                        (uiDetails.current.bwt_stats = event.target.checked)
                       }
                       name="Collection"
                       defaultChecked={
@@ -535,7 +542,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.carbon_monooxide = event.target.checked)
+                        (uiDetails.current.carbon_monooxide =
+                          event.target.checked)
                       }
                       name="Carbon monooxide"
                       defaultChecked={
@@ -551,7 +559,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.methane = event.target.checked)
+                        (uiDetails.current.methane = event.target.checked)
                       }
                       name="Methane"
                       defaultChecked={
@@ -565,7 +573,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.ammonia = event.target.checked)
+                        (uiDetails.current.ammonia = event.target.checked)
                       }
                       name="Ammonia"
                       defaultChecked={
@@ -579,7 +587,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.luminous = event.target.checked)
+                        (uiDetails.current.luminous = event.target.checked)
                       }
                       name="Luminous"
                       defaultChecked={
@@ -604,7 +612,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.air_dryer_health = event.target.checked)
+                        (uiDetails.current.air_dryer_health =
+                          event.target.checked)
                       }
                       name="Air Dryer"
                       defaultChecked={
@@ -620,7 +629,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.choke_health = event.target.checked)
+                        (uiDetails.current.choke_health = event.target.checked)
                       }
                       name="Choke"
                       defaultChecked={
@@ -636,7 +645,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.tap_health = event.target.checked)
+                        (uiDetails.current.tap_health = event.target.checked)
                       }
                       name="Tap"
                       defaultChecked={
@@ -673,7 +682,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.air_dryer_profile = event.target.checked)
+                        (uiDetails.current.air_dryer_profile =
+                          event.target.checked)
                       }
                       name="Air Dryer"
                       defaultChecked={
@@ -689,7 +699,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.rfid_profile = event.target.checked)
+                        (uiDetails.current.rfid_profile = event.target.checked)
                       }
                       name="RFID"
                       defaultChecked={
@@ -767,7 +777,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.alp = event.target.checked)
+                        (uiDetails.current.alp = event.target.checked)
                       }
                       name="ALP"
                       defaultChecked={data?.alp === "false" ? false : data?.alp}
@@ -779,7 +789,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.mp1_valve = event.target.checked)
+                        (uiDetails.current.mp1_valve = event.target.checked)
                       }
                       name="MP1 Valve"
                       defaultChecked={
@@ -793,7 +803,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.mp2_valve = event.target.checked)
+                        (uiDetails.current.mp2_valve = event.target.checked)
                       }
                       name="MP2 Valve"
                       defaultChecked={
@@ -807,7 +817,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.mp3_valve = event.target.checked)
+                        (uiDetails.current.mp3_valve = event.target.checked)
                       }
                       name="MP2 Valve"
                       defaultChecked={
@@ -821,7 +831,7 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.mp4_valve = event.target.checked)
+                        (uiDetails.current.mp4_valve = event.target.checked)
                       }
                       name="MP2 Valve"
                       defaultChecked={
@@ -846,7 +856,8 @@ const GrantPermissions = () => {
                     <input
                       type="checkbox"
                       onClick={(event) =>
-                        (uiDetails.turbidity_value = event.target.checked)
+                        (uiDetails.current.turbidity_value =
+                          event.target.checked)
                       }
                       name="Turbidity Value"
                       defaultChecked={
