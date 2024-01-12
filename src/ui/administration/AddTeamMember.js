@@ -135,11 +135,12 @@ const AddTeamMember = () => {
         });
       }
     } catch (err) {
-      let text = err.message.includes("expired");
+      console.log("check ---->", err);
+      let text = err?.message?.result?.message?.includes("expired");
       if (text) {
         setDialogData({
           title: "Error",
-          message: err.message,
+          message: err?.message?.result?.message,
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log(
@@ -151,7 +152,7 @@ const AddTeamMember = () => {
       } else {
         setDialogData({
           title: "Error",
-          message: err.message,
+          message: err?.message?.result?.message,
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.error(" AddVendorMember fetchAndInitClientList Error", err);

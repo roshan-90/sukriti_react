@@ -122,9 +122,7 @@ export function executeCreateUserLambda(
         var pullResults = JSON.parse(data.Payload);
         console.log("_lambda", pullResults);
         if (pullResults.status !== 1)
-          reject(
-            new Result(-1, undefined, "Error Alert!", pullResults.message)
-          );
+          reject(Result(-1, undefined, "Error Alert!", pullResults));
 
         resolve(pullResults);
       }
