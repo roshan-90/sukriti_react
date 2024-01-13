@@ -40,11 +40,9 @@ const loading = () => (
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    <React.StrictMode off>
-      <React.Suspense fallback={loading()}>
-        <App />
-      </React.Suspense>
-    </React.StrictMode>
+    <React.Suspense fallback={loading()}>
+      <App />
+    </React.Suspense>
   </Provider>
 );
 

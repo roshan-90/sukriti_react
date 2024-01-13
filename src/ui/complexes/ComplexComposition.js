@@ -18,6 +18,7 @@ import {
   setPushComplexPosition,
   updateSelectedCabin,
   complexStore,
+  removeComplexComposition,
 } from "../../features/complesStoreSlice";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 
@@ -69,10 +70,31 @@ const ComplexComposition = React.forwardRef((props, ref) => {
       // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
-  if (Object.keys(complex_store)[2] == undefined) {
-    console.log(" props complex-compostion--->", props);
-    fetchComplexComposition();
-    console.log("props is changed", complex_store?.complex?.name);
+  console.log("complex composition --", complex_store);
+  console.log("complex_store value", Object.keys(complex_store)[2]);
+  console.log("props is changed", complex_store?.complex?.name);
+
+  if (
+    Object.keys(complex_store)[2] == undefined ||
+    Object.keys(complex_store)[2] !== complex_store?.complex?.name
+  ) {
+    if (
+      Object.keys(complex_store)[2] !== undefined &&
+      Object.keys(complex_store)[2] == complex_store?.complex?.name
+    ) {
+      console.log("return null");
+      return null;
+    } else {
+      if (Object.keys(complex_store)[2] !== complex_store?.complex?.name) {
+        console.log("not equal", Object.keys(complex_store)[2]);
+        dispatch(
+          removeComplexComposition({ key: Object.keys(complex_store)[2] })
+        );
+      }
+      console.log(" props complex-compostion--->", props);
+      fetchComplexComposition();
+      console.log("props is changed", complex_store?.complex?.name);
+    }
   }
 
   // useEffect(() => {

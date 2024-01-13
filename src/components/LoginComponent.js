@@ -28,7 +28,7 @@ const LoginComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isLoading = useSelector((state) => state.loading.isLoading);
-
+  console.log("sdsd3");
   const handleSignIn = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     signIn(email, password, dispatch)

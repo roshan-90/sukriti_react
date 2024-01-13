@@ -473,12 +473,12 @@ function getUserType(shortThingName) {
 }
 
 export function getTopicName(type, complex, cabin, complexHierarchy) {
-  var stateCode = complexHierarchy.stateCode;
-  var districtCode = complexHierarchy.districtCode;
-  var cityCode = complexHierarchy.cityCode;
-  var clientName = complex.client;
-  var complexName = complex.name;
-  var thingName = cabin.thingName.substring(20, 27);
+  var stateCode = complexHierarchy?.stateCode;
+  var districtCode = complexHierarchy?.districtCode;
+  var cityCode = complexHierarchy?.cityCode;
+  var clientName = complex?.client;
+  var complexName = complex?.name;
+  var thingName = cabin?.thingName.substring(20, 27);
 
   var START = "TOILETS/"; //"TOILETS/"
   var topicPrefix =

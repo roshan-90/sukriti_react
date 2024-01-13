@@ -60,7 +60,7 @@ const App = () => {
       console.log("sdsd");
     }
   }, [isAuthenticated, dispatch]);
-
+  console.log("sdsd2");
   const loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
   );

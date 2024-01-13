@@ -32,6 +32,7 @@ import {
 import { complexStore } from "../../features/complesStoreSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/authenticationSlice";
+import { stopLoading } from "../../features/loadingSlice";
 
 const CabinDetails = (props, ref) => {
   const [cabinDetails, setCabinDetails] = useState();
@@ -83,8 +84,10 @@ const CabinDetails = (props, ref) => {
         // loadingDialog.current.closeDialog();
         setCabinDetails(result);
       }
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
+      dispatch(stopLoading()); // Dispatch the stopLoading action
       // loadingDialog.current.closeDialog();
       // messageDialog.current.showDialog("Error Alert!", err.message);
     }
@@ -93,7 +96,7 @@ const CabinDetails = (props, ref) => {
   const ComponenetSelector = () => {
     if (cabinDetails == undefined) {
       return <div />;
-    } else if (complex_store.cabin.cabinType === "BWT") {
+    } else if (complex_store?.cabin?.cabinType === "BWT") {
       return (
         <div style={{ width: "95%", margin: "auto" }}>
           <TurbidityAndWaterRecycled
