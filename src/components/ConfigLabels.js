@@ -855,7 +855,7 @@ export function CommandsLabel(props) {
     <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
       <TextLabel
         label={"Duration"}
-        value="10"
+        value={props.value}
         unit="Sec"
         handleUpdate={props.handleUpdate}
       />

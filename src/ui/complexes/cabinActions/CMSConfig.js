@@ -19,51 +19,55 @@ import {
   getPublishMetadata,
 } from "../utils/ComplexUtils";
 import { executePublishConfigLambda } from "../../../awsClients/complexLambdas";
+import { selectUser } from "../../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const CMSConfig = (props) => {
+const CMSConfig = React.forwardRef((props, ref) => {
   const [visibility, setVisibility] = useState(false);
   const [title, setTitle] = useState("");
   const [cmsConfig, setCmsConfig] = useState(undefined);
+  const user = useSelector(selectUser);
+  const complex = useSelector((state) => state.complexStore);
 
-  const messageDialog = useRef();
-  const loadingDialog = useRef();
+  // const messageDialog = useRef();
+  // const loadingDialog = useRef();
 
   const submitConfig = async () => {
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       const topic = getTopicName(
         "CMS_CONFIG",
-        props.complex.complexDetails,
-        props.cabin,
-        props.complex.hierarchy
+        complex[complex?.complex?.name]?.complexDetails,
+        complex?.cabin,
+        complex[complex?.complex?.name]?.hierarchy
       );
       const payload = getPublishPayloadCms(
         cmsConfig,
-        props.complex.complexDetails,
-        props.cabin
+        complex[complex?.complex?.name]?.complexDetails,
+        complex?.cabin
       );
       const metadata = getPublishMetadata(
         "CMS",
-        props.complex.complexDetails,
-        props.cabin,
-        props.user
+        complex[complex?.complex?.name]?.complexDetails,
+        complex?.cabin,
+        user?.user
       );
       const result = await executePublishConfigLambda(
         topic,
         payload,
         metadata,
-        props.credentials
+        user?.credentials
       );
-      messageDialog.current.showDialog(
-        "Success",
-        "New config submitted successfully",
-        toggle
-      );
-      loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog(
+      //   "Success",
+      //   "New config submitted successfully",
+      //   toggle
+      // );
+      // loadingDialog.current.closeDialog();
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -76,6 +80,10 @@ const CMSConfig = (props) => {
     setTitle("CMS Config");
     setVisibility(!visibility);
   };
+
+  React.useImperativeHandle(ref, () => ({
+    showDialog,
+  }));
 
   const onClick = () => {
     submitConfig();
@@ -131,6 +139,6 @@ const CMSConfig = (props) => {
       </Modal>
     </div>
   );
-};
+});
 
 export default CMSConfig;

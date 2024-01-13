@@ -14,8 +14,10 @@ import {
 } from "../utils/ComplexUtils";
 import { settingsModal } from "../../../jsStyles/Style";
 import { executePublishCommandLambda } from "../../../awsClients/complexLambdas";
+import { selectUser } from "../../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const CabinCommands = (props) => {
+const CabinCommands = React.forwardRef((props, ref) => {
   const [visibility, setVisibility] = useState(false);
   const [command, setCommand] = useState(getCommand("Light"));
   const [commandData, setCommandData] = useState({
@@ -24,9 +26,11 @@ const CabinCommands = (props) => {
     Override: 1,
   });
   const [title, setTitle] = useState("");
+  const user = useSelector(selectUser);
+  const complex = useSelector((state) => state.complexStore);
 
-  const messageDialog = useRef();
-  const loadingDialog = useRef();
+  // const messageDialog = useRef();
+  // const loadingDialog = useRef();
 
   const toggle = () => {
     setVisibility(!visibility);
@@ -37,31 +41,35 @@ const CabinCommands = (props) => {
     setVisibility(!visibility);
   };
 
+  React.useImperativeHandle(ref, () => ({
+    showDialog,
+  }));
+
   const onClick = () => {
     submitConfig();
   };
 
   const submitConfig = async () => {
     console.log("_commands", commandData);
-    loadingDialog.current.showDialog();
+    // loadingDialog.current.showDialog();
     try {
       const topic = getTopicName(
         "Command",
-        props.complex.complexDetails,
-        props.cabin,
-        props.complex.hierarchy
+        complex[complex?.complex?.name]?.complexDetails,
+        complex?.cabin,
+        complex[complex?.complex?.name]?.hierarchy
       );
       const payload = getPublishPayloadCommand(
         command,
         commandData,
-        props.complex.complexDetails,
-        props.cabin
+        complex[complex?.complex?.name]?.complexDetails,
+        complex?.cabin
       );
       const metadata = getPublishMetaCommanddata(
         "Command",
-        props.complex.complexDetails,
-        props.cabin,
-        props.user
+        complex[complex?.complex?.name]?.complexDetails,
+        complex?.cabin,
+        user?.user
       );
       console.log("_commands", topic);
       console.log("_commands", payload);
@@ -70,18 +78,18 @@ const CabinCommands = (props) => {
         topic,
         payload,
         metadata,
-        props.credentials
+        user?.credentials
       );
-      messageDialog.current.showDialog(
-        "Success",
-        "Command submitted successfully",
-        toggle()
-      );
-      loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog(
+      //   "Success",
+      //   "Command submitted successfully",
+      //   toggle()
+      // );
+      // loadingDialog.current.closeDialog();
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
-      loadingDialog.current.closeDialog();
-      messageDialog.current.showDialog("Error Alert!", err.message);
+      // loadingDialog.current.closeDialog();
+      // messageDialog.current.showDialog("Error Alert!", err.message);
     }
   };
 
@@ -105,6 +113,7 @@ const CabinCommands = (props) => {
     if (configName === "Duration") {
       setCommandData({ ...commandData, Duration: configValue });
     }
+    console.log("checing handlecommandupdate -->", commandData);
   };
 
   const CommandSelector = () => {
@@ -133,8 +142,13 @@ const CabinCommands = (props) => {
 
   const CommandUi = () => {
     console.log("_command", "CommandUi", command);
-    if (command.value === 0) {
-      return <CommandsLabel handleUpdate={handleCommandUpdate} />;
+    if (command.value !== 0) {
+      return (
+        <CommandsLabel
+          value={commandData.Duration}
+          handleUpdate={handleCommandUpdate}
+        />
+      );
     }
 
     return <CommandsLabelOverride handleUpdate={handleCommandUpdate} />;
@@ -171,6 +185,6 @@ const CabinCommands = (props) => {
       </Modal>
     </div>
   );
-};
+});
 
 export default CabinCommands;
