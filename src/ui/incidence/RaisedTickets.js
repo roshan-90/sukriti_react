@@ -81,21 +81,6 @@ const RaisedTickets = (props) => {
                   <Link
                     to={{
                       pathname: `/Incidence/TicketDetails/${ticketData.ticket_id}`,
-                      state: {
-                        complex: ticketData.ticket_id,
-                        title: ticketData.title,
-                        status: ticketData.ticket_status,
-                        priority: ticketData.criticality,
-                        name: ticketData.complex_name,
-                        state: ticketData.state_code,
-                        district: ticketData.district_name,
-                        city: ticketData.city_name,
-                        role: ticketData.creator_role,
-                        id: ticketData.creator_id,
-                        timestamp: ticketData.timestamp,
-                        comment: ticketData.assignment_comment,
-                        data: ticketData,
-                      },
                     }}
                     style={{ textDecoration: "none" }}
                   >

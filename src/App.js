@@ -40,6 +40,10 @@ const VendorHome = lazy(() => import("./ui/vendor/VendorHome"));
 const VendorDetails = lazy(() => import("./ui/vendor/VendorDetailsHome"));
 const UpdateVendorMember = lazy(() => import("./ui/vendor/UpdateVendorMember"));
 const AddVendorMember = lazy(() => import("./ui/vendor/AddVendorMember"));
+const CreateNewTicket = lazy(() => import("./ui/incidence/CreateNewTicket"));
+const IncidenceTicketDetails = lazy(() =>
+  import("./ui/incidence/IncidenceTicketDetails")
+);
 
 const App = () => {
   const dispatch = useDispatch();
@@ -121,6 +125,18 @@ const App = () => {
                       exact={true}
                       name={"Incidence"}
                       element={<IncidenceTicket />}
+                    />
+                    <Route
+                      path={"/incidence/raiseNewTicket"}
+                      exact={true}
+                      name={"Icidence"}
+                      element={<CreateNewTicket />}
+                    />
+                    <Route
+                      path={"/Incidence/TicketDetails/:id_name"}
+                      exact={true}
+                      name={"Ticket Details"}
+                      element={<IncidenceTicketDetails />}
                     />
                     <Route
                       path={"/administration"}
