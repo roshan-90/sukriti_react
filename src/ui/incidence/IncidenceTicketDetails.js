@@ -23,15 +23,21 @@ import {
   executeProgressLambda,
   executeFetchTeamListLambda,
 } from "../../awsClients/incidenceLambdas";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import CircularProgress from "@mui/material/CircularProgress";
 import moment from "moment";
-import { useSelector } from "react-redux";
 import { useParams, useLocation } from "react-router-dom";
 import { selectUser } from "../../features/authenticationSlice";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { useDispatch, useSelector } from "react-redux";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 function IncidenceTicketDetails(props) {
+  const dispatch = useDispatch();
   const { id_name } = useParams();
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
   const allTickets = useSelector(
     (state) => state.incidenece?.ticketList?.allTickets
   );
@@ -170,25 +176,41 @@ function IncidenceTicketDetails(props) {
   };
 
   async function initCreateTicketRequest(createUserRequest) {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var requestCopy = { ...createUserRequest };
       await executeTicketActionLambda(requestCopy, user?.credentials);
-      // this.messageDialog.current.showDialog(
-      //   "Progress Submitted",
-      //   "Ticket Progress successfully submitted"
-      // );
-      // loadingDialog.current.closeDialog();
+      setDialogData({
+        title: "Progress Submitted",
+        message: "Ticket Progress successfully submitted",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("Progress Submitted :->");
+        },
+      });
     } catch (err) {
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog(
-      //   "Progress Submitted",
-      //   "Ticket Progress successfully submitted",
-      //   () => {
-      //     props.history.goBack();
-      //   }
-      // );
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("initCreateTicketRequest Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("initCreateTicketRequest Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
     setModal(false);
   }
@@ -288,66 +310,102 @@ function IncidenceTicketDetails(props) {
   const onSubmit = () => {
     if (modalShow === "Assign Ticket") {
       if (AcceptDetails.title !== "assign lead") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Type 'assign lead' to accept ticket lead role."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Type 'assign lead' to accept ticket lead role.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("onSubmit Error");
+          },
+        });
       } else if (AcceptDetails.comment === "") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "A comment describing your intent is mandatory."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "A comment describing your intent is mandatory.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("onSubmit Error");
+          },
+        });
       } else {
         initCreateTicketRequest(AcceptDetails);
       }
     } else if (modalShow === "Accept Ticket") {
       if (AcceptDetails.title !== "accept lead") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Type 'accept lead' to accept ticket lead role."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Type 'accept lead' to accept ticket lead role.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else if (AcceptDetails.comment === "") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "A comment describing your intent is mandatory."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "A comment describing your intent is mandatory.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else {
         initCreateTicketRequest(AcceptDetails);
       }
     } else if (modalShow === "Mark Resolved") {
       if (AcceptDetails.title !== "mark resolved") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Type 'mark resolved' to accept ticket lead role."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Type 'mark resolved' to accept ticket lead role.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else if (AcceptDetails.comment === "") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "A comment describing your intent is mandatory."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "A comment describing your intent is mandatory.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else {
         initCreateTicketRequest(AcceptDetails);
       }
     } else if (modalShow === "Submit Progress") {
       if (AcceptDetails.comment === "") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "A comment describing your intent is mandatory."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "A comment describing your intent is mandatory.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else {
         initCreateTicketRequest(AcceptDetails);
       }
     } else if (modalShow === "Mark Closed") {
       if (AcceptDetails.title !== "close ticket") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "Type 'close ticket' to accept ticket lead role."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "Type 'close ticket' to accept ticket lead role.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else if (AcceptDetails.comment === "") {
-        // messageDialog.current.showDialog(
-        //   "Validation Error",
-        //   "A comment describing your intent is mandatory."
-        // );
+        setDialogData({
+          title: "Validation Error",
+          message: "A comment describing your intent is mandatory.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("modalShow Error");
+          },
+        });
       } else {
         initCreateTicketRequest(AcceptDetails);
       }
@@ -380,8 +438,15 @@ function IncidenceTicketDetails(props) {
         padding: "10px 0",
       }}
     >
-      {/* <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
       <div
         style={{
           display: "flex",
@@ -1199,7 +1264,7 @@ function IncidenceTicketDetails(props) {
                   <Form>
                     <InputGroup className="mb-4">
                       <InputGroupText>
-                        <i className="icon-lock"></i>
+                        <LockOutlinedIcon />{" "}
                       </InputGroupText>
                       <Input type="select" onChange={assignment2}>
                         <option selected hidden disabled value="">
@@ -1228,7 +1293,7 @@ function IncidenceTicketDetails(props) {
 
                     <InputGroup className="mb-4">
                       <InputGroupText>
-                        <i className="icon-lock"></i>
+                        <LockOutlinedIcon />{" "}
                       </InputGroupText>
                       <Input
                         type="textarea"
@@ -1241,7 +1306,7 @@ function IncidenceTicketDetails(props) {
 
                     <InputGroup className="mb-3">
                       <InputGroupText>
-                        <i className="icon-user"></i>
+                        <PersonOutlineOutlinedIcon />
                       </InputGroupText>
                       <Input
                         type="text"
@@ -1283,7 +1348,7 @@ function IncidenceTicketDetails(props) {
                   <Form>
                     <InputGroup className="mb-4">
                       <InputGroupText>
-                        <i className="icon-lock"></i>
+                        <LockOutlinedIcon />{" "}
                       </InputGroupText>
                       <Input
                         type="textarea"
@@ -1296,7 +1361,7 @@ function IncidenceTicketDetails(props) {
 
                     <InputGroup className="mb-3">
                       <InputGroupText>
-                        <i className="icon-user"></i>
+                        <PersonOutlineOutlinedIcon />
                       </InputGroupText>
                       <Input
                         type="text"
@@ -1338,7 +1403,7 @@ function IncidenceTicketDetails(props) {
                   <Form>
                     <InputGroup className="mb-4">
                       <InputGroupText>
-                        <i className="icon-lock"></i>
+                        <LockOutlinedIcon />{" "}
                       </InputGroupText>
                       <Input
                         type="textarea"
@@ -1351,7 +1416,7 @@ function IncidenceTicketDetails(props) {
 
                     <InputGroup className="mb-3">
                       <InputGroupText>
-                        <i className="icon-user"></i>
+                        <PersonOutlineOutlinedIcon />
                       </InputGroupText>
                       <Input
                         type="text"
@@ -1391,7 +1456,7 @@ function IncidenceTicketDetails(props) {
                   <Form>
                     <InputGroup className="mb-4">
                       <InputGroupText>
-                        <i className="icon-lock"></i>
+                        <LockOutlinedIcon />{" "}
                       </InputGroupText>
                       <Input
                         type="textarea"
@@ -1434,7 +1499,7 @@ function IncidenceTicketDetails(props) {
                     <Form>
                       <InputGroup className="mb-4">
                         <InputGroupText>
-                          <i className="icon-lock"></i>
+                          <LockOutlinedIcon />{" "}
                         </InputGroupText>
                         <Input
                           type="textarea"
@@ -1447,7 +1512,7 @@ function IncidenceTicketDetails(props) {
 
                       <InputGroup className="mb-3">
                         <InputGroupText>
-                          <i className="icon-user"></i>
+                          <PersonOutlineOutlinedIcon />
                         </InputGroupText>
                         <Input
                           type="text"
@@ -1483,15 +1548,5 @@ function IncidenceTicketDetails(props) {
     </div>
   );
 }
-
-// const mapStateToProps = (state) => {
-//   console.log("_onComplexSelection", state.complexStore);
-
-//   return {
-//     credentials: state.authentication.credentials,
-//   };
-// };
-
-// const mapActionsToProps = {};
 
 export default IncidenceTicketDetails;

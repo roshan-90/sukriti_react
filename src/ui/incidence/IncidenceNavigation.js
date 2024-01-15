@@ -16,12 +16,14 @@ import StateList from "../../components/accessTree/complexNavCompact/SateList";
 import { selectUser, setAccessTree } from "../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { updateSelectedComplex } from "../../features/complesStoreSlice";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
 
 const IncidenceNavigation = () => {
   const dispatch = useDispatch();
   const selectionSummary = useRef();
   const stateList = useRef();
   const user = useSelector(selectUser);
+  const isLoading = useSelector((state) => state.loading.isLoading);
 
   useEffect(() => {
     if (user?.accessTree === undefined) {
@@ -44,14 +46,17 @@ const IncidenceNavigation = () => {
   };
 
   const initFetchCompletedUserAccessTreeAction = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var result = await executeFetchCompletedUserAccessTree(
         user?.user?.userName,
         user?.credentials
       );
       dispatch(setAccessTree(result));
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
       console.log(err, "err");
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 

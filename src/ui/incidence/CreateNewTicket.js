@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setPushComplexPosition,
   updateSelectedCabin,
+  emptyComplexStore,
 } from "../../features/complesStoreSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { useNavigate } from "react-router-dom";
@@ -133,25 +134,26 @@ const CreateNewTicket = () => {
       res.push(await executeCreateTicketLambda(requestCopy, credentials));
       let ticketId = res[0].ticketId;
       console.log("res", res);
-      setDialogData({
-        title: "Ticket Submitted",
-        message:
-          "Ticket successfully submitted, your reference id is: " + ticketId,
-        onClickAction: () => {
-          navigate("/incidence/tickets");
-          console.error("Ticket successfully submitted");
-        },
-      });
       if (ticketId && imageName) {
         Promise.all(imageName).then((values) => {
           imageName.forEach((element, index) => {
             let fileId = element;
             let NewUpdatedName = "Raise-" + "Photo-" + "10" + index;
             let fileName = NewUpdatedName;
-            executeUploadFileS3(ticketId, fileName, fileId);
+            executeUploadFileS3(ticketId, fileName, fileId, credentials);
           });
         });
       }
+      setDialogData({
+        title: "Ticket Submitted",
+        message:
+          "Ticket successfully submitted, your reference id is: " + ticketId,
+        onClickAction: () => {
+          dispatch(emptyComplexStore());
+          navigate("/incidence/tickets");
+          console.error("Ticket successfully submitted");
+        },
+      });
     } catch (err) {
       let text = err.message.includes("expired");
       if (text) {
