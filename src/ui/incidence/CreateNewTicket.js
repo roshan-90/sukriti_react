@@ -1,17 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
-// import {
-//   pushComplexComposition,
-//   updateSelectedCabin,
-// } from "../../store/actions/complex-actions";
-// import {
-//   addTeamMember,
-//   setClientList,
-// } from "../../store/actions/administration-actions";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
 import { executeGetComplexCompositionLambda } from "../../awsClients/complexLambdas";
-
+import { setClientList } from "../../features/adminstrationSlice";
 import {
   Button,
   Card,
@@ -33,41 +23,76 @@ import moment from "moment";
 import { whiteSurface } from "../../jsStyles/Style";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
-const CreateNewTicket = ({
-  complexStore,
-  complex,
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setPushComplexPosition,
   updateSelectedCabin,
-  credentials,
-  hierarchy,
-  history,
-}) => {
+} from "../../features/complesStoreSlice";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+
+const CreateNewTicket = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const complexStore = useSelector((state) => state.complexStore);
+  const credentials = useSelector((state) => state.authentication.credentials);
+  const user = useSelector((state) => state.authentication.user);
+  const hierarchy = complexStore?.hierarchy;
+  const [dialogData, setDialogData] = useState(null);
   const [buttonOne, setButtonOne] = useState(false);
   const [previewImages, setPreviewImages] = useState([]);
   const [imageName, setImageName] = useState([]);
-
-  //   const messageDialog = useRef();
-  //   const loadingDialog = useRef();
-
+  const isLoading = useSelector((state) => state.loading.isLoading);
   const formDetails = {};
 
   useEffect(() => {
-    if (complex !== undefined && complexStore[complex.name] == undefined)
+    if (
+      complexStore?.complex !== undefined &&
+      complexStore[complexStore?.complex.name] == undefined
+    )
       fetchComplexComposition();
-  }, [complex, complexStore]);
+  }, [complexStore?.complex, complexStore]);
 
   const fetchComplexComposition = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
+    console.log("getcomplexcomposition lambda", complexStore?.complex);
     try {
       var result = await executeGetComplexCompositionLambda(
-        complex.name,
+        complexStore?.complex.name,
         credentials
       );
-      //   pushComplexComposition(hierarchy, complex, result);
-      //   loadingDialog.current.closeDialog();
+      dispatch(
+        setPushComplexPosition({
+          hierarchy: hierarchy,
+          complexDetails: complexStore?.complex,
+          complexComposition: result,
+        })
+      );
     } catch (err) {
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchComplexComposition Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchComplexComposition Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -81,10 +106,14 @@ const CreateNewTicket = ({
     let limit = 5;
     if (event.target.files.length > limit) {
       event.preventDefault();
-      //   messageDialog.current.showDialog(
-      //     "Limit exceeds",
-      //     "Only 5 images are allowed"
-      //   );
+      setDialogData({
+        title: "Limit exceeds",
+        message: "Only 5 images are allowed",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.error("selectFiles Error");
+        },
+      });
     } else {
       for (let i = 0; i < event.target.files.length; i++) {
         images.push(URL.createObjectURL(event.target.files[i]));
@@ -96,20 +125,23 @@ const CreateNewTicket = ({
   };
 
   const initCreateTicketRequest = async (createUserRequest) => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var requestCopy = { ...createUserRequest };
       let res = [];
+      console.log("requestCopy", requestCopy);
       res.push(await executeCreateTicketLambda(requestCopy, credentials));
       let ticketId = res[0].ticketId;
-      //   messageDialog.current.showDialog(
-      //     "Ticket Submitted",
-      //     "Ticket successfully submitted, your reference id is: " + ticketId,
-      //     () => {
-      //       history.goBack();
-      //     }
-      //   );
-
+      console.log("res", res);
+      setDialogData({
+        title: "Ticket Submitted",
+        message:
+          "Ticket successfully submitted, your reference id is: " + ticketId,
+        onClickAction: () => {
+          navigate("/incidence/tickets");
+          console.error("Ticket successfully submitted");
+        },
+      });
       if (ticketId && imageName) {
         Promise.all(imageName).then((values) => {
           imageName.forEach((element, index) => {
@@ -120,39 +152,78 @@ const CreateNewTicket = ({
           });
         });
       }
-      //   loadingDialog.current.closeDialog();
     } catch (err) {
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("initCreateTicketRequest Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("initCreateTicketRequest Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   const onSubmit = () => {
     if (formDetails.title === "") {
-      //   messageDialog.current.showDialog(
-      //     "Validation Error",
-      //     "Please enter a title."
-      //   );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a title.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.error("onSubmit Error");
+        },
+      });
     } else if (formDetails.description === "") {
-      //   messageDialog.current.showDialog(
-      //     "Validation Error",
-      //     "Please enter a valid description."
-      //   );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid description",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.error("onSubmit Error");
+        },
+      });
     } else if (formDetails.complex_name === "") {
-      //   messageDialog.current.showDialog(
-      //     "Validation Error",
-      //     "Please enter a valid complex_name."
-      //   );
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter a valid complex_name.",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.error("onSubmit Error");
+        },
+      });
     } else {
+      console.log("formDetails", formDetails);
       initCreateTicketRequest(formDetails);
     }
   };
 
   const ComponentSelector = () => {
     var complex = undefined;
-    if (complex !== undefined) complex = complexStore[complex.name];
+    // if (complex !== undefined)
+    complex = complexStore[complexStore?.complex?.name];
+    if (complex == undefined) return null;
+    console.log("checking component selector", complexStore?.complex.name);
+    console.log(
+      "checking component selector--2",
+      complexStore[complexStore?.complex.name]
+    );
+    console.log("checking component selector--3", complex);
     if (complex !== undefined) return <ComplexHeader />;
-    return null;
   };
 
   const ComplexHeader = () => {
@@ -175,7 +246,7 @@ const CreateNewTicket = ({
     var index = monthCodes[month];
     var year = moment().format("YY");
     var yearMonthCode = year + "-" + index;
-    var complex = complexStore[complex.name];
+    var complex = complexStore[complexStore?.complex.name];
 
     formDetails.assigned_by = "";
     formDetails.assignemt_type = "";
@@ -184,8 +255,8 @@ const CreateNewTicket = ({
     formDetails.city_name = "";
     formDetails.client_name = complex.complexDetails.client;
     formDetails.complex_name = "";
-    // formDetails.creator_id = location.state.user.userName;
-    // formDetails.creator_role = location.state.user.userRole;
+    formDetails.creator_id = user.userName;
+    formDetails.creator_role = user.userRole;
     formDetails.criticality = "";
     formDetails.description = "";
     formDetails.district_code = complex.hierarchy.districtCode;
@@ -247,8 +318,15 @@ const CreateNewTicket = ({
 
   return (
     <div className="col-md-12">
-      {/* <MessageDialog ref={messageDialog} />
-      <LoadingDialog ref={loadingDialog} /> */}
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
 
       <Container>
         <Row className="justify-content-center">
@@ -401,21 +479,4 @@ const CreateNewTicket = ({
     </div>
   );
 };
-
-const mapStateToProps = (state) => {
-  return {
-    complexStore: state.complexStore,
-    complex: state.complexStore.complex,
-    credentials: state.authentication.credentials,
-    hierarchy: state.complexStore.hierarchy,
-  };
-};
-
-// const mapActionsToProps = {
-//   pushComplexComposition,
-//   updateSelectedCabin,
-//   addMember: addTeamMember,
-//   setClientList,
-// };
-
 export default CreateNewTicket;

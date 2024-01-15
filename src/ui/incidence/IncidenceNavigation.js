@@ -11,27 +11,23 @@ import {
   getAccessSummary,
   getComplexHierarchy,
 } from "../../components/accessTree/accessTreeUtils";
-// import { setOwnAccessTree } from "../../store/actions/authentication";
-// import { updateSelectedComplex } from "../../store/actions/complex-actions";
 import NoDataComponent from "../../components/NoDataComponent";
 import StateList from "../../components/accessTree/complexNavCompact/SateList";
+import { selectUser, setAccessTree } from "../../features/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { updateSelectedComplex } from "../../features/complesStoreSlice";
 
-const IncidenceNavigation = ({
-  user,
-  accessTree,
-  credentials,
-  setOwnAccessTree,
-  updateSelectedComplex,
-  button,
-}) => {
+const IncidenceNavigation = () => {
+  const dispatch = useDispatch();
   const selectionSummary = useRef();
   const stateList = useRef();
+  const user = useSelector(selectUser);
 
   useEffect(() => {
-    if (accessTree === undefined) {
+    if (user?.accessTree === undefined) {
       initFetchCompletedUserAccessTreeAction();
     }
-  }, [accessTree]);
+  }, [user?.accessTree]);
 
   const handleComplexSelection = (treeEdge) => {
     var stateIndex = treeEdge.stateIndex;
@@ -40,35 +36,34 @@ const IncidenceNavigation = ({
     var complexIndex = treeEdge.complexIndex;
 
     var complex =
-      accessTree.country.states[stateIndex].districts[districtIndex].cities[
-        cityIndex
-      ].complexes[complexIndex];
+      user?.accessTree.country.states[stateIndex].districts[districtIndex]
+        .cities[cityIndex].complexes[complexIndex];
 
-    var hierarchy = getComplexHierarchy(accessTree, treeEdge);
-    updateSelectedComplex(complex, hierarchy);
+    var hierarchy = getComplexHierarchy(user?.accessTree, treeEdge);
+    dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
   };
 
   const initFetchCompletedUserAccessTreeAction = async () => {
     try {
       var result = await executeFetchCompletedUserAccessTree(
-        user.userName,
-        credentials
+        user?.user?.userName,
+        user?.credentials
       );
-      setOwnAccessTree(result);
+      dispatch(setAccessTree(result));
     } catch (err) {
       console.log(err, "err");
     }
   };
 
   const ComponentSelector = () => {
-    if (accessTree == undefined) {
+    if (user?.accessTree == undefined) {
       return <NoDataComponent />;
     } else {
       return (
         <StateList
           ref={stateList}
-          listData={accessTree}
-          button={button}
+          listData={user?.accessTree}
+          // button={button}
           handleComplexSelection={handleComplexSelection}
         />
       );
@@ -117,19 +112,5 @@ const IncidenceNavigation = ({
     </div>
   );
 };
-
-const mapStateToProps = (state) => {
-  return {
-    user: state.authentication.user,
-    accessTree: state.authentication.accessTree,
-    accessSummary: getAccessSummary(state.authentication.accessTree),
-    credentials: state.authentication.credentials,
-  };
-};
-
-// const mapActionsToProps = {
-//   setOwnAccessTree,
-//   updateSelectedComplex,
-// };
 
 export default IncidenceNavigation;
