@@ -18,6 +18,17 @@ import reportReducer from "./features/reportSlice";
 import extraReducer from "./features/extraSlice";
 import vendorSlice from "./features/vendorSlice";
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/service-worker.js")
+    .then((registration) => {
+      console.log("Service Worker registered with scope:", registration.scope);
+    })
+    .catch((error) => {
+      console.error("Service Worker registration failed:", error);
+    });
+}
+
 const store = configureStore({
   reducer: {
     loading: loadingReducer,

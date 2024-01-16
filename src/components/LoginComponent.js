@@ -22,12 +22,14 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { startLoading, stopLoading } from "../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const LoginComponent = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
   console.log("sdsd3");
   const handleSignIn = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -40,6 +42,14 @@ const LoginComponent = () => {
       .catch((error) => {
         // Handle errors from the signIn function
         console.error("Sign in failed:", error);
+        setDialogData({
+          title: "Error",
+          message: error.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("handleSignIn Error:->", error);
+          },
+        });
       });
     dispatch(stopLoading()); // Dispatch the stopLoading action
   };
@@ -90,6 +100,7 @@ const LoginComponent = () => {
           />
         </div>
       )}
+      <MessageDialog data={dialogData} />
       <div
         style={{
           height: "100vh",
