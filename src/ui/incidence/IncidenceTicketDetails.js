@@ -32,38 +32,92 @@ import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
+import { setTicketList, incidenceList } from "../../features/incidenceSlice";
+import { executeFetchIncidenceLambda } from "../../awsClients/incidenceLambdas";
 function IncidenceTicketDetails(props) {
   const dispatch = useDispatch();
   const { id_name } = useParams();
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
-  const allTickets = useSelector(
-    (state) => state.incidenece?.ticketList?.allTickets
-  );
-  const user = useSelector(selectUser);
-  console.log("all ticket", allTickets);
-  const jsonString = JSON.parse(allTickets);
-  console.log("jsonString", jsonString);
-  const [filteredTicket] = jsonString.filter(
-    (ticket) => ticket.ticket_id === id_name
-  );
-  console.log("allTickets.tickets is not an array.", filteredTicket);
+  const allTickets = useSelector(incidenceList);
 
+  const user = useSelector(selectUser);
+
+  const fetchAndInitTeam = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      console.log("_user", user);
+      var result = await executeFetchIncidenceLambda(
+        user?.username,
+        user?.user.userRole,
+        user?.credentials
+      );
+      dispatch(setTicketList({ ticketList: result }));
+      console.log("IncidenceHome fetchAndInitTeam", result);
+      //   props.loadingDialog.current.closeDialog();
+    } catch (err) {
+      let text = err.message.includes("expired");
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: err.message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("fetchDashboardData Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("fetchAndInitClientList Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
+
+  if (
+    allTickets == null ||
+    allTickets == undefined ||
+    Object.keys(allTickets).length === 0
+  ) {
+    console.log("start wore");
+    fetchAndInitTeam();
+  }
+
+  const jsonString = allTickets?.allTickets
+    ? JSON.parse(allTickets.allTickets)
+    : null;
+  let filteredTicket;
+  if (jsonString) {
+    // Your existing code for handling the parsed JSON
+    [filteredTicket] = jsonString.filter(
+      (ticket) => ticket?.ticket_id === id_name
+    );
+    // ... rest of the code
+  } else {
+    console.log("allTickets?.allTickets is undefined or not a valid JSON");
+    // Handle the case where allTickets?.allTickets is undefined or not a valid JSON
+  }
   const location = useLocation();
   console.log(location, "DATA_DATA_DATA");
-  const complex = filteredTicket.ticket_id;
-  const title = filteredTicket.title;
-  const status = filteredTicket.ticket_status;
-  const priority = filteredTicket.criticality;
-  const name = filteredTicket.complex_name;
-  const state = filteredTicket.state_code;
-  const district = filteredTicket.district_name;
-  const city = filteredTicket.city_name;
-  const role = filteredTicket.creator_role;
-  const id = filteredTicket.creator_id;
-  const timestamp = filteredTicket.timestamp;
-  const comment = filteredTicket.assignment_comment;
+  const complex = filteredTicket?.ticket_id;
+  const title = filteredTicket?.title;
+  const status = filteredTicket?.ticket_status;
+  const priority = filteredTicket?.criticality;
+  const name = filteredTicket?.complex_name;
+  const state = filteredTicket?.state_code;
+  const district = filteredTicket?.district_name;
+  const city = filteredTicket?.city_name;
+  const role = filteredTicket?.creator_role;
+  const id = filteredTicket?.creator_id;
+  const timestamp = filteredTicket?.timestamp;
+  const comment = filteredTicket?.assignment_comment;
   const data = filteredTicket;
 
   console.log("data is getting", {
@@ -116,7 +170,7 @@ function IncidenceTicketDetails(props) {
   };
 
   const isSeniorToLead = (data, user) => {
-    const ticketLeadSeniority = getVendorSideSeniority(data.lead_role);
+    const ticketLeadSeniority = getVendorSideSeniority(data?.lead_role);
     const userSeniority = getVendorSideSeniority(user.userRole);
     result = userSeniority > ticketLeadSeniority;
     setSeniority(result);
@@ -291,18 +345,18 @@ function IncidenceTicketDetails(props) {
         ? 6
         : "",
     comment: "",
-    assigneeId: data.lead_id
-      ? data.lead_id
-      : !data.lead_id && id && !userSelect
+    assigneeId: data?.lead_id
+      ? data?.lead_id
+      : !data?.lead_id && id && !userSelect
       ? id
-      : !data.lead_id && id && userSelect
+      : !data?.lead_id && id && userSelect
       ? userSelect[0]
       : "",
-    assigneeRole: data.lead_role
-      ? data.lead_role
-      : !data.lead_role && role && !userSelect
+    assigneeRole: data?.lead_role
+      ? data?.lead_role
+      : !data?.lead_role && role && !userSelect
       ? role
-      : !data.lead_role && role && userSelect
+      : !data?.lead_role && role && userSelect
       ? userSelect[1]
       : "",
   };
@@ -421,11 +475,11 @@ function IncidenceTicketDetails(props) {
   const displayData = eval(progressData);
   const teamData = eval(teamList);
   console.log(
-    id === data.lead_id && user.userRole === role,
+    id === data?.lead_id && user.userRole === role,
     "id === data.lead_id && user.userRole === role"
   );
-  console.log(id === data.lead_id, "id === data.lead_id ");
-  console.log(data.lead_id, "data.lead_id  ");
+  console.log(id === data?.lead_id, "id === data.lead_id ");
+  console.log(data?.lead_id, "data.lead_id  ");
   console.log(id, "id  ");
   console.log(user.userRole, "user.userRole  ");
   console.log(user.userName, "user.userRole  ");
@@ -746,7 +800,7 @@ function IncidenceTicketDetails(props) {
                               )}
                             </Input>
                           </>
-                        ) : user.userName === data.lead_id ? (
+                        ) : user.userName === data?.lead_id ? (
                           <>
                             <Input
                               type="select"
