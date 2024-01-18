@@ -14,6 +14,7 @@ import {
   setLoggedIn,
   setUsername,
   setUser,
+  selectUser,
 } from "./features/authenticationSlice";
 import AppBar from "./components/AppBar";
 import { Container } from "reactstrap";
@@ -22,6 +23,7 @@ import Home from "./ui/dashboard/Home";
 import AdministrationHome from "./ui/administration/AdministrationHome";
 import MemberDetails from "./ui/administration/MemberDetailsHome";
 import ConfigureUser from "./components/ConfigureUser";
+import useOnlineStatus from "./services/useOnlineStatus";
 
 const DefineMemberAccess = lazy(() =>
   import("./ui/administration/DefineMemberAccess")
@@ -49,6 +51,10 @@ const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { handleOfflineState, handleOnlineState } = useOnlineStatus();
+  const authentication = useSelector(selectUser);
+  const [offlinecount, setOfflineCount] = useState(0);
+  const [refreshcount, setRefreshCount] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -74,12 +80,14 @@ const App = () => {
     function onlineHandler() {
       console.log("Online");
       setIsOnline(true);
+      handleOnlineState(true);
     }
 
-    function offlineHandler() {
-      console.log("Offline");
+    const offlineHandler = () => {
+      console.log("Offline", authentication);
       setIsOnline(false);
-    }
+      setOfflineCount(1);
+    };
 
     window.addEventListener("online", onlineHandler);
     window.addEventListener("offline", offlineHandler);
@@ -91,6 +99,7 @@ const App = () => {
   }, [isOnline]); // Add isOnline as a dependency
 
   useEffect(() => {
+    console.log("beforeunload");
     const handleBeforeUnload = (event) => {
       event.preventDefault();
       localStorage.setItem("lastVisitedPage", window.location.pathname);
@@ -103,7 +112,37 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log("reload --> 1");
+
+    const handleLoad = () => {
+      // Function to be called after page reload
+      console.log("Page has completed reloading", authentication);
+      setRefreshCount(1);
+
+      // You can call your function here
+      // yourFunction();
+    };
+
+    window.addEventListener("load", handleLoad);
+
+    return () => {
+      window.removeEventListener("load", handleLoad);
+    };
+  }, []);
+
   console.log("isOnline", isOnline);
+  console.log("user--->", authentication);
+  console.log("count", offlinecount);
+  if (isOnline == false && offlinecount == 1) {
+    console.log("function work");
+    handleOfflineState(isOnline, authentication);
+    setOfflineCount(0);
+  }
+
+  if (isOnline == false && refreshcount == 1) {
+    console.log("after page refresh", authentication);
+  }
   if (isAuthenticated) {
     return (
       <React.Suspense fallback={loading()}>
