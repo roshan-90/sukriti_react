@@ -13,8 +13,9 @@ import {
 import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
 import { clearUser, selectUser } from "../features/authenticationSlice";
+import Badge from "@mui/material/Badge";
 
-const AppBar = () => {
+const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const [isOpen, setIsOpen] = useState(false);
@@ -106,18 +107,56 @@ const AppBar = () => {
               </NavItem>
             ) : null}
           </Nav>
-
-          <Button
-            outline
-            color="primary"
-            className="px-4"
+          <span
             style={{
               float: "right",
             }}
-            onClick={confirmSignOut}
           >
-            <i className="fa fa-lock"></i> Logout
-          </Button>
+            {/* <Button
+              outline
+              color="primary"
+              // className="px-4"
+              style={{
+                float: "left",
+                height: "37px",
+                padding: "1px",
+                background: "blue",
+                margin: "1px",
+              }}
+            >
+              {isOnline ? (
+                <p style={{ color: "white" }}>Online</p>
+              ) : (
+                <p style={{ color: "red" }}>Offline</p>
+              )}
+            </Button> */}
+            <Badge
+              color={isOnline ? "success" : "error"}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              badgeContent={
+                isOnline ? (
+                  <p style={{ color: "white", margin: "2px" }}>Online</p>
+                ) : (
+                  <p style={{ color: "white", margin: "2px" }}>Offline</p>
+                )
+              }
+            >
+              <Button
+                outline
+                color="primary"
+                className="px-4"
+                style={{
+                  float: "right",
+                }}
+                onClick={confirmSignOut}
+              >
+                <i className="fa fa-lock"></i> Logout
+              </Button>
+            </Badge>
+          </span>
         </Collapse>
       </Navbar>
     </div>

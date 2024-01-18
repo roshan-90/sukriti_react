@@ -1,5 +1,5 @@
 // App.js
-import React, { Suspense, useEffect, lazy } from "react";
+import React, { Suspense, useEffect, lazy, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -48,6 +48,7 @@ const IncidenceTicketDetails = lazy(() =>
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -70,7 +71,28 @@ const App = () => {
   );
 
   useEffect(() => {
+    function onlineHandler() {
+      console.log("Online");
+      setIsOnline(true);
+    }
+
+    function offlineHandler() {
+      console.log("Offline");
+      setIsOnline(false);
+    }
+
+    window.addEventListener("online", onlineHandler);
+    window.addEventListener("offline", offlineHandler);
+
+    return () => {
+      window.removeEventListener("online", onlineHandler);
+      window.removeEventListener("offline", offlineHandler);
+    };
+  }, [isOnline]); // Add isOnline as a dependency
+
+  useEffect(() => {
     const handleBeforeUnload = (event) => {
+      event.preventDefault();
       localStorage.setItem("lastVisitedPage", window.location.pathname);
     };
 
@@ -81,6 +103,7 @@ const App = () => {
     };
   }, []);
 
+  console.log("isOnline", isOnline);
   if (isAuthenticated) {
     return (
       <React.Suspense fallback={loading()}>
@@ -91,7 +114,7 @@ const App = () => {
           }}
         >
           <Router>
-            <AppBar style={{ width: "100%" }} />
+            <AppBar style={{ width: "100%" }} isOnline={isOnline} />
             <div className="app-body">
               <main className="main">
                 <Container fluid>
