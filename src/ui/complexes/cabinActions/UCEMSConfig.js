@@ -12,8 +12,12 @@ import { settingsModal } from "../../../jsStyles/Style";
 import { executePublishConfigLambda } from "../../../awsClients/complexLambdas";
 import { selectUser } from "../../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { startLoading, stopLoading } from "../../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const UCEMSConfig = React.forwardRef((props, ref) => {
+  const dispatch = useDispatch();
   const [visibility, setVisibility] = useState(false);
   const [title, setTitle] = useState("");
   const [ucemsConfig, setUcemsConfig] = useState(undefined);
@@ -24,8 +28,11 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
   console.log("checking complex --> 22", complex[complex?.complex?.name]);
   const messageDialog = useRef();
   const loadingDialog = useRef();
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   const submitConfig = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     // loadingDialog.current.showDialog();
     console.log("console is clicked", props);
     try {
@@ -63,6 +70,14 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
         metadata,
         user?.credentials
       );
+      setDialogData({
+        title: "Success",
+        message: "New config submitted successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("submitConfig Okay");
+        },
+      });
       // messageDialog.current.showDialog(
       //   "Success",
       //   "New config submitted successfully",
@@ -71,8 +86,28 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
       // loadingDialog.current.closeDialog();
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("submitConfig Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("submitConfig Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -106,6 +141,15 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
 
     return (
       <div>
+        {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
+        <MessageDialog data={dialogData} />
         <div
           style={{
             ...settingsModal.labelTimestamp,
@@ -148,7 +192,7 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={onClick}>
-            OK ucemsConfig
+            Submit ucemsConfig
           </Button>{" "}
         </ModalFooter>
       </Modal>

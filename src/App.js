@@ -112,24 +112,24 @@ const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("reload --> 1");
+  // useEffect(() => {
+  //   console.log("reload --> 1");
 
-    const handleLoad = () => {
-      // Function to be called after page reload
-      console.log("Page has completed reloading", authentication);
-      setRefreshCount(1);
+  //   const handleLoad = () => {
+  //     // Function to be called after page reload
+  //     console.log("Page has completed reloading", authentication);
+  //     setRefreshCount(1);
 
-      // You can call your function here
-      // yourFunction();
-    };
+  //     // You can call your function here
+  //     // yourFunction();
+  //   };
 
-    window.addEventListener("load", handleLoad);
+  //   window.addEventListener("load", handleLoad);
 
-    return () => {
-      window.removeEventListener("load", handleLoad);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("load", handleLoad);
+  //   };
+  // }, []);
 
   console.log("isOnline", isOnline);
   console.log("user--->", authentication);
@@ -140,9 +140,10 @@ const App = () => {
     setOfflineCount(0);
   }
 
-  if (isOnline == false && refreshcount == 1) {
-    console.log("after page refresh", authentication);
-  }
+  // if (isOnline == false && refreshcount == 1) {
+  //   console.log("after page refresh", authentication);
+  // }
+
   if (isAuthenticated) {
     return (
       <React.Suspense fallback={loading()}>
