@@ -23,8 +23,10 @@ import WaterLevelStatus from "./WaterLevelStatus";
 import QuickConfig from "./QuickConfig";
 import LiveStatus from "./LiveStatus";
 import { clearUser } from "../../features/authenticationSlice";
+import useOnlineStatus from "../../services/useOnlineStatus";
 
 const Home = () => {
+  const { handleOnlineState } = useOnlineStatus();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -40,6 +42,7 @@ const Home = () => {
     if (lastVisitedPage) {
       navigate(lastVisitedPage);
     }
+    handleOnlineState();
     localStorage.removeItem("lastVisitedPage");
   }, [navigate]);
 

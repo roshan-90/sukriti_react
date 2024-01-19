@@ -130,11 +130,17 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
     submitConfig();
   };
 
-  const updateConfig = (configName, configValue) => {
-    const updatedConfig = { ...ucemsConfig };
-    updatedConfig.data[getKeyUcemsConfig(configName)] = configValue;
-    setUcemsConfig(updatedConfig);
-  };
+  const updateConfig = React.useCallback(
+    (configName, configValue) => {
+      const updatedConfig = { ...ucemsConfig };
+      console.log("updatedConfig", updatedConfig);
+      console.log("updatedConfig--1", configName);
+      console.log("updatedConfig--2", configValue);
+      updatedConfig.data[getKeyUcemsConfig(configName)] = configValue;
+      setUcemsConfig(updatedConfig);
+    },
+    [ucemsConfig]
+  );
 
   const ComponentSelector = () => {
     if (ucemsConfig === undefined) return <div></div>;

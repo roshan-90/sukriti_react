@@ -30,7 +30,7 @@ const DropDown = (props) => {
   };
 
   const helper = (mOption, index) => {
-    if (selectedItem === index) {
+    if (selectedItem === mOption) {
       console.log("_getIndex3", selectedItem);
       return (
         <option key={index} selected>

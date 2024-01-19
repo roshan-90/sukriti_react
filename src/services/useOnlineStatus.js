@@ -1,6 +1,16 @@
 // useOnlineStatus.js
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  setDashboardData,
+  setDashboardConfig,
+  setDashboardLive,
+} from "../features/dashboardSlice";
+import {
+  setTeamList,
+  setClientList,
+  setData,
+} from "../features/adminstrationSlice";
 
 const useOnlineStatus = () => {
   const dispatch = useDispatch();
@@ -38,8 +48,34 @@ const useOnlineStatus = () => {
     }
   };
 
-  const handleOnlineState = (check) => {
-    console.log("handleOnline state", check);
+  const handleOnlineState = () => {
+    console.log("handleOnline state");
+    console.log("authentication data", authentication);
+    const dashboard_data = JSON.parse(localStorage.getItem("dashboard"));
+    const administration_data = JSON.parse(
+      localStorage.getItem("adminstration")
+    );
+    const client_data = JSON.parse(localStorage.getItem("clientData"));
+    const historyStore = JSON.parse(localStorage.getItem("historyStore"));
+    const complexstore_data = JSON.parse(localStorage.getItem("complexStore"));
+    const incidence_data = JSON.parse(localStorage.getItem("incidenece"));
+    const report_data = JSON.parse(localStorage.getItem("report"));
+    const extra_data = JSON.parse(localStorage.getItem("extra"));
+    const vendor_data = JSON.parse(localStorage.getItem("vendor"));
+    console.log("dashboard ", dashboard_data);
+    console.log("administration_data", administration_data);
+    console.log("client_Data", client_data);
+    console.log("historystore_Data", historyStore);
+    console.log("complexStore data", complexstore_data);
+    console.log("incidenece_data", incidence_data);
+    console.log("report_data", report_data);
+    console.log("extra_data", extra_data);
+    console.log("vendor_data", vendor_data);
+
+    dispatch(setDashboardData(dashboard_data?.data));
+    dispatch(
+      setDashboardConfig({ dashboardConfig: dashboard_data?.configData })
+    );
   };
 
   useEffect(() => {}, [

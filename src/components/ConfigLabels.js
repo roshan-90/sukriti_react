@@ -639,6 +639,7 @@ function PaymentModeLabel(props) {
       >
         <Dropdown
           options={["None", "Coin", "RFID", "Coin and RF"]}
+          currentIndex={props.data.value}
           onSelection={(index, value) => {
             setPaymentMode(value);
             props.handleUpdate(props.data.name, index);

@@ -16,8 +16,12 @@ import { settingsModal } from "../../../jsStyles/Style";
 import { executePublishCommandLambda } from "../../../awsClients/complexLambdas";
 import { selectUser } from "../../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { startLoading, stopLoading } from "../../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const CabinCommands = React.forwardRef((props, ref) => {
+  const dispatch = useDispatch();
   const [visibility, setVisibility] = useState(false);
   const [command, setCommand] = useState(getCommand("Light"));
   const [commandData, setCommandData] = useState({
@@ -28,7 +32,8 @@ const CabinCommands = React.forwardRef((props, ref) => {
   const [title, setTitle] = useState("");
   const user = useSelector(selectUser);
   const complex = useSelector((state) => state.complexStore);
-
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
 
@@ -119,6 +124,15 @@ const CabinCommands = React.forwardRef((props, ref) => {
   const CommandSelector = () => {
     return (
       <div>
+        {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
+        <MessageDialog data={dialogData} />
         <CommandsSelectionLabel
           handleCommandSelection={handleCommandSelection}
           label={"Commands"}

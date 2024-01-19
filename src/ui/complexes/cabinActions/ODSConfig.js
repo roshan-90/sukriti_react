@@ -21,14 +21,19 @@ import {
 import { executePublishConfigLambda } from "../../../awsClients/complexLambdas";
 import { selectUser } from "../../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { startLoading, stopLoading } from "../../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const ODSConfig = React.forwardRef((props, ref) => {
+  const dispatch = useDispatch();
   const [visibility, setVisibility] = useState(false);
   const [title, setTitle] = useState("");
   const [odsConfig, setOdsConfig] = useState(undefined);
   const user = useSelector(selectUser);
   const complex = useSelector((state) => state.complexStore);
-
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
   const messageDialog = useRef();
   const loadingDialog = useRef();
 
@@ -100,6 +105,15 @@ const ODSConfig = React.forwardRef((props, ref) => {
 
     return (
       <div>
+        {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
+        <MessageDialog data={dialogData} />
         <OdsConfigList
           handleUpdate={updateConfig}
           data={getOdsConfigData(odsConfig.data)}

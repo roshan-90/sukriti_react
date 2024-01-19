@@ -21,19 +21,25 @@ import {
 import { executePublishConfigLambda } from "../../../awsClients/complexLambdas";
 import { selectUser } from "../../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { startLoading, stopLoading } from "../../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const CMSConfig = React.forwardRef((props, ref) => {
+  const dispatch = useDispatch();
   const [visibility, setVisibility] = useState(false);
   const [title, setTitle] = useState("");
   const [cmsConfig, setCmsConfig] = useState(undefined);
   const user = useSelector(selectUser);
   const complex = useSelector((state) => state.complexStore);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
 
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
 
   const submitConfig = async () => {
-    // loadingDialog.current.showDialog();
+    dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const topic = getTopicName(
         "CMS_CONFIG",
@@ -66,8 +72,29 @@ const CMSConfig = React.forwardRef((props, ref) => {
       // loadingDialog.current.closeDialog();
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      console.log("_fetchCabinDetails", "_err", err);
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("submitConfig Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("submitConfig Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -100,6 +127,15 @@ const CMSConfig = React.forwardRef((props, ref) => {
 
     return (
       <div>
+        {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
+        <MessageDialog data={dialogData} />
         <CmsConfigList
           handleUpdate={updateConfig}
           data={getCmsConfigData(cmsConfig.data)}
