@@ -48,42 +48,42 @@ const Stats = (props) => {
 
       <StatsItem
         name="Usage Stats"
-        total={props.dataSummary.usage}
-        data={props.chartData.usage}
-        pieChartData={props.pieChartData.usage}
+        total={props.dataSummary?.usage}
+        data={props.chartData?.usage}
+        pieChartData={props.pieChartData?.usage}
       />
 
       {/* UI */}
-      {props.uiResult.collection_stats === "true" && (
+      {props.uiResult?.collection_stats === "true" && (
         <>
           <StatsItem
             name="Collection Stats"
-            total={props.dataSummary.collection}
-            data={props.chartData.collection}
-            pieChartData={props.pieChartData.collection}
+            total={props.dataSummary?.collection}
+            data={props.chartData?.collection}
+            pieChartData={props.pieChartData?.collection}
           />
           <StatsItem
             name="UPI Stats"
-            total={props.dataSummary.upiCollection}
-            data={props.chartData.upiCollection}
-            pieChartData={props.pieChartData.upiCollection}
+            total={props.dataSummary?.upiCollection}
+            data={props.chartData?.upiCollection}
+            pieChartData={props.pieChartData?.upiCollection}
           />
         </>
       )}
-      {props.uiResult.bwt_stats === "true" &&
+      {props.uiResult?.bwt_stats === "true" &&
       props.bwtDataSummary !== undefined ? (
         <BWTStatsItem
           name="Recycled Water"
-          total={props.bwtDataSummary.waterRecycled}
-          data={props.bwtChartData.waterRecycled}
-          pieChartData={props.bwtPieChartData.usage}
+          total={props.bwtDataSummary?.waterRecycled}
+          data={props.bwtChartData?.waterRecycled}
+          pieChartData={props.bwtPieChartData?.usage}
         />
       ) : null}
       <StatsItem
         name="Feedback Stats"
-        total={props.dataSummary.feedback}
-        data={props.chartData.feedback}
-        pieChartData={props.pieChartData.feedback}
+        total={props.dataSummary?.feedback}
+        data={props.chartData?.feedback}
+        pieChartData={props.pieChartData?.feedback}
       />
     </div>
   );

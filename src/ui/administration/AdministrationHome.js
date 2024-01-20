@@ -28,6 +28,30 @@ const AdministrationHome = (props) => {
 
   console.log("sdf-->", user?.username);
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchAndInitTeam = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
@@ -38,26 +62,7 @@ const AdministrationHome = (props) => {
       console.log("result--->", result);
       dispatch(setTeamList(result.teamDetails));
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchAndInitTeam");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }

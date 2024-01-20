@@ -49,6 +49,30 @@ const MemberAccess = (props) => {
   let data = useSelector((state) => state.adminstration.teamList);
   const confirmationDialog = useRef();
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchAndInitTeam = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
@@ -59,28 +83,7 @@ const MemberAccess = (props) => {
       console.log("result--->", result);
       dispatch(setTeamList(result.teamDetails));
     } catch (err) {
-      //   loadingDialog.current.closeDialog();
-      //   messageDialog.current.showDialog("Error Alert!", err.message);
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchAndInitTeam");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -96,26 +99,7 @@ const MemberAccess = (props) => {
       console.log("define initFetchCompletedUserAccessTreeAction-->", result);
       setAccessTree(result);
     } catch (err) {
-      let text = err.message ? err.message.includes("expired") : null;
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: `${err.message} Please Login again`,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("initFetchCompletedUserAccessTreeAction Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("initFetchCompletedUserAccessTreeAction Error", err);
-          },
-        });
-      }
+      handleError(err, "initFetchCompletedUserAccessTreeAction");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -157,26 +141,7 @@ const MemberAccess = (props) => {
         },
       });
     } catch (err) {
-      let text = err.message ? err.message.includes("expired") : null;
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: `${err.message} Please Login again`,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("initFetchCompletedUserAccessTreeAction Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("initFetchCompletedUserAccessTreeAction Error", err);
-          },
-        });
-      }
+      handleError(err, "handleSubmitAction");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }

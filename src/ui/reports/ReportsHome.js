@@ -92,6 +92,30 @@ const ReportsHome = () => {
     }, 1000);
   };
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchDashboardData = async () => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
@@ -105,26 +129,7 @@ const ReportsHome = () => {
       console.log("fetchDashboardData-->", result);
       dispatch(setReportData(result));
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchDashboardData");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -695,7 +700,7 @@ const ReportsHome = () => {
                             </Label>
                           </div>
 
-                          {reportData?.data?.uiResult.data.collection_stats ===
+                          {reportData?.data?.uiResult?.data.collection_stats ===
                             "true" && (
                             <>
                               <div className="React__checkbox">
@@ -736,7 +741,7 @@ const ReportsHome = () => {
                               <span className="React__checkbox--span" />
                             </Label>
                           </div>
-                          {reportData?.data?.uiResult.data.bwt_stats ===
+                          {reportData?.data?.uiResult?.data.bwt_stats ===
                             "true" && (
                             <div className="React__checkbox">
                               <Label>

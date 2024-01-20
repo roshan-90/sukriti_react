@@ -64,35 +64,37 @@ const AddVendorMember = () => {
     fetchAndInitClientList();
   }, []);
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchAndInitClientList = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var result = await executelistVendorAdminsLambda(user?.credentials);
       dispatch(setVendorList({ vendorList: result.vendorList }));
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(
-              "AddVendorMemeber fetchAndInitClientList Error:->",
-              err
-            );
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(" AddVendorMember fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchAndInitClientList");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -121,29 +123,7 @@ const AddVendorMember = () => {
         },
       });
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(
-              "AddVendorMemeber fetchAndInitClientList Error:->",
-              err
-            );
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(" AddVendorMember fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "initCreateVendorRequest");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -180,29 +160,7 @@ const AddVendorMember = () => {
       );
       setLinkedResponse(result);
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(
-              "AddVendorMemeber fetchAndInitClientList Error:->",
-              err
-            );
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(" AddVendorMember fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchRazorpayLinkedAcc");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }

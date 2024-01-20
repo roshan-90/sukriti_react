@@ -56,6 +56,30 @@ const CreateNewTicket = () => {
       fetchComplexComposition();
   }, [complexStore?.complex, complexStore]);
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchComplexComposition = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     console.log("getcomplexcomposition lambda", complexStore?.complex);
@@ -72,26 +96,7 @@ const CreateNewTicket = () => {
         })
       );
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchComplexComposition Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchComplexComposition Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchComplexComposition");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -155,26 +160,7 @@ const CreateNewTicket = () => {
         },
       });
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("initCreateTicketRequest Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("initCreateTicketRequest Error", err);
-          },
-        });
-      }
+      handleError(err, "initCreateTicketRequest");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }

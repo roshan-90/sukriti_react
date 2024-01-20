@@ -37,6 +37,30 @@ const UpdateVendorMember = () => {
   const [teamList] = List.filter((data) => data?.vendor_name === id);
   const user = useSelector(selectUser);
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchAndInitTeam = useCallback(async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
@@ -48,26 +72,7 @@ const UpdateVendorMember = () => {
       console.log("UpdateVendorMember -:👉", result);
       dispatch(setTeamList({ teamList: result.teamDetails }));
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchAndInitTeam");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -118,26 +123,7 @@ const UpdateVendorMember = () => {
         },
       });
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "initCreateVendorRequest");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }

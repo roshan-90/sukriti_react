@@ -54,7 +54,7 @@ export function HalfPieChart(props) {
           paddingAngle={5}
           dataKey="value"
         >
-          {props.data.map((entry, index) => (
+          {props?.data?.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
@@ -80,7 +80,7 @@ export function BWTHalfPieChart(props) {
           paddingAngle={5}
           dataKey="value"
         >
-          {props.data.map((entry, index) => (
+          {props?.data?.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
               fill={BWTCOLORS[index % BWTCOLORS.length]}

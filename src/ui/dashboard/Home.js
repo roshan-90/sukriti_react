@@ -61,6 +61,30 @@ const Home = ({ isOnline }) => {
     return null;
   }
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const fetchDashboardData = async (duration) => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
@@ -74,26 +98,7 @@ const Home = ({ isOnline }) => {
       dispatch(setDashboardData(result));
       console.log("fetchDashboardData", result);
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchDashboardData");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -105,30 +110,9 @@ const Home = ({ isOnline }) => {
       console.log("fetchAndInitClientList", result);
       dispatch(setClientList(result.clientList));
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-            window.location.reload();
-            dispatch(clearUser());
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-            window.location.reload();
-            dispatch(clearUser());
-          },
-        });
-      }
+      handleError(err, "fetchAndInitClientList");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 

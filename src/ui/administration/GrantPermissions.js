@@ -91,6 +91,29 @@ const GrantPermissions = () => {
       bwt_stats: data?.bwt_stats,
     };
   };
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
 
   const fetchAndInitClientList = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -100,29 +123,7 @@ const GrantPermissions = () => {
       fetchClientWiseUI("SSF");
       dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(
-              "AddVendorMemeber fetchAndInitClientList Error:->",
-              err
-            );
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(" AddVendorMember fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchAndInitClientList");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -136,26 +137,7 @@ const GrantPermissions = () => {
       console.log("result.data", result.data);
       initializeUiDetails(result.data);
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("GrantPermission fetchClientWiseUI Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(" GrantPermission fetchClientWiseUI Error", err);
-          },
-        });
-      }
+      handleError(err, "fetchClientWiseUI");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -178,32 +160,7 @@ const GrantPermissions = () => {
         },
       });
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(
-              "GrantPermission initCreatePermissionRequest Error:->",
-              err
-            );
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(
-              " GrantPermission initCreatePermissionRequest Error",
-              err
-            );
-          },
-        });
-      }
+      handleError(err, "initCreatePermissionRequest");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
