@@ -143,6 +143,34 @@ const App = () => {
   //   console.log("after page refresh", authentication);
   // }
 
+  // Function to encode data and set it in localStorage
+  const setLocalStorageItem = (key, value) => {
+    try {
+      const encodedValue = btoa(JSON.stringify(value));
+      localStorage.setItem(key, encodedValue);
+    } catch (error) {
+      console.error("Error encoding and setting item:", error);
+    }
+  };
+
+  // Function to get encoded data from localStorage and decode it
+  const getLocalStorageItem = (key) => {
+    try {
+      const encodedValue = localStorage.getItem(key);
+      if (encodedValue) {
+        const decodedValue = JSON.parse(atob(encodedValue));
+        return decodedValue;
+      }
+    } catch (error) {
+      console.error("Error decoding and getting item:", error);
+    }
+  };
+
+  setLocalStorageItem("myKey", JSON.parse(localStorage.getItem("userDetails")));
+  // Get decoded item from localStorage
+  const retrievedData = getLocalStorageItem("myKey");
+
+  console.log("retrievedData", retrievedData);
   if (isAuthenticated) {
     return (
       <React.Suspense fallback={loading()}>
