@@ -51,7 +51,7 @@ const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const { handleOfflineState, handleOnlineState } = useOnlineStatus();
+  const { handleOfflineState } = useOnlineStatus();
   const authentication = useSelector(selectUser);
   const [offlinecount, setOfflineCount] = useState(0);
   const [refreshcount, setRefreshCount] = useState(0);
@@ -80,7 +80,6 @@ const App = () => {
     function onlineHandler() {
       console.log("Online");
       setIsOnline(true);
-      handleOnlineState(true);
     }
 
     const offlineHandler = () => {
@@ -163,7 +162,7 @@ const App = () => {
                       path={"/dashboard"}
                       name={"Dashboard"}
                       exact={true}
-                      element={<Home />}
+                      element={<Home isOnline={isOnline} />}
                     />
                     <Route
                       path="/complex/complexTree"

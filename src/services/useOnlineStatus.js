@@ -4,13 +4,22 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setDashboardData,
   setDashboardConfig,
-  setDashboardLive,
 } from "../features/dashboardSlice";
 import {
   setTeamList,
   setClientList,
   setData,
 } from "../features/adminstrationSlice";
+import { savePayload } from "../features/iccc-dashboard-reducer";
+import { fullComplexStore } from "../features/complesStoreSlice";
+import { setTicketList } from "../features/incidenceSlice";
+import { setReportData } from "../features/reportSlice";
+import { setComplexData } from "../features/extraSlice";
+import {
+  setTeamList as vendorsetTeamList,
+  setVendorList,
+} from "../features/vendorSlice";
+import { setAccessTree } from "../features/authenticationSlice";
 
 const useOnlineStatus = () => {
   const dispatch = useDispatch();
@@ -51,6 +60,9 @@ const useOnlineStatus = () => {
   const handleOnlineState = () => {
     console.log("handleOnline state");
     console.log("authentication data", authentication);
+    const authentication_data = JSON.parse(
+      localStorage.getItem("authentication")
+    );
     const dashboard_data = JSON.parse(localStorage.getItem("dashboard"));
     const administration_data = JSON.parse(
       localStorage.getItem("adminstration")
@@ -71,11 +83,21 @@ const useOnlineStatus = () => {
     console.log("report_data", report_data);
     console.log("extra_data", extra_data);
     console.log("vendor_data", vendor_data);
-
+    dispatch(setAccessTree(authentication_data?.accessTree));
     dispatch(setDashboardData(dashboard_data?.data));
     dispatch(
       setDashboardConfig({ dashboardConfig: dashboard_data?.configData })
     );
+    dispatch(setTeamList(administration_data?.teamList));
+    dispatch(setClientList(administration_data?.clientList));
+    dispatch(setData(administration_data?.data));
+    // dispatch(savePayload(client_data?.complexes));
+    // dispatch(fullComplexStore(complexstore_data));
+    dispatch(setTicketList({ ticketList: incidence_data?.ticketList }));
+    dispatch(setReportData(report_data?.data));
+    dispatch(setComplexData({ complexData: extra_data?.data }));
+    dispatch(vendorsetTeamList({ teamList: vendor_data?.teamList }));
+    dispatch(setVendorList({ vendorList: vendor_data?.vendorList }));
   };
 
   useEffect(() => {}, [

@@ -53,6 +53,9 @@ const complexStoreSlice = createSlice({
     emptyComplexStore: (state, action) => {
       return (state = initialState);
     },
+    fullComplexStore: (state, action) => {
+      return (state = action.payload);
+    },
   },
 });
 
@@ -64,6 +67,7 @@ export const {
   savePayload,
   updatedSavePayload,
   emptyComplexStore,
+  fullComplexStore,
 } = complexStoreSlice.actions;
 
 export const complexStore = (state) => state.complexStore;

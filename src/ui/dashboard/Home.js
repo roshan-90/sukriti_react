@@ -25,7 +25,7 @@ import LiveStatus from "./LiveStatus";
 import { clearUser } from "../../features/authenticationSlice";
 import useOnlineStatus from "../../services/useOnlineStatus";
 
-const Home = () => {
+const Home = ({ isOnline }) => {
   const { handleOnlineState } = useOnlineStatus();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -42,7 +42,9 @@ const Home = () => {
     if (lastVisitedPage) {
       navigate(lastVisitedPage);
     }
-    handleOnlineState();
+    if (isOnline == false) {
+      handleOnlineState();
+    }
     localStorage.removeItem("lastVisitedPage");
   }, [navigate]);
 
