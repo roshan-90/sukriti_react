@@ -76,6 +76,8 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
         onClickAction: () => {
           // Handle the action when the user clicks OK
           console.log("submitConfig Okay");
+          setDialogData(null);
+          setVisibility(false);
         },
       });
       // messageDialog.current.showDialog(
@@ -116,6 +118,7 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
   };
 
   const showDialog = (ucemsConfig, onClickAction) => {
+    console.log("show modal to check data", ucemsConfig);
     setUcemsConfig(ucemsConfig);
     setTitle("UCEMS Config");
     setOnClickAction(onClickAction);
@@ -132,12 +135,17 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
 
   const updateConfig = React.useCallback(
     (configName, configValue) => {
+      console.log("updateConfig check data -->1", ucemsConfig);
       const updatedConfig = { ...ucemsConfig };
       console.log("updatedConfig", updatedConfig);
       console.log("updatedConfig--1", configName);
       console.log("updatedConfig--2", configValue);
+      console.log(
+        "updateConfig check data -->2",
+        updatedConfig.data[getKeyUcemsConfig(configName)]
+      );
       updatedConfig.data[getKeyUcemsConfig(configName)] = configValue;
-      setUcemsConfig(updatedConfig);
+      // setUcemsConfig(updatedConfig);
     },
     [ucemsConfig]
   );

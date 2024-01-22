@@ -82,6 +82,7 @@ function CriticalityLabel(props) {
 
   var getIndex = (value) => {
     if (props.data.name === "Air Dryer") console.log("_getIndex", value);
+    console.log("getIndex value", typeof value);
     if (value === "0") {
       return 1;
     }
@@ -142,10 +143,12 @@ function CriticalityLabel(props) {
         <Dropdown
           options={options}
           onSelection={(index, value) => {
+            console.log("checking dropdown critical index", index);
+            console.log("checking dropdown critical value", value);
             setCriticality(value);
             props.handleUpdate(props.data.name, index);
           }}
-          currentIndex={getIndex(props.data.value)}
+          currentIndex={criticality}
         />
       </div>
     </div>
@@ -585,7 +588,8 @@ function EntryChargeLabel(props) {
 
 function PaymentModeLabel(props) {
   const [paymentMode, setPaymentMode] = useState(props.data.value);
-
+  let options = ["None", "Coin", "RFID", "Coin and RF"];
+  console.log("paymentmodelLabel", paymentMode);
   return (
     <div
       className="row"
@@ -638,12 +642,14 @@ function PaymentModeLabel(props) {
         }}
       >
         <Dropdown
-          options={["None", "Coin", "RFID", "Coin and RF"]}
-          currentIndex={props.data.value}
+          options={options}
           onSelection={(index, value) => {
-            setPaymentMode(value);
+            setPaymentMode(index);
+            console.log("dropdown index", index);
+            console.log("dropdown value", value);
             props.handleUpdate(props.data.name, index);
           }}
+          currentIndex={paymentMode}
           // onSelection={(index,value) => {setCriticality(value); {props.onSelection(index,value)}}}
         />
       </div>
