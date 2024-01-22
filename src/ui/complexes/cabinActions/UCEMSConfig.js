@@ -206,7 +206,7 @@ const UCEMSConfig = React.forwardRef((props, ref) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={onClick}>
-            Submit ucemsConfig
+            Submit
           </Button>{" "}
         </ModalFooter>
       </Modal>

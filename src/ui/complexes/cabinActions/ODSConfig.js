@@ -63,6 +63,16 @@ const ODSConfig = React.forwardRef((props, ref) => {
         metadata,
         user?.credentials
       );
+      setDialogData({
+        title: "Success",
+        message: "New config submitted successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("ODS config Okay");
+          setDialogData(null);
+          setVisibility(false);
+        },
+      });
       // messageDialog.current.showDialog(
       //   "Success",
       //   "New config submitted successfully",
@@ -70,9 +80,29 @@ const ODSConfig = React.forwardRef((props, ref) => {
       // );
       // loadingDialog.current.closeDialog();
     } catch (err) {
-      console.log("_fetchCabinDetails", "_err", err);
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      console.log("ODS submitConfig", "_err", err);
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("ODS submitConfig Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("ODS submitConfig Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -97,7 +127,7 @@ const ODSConfig = React.forwardRef((props, ref) => {
   const updateConfig = (configName, configValue) => {
     const updatedConfig = { ...odsConfig };
     updatedConfig.data[getKeyOdsConfig(configName)] = configValue;
-    setOdsConfig(updatedConfig);
+    // setOdsConfig(updatedConfig);
   };
 
   const ComponentSelector = () => {
@@ -147,7 +177,7 @@ const ODSConfig = React.forwardRef((props, ref) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={onClick}>
-            OK
+            Submit
           </Button>{" "}
         </ModalFooter>
       </Modal>

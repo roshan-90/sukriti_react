@@ -64,6 +64,16 @@ const CMSConfig = React.forwardRef((props, ref) => {
         metadata,
         user?.credentials
       );
+      setDialogData({
+        title: "Success",
+        message: "New config submitted successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("cms config Okay");
+          setDialogData(null);
+          setVisibility(false);
+        },
+      });
       // messageDialog.current.showDialog(
       //   "Success",
       //   "New config submitted successfully",
@@ -119,7 +129,7 @@ const CMSConfig = React.forwardRef((props, ref) => {
   const updateConfig = (configName, configValue) => {
     const updatedConfig = { ...cmsConfig };
     updatedConfig.data[getKeyCmsConfig(configName)] = configValue;
-    setCmsConfig(updatedConfig);
+    // setCmsConfig(updatedConfig);
   };
 
   const ComponentSelector = () => {
@@ -169,7 +179,7 @@ const CMSConfig = React.forwardRef((props, ref) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={onClick}>
-            OK
+            Submit
           </Button>{" "}
         </ModalFooter>
       </Modal>

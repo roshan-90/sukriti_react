@@ -85,6 +85,16 @@ const CabinCommands = React.forwardRef((props, ref) => {
         metadata,
         user?.credentials
       );
+      setDialogData({
+        title: "Success",
+        message: "Command submitted successfully",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("Command config Okay");
+          setDialogData(null);
+          setVisibility(false);
+        },
+      });
       // messageDialog.current.showDialog(
       //   "Success",
       //   "Command submitted successfully",
@@ -92,9 +102,29 @@ const CabinCommands = React.forwardRef((props, ref) => {
       // );
       // loadingDialog.current.closeDialog();
     } catch (err) {
-      console.log("_fetchCabinDetails", "_err", err);
-      // loadingDialog.current.closeDialog();
-      // messageDialog.current.showDialog("Error Alert!", err.message);
+      console.log("Command submitConfig", "_err", err);
+      let text = err.message ? err.message.includes("expired") : null;
+      if (text) {
+        setDialogData({
+          title: "Error",
+          message: `${err.message} Please Login again`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("Command submitConfig Error:->", err);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "SomeThing Went Wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.error("Command submitConfig Error", err);
+          },
+        });
+      }
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
