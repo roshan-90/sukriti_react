@@ -659,7 +659,7 @@ function PaymentModeLabel(props) {
 
 export function CommandsSelectionLabel(props) {
   const [paymentMode, setPaymentMode] = useState(0);
-
+  console.log("checking commandselectiolave", props);
   return (
     <div
       className="row"
@@ -705,8 +705,10 @@ export function CommandsSelectionLabel(props) {
         <Dropdown
           options={props.options}
           onSelection={(index, value) => {
+            console.log("dropdown index", index);
+            console.log("dropdown value", value);
             setPaymentMode(value);
-            props.handleCommandSelection(index);
+            props.handleCommandSelection(value);
           }}
         />
       </div>

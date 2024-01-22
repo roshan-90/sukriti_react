@@ -146,7 +146,9 @@ const CabinCommands = React.forwardRef((props, ref) => {
       setCommandData({ ...commandData, Action: 2 });
     }
     if (configName === "Duration") {
-      setCommandData({ ...commandData, Duration: configValue });
+      commandData.Duration = configValue;
+      console.log("command", command);
+      // setCommandData({ ...commandData, Duration: configValue });
     }
     console.log("checing handlecommandupdate -->", commandData);
   };
@@ -186,7 +188,7 @@ const CabinCommands = React.forwardRef((props, ref) => {
 
   const CommandUi = () => {
     console.log("_command", "CommandUi", command);
-    if (command.value !== 0) {
+    if (command.value == 0) {
       return (
         <CommandsLabel
           value={commandData.Duration}
