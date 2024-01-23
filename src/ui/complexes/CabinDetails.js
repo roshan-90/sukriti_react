@@ -73,26 +73,35 @@ const CabinDetails = (props, ref) => {
           user?.credentials,
           user?.user.clientName
         );
+        console.log("checking fetchcabindetail -->", result);
         // loadingDialog.current.closeDialog();
-        setCabinDetails(result);
+        // setCabinDetails(result);
+        localStorage.setItem("cabinDetail", JSON.stringify(result));
       } else {
         var result = await executeGetCabinDetailsLambda(
           complex_store?.cabin?.thingName,
           user?.credentials,
           user?.user.clientName
         );
+        console.log("checking fetchcabindetail 2-->", result);
         // loadingDialog.current.closeDialog();
-        setCabinDetails(result);
+        // setCabinDetails(result);
+        localStorage.setItem("cabinDetail", JSON.stringify(result));
       }
-      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
       console.log("_fetchCabinDetails", "_err", err);
-      dispatch(stopLoading()); // Dispatch the stopLoading action
       // loadingDialog.current.closeDialog();
       // messageDialog.current.showDialog("Error Alert!", err.message);
+    } finally {
+      const cabinDetail = JSON.parse(localStorage.getItem("cabinDetail"));
+      console.log("checking shsdlfk", complex_store?.cabinDetail);
+      setCabinDetails(cabinDetail);
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
+  console.log("checking detail  :-> ", cabinDetails);
+  console.log("checking detail 2 :-> ", complex_store?.cabinDetail);
   const ComponenetSelector = () => {
     if (cabinDetails == undefined) {
       return <div />;

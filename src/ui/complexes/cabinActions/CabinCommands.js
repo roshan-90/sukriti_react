@@ -57,6 +57,7 @@ const CabinCommands = React.forwardRef((props, ref) => {
   const submitConfig = async () => {
     console.log("_commands", commandData);
     // loadingDialog.current.showDialog();
+    localStorage.removeItem("selection_key");
     try {
       const topic = getTopicName(
         "Command",

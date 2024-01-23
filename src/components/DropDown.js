@@ -27,10 +27,14 @@ const DropDown = (props) => {
     props.onSelection(selectedIndex, props.options[selectedIndex]);
     setSelectedItem(props.options[selectedIndex]);
     console.log(selectedIndex, "selectedIndex");
+    console.log("selction", props.options[selectedIndex]);
+    localStorage.setItem("selection_key", props.options[selectedIndex]);
   };
 
   const helper = (mOption, index) => {
-    if (selectedItem === mOption) {
+    let current_selected = localStorage.getItem("selection_key");
+    // console.log("current_selected value", current_selected);
+    if (selectedItem === mOption || current_selected === mOption) {
       console.log("_getIndex3", selectedItem);
       return (
         <option key={index} selected>

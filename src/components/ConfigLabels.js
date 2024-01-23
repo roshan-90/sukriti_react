@@ -20,12 +20,22 @@ export function UcemsConfigList(props) {
       />
 
       {props.data.timerConfig.map((item, index) => {
-        return <DurationLabel data={item} handleUpdate={props.handleUpdate} />;
+        return (
+          <DurationLabel
+            key={index}
+            data={item}
+            handleUpdate={props.handleUpdate}
+          />
+        );
       })}
 
       {props.data.criticalityConfig.map((item, index) => {
         return (
-          <CriticalityLabel data={item} handleUpdate={props.handleUpdate} />
+          <CriticalityLabel
+            key={index}
+            data={item}
+            handleUpdate={props.handleUpdate}
+          />
         );
       })}
     </div>

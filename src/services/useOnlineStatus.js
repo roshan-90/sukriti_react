@@ -91,8 +91,9 @@ const useOnlineStatus = () => {
     dispatch(setTeamList(administration_data?.teamList));
     dispatch(setClientList(administration_data?.clientList));
     dispatch(setData(administration_data?.data));
+    console.log("complexstore_data in online status", complexstore_data);
     // dispatch(savePayload(client_data?.complexes));
-    // dispatch(fullComplexStore(complexstore_data));
+    dispatch(fullComplexStore(complexstore_data));
     dispatch(setTicketList({ ticketList: incidence_data?.ticketList }));
     dispatch(setReportData(report_data?.data));
     dispatch(setComplexData({ complexData: extra_data?.data }));
