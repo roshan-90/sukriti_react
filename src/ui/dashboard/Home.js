@@ -112,7 +112,7 @@ const Home = ({ isOnline }) => {
     } catch (err) {
       handleError(err, "fetchAndInitClientList");
     } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
+      // dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 

@@ -34,6 +34,31 @@ const useOnlineStatus = () => {
   const extra = useSelector((state) => state.extra);
   const vendor = useSelector((state) => state.vendor);
 
+  // Function to encode data and set it in localStorage
+  const setLocalStorageItem = (key, value) => {
+    try {
+      const encodedValue = btoa(JSON.stringify(value));
+      localStorage.setItem(key, encodedValue);
+    } catch (error) {
+      console.error("Error encoding and setting item:", error);
+    }
+  };
+
+  // Function to get encoded data from localStorage and decode it
+  const getLocalStorageItem = (key) => {
+    try {
+      console.log("key", key);
+      const encodedValue = localStorage.getItem(key);
+      console.log("encodedValue", encodedValue);
+      if (encodedValue) {
+        const decodedValue = JSON.parse(JSON.parse(atob(encodedValue)));
+        return decodedValue;
+      }
+    } catch (error) {
+      console.error("Error decoding and getting item:", error);
+    }
+  };
+
   const handleOfflineState = (check) => {
     try {
       if (!check) {
@@ -41,16 +66,26 @@ const useOnlineStatus = () => {
         console.log("authentication data", authentication);
         console.log("dashboard ", dashboard);
 
-        localStorage.setItem("authentication", JSON.stringify(authentication));
-        localStorage.setItem("dashboard", JSON.stringify(dashboard));
-        localStorage.setItem("adminstration", JSON.stringify(adminstration));
-        localStorage.setItem("clientData", JSON.stringify(clientData));
-        localStorage.setItem("historyStore", JSON.stringify(historyStore));
-        localStorage.setItem("complexStore", JSON.stringify(complexStore));
-        localStorage.setItem("incidenece", JSON.stringify(incidenece));
-        localStorage.setItem("report", JSON.stringify(report));
-        localStorage.setItem("extra", JSON.stringify(extra));
-        localStorage.setItem("vendor", JSON.stringify(vendor));
+        // localStorage.setItem("authentication", JSON.stringify(authentication));
+        // localStorage.setItem("dashboard", JSON.stringify(dashboard));
+        // localStorage.setItem("adminstration", JSON.stringify(adminstration));
+        // localStorage.setItem("clientData", JSON.stringify(clientData));
+        // localStorage.setItem("historyStore", JSON.stringify(historyStore));
+        // localStorage.setItem("complexStore", JSON.stringify(complexStore));
+        // localStorage.setItem("incidenece", JSON.stringify(incidenece));
+        // localStorage.setItem("report", JSON.stringify(report));
+        // localStorage.setItem("extra", JSON.stringify(extra));
+        // localStorage.setItem("vendor", JSON.stringify(vendor));
+        setLocalStorageItem("dashboard", JSON.stringify(dashboard));
+        setLocalStorageItem("authentication", JSON.stringify(authentication));
+        setLocalStorageItem("adminstration", JSON.stringify(adminstration));
+        setLocalStorageItem("clientData", JSON.stringify(clientData));
+        setLocalStorageItem("historyStore", JSON.stringify(historyStore));
+        setLocalStorageItem("complexStore", JSON.stringify(complexStore));
+        setLocalStorageItem("incidenece", JSON.stringify(incidenece));
+        setLocalStorageItem("report", JSON.stringify(report));
+        setLocalStorageItem("extra", JSON.stringify(extra));
+        setLocalStorageItem("vendor", JSON.stringify(vendor));
       }
     } catch (error) {
       console.error("Error storing data in local storage:", error);
@@ -60,20 +95,16 @@ const useOnlineStatus = () => {
   const handleOnlineState = () => {
     console.log("handleOnline state");
     console.log("authentication data", authentication);
-    const authentication_data = JSON.parse(
-      localStorage.getItem("authentication")
-    );
-    const dashboard_data = JSON.parse(localStorage.getItem("dashboard"));
-    const administration_data = JSON.parse(
-      localStorage.getItem("adminstration")
-    );
-    const client_data = JSON.parse(localStorage.getItem("clientData"));
-    const historyStore = JSON.parse(localStorage.getItem("historyStore"));
-    const complexstore_data = JSON.parse(localStorage.getItem("complexStore"));
-    const incidence_data = JSON.parse(localStorage.getItem("incidenece"));
-    const report_data = JSON.parse(localStorage.getItem("report"));
-    const extra_data = JSON.parse(localStorage.getItem("extra"));
-    const vendor_data = JSON.parse(localStorage.getItem("vendor"));
+    const authentication_data = getLocalStorageItem("authentication");
+    const dashboard_data = getLocalStorageItem("dashboard");
+    const administration_data = getLocalStorageItem("adminstration");
+    const client_data = getLocalStorageItem("clientData");
+    const historyStore = getLocalStorageItem("historyStore");
+    const complexstore_data = getLocalStorageItem("complexStore");
+    const incidence_data = getLocalStorageItem("incidenece");
+    const report_data = getLocalStorageItem("report");
+    const extra_data = getLocalStorageItem("extra");
+    const vendor_data = getLocalStorageItem("vendor");
     console.log("dashboard ", dashboard_data);
     console.log("administration_data", administration_data);
     console.log("client_Data", client_data);
@@ -123,7 +154,12 @@ const useOnlineStatus = () => {
   //   }
   // }, [authentication]); // Add dependencies as needed
 
-  return { handleOfflineState, handleOnlineState };
+  return {
+    handleOfflineState,
+    handleOnlineState,
+    setLocalStorageItem,
+    getLocalStorageItem,
+  };
 };
 
 export default useOnlineStatus;
