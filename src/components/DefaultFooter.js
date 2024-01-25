@@ -21,7 +21,7 @@ const DefaultFooter = () => {
       <span className="ml-auto">
         Powered by{" "}
         <a target="_blank" rel="noreferrer" href="https://www.sukriti.ngo/">
-          Sukriti Social Foundation
+          Sukriti Social Pvt. Ltd.
         </a>
       </span>
     </div>
