@@ -14,12 +14,14 @@ import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
 import { clearUser, selectUser } from "../features/authenticationSlice";
 import Badge from "@mui/material/Badge";
+import MessageDialog from "../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const [dialogData, setDialogData] = useState(null);
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -29,9 +31,27 @@ const AppBar = ({ isOnline }) => {
     dispatch(clearUser());
   };
 
+  const setOfflineMessage = (title) => {
+    return (message) => {
+      return (name) => {
+        console.log("title ", title);
+        console.log("message ", message);
+        setDialogData({
+          title: title,
+          message: message,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`${name} -->`);
+          },
+        });
+      };
+    };
+  };
+
   return (
     <div>
       <Navbar color="white" light expand="md">
+        <MessageDialog data={dialogData} />
         <NavbarBrand href="/">
           <img src={logo} style={{ width: 180 }} alt="" />
         </NavbarBrand>
@@ -58,7 +78,14 @@ const AppBar = ({ isOnline }) => {
               <NavLink
                 style={navLinkStyle}
                 onClick={() => {
-                  navigate("/complex/details");
+                  console.log("isOnline", isOnline);
+                  if (isOnline) {
+                    navigate("/complex/details");
+                  } else {
+                    setOfflineMessage("Offline")(
+                      "Feature is not available in Offline Mode"
+                    )("complex_detail");
+                  }
                 }}
               >
                 Complexes
@@ -68,7 +95,13 @@ const AppBar = ({ isOnline }) => {
               <NavLink
                 style={navLinkStyle}
                 onClick={() => {
-                  navigate("/incidence/tickets");
+                  if (isOnline) {
+                    navigate("/incidence/tickets");
+                  } else {
+                    setOfflineMessage("Offline")(
+                      "Feature is not available in Offline Mode"
+                    )("incidence ticket");
+                  }
                 }}
               >
                 Incidence
@@ -88,7 +121,13 @@ const AppBar = ({ isOnline }) => {
               <NavLink
                 style={navLinkStyle}
                 onClick={() => {
-                  navigate("/administration");
+                  if (isOnline) {
+                    navigate("/administration");
+                  } else {
+                    setOfflineMessage("Offline")(
+                      "Feature is not available in Offline Mode"
+                    )("administration");
+                  }
                 }}
               >
                 Administration
@@ -99,7 +138,13 @@ const AppBar = ({ isOnline }) => {
                 <NavLink
                   style={navLinkStyle}
                   onClick={() => {
-                    navigate("/vendor");
+                    if (isOnline) {
+                      navigate("/vendor");
+                    } else {
+                      setOfflineMessage("Offline")(
+                        "Feature is not available in Offline Mode"
+                      )("vendor");
+                    }
                   }}
                 >
                   Vendor
