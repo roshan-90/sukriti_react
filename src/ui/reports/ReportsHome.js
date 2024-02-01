@@ -17,7 +17,10 @@ import { setReportData, hasData } from "../../features/reportSlice";
 import { setResetData, extraData } from "../../features/extraSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
-import { executeFetchDashboardLambda } from "../../awsClients/administrationLambdas";
+import {
+  executeFetchDashboardLambda,
+  executeReportFetchDashboardLambda,
+} from "../../awsClients/administrationLambdas";
 import {
   // executeDeleteUserSchedulerLambda,
   executeFetchReportLambda2,
@@ -33,6 +36,7 @@ import "../complexes/ComplexComposition.css";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { selectUser } from "../../features/authenticationSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import useOnlineStatus from "../../services/useOnlineStatus";
 
 const ReportsHome = () => {
   const [visibility, setVisibility] = useState(false);
@@ -62,7 +66,8 @@ const ReportsHome = () => {
   const [isEndDateEnabled, setIsEndDateEnabled] = useState(false);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
-
+  const { setLocalStorageItem, chunkArray, getLocalStorageItem } =
+    useOnlineStatus();
   const complexComposition = useRef();
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
@@ -80,7 +85,85 @@ const ReportsHome = () => {
     resetData(); // call the function to reset the data
   };
 
+  let complex_array = [];
+  let all_report_data = [];
+  const storeComplexdata = () => {
+    (user?.accessTree?.country?.states ?? []).flatMap((state) =>
+      (state.districts ?? []).flatMap((district) =>
+        (district.cities ?? []).flatMap((city) =>
+          (city.complexes ?? []).map((complex) =>
+            complex_array.push(complex.name)
+          )
+        )
+      )
+    );
+  };
+
+  const fetchDashboardReport = async (complex) => {
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      console.log("fetchDashboardData--> 1111", reportParms);
+      var result = await executeReportFetchDashboardLambda(
+        user?.username,
+        reportParms.duration,
+        complex,
+        user?.credentials
+      );
+      console.log("fetchDashboardData-->", result);
+      all_report_data.push(result);
+    } catch (err) {
+      handleError(err, "fetchDashboardData");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
+
+  const filter_complex = () => {
+    let shouldContinue = true;
+
+    for (let i = 0; i < all_report_data.length; i++) {
+      const response = all_report_data[i];
+      for (let j = 0; j < response.length; j++) {
+        const obj = response[j];
+        console.log("obj :->", obj);
+        // Check if the object has the property 'complexName'
+        if (shouldContinue && obj.hasOwnProperty("complexName")) {
+          // Print or store the name
+          if (obj.complexName === "DUMMY_TESeT") {
+            console.log(obj.complexName);
+            // Update the flag to stop further iterations
+            shouldContinue = false;
+            break; // Exit the inner loop
+          }
+        }
+      }
+      console.log("shouldContinue:-->", response);
+      // Exit the outer loop if shouldContinue is false
+      if (!shouldContinue) {
+        break; // Exit the outer loop if the name is found
+      }
+    }
+  };
+
+  async function overloopData(dataArray) {
+    try {
+      const chunks = chunkArray(dataArray, 15);
+      for (const chunk of chunks) {
+        // await uploadDataChunk(chunk);
+        await fetchDashboardReport(chunk);
+        console.log("chunck :->", chunk);
+      }
+      console.log("all_report_data", all_report_data);
+      // setLocalStorageItem("report_dashboard", all_report_data);
+    } catch (error) {
+      // Catch an error here
+    }
+  }
   const showDialog = (onClickAction) => {
+    storeComplexdata();
+    overloopData(complex_array);
+    console.log("complex_array", complex_array);
+    return;
     title = "REPORT DATA";
     onClickAction
       ? (onClickAction = onClickAction)

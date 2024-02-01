@@ -373,6 +373,43 @@ export function executeFetchDashboardLambda(
   });
 }
 
+export function executeReportFetchDashboardLambda(
+  userName,
+  duration,
+  complex,
+  credentials
+) {
+  return new Promise(function (resolve, reject) {
+    var request = {
+      userName: userName,
+      duration: duration,
+      complex: ["BRIJWASAN_TERM_IOCL", "DUMMY_TEST"],
+      startDate: "1696228493000",
+      endDate: "1706596493000",
+    };
+    console.log("checking value executeReportFetchDashboardLambda-->", request);
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "mis_report_fetchDateWaiseUsageData",
+      Payload: JSON.stringify(request),
+    };
+
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
 export function executePermissionUiLambda(config, credentials) {
   return new Promise(function (resolve, reject) {
     var payload = { payload: config };
