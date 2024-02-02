@@ -84,7 +84,7 @@ const ReportsHome = () => {
     setVisibility(!visibility);
     resetData(); // call the function to reset the data
   };
-  
+
   let dashboard_data = getLocalStorageItem("dashboard_15");
   let complex_array;
   let all_report_data = [];
@@ -120,6 +120,44 @@ const ReportsHome = () => {
     }
   };
 
+  const filter_date = (data) => {
+    // Define start and end dates
+    const startDateString = "2023-12-10"; // Example start date string
+    const endDateString = "2024-01-30"; // Example end date string
+
+    // Function to filter data based on date range
+    function filterDataByDateRange(data, startDateString, endDateString) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30); // Set start date to 15 days ago
+      const endDate = new Date(); // End date is today
+      // const startDate = new Date(startDateString);
+      // const endDate = new Date(endDateString);
+      return data.filter((entry) => {
+        const [day, month, year] = entry.date.split("/");
+        const entryDate = new Date(`${year}-${month}-${day}`);
+        return entryDate >= startDate && entryDate <= endDate;
+      });
+    }
+
+    // Create a new object to store filtered data for all keys
+    const filteredData = {};
+
+    // Loop through each key in data.dashboardChartData
+    Object.keys(data.dashboardChartData).forEach((key) => {
+      // Filter data based on date range for each key
+      filteredData[key] = filterDataByDateRange(
+        data.dashboardChartData[key],
+        startDateString,
+        endDateString
+      );
+    });
+
+    // Update data.dashboardChartData with filteredData
+    Object.assign(data.dashboardChartData, filteredData);
+
+    console.log("data.dashboardChartData :-->", data);
+  };
+
   const filter_complex = (all_report_data) => {
     let shouldContinue = true;
     console.log("name :--> ", reportParms.complex);
@@ -133,7 +171,8 @@ const ReportsHome = () => {
           // Print or store the name
           if (obj.complexName === reportParms.complex) {
             console.log(obj.complexName);
-            dispatch(setReportData(obj));
+            filter_date(obj);
+            // dispatch(setReportData(obj));
             // Update the flag to stop further iterations
             shouldContinue = false;
             break; // Exit the inner loop

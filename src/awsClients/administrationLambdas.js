@@ -383,7 +383,7 @@ export function executeReportFetchDashboardLambda(
     var request = {
       userName: userName,
       duration: duration,
-      complex: ["BRIJWASAN_TERM_IOCL", "DUMMY_TEST"],
+      complex: ["TOWNHALL_MSCL", "DUMMY_TEST"],
       startDate: "1696228493000",
       endDate: "1706596493000",
     };
