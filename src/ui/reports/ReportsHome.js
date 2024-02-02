@@ -12,7 +12,7 @@ import {
   Input,
   InputGroup,
 } from "reactstrap";
-// import { setDashboardData } from "../features/dashboardSlice";
+import { dashboard } from "../../features/dashboardSlice";
 import { setReportData, hasData } from "../../features/reportSlice";
 import { setResetData, extraData } from "../../features/extraSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -84,10 +84,12 @@ const ReportsHome = () => {
     setVisibility(!visibility);
     resetData(); // call the function to reset the data
   };
-
-  let complex_array = [];
+  
+  let dashboard_data = getLocalStorageItem("dashboard_15");
+  let complex_array;
   let all_report_data = [];
   const storeComplexdata = () => {
+    complex_array = [];
     (user?.accessTree?.country?.states ?? []).flatMap((state) =>
       (state.districts ?? []).flatMap((district) =>
         (district.cities ?? []).flatMap((city) =>
@@ -118,9 +120,9 @@ const ReportsHome = () => {
     }
   };
 
-  const filter_complex = () => {
+  const filter_complex = (all_report_data) => {
     let shouldContinue = true;
-
+    console.log("name :--> ", reportParms.complex);
     for (let i = 0; i < all_report_data.length; i++) {
       const response = all_report_data[i];
       for (let j = 0; j < response.length; j++) {
@@ -129,15 +131,16 @@ const ReportsHome = () => {
         // Check if the object has the property 'complexName'
         if (shouldContinue && obj.hasOwnProperty("complexName")) {
           // Print or store the name
-          if (obj.complexName === "DUMMY_TESeT") {
+          if (obj.complexName === reportParms.complex) {
             console.log(obj.complexName);
+            dispatch(setReportData(obj));
             // Update the flag to stop further iterations
             shouldContinue = false;
             break; // Exit the inner loop
           }
         }
       }
-      console.log("shouldContinue:-->", response);
+      console.log("shouldContinue:-->", reportParms.complex);
       // Exit the outer loop if shouldContinue is false
       if (!shouldContinue) {
         break; // Exit the outer loop if the name is found
@@ -154,6 +157,7 @@ const ReportsHome = () => {
         console.log("chunck :->", chunk);
       }
       console.log("all_report_data", all_report_data);
+      localStorage.setItem("report_dashboard", JSON.stringify(all_report_data));
       // setLocalStorageItem("report_dashboard", all_report_data);
     } catch (error) {
       // Catch an error here
@@ -199,34 +203,67 @@ const ReportsHome = () => {
     }
   };
 
-  const fetchDashboardData = async () => {
-    try {
-      dispatch(startLoading()); // Dispatch the startLoading action
-      console.log("fetchDashboardData--> 1111", reportParms);
-      var result = await executeFetchDashboardLambda(
-        user?.username,
-        reportParms.duration,
-        reportParms.complex,
-        user?.credentials
-      );
-      console.log("fetchDashboardData-->", result);
-      dispatch(setReportData(result));
-    } catch (err) {
-      handleError(err, "fetchDashboardData");
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  };
+  // const fetchDashboardData = async () => {
+  //   try {
+  //     dispatch(startLoading()); // Dispatch the startLoading action
+  //     console.log("fetchDashboardData--> 1111", reportParms);
+  //     var result = await executeFetchDashboardLambda(
+  //       user?.username,
+  //       reportParms.duration,
+  //       reportParms.complex,
+  //       user?.credentials
+  //     );
+  //     console.log("fetchDashboardData-->", result);
+  //     dispatch(setReportData(result));
+  //   } catch (err) {
+  //     handleError(err, "fetchDashboardData");
+  //   } finally {
+  //     dispatch(stopLoading()); // Dispatch the stopLoading action
+  //   }
+  // };
 
   const setComplexSelection = (selectedComplex) => {
     reportParms.complex = selectedComplex.name;
     console.log("setComplexselection---> clicked", reportParms);
-    fetchDashboardData();
+    let value = localStorage.getItem("report_dashboard");
+    console.log("value -->", JSON.parse(value));
+    filter_complex(JSON.parse(value));
+    return;
+    // fetchDashboardData();
   };
 
   const setDurationSelection = (selectedDuration) => {
     reportParms.duration = selectedDuration;
-    fetchDashboardData();
+    // fetchDashboardData();
+    switch (true) {
+      case selectedDuration === 15:
+        let dashboard_15 = getLocalStorageItem("dashboard_15");
+        console.log("this is reportParms is 15 is selected", dashboard_15);
+        dispatch(setReportData(dashboard_15));
+        break;
+      case selectedDuration === 30:
+        let dashboard_30 = getLocalStorageItem("dashboard_30");
+        console.log("this is reportparms is 30 selected", dashboard_30);
+        dispatch(setReportData(dashboard_30));
+        break;
+      case selectedDuration === 45:
+        let dashboard_45 = getLocalStorageItem("dashboard_45");
+        console.log("this is reportParms is 45 selected", dashboard_45);
+        dispatch(setReportData(dashboard_45));
+        break;
+      case selectedDuration === 60:
+        let dashboard_60 = getLocalStorageItem("dashboard_60");
+        console.log("this is reportparms is 60 selected", dashboard_60);
+        dispatch(setReportData(dashboard_60));
+        break;
+      case selectedDuration === 90:
+        let dashboard_90 = getLocalStorageItem("dashboard_90");
+        console.log("this is reportparms is 90 selected", dashboard_90);
+        dispatch(setReportData(dashboard_90));
+        break;
+      default:
+        console.log("default switch working");
+    }
   };
 
   const handleChange = (event) => {
@@ -326,7 +363,8 @@ const ReportsHome = () => {
   };
 
   useEffect(() => {
-    fetchDashboardData(15);
+    // fetchDashboardData(15);
+    dispatch(setReportData(dashboard_data));
   }, []);
 
   const resetData = () => {
@@ -641,7 +679,7 @@ const ReportsHome = () => {
                         reportData?.data?.dashboardUpiChartData
                       }
                       pieChartUpiData={reportData?.data?.pieChartUpiData}
-                      uiResult={reportData?.data?.uiResult?.data}
+                      uiResult={dashboard_data?.uiResult?.data}
                     />
                   </div>
                 </td>
