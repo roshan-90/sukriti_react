@@ -186,7 +186,7 @@ const App = () => {
                       path="/reports"
                       exact={true}
                       name={"Reports"}
-                      element={<ReportsHome />}
+                      element={<ReportsHome isOnline={isOnline} />}
                     />
                     <Route
                       path={"/incidence/tickets"}

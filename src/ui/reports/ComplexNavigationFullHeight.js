@@ -33,7 +33,7 @@ const ComplexNavigationFullHeight = (props) => {
   const { chunkArray } = useOnlineStatus();
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
-  const reportParms = { complex: "all", duration: "15" };
+  const reportParms = { complex: "all", duration: "90" };
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -98,13 +98,11 @@ const ComplexNavigationFullHeight = (props) => {
     try {
       const chunks = chunkArray(dataArray, 15);
       for (const chunk of chunks) {
-        // await uploadDataChunk(chunk);
         await fetchDashboardReport(chunk);
         console.log("chunck :->", chunk);
       }
       console.log("all_report_data", all_report_data);
       localStorage.setItem("report_dashboard", JSON.stringify(all_report_data));
-      // setLocalStorageItem("report_dashboard", all_report_data);
     } catch (error) {
       // Catch an error here
     }
@@ -122,7 +120,7 @@ const ComplexNavigationFullHeight = (props) => {
       // localStorage.setItem("accessTree", JSON.stringify(complex_array));
       console.log("_defineAccess", result);
     } catch (err) {
-      console.log("_defineAccess", "_err", err);
+      handleError(err, "initFetchCompletedUserAccessTreeAction");
     }
   };
 

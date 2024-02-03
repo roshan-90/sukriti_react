@@ -381,15 +381,23 @@ export function executeReportFetchDashboardLambda(
 ) {
   return new Promise(function (resolve, reject) {
     const currentDateTimestamp = Date.now();
-    // Get timestamp for 90 days ago
-    const ninetyDaysAgoTimestamp =
-      currentDateTimestamp - 120 * 24 * 60 * 60 * 1000;
-
+    let dynamic_duration = null;
+    if (duration == 15) {
+      dynamic_duration = currentDateTimestamp - 15 * 24 * 60 * 60 * 1000;
+    } else if (duration == 30) {
+      dynamic_duration = currentDateTimestamp - 30 * 24 * 60 * 60 * 1000;
+    } else if (duration == 45) {
+      dynamic_duration = currentDateTimestamp - 45 * 24 * 60 * 60 * 1000;
+    } else if (duration == 60) {
+      dynamic_duration = currentDateTimestamp - 60 * 24 * 60 * 60 * 1000;
+    } else if (duration == 90) {
+      dynamic_duration = currentDateTimestamp - 90 * 24 * 60 * 60 * 1000;
+    }
     var request = {
       userName: userName,
       duration: duration,
-      complex: ["TOWNHALL_MSCL", "DUMMY_TEST"],
-      startDate: ninetyDaysAgoTimestamp,
+      complex: ["TOWNHALL_MSCL"],
+      startDate: dynamic_duration,
       endDate: currentDateTimestamp,
     };
     console.log("checking value executeReportFetchDashboardLambda-->", request);
