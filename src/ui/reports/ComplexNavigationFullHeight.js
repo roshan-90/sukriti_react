@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, setAccessTree } from "../../features/authenticationSlice";
 import { updateSelectedComplex } from "../../features/complesStoreSlice";
@@ -11,11 +11,18 @@ import icToilet from "../../assets/img/icons/ic_toilet.png";
 import StateList from "../../components/accessTree/complexNavCompact/SateList";
 import NoDataComponent from "../../components/NoDataComponent";
 //Functionality
-import { executeFetchCompletedUserAccessTree } from "../../awsClients/administrationLambdas";
+import {
+  executeFetchCompletedUserAccessTree,
+  executeReportFetchDashboardLambda,
+} from "../../awsClients/administrationLambdas";
 import {
   getAccessSummary,
   getComplexHierarchy,
 } from "../../components/accessTree/accessTreeUtils";
+import useOnlineStatus from "../../services/useOnlineStatus";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const ComplexNavigationFullHeight = (props) => {
   const dispatch = useDispatch();
@@ -23,6 +30,85 @@ const ComplexNavigationFullHeight = (props) => {
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const stateList = useRef();
+  const { chunkArray } = useOnlineStatus();
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const [dialogData, setDialogData] = useState(null);
+  const reportParms = { complex: "all", duration: "15" };
+
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
+  let complex_array;
+  let all_report_data = [];
+
+  const fetchDashboardReport = async (complex) => {
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      console.log("fetchDashboardData--> 1111", reportParms);
+      var result = await executeReportFetchDashboardLambda(
+        user?.username,
+        reportParms.duration,
+        complex,
+        user?.credentials
+      );
+      console.log("fetchDashboardData-->", result);
+      all_report_data.push(result);
+    } catch (err) {
+      handleError(err, "fetchDashboardData");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
+
+  const storeComplexdata = async (data) => {
+    complex_array = [];
+    (data?.country?.states ?? []).flatMap((state) =>
+      (state.districts ?? []).flatMap((district) =>
+        (district.cities ?? []).flatMap((city) =>
+          (city.complexes ?? []).map((complex) =>
+            complex_array.push(complex.name)
+          )
+        )
+      )
+    );
+  };
+
+  async function overloopData(dataArray) {
+    try {
+      const chunks = chunkArray(dataArray, 15);
+      for (const chunk of chunks) {
+        // await uploadDataChunk(chunk);
+        await fetchDashboardReport(chunk);
+        console.log("chunck :->", chunk);
+      }
+      console.log("all_report_data", all_report_data);
+      localStorage.setItem("report_dashboard", JSON.stringify(all_report_data));
+      // setLocalStorageItem("report_dashboard", all_report_data);
+    } catch (error) {
+      // Catch an error here
+    }
+  }
 
   const initFetchCompletedUserAccessTreeAction = async () => {
     try {
@@ -30,7 +116,10 @@ const ComplexNavigationFullHeight = (props) => {
         user?.user.userName,
         user?.credentials
       );
+      await storeComplexdata(result);
       dispatch(setAccessTree(result));
+      await overloopData(complex_array);
+      // localStorage.setItem("accessTree", JSON.stringify(complex_array));
       console.log("_defineAccess", result);
     } catch (err) {
       console.log("_defineAccess", "_err", err);
@@ -116,6 +205,15 @@ const ComplexNavigationFullHeight = (props) => {
 
   return (
     <div style={{ background: "white", width: "100%", padding: "5px" }}>
+      {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+      <MessageDialog data={dialogData} />
       <Header />
       <ComponentSelector />
     </div>

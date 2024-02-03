@@ -380,12 +380,17 @@ export function executeReportFetchDashboardLambda(
   credentials
 ) {
   return new Promise(function (resolve, reject) {
+    const currentDateTimestamp = Date.now();
+    // Get timestamp for 90 days ago
+    const ninetyDaysAgoTimestamp =
+      currentDateTimestamp - 120 * 24 * 60 * 60 * 1000;
+
     var request = {
       userName: userName,
       duration: duration,
       complex: ["TOWNHALL_MSCL", "DUMMY_TEST"],
-      startDate: "1696228493000",
-      endDate: "1706596493000",
+      startDate: ninetyDaysAgoTimestamp,
+      endDate: currentDateTimestamp,
     };
     console.log("checking value executeReportFetchDashboardLambda-->", request);
     var lambda = new AWS.Lambda({

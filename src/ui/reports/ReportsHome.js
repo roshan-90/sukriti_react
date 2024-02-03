@@ -86,41 +86,41 @@ const ReportsHome = () => {
   };
 
   let dashboard_data = getLocalStorageItem("dashboard_15");
-  let complex_array;
-  let all_report_data = [];
-  const storeComplexdata = () => {
-    complex_array = [];
-    (user?.accessTree?.country?.states ?? []).flatMap((state) =>
-      (state.districts ?? []).flatMap((district) =>
-        (district.cities ?? []).flatMap((city) =>
-          (city.complexes ?? []).map((complex) =>
-            complex_array.push(complex.name)
-          )
-        )
-      )
-    );
-  };
+  // let complex_array;
+  // let all_report_data = [];
+  // const storeComplexdata = () => {
+  //   complex_array = [];
+  //   (user?.accessTree?.country?.states ?? []).flatMap((state) =>
+  //     (state.districts ?? []).flatMap((district) =>
+  //       (district.cities ?? []).flatMap((city) =>
+  //         (city.complexes ?? []).map((complex) =>
+  //           complex_array.push(complex.name)
+  //         )
+  //       )
+  //     )
+  //   );
+  // };
 
-  const fetchDashboardReport = async (complex) => {
-    try {
-      dispatch(startLoading()); // Dispatch the startLoading action
-      console.log("fetchDashboardData--> 1111", reportParms);
-      var result = await executeReportFetchDashboardLambda(
-        user?.username,
-        reportParms.duration,
-        complex,
-        user?.credentials
-      );
-      console.log("fetchDashboardData-->", result);
-      all_report_data.push(result);
-    } catch (err) {
-      handleError(err, "fetchDashboardData");
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  };
+  // const fetchDashboardReport = async (complex) => {
+  //   try {
+  //     dispatch(startLoading()); // Dispatch the startLoading action
+  //     console.log("fetchDashboardData--> 1111", reportParms);
+  //     var result = await executeReportFetchDashboardLambda(
+  //       user?.username,
+  //       reportParms.duration,
+  //       complex,
+  //       user?.credentials
+  //     );
+  //     console.log("fetchDashboardData-->", result);
+  //     all_report_data.push(result);
+  //   } catch (err) {
+  //     handleError(err, "fetchDashboardData");
+  //   } finally {
+  //     dispatch(stopLoading()); // Dispatch the stopLoading action
+  //   }
+  // };
 
-  const filter_date = (data) => {
+  const filter_date = (data, duration) => {
     // Define start and end dates
     const startDateString = "2023-12-10"; // Example start date string
     const endDateString = "2024-01-30"; // Example end date string
@@ -128,7 +128,7 @@ const ReportsHome = () => {
     // Function to filter data based on date range
     function filterDataByDateRange(data, startDateString, endDateString) {
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 30); // Set start date to 15 days ago
+      startDate.setDate(startDate.getDate() - duration); // Set start date to 15 days ago
       const endDate = new Date(); // End date is today
       // const startDate = new Date(startDateString);
       // const endDate = new Date(endDateString);
@@ -154,11 +154,12 @@ const ReportsHome = () => {
 
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
+    dispatch(setReportData(data));
 
     console.log("data.dashboardChartData :-->", data);
   };
 
-  const filter_complex = (all_report_data) => {
+  const filter_complex = (all_report_data, duration) => {
     let shouldContinue = true;
     console.log("name :--> ", reportParms.complex);
     for (let i = 0; i < all_report_data.length; i++) {
@@ -171,7 +172,7 @@ const ReportsHome = () => {
           // Print or store the name
           if (obj.complexName === reportParms.complex) {
             console.log(obj.complexName);
-            filter_date(obj);
+            filter_date(obj, duration);
             // dispatch(setReportData(obj));
             // Update the flag to stop further iterations
             shouldContinue = false;
@@ -187,26 +188,27 @@ const ReportsHome = () => {
     }
   };
 
-  async function overloopData(dataArray) {
-    try {
-      const chunks = chunkArray(dataArray, 15);
-      for (const chunk of chunks) {
-        // await uploadDataChunk(chunk);
-        await fetchDashboardReport(chunk);
-        console.log("chunck :->", chunk);
-      }
-      console.log("all_report_data", all_report_data);
-      localStorage.setItem("report_dashboard", JSON.stringify(all_report_data));
-      // setLocalStorageItem("report_dashboard", all_report_data);
-    } catch (error) {
-      // Catch an error here
-    }
-  }
+  // async function overloopData(dataArray) {
+  //   try {
+  //     const chunks = chunkArray(dataArray, 15);
+  //     for (const chunk of chunks) {
+  //       // await uploadDataChunk(chunk);
+  //       await fetchDashboardReport(chunk);
+  //       console.log("chunck :->", chunk);
+  //     }
+  //     console.log("all_report_data", all_report_data);
+  //     localStorage.setItem("report_dashboard", JSON.stringify(all_report_data));
+  //     // setLocalStorageItem("report_dashboard", all_report_data);
+  //   } catch (error) {
+  //     // Catch an error here
+  //   }
+  // }
   const showDialog = (onClickAction) => {
-    storeComplexdata();
-    overloopData(complex_array);
-    console.log("complex_array", complex_array);
-    return;
+    // storeComplexdata();
+    // let complex_array = JSON.parse(localStorage.getItem("accessTree"));
+    // console.log("complex_array :-->", complex_array);
+    // overloopData(complex_array);
+    // return;
     title = "REPORT DATA";
     onClickAction
       ? (onClickAction = onClickAction)
@@ -261,47 +263,58 @@ const ReportsHome = () => {
   //   }
   // };
 
-  const setComplexSelection = (selectedComplex) => {
+  const setComplexSelection = async (selectedComplex) => {
     reportParms.complex = selectedComplex.name;
+    reportParms.duration = 15;
+    localStorage.setItem("complex_name", selectedComplex.name);
     console.log("setComplexselection---> clicked", reportParms);
     let value = localStorage.getItem("report_dashboard");
     console.log("value -->", JSON.parse(value));
-    filter_complex(JSON.parse(value));
-    return;
+    filter_complex(JSON.parse(value), 15);
     // fetchDashboardData();
   };
 
   const setDurationSelection = (selectedDuration) => {
     reportParms.duration = selectedDuration;
+    reportParms.complex = localStorage.getItem("complex_name");
+    console.log("reportParam", reportParms);
     // fetchDashboardData();
-    switch (true) {
-      case selectedDuration === 15:
-        let dashboard_15 = getLocalStorageItem("dashboard_15");
-        console.log("this is reportParms is 15 is selected", dashboard_15);
-        dispatch(setReportData(dashboard_15));
-        break;
-      case selectedDuration === 30:
-        let dashboard_30 = getLocalStorageItem("dashboard_30");
-        console.log("this is reportparms is 30 selected", dashboard_30);
-        dispatch(setReportData(dashboard_30));
-        break;
-      case selectedDuration === 45:
-        let dashboard_45 = getLocalStorageItem("dashboard_45");
-        console.log("this is reportParms is 45 selected", dashboard_45);
-        dispatch(setReportData(dashboard_45));
-        break;
-      case selectedDuration === 60:
-        let dashboard_60 = getLocalStorageItem("dashboard_60");
-        console.log("this is reportparms is 60 selected", dashboard_60);
-        dispatch(setReportData(dashboard_60));
-        break;
-      case selectedDuration === 90:
-        let dashboard_90 = getLocalStorageItem("dashboard_90");
-        console.log("this is reportparms is 90 selected", dashboard_90);
-        dispatch(setReportData(dashboard_90));
-        break;
-      default:
-        console.log("default switch working");
+    let value = localStorage.getItem("report_dashboard");
+    if (value) {
+      switch (true) {
+        case selectedDuration === 15:
+          filter_complex(JSON.parse(value), 15);
+          // let dashboard_15 = getLocalStorageItem("dashboard_15");
+          // console.log("this is reportParms is 15 is selected", dashboard_15);
+          // dispatch(setReportData(dashboard_15));
+          break;
+        case selectedDuration === 30:
+          filter_complex(JSON.parse(value), 30);
+          // let dashboard_30 = getLocalStorageItem("dashboard_30");
+          // console.log("this is reportparms is 30 selected", dashboard_30);
+          // dispatch(setReportData(dashboard_30));
+          break;
+        case selectedDuration === 45:
+          filter_complex(JSON.parse(value), 45);
+          // let dashboard_45 = getLocalStorageItem("dashboard_45");
+          // console.log("this is reportParms is 45 selected", dashboard_45);
+          // dispatch(setReportData(dashboard_45));
+          break;
+        case selectedDuration === 60:
+          filter_complex(JSON.parse(value), 60);
+          // let dashboard_60 = getLocalStorageItem("dashboard_60");
+          // console.log("this is reportparms is 60 selected", dashboard_60);
+          // dispatch(setReportData(dashboard_60));
+          break;
+        case selectedDuration === 90:
+          filter_complex(JSON.parse(value), 90);
+          // let dashboard_90 = getLocalStorageItem("dashboard_90");
+          // console.log("this is reportparms is 90 selected", dashboard_90);
+          // dispatch(setReportData(dashboard_90));
+          break;
+        default:
+          console.log("default switch working");
+      }
     }
   };
 
