@@ -54,6 +54,7 @@ const Home = ({ isOnline }) => {
       navigate("/login");
     } else {
       fetchDashboardData(15);
+      localStorage.setItem("selection_key", "15 Days");
     }
   }, [isAuthenticated, navigate]);
 
