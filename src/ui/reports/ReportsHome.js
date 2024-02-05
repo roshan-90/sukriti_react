@@ -120,6 +120,32 @@ const ReportsHome = ({ isOnline }) => {
     }
   };
 
+  let totalCount = 0;
+  let usage_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+  let collection_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+  let upiCollection_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+  let feedback_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+
   const filter_date = (data, duration) => {
     // Define start and end dates
     const startDateString = "2023-12-10"; // Example start date string
@@ -147,7 +173,6 @@ const ReportsHome = ({ isOnline }) => {
       upiCollection: 0,
       usage: 0,
     };
-    let totalCount = 0;
 
     const summaryFunction = (key, data) => {
       console.log("summaryFunction :-->", data);
@@ -159,10 +184,68 @@ const ReportsHome = ({ isOnline }) => {
               console.log("total feedback", data.length);
               totalCount = data.length;
               dataSummary[key] += Number(data[i].all);
+              if (data[i].fwc !== 0) {
+                feedback_summary[1].value += Number(data[i].fwc);
+              }
+              if (data[i].mur !== 0) {
+                feedback_summary[3].value += Number(data[i].mur);
+              }
+              if (data[i].mwc !== 0) {
+                feedback_summary[0].value += Number(data[i].mwc);
+              }
+              if (data[i].pwc !== 0) {
+                feedback_summary[2].value += Number(data[i].pwc);
+              }
             } else {
               console.log("check key :-->", key);
               console.log("check vlaue of key :-->", data[i].all);
               dataSummary[key] += Number(data[i].all);
+              if (key === "usage") {
+                if (data[i].fwc !== 0) {
+                  console.log("ussage summary-->fwc", data[i].fwc);
+                  usage_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  console.log("ussage summary-->mur", data[i].mur);
+                  usage_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  console.log("ussage summary-->mwc", data[i].mwc);
+                  usage_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  console.log("ussage summary-->pwc", data[i].pwc);
+                  usage_summary[2].value += Number(data[i].pwc);
+                }
+                console.log("usage_summary", usage_summary);
+                console.log("usage_summary--1", usage_summary[0].name);
+              } else if (key === "upiCollection") {
+                if (data[i].fwc !== 0) {
+                  upiCollection_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  upiCollection_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  upiCollection_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  upiCollection_summary[2].value += Number(data[i].pwc);
+                }
+              } else if (key === "collection") {
+                if (data[i].fwc !== 0) {
+                  collection_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  collection_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  collection_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  collection_summary[2].value += Number(data[i].pwc);
+                }
+              }
             }
           }
           console.log("i :-->", data[i].all);
@@ -185,8 +268,14 @@ const ReportsHome = ({ isOnline }) => {
 
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
-    dataSummary.feedback = totalCount / dataSummary.feedback;
+    dataSummary.feedback = dataSummary.feedback / totalCount;
     Object.assign(data.dataSummary, dataSummary);
+    Object.assign(data.pieChartData, {
+      collection: collection_summary,
+      feedback: feedback_summary,
+      upiCollection: upiCollection_summary,
+      usage: usage_summary,
+    });
     dispatch(setReportData(data));
 
     console.log("data.dashboardChartData :-->", data);
@@ -299,6 +388,7 @@ const ReportsHome = ({ isOnline }) => {
   // };
 
   const setComplexSelection = async (selectedComplex) => {
+    localStorage.setItem("selection_key", "15 Days");
     reportParms.complex = selectedComplex.name;
     reportParms.duration = 15;
     localStorage.setItem("complex_name", selectedComplex.name);
