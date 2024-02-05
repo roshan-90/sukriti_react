@@ -141,7 +141,35 @@ const ReportsHome = ({ isOnline }) => {
 
     // Create a new object to store filtered data for all keys
     const filteredData = {};
+    const dataSummary = {
+      collection: 0,
+      feedback: 0,
+      upiCollection: 0,
+      usage: 0,
+    };
+    let totalCount = 0;
 
+    const summaryFunction = (key, data) => {
+      console.log("summaryFunction :-->", data);
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].all !== 0) {
+          if (key in dataSummary) {
+            if (key === "feedback") {
+              console.log("check key feedback :-->", key);
+              console.log("total feedback", data.length);
+              totalCount = data.length;
+              dataSummary[key] += Number(data[i].all);
+            } else {
+              console.log("check key :-->", key);
+              console.log("check vlaue of key :-->", data[i].all);
+              dataSummary[key] += Number(data[i].all);
+            }
+          }
+          console.log("i :-->", data[i].all);
+          console.log("value :->", key in dataSummary);
+        }
+      }
+    };
     // Loop through each key in data.dashboardChartData
     Object.keys(data.dashboardChartData).forEach((key) => {
       // Filter data based on date range for each key
@@ -150,13 +178,20 @@ const ReportsHome = ({ isOnline }) => {
         startDateString,
         endDateString
       );
+      console.log("key", key);
+      console.log("filteredData", filteredData[key]);
+      summaryFunction(key, filteredData[key]);
     });
 
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
+    dataSummary.feedback = totalCount / dataSummary.feedback;
+    Object.assign(data.dataSummary, dataSummary);
     dispatch(setReportData(data));
 
     console.log("data.dashboardChartData :-->", data);
+    console.log("data.dashboard summary", dataSummary);
+    console.log("data totalCount", totalCount);
   };
 
   const filter_complex = (all_report_data, duration) => {
