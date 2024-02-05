@@ -428,7 +428,40 @@ const ReportsHome = ({ isOnline }) => {
         }
       }
     } else {
-      fetchDashboardReport([reportParms.complex]);
+      if (reportParms.complex === "all") {
+        console.log("report complex all");
+        switch (true) {
+          case selectedDuration === 15:
+            let dashboard_15 = getLocalStorageItem("dashboard_15");
+            console.log("this is reportParms is 15 is selected", dashboard_15);
+            dispatch(setReportData(dashboard_15));
+            break;
+          case selectedDuration === 30:
+            let dashboard_30 = getLocalStorageItem("dashboard_30");
+            console.log("this is reportparms is 30 selected", dashboard_30);
+            dispatch(setReportData(dashboard_30));
+            break;
+          case selectedDuration === 45:
+            let dashboard_45 = getLocalStorageItem("dashboard_45");
+            console.log("this is reportParms is 45 selected", dashboard_45);
+            dispatch(setReportData(dashboard_45));
+            break;
+          case selectedDuration === 60:
+            let dashboard_60 = getLocalStorageItem("dashboard_60");
+            console.log("this is reportparms is 60 selected", dashboard_60);
+            dispatch(setReportData(dashboard_60));
+            break;
+          case selectedDuration === 90:
+            let dashboard_90 = getLocalStorageItem("dashboard_90");
+            console.log("this is reportparms is 90 selected", dashboard_90);
+            dispatch(setReportData(dashboard_90));
+            break;
+          default:
+            console.log("default switch working");
+        }
+      } else {
+        fetchDashboardReport([reportParms.complex]);
+      }
     }
   };
 
@@ -531,6 +564,7 @@ const ReportsHome = ({ isOnline }) => {
   useEffect(() => {
     // fetchDashboardData(15);
     localStorage.setItem("selection_key", "15 Days");
+    localStorage.setItem("complex_name", "all");
     dispatch(setReportData(dashboard_data));
   }, []);
 
