@@ -268,7 +268,7 @@ const ReportsHome = ({ isOnline }) => {
 
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
-    dataSummary.feedback = dataSummary.feedback / totalCount;
+    dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
     Object.assign(data.dataSummary, dataSummary);
     Object.assign(data.pieChartData, {
       collection: collection_summary,
@@ -387,6 +387,38 @@ const ReportsHome = ({ isOnline }) => {
   //   }
   // };
 
+  const setDashboard_data = (selectedDuration) => {
+    switch (true) {
+      case selectedDuration === 15:
+        let dashboard_15 = getLocalStorageItem("dashboard_15");
+        console.log("this is reportParms is 15 is selected", dashboard_15);
+        dispatch(setReportData(dashboard_15));
+        break;
+      case selectedDuration === 30:
+        let dashboard_30 = getLocalStorageItem("dashboard_30");
+        console.log("this is reportparms is 30 selected", dashboard_30);
+        dispatch(setReportData(dashboard_30));
+        break;
+      case selectedDuration === 45:
+        let dashboard_45 = getLocalStorageItem("dashboard_45");
+        console.log("this is reportParms is 45 selected", dashboard_45);
+        dispatch(setReportData(dashboard_45));
+        break;
+      case selectedDuration === 60:
+        let dashboard_60 = getLocalStorageItem("dashboard_60");
+        console.log("this is reportparms is 60 selected", dashboard_60);
+        dispatch(setReportData(dashboard_60));
+        break;
+      case selectedDuration === 90:
+        let dashboard_90 = getLocalStorageItem("dashboard_90");
+        console.log("this is reportparms is 90 selected", dashboard_90);
+        dispatch(setReportData(dashboard_90));
+        break;
+      default:
+        console.log("default switch working");
+    }
+  };
+
   const setComplexSelection = async (selectedComplex) => {
     localStorage.setItem("selection_key", "15 Days");
     reportParms.complex = selectedComplex.name;
@@ -405,60 +437,36 @@ const ReportsHome = ({ isOnline }) => {
     reportParms.complex = localStorage.getItem("complex_name");
     console.log("reportParam", reportParms);
     if (isOnline == false) {
-      let value = localStorage.getItem("report_dashboard");
-      if (value) {
-        switch (true) {
-          case selectedDuration === 15:
-            filter_complex(JSON.parse(value), 15);
-            break;
-          case selectedDuration === 30:
-            filter_complex(JSON.parse(value), 30);
-            break;
-          case selectedDuration === 45:
-            filter_complex(JSON.parse(value), 45);
-            break;
-          case selectedDuration === 60:
-            filter_complex(JSON.parse(value), 60);
-            break;
-          case selectedDuration === 90:
-            filter_complex(JSON.parse(value), 90);
-            break;
-          default:
-            console.log("default switch working");
+      if (reportParms.complex === "all") {
+        setDashboard_data(selectedDuration);
+      } else {
+        let value = localStorage.getItem("report_dashboard");
+        if (value) {
+          switch (true) {
+            case selectedDuration === 15:
+              filter_complex(JSON.parse(value), 15);
+              break;
+            case selectedDuration === 30:
+              filter_complex(JSON.parse(value), 30);
+              break;
+            case selectedDuration === 45:
+              filter_complex(JSON.parse(value), 45);
+              break;
+            case selectedDuration === 60:
+              filter_complex(JSON.parse(value), 60);
+              break;
+            case selectedDuration === 90:
+              filter_complex(JSON.parse(value), 90);
+              break;
+            default:
+              console.log("default switch working");
+          }
         }
       }
     } else {
       if (reportParms.complex === "all") {
         console.log("report complex all");
-        switch (true) {
-          case selectedDuration === 15:
-            let dashboard_15 = getLocalStorageItem("dashboard_15");
-            console.log("this is reportParms is 15 is selected", dashboard_15);
-            dispatch(setReportData(dashboard_15));
-            break;
-          case selectedDuration === 30:
-            let dashboard_30 = getLocalStorageItem("dashboard_30");
-            console.log("this is reportparms is 30 selected", dashboard_30);
-            dispatch(setReportData(dashboard_30));
-            break;
-          case selectedDuration === 45:
-            let dashboard_45 = getLocalStorageItem("dashboard_45");
-            console.log("this is reportParms is 45 selected", dashboard_45);
-            dispatch(setReportData(dashboard_45));
-            break;
-          case selectedDuration === 60:
-            let dashboard_60 = getLocalStorageItem("dashboard_60");
-            console.log("this is reportparms is 60 selected", dashboard_60);
-            dispatch(setReportData(dashboard_60));
-            break;
-          case selectedDuration === 90:
-            let dashboard_90 = getLocalStorageItem("dashboard_90");
-            console.log("this is reportparms is 90 selected", dashboard_90);
-            dispatch(setReportData(dashboard_90));
-            break;
-          default:
-            console.log("default switch working");
-        }
+        setDashboard_data(selectedDuration);
       } else {
         fetchDashboardReport([reportParms.complex]);
       }
