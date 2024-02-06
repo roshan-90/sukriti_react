@@ -138,7 +138,7 @@ const Home = ({ isOnline }) => {
     reportParms.duration = duration;
     if (isOnline == false) {
       console.log("reportParms.duration", typeof reportParms.duration);
-      console.log("reportParms.duration === 15", reportParms.duration === 15);
+      console.log("reportParms.duration", reportParms.duration);
       switch (true) {
         case duration === 15:
           let dashboard_15 = getLocalStorageItem("dashboard_15");
@@ -372,6 +372,16 @@ const Home = ({ isOnline }) => {
     Object.assign(data.bwtdashboardChartData, { waterRecycled: filteredData });
     bwtSummary(filteredData);
     Object.assign(data.bwtdataSummary, { waterRecycled: databwtsummary?.all });
+
+    Object.assign(data.bwtpieChartData, {
+      usage: [
+        {
+          name: "BWT",
+          value: databwtsummary?.bwt,
+        },
+      ],
+    });
+
     console.log("filter data -->", data);
     setLocalStorageItem(`dashboard_${duration}`, JSON.stringify(data));
     // dispatch(setDashboardData(data));
