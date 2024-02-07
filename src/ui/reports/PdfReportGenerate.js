@@ -211,11 +211,19 @@ const PdfGenerate = () => {
     }
   };
 
+  function getValue(array, cabin) {
+    if (array) {
+      const item = array.find((item) => item.name === cabin);
+      return item ? item.value : 0;
+    } else {
+      return 0;
+    }
+  }
   let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
   useEffect(() => {
     let value = localStorage.getItem("report_dashboard");
     array.forEach((name) => {
-      filter_complex(JSON.parse(value), name, 15);
+      filter_complex(JSON.parse(value), name, 90);
     });
     setHasdata(1);
   }, []);
@@ -256,8 +264,68 @@ const PdfGenerate = () => {
                   background: colorTheme.primary,
                 }}
               >
-                {`Data Report for complex : `}
+                {`Data Report for complex : ${data?.data?.complexName}`}
               </div>
+              <table
+                style={{ width: "100%", height: "100%", padding: "0px" }}
+                class="table table-bordered"
+              >
+                <thead>
+                  <tr>
+                    <th scope="col">Cabin</th>
+                    <th scope="col">Usage</th>
+                    <th scope="col">Collection</th>
+                    <th scope="col">UPI</th>
+                    <th scope="col">Feedback</th>
+                    <th scope="col">Recycled</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(data?.data?.pieChartData).map((cabin, index) => {
+                    console.log("Cabin:", cabin);
+                    console.log(
+                      "checking value",
+                      data?.data?.pieChartData[cabin]
+                    );
+                    console.log(
+                      "checking value :-->",
+                      data?.data?.pieChartData[cabin][index].value
+                    );
+                    return (
+                      <tr key={index}>
+                        <th scope="row">
+                          {data?.data?.pieChartData[cabin][index].name}
+                        </th>
+                        <td>
+                          {getValue(
+                            data?.data?.pieChartData[cabin].usage,
+                            cabin
+                          )}
+                        </td>
+                        <td>
+                          {getValue(
+                            data?.data?.pieChartData[cabin].collection,
+                            cabin
+                          )}
+                        </td>
+                        <td>
+                          {getValue(
+                            data?.data?.pieChartData[cabin].upiCollection,
+                            cabin
+                          )}
+                        </td>
+                        <td>
+                          {getValue(
+                            data?.data?.pieChartData[cabin].feedback,
+                            cabin
+                          )}
+                        </td>
+                        <td>NA</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
               <table style={{ width: "100%", height: "100%", padding: "0px" }}>
                 <tbody>
                   <tr>
