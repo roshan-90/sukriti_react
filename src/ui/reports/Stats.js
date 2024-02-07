@@ -38,13 +38,15 @@ const Stats = (props) => {
         alignItems: "center",
       }}
     >
-      <div style={{ width: "30%", float: "right" }}>
-        <DropDownLabel
-          label={"Duration"}
-          handleUpdate={handleUpdate}
-          options={actionOptions}
-        />
-      </div>
+      {props.isDuration == undefined && props.isDuration !== false && (
+        <div style={{ width: "30%", float: "right" }}>
+          <DropDownLabel
+            label={"Duration"}
+            handleUpdate={handleUpdate}
+            options={actionOptions}
+          />
+        </div>
+      )}
 
       <StatsItem
         name="Usage Stats"
