@@ -288,7 +288,7 @@ const PdfGenerate = () => {
                 {`Data Report for complex : ${data?.data?.complexName}`}
               </div>
               <table
-                style={{ width: "100%", height: "100%", padding: "0px" }}
+                style={{ width: "95%", height: "95%", margin: "30px" }}
                 className="table table-bordered"
                 key={index}
               >
@@ -345,7 +345,7 @@ const PdfGenerate = () => {
                   </tr>
                 </tbody>
               </table>
-              <table style={{ width: "100%", height: "100%", padding: "0px" }}>
+              <table style={{ width: "95%", height: "95%", margin: "30px" }}>
                 <tbody>
                   <tr>
                     <td style={{ width: "80%" }}>
@@ -375,8 +375,7 @@ const PdfGenerate = () => {
                   className="table table-bordered"
                 >
                   <thead>
-                    <tr
-                    >
+                    <tr>
                       <th colSpan="1" scope="colgroup"></th>
                       <th colSpan="5" scope="colgroup">
                         Usage
@@ -420,30 +419,118 @@ const PdfGenerate = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr key={index}>
-                      <td>05/02/2024</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>5.0</td>
-                      <td>5.0</td>
-                      <td>5.0</td>
-                      <td>0</td>
-                      <td>5.0</td>
-                      <td>NA</td>
-                    </tr>
+                    {data?.data?.dashboardChartData.usage.map(
+                      (usage, index) => {
+                        return (
+                          <tr key={index}>
+                            <td style={{ "font-weight": "bold" }}>
+                              {usage.date}
+                            </td>
+                            <td>{usage.all}</td>
+                            <td>{usage.mwc}</td>
+                            <td>{usage.fwc}</td>
+                            <td>{usage.pwc}</td>
+                            <td>{usage.mur}</td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.collection[index]
+                                  .all
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.collection[index]
+                                  .mwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.collection[index]
+                                  .fwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.collection[index]
+                                  .pwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.collection[index]
+                                  .mur
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.upiCollection[
+                                  index
+                                ].all
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.upiCollection[
+                                  index
+                                ].mwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.upiCollection[
+                                  index
+                                ].fwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.upiCollection[
+                                  index
+                                ].pwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.upiCollection[
+                                  index
+                                ].mur
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.feedback[index]
+                                  .all
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.feedback[index]
+                                  .mwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.feedback[index]
+                                  .fwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.feedback[index]
+                                  .pwc
+                              }
+                            </td>
+                            <td>
+                              {
+                                data?.data?.dashboardChartData.feedback[index]
+                                  .mur
+                              }
+                            </td>
+                            <td>NA</td>
+                          </tr>
+                        );
+                      }
+                    )}
                   </tbody>
                 </table>
               </div>
