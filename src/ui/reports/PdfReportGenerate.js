@@ -19,6 +19,8 @@ const PdfGenerate = () => {
   const reportParms = { complex: "REGISTRY_OFFICE_MSCL", duration: "15" };
   const [hasdata, setHasdata] = useState(0);
 
+  let summaryPayload = {};
+
   const filter_date = (data, duration) => {
     // Define start and end dates
     const startDateString = "2023-12-10"; // Example start date string
@@ -232,14 +234,6 @@ const PdfGenerate = () => {
     }
   };
 
-  function getValue(array, cabin) {
-    if (array) {
-      const item = array.find((item) => item.name === cabin);
-      return item ? item.value : 0;
-    } else {
-      return 0;
-    }
-  }
   let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
   useEffect(() => {
     let value = localStorage.getItem("report_dashboard");
@@ -249,10 +243,84 @@ const PdfGenerate = () => {
     setHasdata(1);
   }, []);
 
+  const filterDashboadData = (data, key) => {
+    for (let i = 0; i < data.length; i++) {
+      console.log(" filter dashboard data", data[i]);
+      console.log("key--->", key);
+      console.log(
+        "filter dashboard data 22",
+        summaryPayload.dashboardChartData[key]
+      );
+      // Find the object with the same date
+      let existingItem = summaryPayload.dashboardChartData[key].find(
+        (item) => item.date === data[i].date
+      );
+
+      if (key == "feedback") {
+        // If the date is present, update its 'all' value
+        if (existingItem) {
+          existingItem.all += Number(data[i].all);
+          existingItem.mwc += Number(data[i].mwc);
+          existingItem.fwc += Number(data[i].fwc);
+          existingItem.pwc += Number(data[i].pwc);
+          existingItem.mur += Number(data[i].mur);
+        } else {
+          // If the date is not present, push the new object
+          summaryPayload.dashboardChartData[key].push(data[i]);
+        }
+      } else {
+        // If the date is present, update its 'all' value
+        if (existingItem) {
+          existingItem.all += Number(data[i].all);
+          existingItem.mwc += Number(data[i].mwc);
+          existingItem.fwc += Number(data[i].fwc);
+          existingItem.pwc += Number(data[i].pwc);
+          existingItem.mur += Number(data[i].mur);
+        } else {
+          // If the date is not present, push the new object
+          summaryPayload.dashboardChartData[key].push(data[i]);
+        }
+      }
+    }
+  };
+
+  const createSummaryFunction = (data) => {
+    const filteredData = {};
+    console.log("create new", data.data);
+    Object.keys(data?.data?.dashboardChartData).forEach((key) => {
+      // Filter data based on date range for each key
+      console.log("createSummaryFunction key", key);
+      filteredData[key] = filterDashboadData(
+        data.data.dashboardChartData[key],
+        key
+      );
+      console.log("createSummaryFunction filteredData", filteredData[key]);
+      // summaryFunction(key, filteredData[key]);
+    });
+    console.log("summaryPayload", summaryPayload);
+    Object.assign(data?.data?.dashboardChartData, filteredData);
+  };
+
   if (hasdata) {
     console.log("hasdata", hasdata);
     console.log("reportData", reportData);
-
+    summaryPayload.bwtAvalibility = reportData[0].data.bwtAvalibility;
+    summaryPayload.bwtdashboardChartData =
+      reportData[0].data.bwtdashboardChartData;
+    summaryPayload.bwtdataSummary = reportData[0].data.bwtdataSummary;
+    summaryPayload.complexName = "Data Report for all complex";
+    summaryPayload.bwtpieChartData = reportData[0].data.bwtpieChartData;
+    summaryPayload.dashboardChartData = {
+      usage: [],
+      feedback: [],
+      collection: [],
+      upiCollection: [],
+    };
+    console.log("summaryPayload", summaryPayload);
+    reportData.forEach((data) => {
+      createSummaryFunction(data);
+    });
+    return;
     // Assuming you want to render each item in the reportData array horizontally
     return (
       <div
