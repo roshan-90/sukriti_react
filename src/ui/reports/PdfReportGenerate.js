@@ -369,6 +369,84 @@ const PdfGenerate = () => {
                   </tr>
                 </tbody>
               </table>
+              <div>
+                <table
+                  style={{ width: "100%", height: "100%", padding: "0px" }}
+                  className="table table-bordered"
+                >
+                  <thead>
+                    <tr
+                    >
+                      <th colSpan="1" scope="colgroup"></th>
+                      <th colSpan="5" scope="colgroup">
+                        Usage
+                      </th>
+                      <th colSpan="5" scope="colgroup">
+                        Collection
+                      </th>
+                      <th colSpan="5" scope="colgroup">
+                        Upi
+                      </th>
+                      <th colSpan="5" scope="colgroup">
+                        Feedback
+                      </th>
+                      <th colSpan="1" scope="colgroup">
+                        Recycled
+                      </th>
+                    </tr>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">All</th>
+                      <th scope="col">MWC</th>
+                      <th scope="col">FWC</th>
+                      <th scope="col">PWC</th>
+                      <th scope="col">MUR</th>
+                      <th scope="col">All</th>
+                      <th scope="col">MWC</th>
+                      <th scope="col">FWC</th>
+                      <th scope="col">PWC</th>
+                      <th scope="col">MUR</th>
+                      <th scope="col">All</th>
+                      <th scope="col">MWC</th>
+                      <th scope="col">FWC</th>
+                      <th scope="col">PWC</th>
+                      <th scope="col">MUR</th>
+                      <th scope="col">All</th>
+                      <th scope="col">MWC</th>
+                      <th scope="col">FWC</th>
+                      <th scope="col">PWC</th>
+                      <th scope="col">MUR</th>
+                      <th scope="col">BWT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr key={index}>
+                      <td>05/02/2024</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>5.0</td>
+                      <td>5.0</td>
+                      <td>5.0</td>
+                      <td>0</td>
+                      <td>5.0</td>
+                      <td>NA</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           ))}
         </div>
