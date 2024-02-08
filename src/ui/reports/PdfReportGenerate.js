@@ -19,32 +19,6 @@ const PdfGenerate = () => {
   const reportParms = { complex: "REGISTRY_OFFICE_MSCL", duration: "15" };
   const [hasdata, setHasdata] = useState(0);
 
-  let totalCount = 0;
-  let usage_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let collection_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let upiCollection_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let feedback_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-
   const filter_date = (data, duration) => {
     // Define start and end dates
     const startDateString = "2023-12-10"; // Example start date string
@@ -64,6 +38,31 @@ const PdfGenerate = () => {
       });
     }
 
+    let totalCount = 0;
+    let usage_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let collection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let upiCollection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let feedback_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
     // Create a new object to store filtered data for all keys
     const filteredData = {};
     const dataSummary = {
@@ -168,6 +167,28 @@ const PdfGenerate = () => {
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
     dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
+    console.log("feedback_summary", feedback_summary);
+    if (feedback_summary[0].value !== 0) {
+      feedback_summary[0].value = Number(
+        feedback_summary[0].value / totalCount
+      ).toFixed(0);
+    }
+    if (feedback_summary[1].value !== 0) {
+      feedback_summary[1].value = Number(
+        feedback_summary[1].value / totalCount
+      ).toFixed(0);
+    }
+    if (feedback_summary[2].value !== 0) {
+      feedback_summary[2].value = Number(
+        feedback_summary[2].value / totalCount
+      ).toFixed(0);
+    }
+    if (feedback_summary[3].value !== 0) {
+      feedback_summary[3].value = Number(
+        feedback_summary[3].value / totalCount
+      ).toFixed(0);
+    }
+    console.log("feedback summary :->2", feedback_summary);
     Object.assign(data.dataSummary, dataSummary);
     Object.assign(data.pieChartData, {
       collection: collection_summary,
@@ -268,7 +289,8 @@ const PdfGenerate = () => {
               </div>
               <table
                 style={{ width: "100%", height: "100%", padding: "0px" }}
-                class="table table-bordered"
+                className="table table-bordered"
+                key={index}
               >
                 <thead>
                   <tr>
@@ -281,49 +303,46 @@ const PdfGenerate = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.keys(data?.data?.pieChartData).map((cabin, index) => {
-                    console.log("Cabin:", cabin);
-                    console.log(
-                      "checking value",
-                      data?.data?.pieChartData[cabin]
-                    );
-                    console.log(
-                      "checking value :-->",
-                      data?.data?.pieChartData[cabin][index].value
-                    );
-                    return (
-                      <tr key={index}>
-                        <th scope="row">
-                          {data?.data?.pieChartData[cabin][index].name}
-                        </th>
-                        <td>
-                          {getValue(
-                            data?.data?.pieChartData[cabin].usage,
-                            cabin
-                          )}
-                        </td>
-                        <td>
-                          {getValue(
-                            data?.data?.pieChartData[cabin].collection,
-                            cabin
-                          )}
-                        </td>
-                        <td>
-                          {getValue(
-                            data?.data?.pieChartData[cabin].upiCollection,
-                            cabin
-                          )}
-                        </td>
-                        <td>
-                          {getValue(
-                            data?.data?.pieChartData[cabin].feedback,
-                            cabin
-                          )}
-                        </td>
-                        <td>NA</td>
-                      </tr>
-                    );
-                  })}
+                  <tr>
+                    <th scope="row">MWC</th>
+                    <td>{data?.data?.pieChartData?.usage[0].value}</td>
+                    <td>{data?.data?.pieChartData?.collection[0].value}</td>
+                    <td>{data?.data?.pieChartData?.upiCollection[0].value}</td>
+                    <td>{data?.data?.pieChartData?.feedback[0].value}</td>
+                    <td>NA</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">FWC</th>
+                    <td>{data?.data?.pieChartData?.usage[1].value}</td>
+                    <td>{data?.data?.pieChartData?.collection[1].value}</td>
+                    <td>{data?.data?.pieChartData?.upiCollection[1].value}</td>
+                    <td>{data?.data?.pieChartData?.feedback[1].value}</td>
+                    <td>NA</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">PWC</th>
+                    <td>{data?.data?.pieChartData?.usage[2].value}</td>
+                    <td>{data?.data?.pieChartData?.collection[2].value}</td>
+                    <td>{data?.data?.pieChartData?.upiCollection[2].value}</td>
+                    <td>{data?.data?.pieChartData?.feedback[2].value}</td>
+                    <td>NA</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">MUR</th>
+                    <td>{data?.data?.pieChartData?.usage[3].value}</td>
+                    <td>{data?.data?.pieChartData?.collection[3].value}</td>
+                    <td>{data?.data?.pieChartData?.upiCollection[3].value}</td>
+                    <td>{data?.data?.pieChartData?.feedback[3].value}</td>
+                    <td>NA</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">BWT</th>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                  </tr>
                 </tbody>
               </table>
               <table style={{ width: "100%", height: "100%", padding: "0px" }}>
