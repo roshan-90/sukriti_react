@@ -28,11 +28,11 @@ const PdfGenerate = () => {
 
     // Function to filter data based on date range
     function filterDataByDateRange(data, startDateString, endDateString) {
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - duration); // Set start date to 15 days ago
-      const endDate = new Date(); // End date is today
-      // const startDate = new Date(startDateString);
-      // const endDate = new Date(endDateString);
+      // const startDate = new Date();
+      // startDate.setDate(startDate.getDate() - duration); // Set start date to 15 days ago
+      // const endDate = new Date(); // End date is today
+      const startDate = new Date(startDateString);
+      const endDate = new Date(endDateString);
       return data.filter((entry) => {
         const [day, month, year] = entry.date.split("/");
         const entryDate = new Date(`${year}-${month}-${day}`);
@@ -41,6 +41,7 @@ const PdfGenerate = () => {
     }
 
     let totalCount = 0;
+
     let usage_summary = [
       { name: "MWC", value: 0 },
       { name: "FWC", value: 0 },
@@ -268,7 +269,7 @@ const PdfGenerate = () => {
     { name: "PWC", value: 0 },
     { name: "MUR", value: 0 },
   ];
-  const dataSummary = {
+  let dataSummary = {
     collection: 0,
     feedback: 0,
     upiCollection: 0,
@@ -486,6 +487,7 @@ const PdfGenerate = () => {
     reportData.forEach(async (data) => {
       await createSummaryFunction(data);
     });
+    console.log("data?.data.dataSummary :->23", dataSummary);
     summaryPayload.dataSummary = {
       collection: dataSummary.collection,
       feedback: dataSummary.feedback,
@@ -498,8 +500,40 @@ const PdfGenerate = () => {
       collection: collection_summary,
       upiCollection: upiCollection_summary,
     };
+
+    dataSummary = {
+      collection: 0,
+      feedback: 0,
+      upiCollection: 0,
+      usage: 0,
+    };
+    usage_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    collection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    upiCollection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    feedback_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
     console.log("summaryPayload test", summaryPayload);
     // Assuming you want to render each item in the reportData array horizontally
+    setHasdata(0);
     return (
       <div
         style={{
