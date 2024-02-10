@@ -611,6 +611,7 @@ const ReportsHome = ({ isOnline }) => {
   };
 
   const fetchReportData = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     console.log("this.props.credentials", user?.credentials);
     const {
       duration,
@@ -637,20 +638,21 @@ const ReportsHome = ({ isOnline }) => {
             console.log("ReportHome complexdata length");
           },
         });
+        dispatch(stopLoading()); // Dispatch the stopLoading action
         return;
       }
 
-      if (duration === null) {
-        setDialogData({
-          title: "Validation Error",
-          message: "Please Select Past Date.",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("ReportHome duration");
-          },
-        });
-        return;
-      }
+      // if (duration === null) {
+      //   setDialogData({
+      //     title: "Validation Error",
+      //     message: "Please Select Past Date.",
+      //     onClickAction: () => {
+      //       // Handle the action when the user clicks OK
+      //       console.log("ReportHome duration");
+      //     },
+      //   });
+      //   return;
+      // }
 
       if (
         !usageStats &&
@@ -667,6 +669,7 @@ const ReportsHome = ({ isOnline }) => {
             console.log("ReportHome");
           },
         });
+        dispatch(stopLoading()); // Dispatch the stopLoading action
         return;
       }
 
@@ -725,9 +728,32 @@ const ReportsHome = ({ isOnline }) => {
             },
           });
         }
+        dispatch(stopLoading()); // Dispatch the stopLoading action
         return;
       }
-
+      console.log("checking data", {
+        StartDate,
+        EndDate,
+        usageStats,
+        collectionStats,
+        upiStats,
+        feedbackStats,
+        bwtStats,
+        complexData,
+      });
+      if (isOnline == false) {
+        PdfGenerate({
+          StartDate,
+          EndDate,
+          usageStats,
+          collectionStats,
+          upiStats,
+          feedbackStats,
+          bwtStats,
+          complexData,
+        });
+        return true;
+      }
       // this.loadingDialog.current.showDialog();
       console.log("executeFetchReportLambda2 triggered");
       var result = await executeFetchReportLambda2(
@@ -740,7 +766,7 @@ const ReportsHome = ({ isOnline }) => {
         assignDetails.rateValue,
         "days",
         assignDetails.scheduleDuration,
-        assignDetails.EndDate,
+        moment(assignDetails.EndDate).unix(),
         moment(assignDetails.StartDate).unix(),
         assignDetails.ScheduleStartDate,
         assignDetails.ScheduleEndDate,
@@ -780,6 +806,26 @@ const ReportsHome = ({ isOnline }) => {
         console.log("setReportdata-->", result);
         dispatch(setReportData(result));
         var link = result.body.link;
+        setDialogData({
+          title: "Report Generated",
+          message: (
+            <div>
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                download={link}
+              >
+                Link for your PDF
+              </a>
+            </div>
+          ),
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("report home schedulenddate");
+          },
+        });
+
         // this.messageDialog.current.showDialog(
         //   "Report Generated",
         //   <a
@@ -803,6 +849,8 @@ const ReportsHome = ({ isOnline }) => {
       console.log("_lambda", err);
       // this.loadingDialog.current.closeDialog();
       // this.messageDialog.current.showDialog("Error Alert!", err.message);
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -831,31 +879,7 @@ const ReportsHome = ({ isOnline }) => {
   };
 
   const getPDF = () => {
-    if (isOnline) {
-      fetchReportData();
-    } else {
-      const { StartDate, EndDate } = assignDetails;
-      console.log("checking data", {
-        StartDate,
-        EndDate,
-        usageStats,
-        collectionStats,
-        upiStats,
-        feedbackStats,
-        bwtStats,
-        complexData,
-      });
-      PdfGenerate({
-        StartDate,
-        EndDate,
-        usageStats,
-        collectionStats,
-        upiStats,
-        feedbackStats,
-        bwtStats,
-        complexData,
-      });
-    }
+    fetchReportData();
   };
 
   console.log(hasReportData, "hasReportData");
@@ -937,6 +961,14 @@ const ReportsHome = ({ isOnline }) => {
             </tbody>
           </table>
           <Modal isOpen={visibility} toggle={isEnabled} className={"modal-xl"}>
+            {isLoading && (
+              <div className="loader-container">
+                <CircularProgress
+                  className="loader"
+                  style={{ color: "rgb(93 192 166)" }}
+                />
+              </div>
+            )}
             <ModalHeader
               style={{ background: "#5DC0A6", color: `white` }}
               toggle={toggleDialog}
