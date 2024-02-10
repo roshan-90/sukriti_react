@@ -847,6 +847,7 @@ const ReportsHome = ({ isOnline }) => {
       setVisibility(!visibility);
     } catch (err) {
       console.log("_lambda", err);
+      handleError(err, "fetchReportData");
       // this.loadingDialog.current.closeDialog();
       // this.messageDialog.current.showDialog("Error Alert!", err.message);
     } finally {
