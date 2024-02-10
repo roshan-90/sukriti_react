@@ -37,6 +37,7 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 import { selectUser } from "../../features/authenticationSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import useOnlineStatus from "../../services/useOnlineStatus";
+import PdfGenerate from "./PdfReportGenerate";
 
 const ReportsHome = ({ isOnline }) => {
   const [visibility, setVisibility] = useState(false);
@@ -541,6 +542,19 @@ const ReportsHome = ({ isOnline }) => {
         updatedAssignDetails.StartDate = startDate;
         updatedAssignDetails.EndDate = endDate;
         break;
+      case "duration1":
+        // console.log("startDate1", startDate1);
+        // console.log("endDate1", endDate1);
+        updatedAssignDetails.StartDate = value;
+        // const dayDifference = Math.abs(endDate.diff(startDate, "days"));
+        // updatedAssignDetails.duration = dayDifference;
+        // updatedAssignDetails.selectedDate = value;
+        // updatedAssignDetails.StartDate = startDate;
+        // updatedAssignDetails.EndDate = endDate;
+        break;
+      case "duration2":
+        updatedAssignDetails.EndDate = value;
+        break;
       case "email":
         updatedAssignDetails.email = value;
         break;
@@ -609,6 +623,9 @@ const ReportsHome = ({ isOnline }) => {
       StartDate,
       EndDate,
     } = assignDetails;
+
+    console.log("startDate fetch Report Data", moment(StartDate).unix());
+    console.log("startDate fetch Report Data", moment(EndDate).unix());
 
     try {
       if (!complexData.length) {
@@ -724,7 +741,7 @@ const ReportsHome = ({ isOnline }) => {
         "days",
         assignDetails.scheduleDuration,
         assignDetails.EndDate,
-        assignDetails.StartDate,
+        moment(assignDetails.StartDate).unix(),
         assignDetails.ScheduleStartDate,
         assignDetails.ScheduleEndDate,
         usageStats,
@@ -814,7 +831,31 @@ const ReportsHome = ({ isOnline }) => {
   };
 
   const getPDF = () => {
-    fetchReportData();
+    if (isOnline) {
+      fetchReportData();
+    } else {
+      const { StartDate, EndDate } = assignDetails;
+      console.log("checking data", {
+        StartDate,
+        EndDate,
+        usageStats,
+        collectionStats,
+        upiStats,
+        feedbackStats,
+        bwtStats,
+        complexData,
+      });
+      PdfGenerate({
+        StartDate,
+        EndDate,
+        usageStats,
+        collectionStats,
+        upiStats,
+        feedbackStats,
+        bwtStats,
+        complexData,
+      });
+    }
   };
 
   console.log(hasReportData, "hasReportData");
@@ -948,14 +989,27 @@ const ReportsHome = ({ isOnline }) => {
                     }}
                   >
                     <InputDatePicker
-                      value={assignDetails.selectedDate}
+                      value={assignDetails.StartDate}
                       onSelect={(value) =>
-                        updateAssignDetailsField("duration", value)
+                        updateAssignDetailsField("duration1", value)
                       }
                       minDate={new Date("01-02-2023")}
                       maxDate={new Date()}
                       onlyDate
-                      label="Select Past Date"
+                      label="Select Start Date"
+                      type="date"
+                      placeholder="Start Date"
+                      className="date-picker-input"
+                    />
+                    <InputDatePicker
+                      value={assignDetails.EndDate}
+                      onSelect={(value) =>
+                        updateAssignDetailsField("duration2", value)
+                      }
+                      minDate={new Date("01-02-2023")}
+                      maxDate={new Date()}
+                      onlyDate
+                      label="Select End Date"
                       type="date"
                       placeholder="End Date"
                       className="date-picker-input"
@@ -1122,7 +1176,7 @@ const ReportsHome = ({ isOnline }) => {
                               className="radio-input"
                               value="yesschedule"
                               name="radio"
-                              // disabled
+                              disabled={isOnline ? false : true}
                               onChange={showFields}
                             />
                             <span class="checkmark"></span>

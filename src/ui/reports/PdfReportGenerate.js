@@ -11,7 +11,16 @@ import { useDispatch, useSelector } from "react-redux";
 import useOnlineStatus from "../../services/useOnlineStatus";
 import Stats from "./Stats";
 
-const PdfGenerate = () => {
+const PdfGenerate = ({
+  StartDate,
+  EndDate,
+  usageStats,
+  collectionStats,
+  upiStats,
+  feedbackStats,
+  bwtStats,
+  complexData,
+}) => {
   const dispatch = useDispatch();
   const { getLocalStorageItem } = useOnlineStatus();
   let dashboard_data = getLocalStorageItem("dashboard_15");
@@ -533,7 +542,6 @@ const PdfGenerate = () => {
     ];
     console.log("summaryPayload test", summaryPayload);
     // Assuming you want to render each item in the reportData array horizontally
-    setHasdata(0);
     return (
       <div
         style={{
