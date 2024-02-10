@@ -179,26 +179,25 @@ const PdfGenerate = ({
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
     dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
-    // console.log("feedback_summary", feedback_summary);
     if (feedback_summary[0].value !== 0) {
-      feedback_summary[0].value = Number(
-        feedback_summary[0].value / totalCount
-      ).toFixed(0);
+      feedback_summary[0].value = parseInt(
+        Number(feedback_summary[0].value / totalCount).toFixed(0)
+      );
     }
     if (feedback_summary[1].value !== 0) {
-      feedback_summary[1].value = Number(
-        feedback_summary[1].value / totalCount
-      ).toFixed(0);
+      feedback_summary[1].value = parseInt(
+        Number(feedback_summary[1].value / totalCount).toFixed(0)
+      );
     }
     if (feedback_summary[2].value !== 0) {
-      feedback_summary[2].value = Number(
-        feedback_summary[2].value / totalCount
-      ).toFixed(0);
+      feedback_summary[2].value = parseInt(
+        Number(feedback_summary[2].value / totalCount).toFixed(0)
+      );
     }
     if (feedback_summary[3].value !== 0) {
-      feedback_summary[3].value = Number(
-        feedback_summary[3].value / totalCount
-      ).toFixed(0);
+      feedback_summary[3].value = parseInt(
+        Number(feedback_summary[3].value / totalCount).toFixed(0)
+      );
     }
     // console.log("feedback summary :->2", feedback_summary);
     Object.assign(data.dataSummary, dataSummary);
@@ -215,9 +214,9 @@ const PdfGenerate = ({
   };
 
   const filter_complex = (all_report_data, name, duration) => {
+    console.log("all_report_data :-->", all_report_data);
     let shouldContinue = true;
     console.log("name :--> ", name);
-    console.log("all_report_data :-->", all_report_data);
     for (let i = 0; i < all_report_data.length; i++) {
       const response = all_report_data[i];
       for (let j = 0; j < response.length; j++) {
@@ -228,6 +227,7 @@ const PdfGenerate = ({
           // Print or store the name
           if (obj.complexName === name) {
             console.log(obj.complexName);
+            console.log("object data", obj);
             filter_date(obj, duration);
             // dispatch(setReportData(obj));
             // Update the flag to stop further iterations
@@ -247,6 +247,7 @@ const PdfGenerate = ({
   let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
   useEffect(() => {
     let value = localStorage.getItem("report_dashboard");
+    console.log("check dashboard data", JSON.parse(value));
     array.forEach((name) => {
       filter_complex(JSON.parse(value), name, 90);
     });
@@ -442,24 +443,24 @@ const PdfGenerate = ({
     dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
     console.log("feedback_summary", feedback_summary);
     if (feedback_summary[0].value !== 0) {
-      feedback_summary[0].value = Number(
-        feedback_summary[0].value / totalCount
-      ).toFixed(0);
+      feedback_summary[0].value = parseInt(
+        Number(feedback_summary[0].value / totalCount).toFixed(0)
+      );
     }
     if (feedback_summary[1].value !== 0) {
-      feedback_summary[1].value = Number(
-        feedback_summary[1].value / totalCount
-      ).toFixed(0);
+      feedback_summary[1].value = parseInt(
+        Number(feedback_summary[1].value / totalCount).toFixed(0)
+      );
     }
     if (feedback_summary[2].value !== 0) {
-      feedback_summary[2].value = Number(
-        feedback_summary[2].value / totalCount
-      ).toFixed(0);
+      feedback_summary[2].value = parseInt(
+        Number(feedback_summary[2].value / totalCount).toFixed(0)
+      );
     }
     if (feedback_summary[3].value !== 0) {
-      feedback_summary[3].value = Number(
-        feedback_summary[3].value / totalCount
-      ).toFixed(0);
+      feedback_summary[3].value = parseInt(
+        Number(feedback_summary[3].value / totalCount).toFixed(0)
+      );
     }
     console.log("data?.data.dataSummary :->2", dataSummary);
     // Object.assign(data?.data.dataSummary, {
