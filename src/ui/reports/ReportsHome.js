@@ -38,6 +38,7 @@ import { selectUser } from "../../features/authenticationSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import useOnlineStatus from "../../services/useOnlineStatus";
 import PdfGenerate from "./PdfReportGenerate";
+import { useNavigate } from "react-router-dom";
 
 const ReportsHome = ({ isOnline }) => {
   const [visibility, setVisibility] = useState(false);
@@ -72,6 +73,7 @@ const ReportsHome = ({ isOnline }) => {
   const complexComposition = useRef();
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -389,6 +391,8 @@ const ReportsHome = ({ isOnline }) => {
   // };
 
   const setDashboard_data = (selectedDuration) => {
+    navigate("/report/custom-pdf-generate");
+    return;
     switch (true) {
       case selectedDuration === 15:
         let dashboard_15 = getLocalStorageItem("dashboard_15");
@@ -1019,8 +1023,18 @@ const ReportsHome = ({ isOnline }) => {
                   <div
                     style={{
                       ...statsStyle.scheduleTitle,
+                      display: "flex",
                     }}
                   >
+                    <Label
+                      style={{
+                        marginRight: "67px",
+                        width: "108px",
+                      }}
+                    >
+                      Select Date
+                    </Label>
+
                     <InputDatePicker
                       value={assignDetails.StartDate}
                       onSelect={(value) =>
@@ -1029,7 +1043,7 @@ const ReportsHome = ({ isOnline }) => {
                       minDate={new Date("01-02-2023")}
                       maxDate={new Date()}
                       onlyDate
-                      label="Select Start Date"
+                      // label="Select Start Date"
                       type="date"
                       placeholder="Start Date"
                       className="date-picker-input"
@@ -1042,7 +1056,7 @@ const ReportsHome = ({ isOnline }) => {
                       minDate={new Date("01-02-2023")}
                       maxDate={new Date()}
                       onlyDate
-                      label="Select End Date"
+                      // label="Select End Date"
                       type="date"
                       placeholder="End Date"
                       className="date-picker-input"

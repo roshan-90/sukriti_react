@@ -10,6 +10,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import useOnlineStatus from "../../services/useOnlineStatus";
 import Stats from "./Stats";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const PdfGenerate = ({
   StartDate,
@@ -29,6 +31,21 @@ const PdfGenerate = ({
   const [hasdata, setHasdata] = useState(0);
 
   let summaryPayload = {};
+
+  const generatePDF = () => {
+    const input = document.getElementById("pdf-content");
+
+    html2canvas(input, { scrollY: -window.scrollY, scale: 1 }).then(
+      (canvas) => {
+        const imgData = canvas.toDataURL("image/jpeg");
+        const pdf = new jsPDF(); // Create new PDF document
+        const width = pdf.internal.pageSize.getWidth();
+        const height = (canvas.height * width) / canvas.width;
+        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+        pdf.save("summary.pdf"); // Download the PDF
+      }
+    );
+  };
 
   const filter_date = (data, duration) => {
     // Define start and end dates
@@ -214,9 +231,9 @@ const PdfGenerate = ({
   };
 
   const filter_complex = (all_report_data, name, duration) => {
-    console.log("all_report_data :-->", all_report_data);
+    // console.log("all_report_data :-->", all_report_data);
     let shouldContinue = true;
-    console.log("name :--> ", name);
+    // console.log("name :--> ", name);
     for (let i = 0; i < all_report_data.length; i++) {
       const response = all_report_data[i];
       for (let j = 0; j < response.length; j++) {
@@ -227,7 +244,7 @@ const PdfGenerate = ({
           // Print or store the name
           if (obj.complexName === name) {
             console.log(obj.complexName);
-            console.log("object data", obj);
+            // console.log("object data", obj);
             filter_date(obj, duration);
             // dispatch(setReportData(obj));
             // Update the flag to stop further iterations
@@ -236,7 +253,7 @@ const PdfGenerate = ({
           }
         }
       }
-      console.log("shouldContinue:-->", reportParms.complex);
+      // console.log("shouldContinue:-->", reportParms.complex);
       // Exit the outer loop if shouldContinue is false
       if (!shouldContinue) {
         break; // Exit the outer loop if the name is found
@@ -244,7 +261,9 @@ const PdfGenerate = ({
     }
   };
 
-  let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
+  // let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
+  let array = ["REGISTRY_OFFICE_MSCL"];
+  console.log("test props data");
   useEffect(() => {
     let value = localStorage.getItem("report_dashboard");
     console.log("check dashboard data", JSON.parse(value));
@@ -469,7 +488,7 @@ const PdfGenerate = ({
     //   upiCollection: dataSummary.upiCollection,
     //   usage: dataSummary.usage,
     // });
-    console.log("piechart", usage_summary);
+    // console.log("piechart", usage_summary);
     // Object.assign(data?.data.pieChartData, {
     //   collection: collection_summary,
     //   feedback: feedback_summary,
@@ -545,6 +564,7 @@ const PdfGenerate = ({
     // Assuming you want to render each item in the reportData array horizontally
     return (
       <div
+        id="pdf-content"
         style={{
           ...whiteSurface,
           background: "white",
@@ -554,6 +574,7 @@ const PdfGenerate = ({
           padding: "10px",
           paddingBottom: "20px",
           overflowX: "auto", // Enable horizontal scrolling
+          fontSize: "10px",
         }}
       >
         <div
@@ -575,6 +596,8 @@ const PdfGenerate = ({
             >
               {`Summary :  ${summaryPayload?.complexName}`}
             </div>
+            <button onClick={generatePDF}>Generate PDF</button>
+
             <table
               style={{ width: "95%", height: "95%", margin: "30px" }}
               className="table table-bordered"
