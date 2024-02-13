@@ -111,9 +111,25 @@ export function ComplexRow(props) {
 
   const handleChange = (event) => {
     let data = event.target.value;
+    console.log("event", event.target.checked);
     console.log("check handleChange ", data);
+    // Get existing data from localStorage or initialize as an empty array
+    let array_data = JSON.parse(localStorage.getItem("array_data")) || [];
 
-    dispatch(setComplexData({ complexData: data }));
+    if (event.target.checked) {
+      // Update array_data
+      array_data.push(data);
+      // Store updated array_data in localStorage
+      localStorage.setItem("array_data", JSON.stringify(array_data));
+    } else {
+      var filteredArray = array_data.filter((e) => e !== data);
+      console.log("filteredArray", filteredArray);
+      // Store updated filteredArray in localStorage
+      localStorage.setItem("array_data", JSON.stringify(filteredArray));
+    }
+
+    console.log("this is data click", array_data);
+    // dispatch(setComplexData({ complexData: data }));
   };
 
   return (

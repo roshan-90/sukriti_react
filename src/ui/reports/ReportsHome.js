@@ -84,8 +84,12 @@ const ReportsHome = ({ isOnline }) => {
   let title = "";
 
   const toggleDialog = () => {
+    console.log("visibility", visibility);
     setVisibility(!visibility);
     resetData(); // call the function to reset the data
+    if (visibility == true) {
+      localStorage.removeItem("array_data");
+    }
   };
 
   let dashboard_data = getLocalStorageItem("dashboard_15");
@@ -631,9 +635,10 @@ const ReportsHome = ({ isOnline }) => {
 
     console.log("startDate fetch Report Data", moment(StartDate).unix());
     console.log("startDate fetch Report Data", moment(EndDate).unix());
+    let complexDataValue = JSON.parse(localStorage.getItem("array_data"));
 
     try {
-      if (!complexData.length) {
+      if (!complexDataValue.length) {
         setDialogData({
           title: "Validation Error",
           message: "Please Select Complex.",
@@ -735,29 +740,7 @@ const ReportsHome = ({ isOnline }) => {
         dispatch(stopLoading()); // Dispatch the stopLoading action
         return;
       }
-      console.log("checking data", {
-        StartDate,
-        EndDate,
-        usageStats,
-        collectionStats,
-        upiStats,
-        feedbackStats,
-        bwtStats,
-        complexData,
-      });
-      if (isOnline == false) {
-        PdfGenerate({
-          StartDate,
-          EndDate,
-          usageStats,
-          collectionStats,
-          upiStats,
-          feedbackStats,
-          bwtStats,
-          complexData,
-        });
-        return true;
-      }
+      console.log("complexData", complexDataValue);
       // this.loadingDialog.current.showDialog();
       console.log("executeFetchReportLambda2 triggered");
       var result = await executeFetchReportLambda2(
@@ -779,7 +762,7 @@ const ReportsHome = ({ isOnline }) => {
         upiStats,
         feedbackStats,
         bwtStats,
-        complexData,
+        complexDataValue,
         user?.credentials
       );
       console.log("executeFetchReportLambda2-->", result);
@@ -829,21 +812,7 @@ const ReportsHome = ({ isOnline }) => {
             console.log("report home schedulenddate");
           },
         });
-
-        // this.messageDialog.current.showDialog(
-        //   "Report Generated",
-        //   <a
-        //     href={link}
-        //     target="_blank"
-        //     without
-        //     rel="noopener noreferrer"
-        //     download={link}
-        //   >
-        //     Link for your PDF
-        //   </a>
-        // );
       }
-      // this.loadingDialog.current.closeDialog();
       resetData(); // call the function to reset the data
       setTimeout(() => {
         setResetData();
@@ -855,6 +824,7 @@ const ReportsHome = ({ isOnline }) => {
       // this.loadingDialog.current.closeDialog();
       // this.messageDialog.current.showDialog("Error Alert!", err.message);
     } finally {
+      localStorage.removeItem("array_data");
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
@@ -883,6 +853,29 @@ const ReportsHome = ({ isOnline }) => {
     }
   };
 
+  const generatePdf = () => {
+    const { StartDate, EndDate } = assignDetails;
+    console.log("checking data", {
+      StartDate,
+      EndDate,
+      usageStats,
+      collectionStats,
+      upiStats,
+      feedbackStats,
+      bwtStats,
+      complexData,
+    });
+    PdfGenerate({
+      StartDate,
+      EndDate,
+      usageStats,
+      collectionStats,
+      upiStats,
+      feedbackStats,
+      bwtStats,
+      complexData,
+    });
+  };
   const getPDF = () => {
     fetchReportData();
   };
@@ -935,6 +928,7 @@ const ReportsHome = ({ isOnline }) => {
                         outline
                         className="px-4"
                         onClick={() => {
+                          localStorage.removeItem("array_data");
                           showDialog();
                         }}
                       >
@@ -1400,7 +1394,7 @@ const ReportsHome = ({ isOnline }) => {
                 style={{ margin: "auto" }}
                 color="primary"
                 className="px-4"
-                onClick={getPDF}
+                onClick={isOnline ? getPDF : generatePdf}
               >
                 Download Pdf
               </Button>
