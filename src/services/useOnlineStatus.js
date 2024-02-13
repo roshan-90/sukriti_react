@@ -49,7 +49,7 @@ const useOnlineStatus = () => {
     try {
       console.log("key", key);
       const encodedValue = localStorage.getItem(key);
-      console.log("encodedValue", encodedValue);
+      // console.log("encodedValue", encodedValue);
       if (encodedValue) {
         const decodedValue = JSON.parse(JSON.parse(atob(encodedValue)));
         return decodedValue;

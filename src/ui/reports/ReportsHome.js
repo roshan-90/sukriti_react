@@ -39,6 +39,8 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import useOnlineStatus from "../../services/useOnlineStatus";
 import PdfGenerate from "./PdfReportGenerate";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const ReportsHome = ({ isOnline }) => {
   const [visibility, setVisibility] = useState(false);
@@ -90,6 +92,35 @@ const ReportsHome = ({ isOnline }) => {
     if (visibility == true) {
       localStorage.removeItem("array_data");
     }
+  };
+
+  const generatePDF = () => {
+    const input = document.getElementById("pdf-content");
+
+    html2canvas(input, { scrollY: -window.scrollY, scale: 1 }).then(
+      (canvas) => {
+        const imgData = canvas.toDataURL("image/jpeg");
+        const pdf = new jsPDF(); // Create new PDF document
+        const width = pdf.internal.pageSize.getWidth();
+        const height = (canvas.height * width) / canvas.width;
+        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+
+        // Check if there's content that extends beyond the first page
+        if (height > pdf.internal.pageSize.getHeight()) {
+          // Add remaining content by looping through each page
+          let remainingHeight = height - pdf.internal.pageSize.getHeight();
+          let position = pdf.internal.pageSize.getHeight();
+          while (remainingHeight > 0) {
+            pdf.addPage();
+            pdf.addImage(imgData, "JPEG", 0, -position, width, height);
+            remainingHeight -= pdf.internal.pageSize.getHeight();
+            position += pdf.internal.pageSize.getHeight();
+          }
+        }
+
+        pdf.save("summary.pdf"); // Download the PDF
+      }
+    );
   };
 
   let dashboard_data = getLocalStorageItem("dashboard_15");
@@ -437,6 +468,8 @@ const ReportsHome = ({ isOnline }) => {
       let value = localStorage.getItem("report_dashboard");
       filter_complex(JSON.parse(value), 15);
     } else {
+      console.log("selecte :->");
+
       fetchDashboardReport([selectedComplex.name]);
     }
   };
@@ -934,10 +967,25 @@ const ReportsHome = ({ isOnline }) => {
                       >
                         Download Report
                       </Button>
+                      <Button
+                        style={{
+                          width: "100%",
+                          padding: "5%",
+                          marginTop: "10px",
+                        }}
+                        color="primary"
+                        outline
+                        className="px-4"
+                        onClick={() => {
+                          generatePDF();
+                        }}
+                      >
+                        Generate PDF
+                      </Button>
                     </div>
                   </div>
                 </td>
-                <td style={{ width: "80%" }}>
+                <td style={{ width: "80%" }} id="pdf-content">
                   <div style={{ width: "100" }}>
                     <Stats
                       setDurationSelection={setDurationSelection}
@@ -955,10 +1003,197 @@ const ReportsHome = ({ isOnline }) => {
                       uiResult={dashboard_data?.uiResult?.data}
                     />
                   </div>
+                  <table
+                    style={{
+                      width: "80%",
+                      fontSize: "14px",
+                    }}
+                    className="table table-bordered"
+                  >
+                    <thead>
+                      <tr>
+                        <th colSpan="1" scope="colgroup"></th>
+                        <th colSpan="5" scope="colgroup">
+                          Usage
+                        </th>
+                        <th colSpan="5" scope="colgroup">
+                          Collection
+                        </th>
+                        <th colSpan="5" scope="colgroup">
+                          Upi
+                        </th>
+                        <th colSpan="5" scope="colgroup">
+                          Feedback
+                        </th>
+                        <th colSpan="1" scope="colgroup">
+                          Recycled
+                        </th>
+                      </tr>
+                      <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">BWT</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reportData?.data?.dashboardChartData.usage.map(
+                        (usage, index) => {
+                          return (
+                            <tr key={index}>
+                              <td style={{ "font-weight": "bold" }}>
+                                {usage.date}
+                              </td>
+                              <td>{usage.all}</td>
+                              <td>{usage.mwc}</td>
+                              <td>{usage.fwc}</td>
+                              <td>{usage.pwc}</td>
+                              <td>{usage.mur}</td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .collection[index].all
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .collection[index].mwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .collection[index].fwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .collection[index].pwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .collection[index].mur
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .upiCollection[index].all
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .upiCollection[index].mwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .upiCollection[index].fwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .upiCollection[index].pwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  reportData?.data?.dashboardChartData
+                                    .upiCollection[index].mur
+                                }
+                              </td>
+                              <td>
+                                {typeof reportData?.data?.dashboardChartData
+                                  .feedback[index].all === "number"
+                                  ? reportData.data.dashboardChartData.feedback[
+                                      index
+                                    ].all.toFixed(1)
+                                  : Number(
+                                      reportData.data.dashboardChartData
+                                        .feedback[index].all
+                                    ).toFixed(1)}
+                              </td>
+                              <td>
+                                {typeof reportData?.data?.dashboardChartData
+                                  .feedback[index].mwc === "number"
+                                  ? reportData.data.dashboardChartData.feedback[
+                                      index
+                                    ].mwc.toFixed(1)
+                                  : Number(
+                                      reportData.data.dashboardChartData
+                                        .feedback[index].mwc
+                                    ).toFixed(1)}
+                              </td>
+                              <td>
+                                {typeof reportData?.data?.dashboardChartData
+                                  .feedback[index].fwc === "number"
+                                  ? reportData.data.dashboardChartData.feedback[
+                                      index
+                                    ].fwc.toFixed(0)
+                                  : Number(
+                                      reportData.data.dashboardChartData
+                                        .feedback[index].fwc
+                                    ).toFixed(0)}
+                              </td>
+                              <td>
+                                {typeof reportData?.data?.dashboardChartData
+                                  .feedback[index].pwc === "number"
+                                  ? reportData.data.dashboardChartData.feedback[
+                                      index
+                                    ].pwc.toFixed(0)
+                                  : Number(
+                                      reportData.data.dashboardChartData
+                                        .feedback[index].pwc
+                                    ).toFixed(0)}
+                              </td>
+                              <td>
+                                {typeof reportData?.data?.dashboardChartData
+                                  .feedback[index].mur === "number"
+                                  ? reportData.data.dashboardChartData.feedback[
+                                      index
+                                    ].mur.toFixed(0)
+                                  : Number(
+                                      reportData.data.dashboardChartData
+                                        .feedback[index].mur
+                                    ).toFixed(0)}
+                              </td>
+                              <td>NA</td>
+                            </tr>
+                          );
+                        }
+                      )}
+                    </tbody>
+                  </table>
                 </td>
               </tr>
             </tbody>
           </table>
+          <div></div>
           <Modal isOpen={visibility} toggle={isEnabled} className={"modal-xl"}>
             {isLoading && (
               <div className="loader-container">
