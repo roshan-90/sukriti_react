@@ -10,8 +10,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import useOnlineStatus from "../../services/useOnlineStatus";
 import Stats from "./Stats";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2pdf from "html2pdf.js";
 
 const PdfGenerate = ({
   StartDate,
@@ -35,16 +34,62 @@ const PdfGenerate = ({
   const generatePDF = () => {
     const input = document.getElementById("pdf-content");
 
-    html2canvas(input, { scrollY: -window.scrollY, scale: 1 }).then(
-      (canvas) => {
-        const imgData = canvas.toDataURL("image/jpeg");
-        const pdf = new jsPDF(); // Create new PDF document
-        const width = pdf.internal.pageSize.getWidth();
-        const height = (canvas.height * width) / canvas.width;
-        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-        pdf.save("summary.pdf"); // Download the PDF
-      }
-    );
+    // Define options for html2pdf
+    const options = {
+      margin: 5,
+      filename: "summary.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },
+    };
+
+    // Convert HTML content to PDF
+    html2pdf()
+      .set(options)
+      .from(input)
+      .toPdf()
+      .get("pdf")
+      .then(function (pdf) {
+        let totalPages = pdf.internal.getNumberOfPages();
+        let pageHeight = pdf.internal.pageSize.height;
+
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          let pageContentHeight = pdf.internal.getPageInfo(i).height;
+
+          if (pageContentHeight > pageHeight) {
+            // If content height exceeds page height, split the content
+            let remainingContentHeight = pageContentHeight;
+            let pageSections = input.querySelectorAll(".pdf-section");
+            let currentSectionIndex = 0;
+            let startY = 0;
+
+            // Iterate over each section of content within the page
+            while (
+              currentSectionIndex < pageSections.length &&
+              remainingContentHeight > 0
+            ) {
+              let section = pageSections[currentSectionIndex];
+              let sectionHeight = section.offsetHeight;
+
+              // Check if section fits within remaining space on page
+              if (startY + sectionHeight > pageHeight) {
+                pdf.addPage();
+                startY = 0; // Reset startY for new page
+              }
+
+              // Add the section content to the PDF
+              pdf.fromHTML(section, 0, startY);
+
+              // Update startY and remaining content height
+              startY += sectionHeight;
+              remainingContentHeight -= sectionHeight;
+              currentSectionIndex++;
+            }
+          }
+        }
+      })
+      .save();
   };
 
   const filter_date = (data, duration) => {
@@ -261,8 +306,8 @@ const PdfGenerate = ({
     }
   };
 
-  // let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
-  let array = ["REGISTRY_OFFICE_MSCL"];
+  let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
+  // let array = ["REGISTRY_OFFICE_MSCL"];
   console.log("test props data");
   useEffect(() => {
     let value = localStorage.getItem("report_dashboard");
@@ -582,6 +627,7 @@ const PdfGenerate = ({
             display: "flex",
             flexDirection: "column", // Stack tables vertically
           }}
+          className="pdf-section"
         >
           <div style={{ marginBottom: "20px" }}>
             <div
@@ -600,7 +646,7 @@ const PdfGenerate = ({
 
             <table
               style={{ width: "95%", height: "95%", margin: "30px" }}
-              className="table table-bordered"
+              className="table table-bordered pdf-section"
             >
               <thead>
                 <tr>
@@ -663,7 +709,10 @@ const PdfGenerate = ({
                 </tr>
               </tbody>
             </table>
-            <table style={{ width: "95%", height: "95%", margin: "30px" }}>
+            <table
+              style={{ width: "95%", height: "95%", margin: "30px" }}
+              className="pdf-section"
+            >
               <tbody>
                 <tr>
                   <td style={{ width: "80%" }}>
@@ -859,7 +908,11 @@ const PdfGenerate = ({
             </div>
           </div>
           {reportData.map((data, index) => (
-            <div key={index} style={{ marginBottom: "20px" }}>
+            <div
+              key={index}
+              style={{ marginBottom: "20px" }}
+              className="pdf-section"
+            >
               <div
                 className="row"
                 style={{
@@ -1082,34 +1135,64 @@ const PdfGenerate = ({
                               }
                             </td>
                             <td>
-                              {
-                                data?.data?.dashboardChartData.feedback[index]
-                                  .all
-                              }
+                              {typeof data?.data?.dashboardChartData.feedback[
+                                index
+                              ].all === "number"
+                                ? data.data.dashboardChartData.feedback[
+                                    index
+                                  ].all.toFixed(1)
+                                : Number(
+                                    data.data.dashboardChartData.feedback[index]
+                                      .all
+                                  ).toFixed(1)}
                             </td>
                             <td>
-                              {
-                                data?.data?.dashboardChartData.feedback[index]
-                                  .mwc
-                              }
+                              {typeof data?.data?.dashboardChartData.feedback[
+                                index
+                              ].mwc === "number"
+                                ? data.data.dashboardChartData.feedback[
+                                    index
+                                  ].mwc.toFixed(1)
+                                : Number(
+                                    data.data.dashboardChartData.feedback[index]
+                                      .mwc
+                                  ).toFixed(1)}
                             </td>
                             <td>
-                              {
-                                data?.data?.dashboardChartData.feedback[index]
-                                  .fwc
-                              }
+                              {typeof data?.data?.dashboardChartData.feedback[
+                                index
+                              ].fwc === "number"
+                                ? data.data.dashboardChartData.feedback[
+                                    index
+                                  ].fwc.toFixed(1)
+                                : Number(
+                                    data.data.dashboardChartData.feedback[index]
+                                      .fwc
+                                  ).toFixed(1)}
                             </td>
                             <td>
-                              {
-                                data?.data?.dashboardChartData.feedback[index]
-                                  .pwc
-                              }
+                              {typeof data?.data?.dashboardChartData.feedback[
+                                index
+                              ].pwc === "number"
+                                ? data.data.dashboardChartData.feedback[
+                                    index
+                                  ].pwc.toFixed(1)
+                                : Number(
+                                    data.data.dashboardChartData.feedback[index]
+                                      .pwc
+                                  ).toFixed(1)}
                             </td>
                             <td>
-                              {
-                                data?.data?.dashboardChartData.feedback[index]
-                                  .mur
-                              }
+                              {typeof data?.data?.dashboardChartData.feedback[
+                                index
+                              ].mur === "number"
+                                ? data.data.dashboardChartData.feedback[
+                                    index
+                                  ].mur.toFixed(1)
+                                : Number(
+                                    data.data.dashboardChartData.feedback[index]
+                                      .mur
+                                  ).toFixed(1)}
                             </td>
                             <td>NA</td>
                           </tr>

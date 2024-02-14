@@ -12,7 +12,6 @@ import {
   Input,
   InputGroup,
 } from "reactstrap";
-import { dashboard } from "../../features/dashboardSlice";
 import { setReportData, hasData } from "../../features/reportSlice";
 import { setResetData, extraData } from "../../features/extraSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -39,8 +38,7 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import useOnlineStatus from "../../services/useOnlineStatus";
 import PdfGenerate from "./PdfReportGenerate";
 import { useNavigate } from "react-router-dom";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2pdf from "html2pdf.js";
 
 const ReportsHome = ({ isOnline }) => {
   const [visibility, setVisibility] = useState(false);
@@ -97,30 +95,62 @@ const ReportsHome = ({ isOnline }) => {
   const generatePDF = () => {
     const input = document.getElementById("pdf-content");
 
-    html2canvas(input, { scrollY: -window.scrollY, scale: 1 }).then(
-      (canvas) => {
-        const imgData = canvas.toDataURL("image/jpeg");
-        const pdf = new jsPDF(); // Create new PDF document
-        const width = pdf.internal.pageSize.getWidth();
-        const height = (canvas.height * width) / canvas.width;
-        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+    // Define options for html2pdf
+    const options = {
+      margin: 5,
+      filename: "summary.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },
+    };
 
-        // Check if there's content that extends beyond the first page
-        if (height > pdf.internal.pageSize.getHeight()) {
-          // Add remaining content by looping through each page
-          let remainingHeight = height - pdf.internal.pageSize.getHeight();
-          let position = pdf.internal.pageSize.getHeight();
-          while (remainingHeight > 0) {
-            pdf.addPage();
-            pdf.addImage(imgData, "JPEG", 0, -position, width, height);
-            remainingHeight -= pdf.internal.pageSize.getHeight();
-            position += pdf.internal.pageSize.getHeight();
+    // Convert HTML content to PDF
+    html2pdf()
+      .set(options)
+      .from(input)
+      .toPdf()
+      .get("pdf")
+      .then(function (pdf) {
+        let totalPages = pdf.internal.getNumberOfPages();
+        let pageHeight = pdf.internal.pageSize.height;
+
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          let pageContentHeight = pdf.internal.getPageInfo(i).height;
+
+          if (pageContentHeight > pageHeight) {
+            // If content height exceeds page height, split the content
+            let remainingContentHeight = pageContentHeight;
+            let pageSections = input.querySelectorAll(".pdf-section");
+            let currentSectionIndex = 0;
+            let startY = 0;
+
+            // Iterate over each section of content within the page
+            while (
+              currentSectionIndex < pageSections.length &&
+              remainingContentHeight > 0
+            ) {
+              let section = pageSections[currentSectionIndex];
+              let sectionHeight = section.offsetHeight;
+
+              // Check if section fits within remaining space on page
+              if (startY + sectionHeight > pageHeight) {
+                pdf.addPage();
+                startY = 0; // Reset startY for new page
+              }
+
+              // Add the section content to the PDF
+              pdf.fromHTML(section, 0, startY);
+
+              // Update startY and remaining content height
+              startY += sectionHeight;
+              remainingContentHeight -= sectionHeight;
+              currentSectionIndex++;
+            }
           }
         }
-
-        pdf.save("summary.pdf"); // Download the PDF
-      }
-    );
+      })
+      .save();
   };
 
   let dashboard_data = getLocalStorageItem("dashboard_15");
@@ -986,7 +1016,7 @@ const ReportsHome = ({ isOnline }) => {
                   </div>
                 </td>
                 <td style={{ width: "80%" }} id="pdf-content">
-                  <div style={{ width: "100" }}>
+                  <div style={{ width: "100" }} className="pdf-section">
                     <Stats
                       setDurationSelection={setDurationSelection}
                       // handleComplexSelection={handleComplexSelection}
@@ -1008,7 +1038,7 @@ const ReportsHome = ({ isOnline }) => {
                       width: "80%",
                       fontSize: "14px",
                     }}
-                    className="table table-bordered"
+                    className="table table-bordered  pdf-section pagebreak"
                   >
                     <thead>
                       <tr>
