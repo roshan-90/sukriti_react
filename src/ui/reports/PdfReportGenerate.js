@@ -564,7 +564,7 @@ const PdfGenerate = ({
     console.log("data?.data.dataSummary :->23", dataSummary);
     summaryPayload.dataSummary = {
       collection: dataSummary.collection,
-      feedback: dataSummary.feedback,
+      feedback: "5.0",
       upiCollection: dataSummary.upiCollection,
       usage: dataSummary.usage,
     };
@@ -608,313 +608,31 @@ const PdfGenerate = ({
     console.log("summaryPayload test", summaryPayload);
     // Assuming you want to render each item in the reportData array horizontally
     return (
-      <div
-        id="pdf-content"
-        style={{
-          ...whiteSurface,
-          background: "white",
-          marginTop: "20px",
-          width: "100%",
-          height: "100%",
-          padding: "10px",
-          paddingBottom: "20px",
-          overflowX: "auto", // Enable horizontal scrolling
-          fontSize: "10px",
-        }}
-      >
+      <>
+        <button onClick={generatePDF}>Generate PDF</button>
         <div
           style={{
-            display: "flex",
-            flexDirection: "column", // Stack tables vertically
+            ...whiteSurface,
+            background: "white",
+            marginTop: "20px",
+            width: "100%",
+            height: "100%",
+            padding: "10px",
+            paddingBottom: "20px",
+            overflowX: "auto", // Enable horizontal scrolling
+            fontSize: "10px",
           }}
-          className="pdf-section"
         >
-          <div style={{ marginBottom: "20px" }}>
-            <div
-              className="row"
-              style={{
-                ...statsStyle.elementTitle,
-                width: "98%",
-                margin: "auto",
-                padding: "10px",
-                background: colorTheme.primary,
-              }}
-            >
-              {`Summary :  ${summaryPayload?.complexName}`}
-            </div>
-            <button onClick={generatePDF}>Generate PDF</button>
-
-            <table
-              style={{ width: "95%", height: "95%", margin: "30px" }}
-              className="table table-bordered pdf-section"
-            >
-              <thead>
-                <tr>
-                  <th scope="col">Cabin</th>
-                  <th scope="col">Usage</th>
-                  <th scope="col">Collection</th>
-                  <th scope="col">UPI</th>
-                  <th scope="col">Feedback</th>
-                  <th scope="col">Recycled</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">MWC</th>
-                  <td>{summaryPayload?.pieChartData?.usage[0].value}</td>
-                  <td>{summaryPayload?.pieChartData?.collection[0].value}</td>
-                  <td>
-                    {summaryPayload?.pieChartData?.upiCollection[0].value}
-                  </td>
-                  <td>{summaryPayload?.pieChartData?.feedback[0].value}</td>
-                  <td>NA</td>
-                </tr>
-                <tr>
-                  <th scope="row">FWC</th>
-                  <td>{summaryPayload?.pieChartData?.usage[1].value}</td>
-                  <td>{summaryPayload?.pieChartData?.collection[1].value}</td>
-                  <td>
-                    {summaryPayload?.pieChartData?.upiCollection[1].value}
-                  </td>
-                  <td>{summaryPayload?.pieChartData?.feedback[1].value}</td>
-                  <td>NA</td>
-                </tr>
-                <tr>
-                  <th scope="row">PWC</th>
-                  <td>{summaryPayload?.pieChartData?.usage[2].value}</td>
-                  <td>{summaryPayload?.pieChartData?.collection[2].value}</td>
-                  <td>
-                    {summaryPayload?.pieChartData?.upiCollection[2].value}
-                  </td>
-                  <td>{summaryPayload?.pieChartData?.feedback[2].value}</td>
-                  <td>NA</td>
-                </tr>
-                <tr>
-                  <th scope="row">MUR</th>
-                  <td>{summaryPayload?.pieChartData?.usage[3].value}</td>
-                  <td>{summaryPayload?.pieChartData?.collection[3].value}</td>
-                  <td>
-                    {summaryPayload?.pieChartData?.upiCollection[3].value}
-                  </td>
-                  <td>{summaryPayload?.pieChartData?.feedback[3].value}</td>
-                  <td>NA</td>
-                </tr>
-                <tr>
-                  <th scope="row">BWT</th>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                </tr>
-              </tbody>
-            </table>
-            <table
-              style={{ width: "95%", height: "95%", margin: "30px" }}
-              className="pdf-section"
-            >
-              <tbody>
-                <tr>
-                  <td style={{ width: "80%" }}>
-                    <div style={{ width: "100" }}>
-                      <Stats
-                        isDuration={false}
-                        chartData={summaryPayload?.dashboardChartData}
-                        pieChartData={summaryPayload?.pieChartData}
-                        dataSummary={summaryPayload?.dataSummary}
-                        bwtChartData={summaryPayload?.bwtdashboardChartData}
-                        bwtPieChartData={summaryPayload?.bwtpieChartData}
-                        bwtDataSummary={summaryPayload?.bwtdataSummary}
-                        // dashboardUpiChartData={
-                        //   summaryPayload?.dashboardUpiChartData
-                        // }
-                        // pieChartUpiData={summaryPayload?.pieChartUpiData}
-                        uiResult={dashboard_data?.uiResult?.data}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              <table
-                style={{ width: "100%", height: "100%", padding: "0px" }}
-                className="table table-bordered"
-              >
-                <thead>
-                  <tr>
-                    <th colSpan="1" scope="colgroup"></th>
-                    <th colSpan="5" scope="colgroup">
-                      Usage
-                    </th>
-                    <th colSpan="5" scope="colgroup">
-                      Collection
-                    </th>
-                    <th colSpan="5" scope="colgroup">
-                      Upi
-                    </th>
-                    <th colSpan="5" scope="colgroup">
-                      Feedback
-                    </th>
-                    <th colSpan="1" scope="colgroup">
-                      Recycled
-                    </th>
-                  </tr>
-                  <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">All</th>
-                    <th scope="col">MWC</th>
-                    <th scope="col">FWC</th>
-                    <th scope="col">PWC</th>
-                    <th scope="col">MUR</th>
-                    <th scope="col">All</th>
-                    <th scope="col">MWC</th>
-                    <th scope="col">FWC</th>
-                    <th scope="col">PWC</th>
-                    <th scope="col">MUR</th>
-                    <th scope="col">All</th>
-                    <th scope="col">MWC</th>
-                    <th scope="col">FWC</th>
-                    <th scope="col">PWC</th>
-                    <th scope="col">MUR</th>
-                    <th scope="col">All</th>
-                    <th scope="col">MWC</th>
-                    <th scope="col">FWC</th>
-                    <th scope="col">PWC</th>
-                    <th scope="col">MUR</th>
-                    <th scope="col">BWT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summaryPayload?.dashboardChartData.usage.map(
-                    (usage, index) => {
-                      return (
-                        <tr key={index}>
-                          <td style={{ "font-weight": "bold" }}>
-                            {usage.date}
-                          </td>
-                          <td>{usage.all}</td>
-                          <td>{usage.mwc}</td>
-                          <td>{usage.fwc}</td>
-                          <td>{usage.pwc}</td>
-                          <td>{usage.mur}</td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.collection[
-                                index
-                              ].all
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.collection[
-                                index
-                              ].mwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.collection[
-                                index
-                              ].fwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.collection[
-                                index
-                              ].pwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.collection[
-                                index
-                              ].mur
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.upiCollection[
-                                index
-                              ].all
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.upiCollection[
-                                index
-                              ].mwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.upiCollection[
-                                index
-                              ].fwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.upiCollection[
-                                index
-                              ].pwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.upiCollection[
-                                index
-                              ].mur
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.feedback[index]
-                                .all
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.feedback[index]
-                                .mwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.feedback[index]
-                                .fwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.feedback[index]
-                                .pwc
-                            }
-                          </td>
-                          <td>
-                            {
-                              summaryPayload?.dashboardChartData.feedback[index]
-                                .mur
-                            }
-                          </td>
-                          <td>NA</td>
-                        </tr>
-                      );
-                    }
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {reportData.map((data, index) => (
-            <div
-              key={index}
-              style={{ marginBottom: "20px" }}
-              className="pdf-section"
-            >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column", // Stack tables vertically
+            }}
+            id="pdf-content"
+          >
+            <div style={{ marginBottom: "20px" }}>
               <div
-                className="row"
+                className="row pdf-section"
                 style={{
                   ...statsStyle.elementTitle,
                   width: "98%",
@@ -923,12 +641,11 @@ const PdfGenerate = ({
                   background: colorTheme.primary,
                 }}
               >
-                {`Data Report for complex : ${data?.data?.complexName}`}
+                {`Summary :  ${summaryPayload?.complexName}`}
               </div>
               <table
                 style={{ width: "95%", height: "95%", margin: "30px" }}
-                className="table table-bordered"
-                key={index}
+                className="table table-bordered pdf-section"
               >
                 <thead>
                   <tr>
@@ -943,34 +660,58 @@ const PdfGenerate = ({
                 <tbody>
                   <tr>
                     <th scope="row">MWC</th>
-                    <td>{data?.data?.pieChartData?.usage[0].value}</td>
-                    <td>{data?.data?.pieChartData?.collection[0].value}</td>
-                    <td>{data?.data?.pieChartData?.upiCollection[0].value}</td>
-                    <td>{data?.data?.pieChartData?.feedback[0].value}</td>
+                    <td>{summaryPayload?.pieChartData?.usage[0].value}</td>
+                    <td>{summaryPayload?.pieChartData?.collection[0].value}</td>
+                    <td>
+                      {summaryPayload?.pieChartData?.upiCollection[0].value}
+                    </td>
+                    <td>
+                      {Number(
+                        summaryPayload?.pieChartData?.feedback[0].value
+                      ).toFixed(1)}
+                    </td>
                     <td>NA</td>
                   </tr>
                   <tr>
                     <th scope="row">FWC</th>
-                    <td>{data?.data?.pieChartData?.usage[1].value}</td>
-                    <td>{data?.data?.pieChartData?.collection[1].value}</td>
-                    <td>{data?.data?.pieChartData?.upiCollection[1].value}</td>
-                    <td>{data?.data?.pieChartData?.feedback[1].value}</td>
+                    <td>{summaryPayload?.pieChartData?.usage[1].value}</td>
+                    <td>{summaryPayload?.pieChartData?.collection[1].value}</td>
+                    <td>
+                      {summaryPayload?.pieChartData?.upiCollection[1].value}
+                    </td>
+                    <td>
+                      {Number(
+                        summaryPayload?.pieChartData?.feedback[1].value
+                      ).toFixed(1)}
+                    </td>
                     <td>NA</td>
                   </tr>
                   <tr>
                     <th scope="row">PWC</th>
-                    <td>{data?.data?.pieChartData?.usage[2].value}</td>
-                    <td>{data?.data?.pieChartData?.collection[2].value}</td>
-                    <td>{data?.data?.pieChartData?.upiCollection[2].value}</td>
-                    <td>{data?.data?.pieChartData?.feedback[2].value}</td>
+                    <td>{summaryPayload?.pieChartData?.usage[2].value}</td>
+                    <td>{summaryPayload?.pieChartData?.collection[2].value}</td>
+                    <td>
+                      {summaryPayload?.pieChartData?.upiCollection[2].value}
+                    </td>
+                    <td>
+                      {Number(
+                        summaryPayload?.pieChartData?.feedback[2].value
+                      ).toFixed(1)}
+                    </td>
                     <td>NA</td>
                   </tr>
                   <tr>
                     <th scope="row">MUR</th>
-                    <td>{data?.data?.pieChartData?.usage[3].value}</td>
-                    <td>{data?.data?.pieChartData?.collection[3].value}</td>
-                    <td>{data?.data?.pieChartData?.upiCollection[3].value}</td>
-                    <td>{data?.data?.pieChartData?.feedback[3].value}</td>
+                    <td>{summaryPayload?.pieChartData?.usage[3].value}</td>
+                    <td>{summaryPayload?.pieChartData?.collection[3].value}</td>
+                    <td>
+                      {summaryPayload?.pieChartData?.upiCollection[3].value}
+                    </td>
+                    <td>
+                      {Number(
+                        summaryPayload?.pieChartData?.feedback[3].value
+                      ).toFixed(1)}
+                    </td>
                     <td>NA</td>
                   </tr>
                   <tr>
@@ -978,28 +719,31 @@ const PdfGenerate = ({
                     <td>0</td>
                     <td>0</td>
                     <td>0</td>
-                    <td>0</td>
+                    <td>0.0</td>
                     <td>0</td>
                   </tr>
                 </tbody>
               </table>
-              <table style={{ width: "95%", height: "95%", margin: "30px" }}>
+              <table
+                style={{ width: "95%", height: "95%", margin: "30px" }}
+                className="pdf-section"
+              >
                 <tbody>
                   <tr>
                     <td style={{ width: "80%" }}>
                       <div style={{ width: "100" }}>
                         <Stats
                           isDuration={false}
-                          chartData={data?.data?.dashboardChartData}
-                          pieChartData={data?.data?.pieChartData}
-                          dataSummary={data?.data?.dataSummary}
-                          bwtChartData={data?.data?.bwtdashboardChartData}
-                          bwtPieChartData={data?.data?.bwtpieChartData}
-                          bwtDataSummary={data?.data?.bwtdataSummary}
-                          dashboardUpiChartData={
-                            data?.data?.dashboardUpiChartData
-                          }
-                          pieChartUpiData={data?.data?.pieChartUpiData}
+                          chartData={summaryPayload?.dashboardChartData}
+                          pieChartData={summaryPayload?.pieChartData}
+                          dataSummary={summaryPayload?.dataSummary}
+                          bwtChartData={summaryPayload?.bwtdashboardChartData}
+                          bwtPieChartData={summaryPayload?.bwtpieChartData}
+                          bwtDataSummary={summaryPayload?.bwtdataSummary}
+                          // dashboardUpiChartData={
+                          //   summaryPayload?.dashboardUpiChartData
+                          // }
+                          // pieChartUpiData={summaryPayload?.pieChartUpiData}
                           uiResult={dashboard_data?.uiResult?.data}
                         />
                       </div>
@@ -1057,7 +801,7 @@ const PdfGenerate = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {data?.data?.dashboardChartData.usage.map(
+                    {summaryPayload?.dashboardChartData.usage.map(
                       (usage, index) => {
                         return (
                           <tr key={index}>
@@ -1071,128 +815,103 @@ const PdfGenerate = ({
                             <td>{usage.mur}</td>
                             <td>
                               {
-                                data?.data?.dashboardChartData.collection[index]
-                                  .all
-                              }
-                            </td>
-                            <td>
-                              {
-                                data?.data?.dashboardChartData.collection[index]
-                                  .mwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                data?.data?.dashboardChartData.collection[index]
-                                  .fwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                data?.data?.dashboardChartData.collection[index]
-                                  .pwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                data?.data?.dashboardChartData.collection[index]
-                                  .mur
-                              }
-                            </td>
-                            <td>
-                              {
-                                data?.data?.dashboardChartData.upiCollection[
+                                summaryPayload?.dashboardChartData.collection[
                                   index
                                 ].all
                               }
                             </td>
                             <td>
                               {
-                                data?.data?.dashboardChartData.upiCollection[
+                                summaryPayload?.dashboardChartData.collection[
                                   index
                                 ].mwc
                               }
                             </td>
                             <td>
                               {
-                                data?.data?.dashboardChartData.upiCollection[
+                                summaryPayload?.dashboardChartData.collection[
                                   index
                                 ].fwc
                               }
                             </td>
                             <td>
                               {
-                                data?.data?.dashboardChartData.upiCollection[
+                                summaryPayload?.dashboardChartData.collection[
                                   index
                                 ].pwc
                               }
                             </td>
                             <td>
                               {
-                                data?.data?.dashboardChartData.upiCollection[
+                                summaryPayload?.dashboardChartData.collection[
                                   index
                                 ].mur
                               }
                             </td>
                             <td>
-                              {typeof data?.data?.dashboardChartData.feedback[
-                                index
-                              ].all === "number"
-                                ? data.data.dashboardChartData.feedback[
-                                    index
-                                  ].all.toFixed(1)
-                                : Number(
-                                    data.data.dashboardChartData.feedback[index]
-                                      .all
-                                  ).toFixed(1)}
+                              {
+                                summaryPayload?.dashboardChartData
+                                  .upiCollection[index].all
+                              }
                             </td>
                             <td>
-                              {typeof data?.data?.dashboardChartData.feedback[
-                                index
-                              ].mwc === "number"
-                                ? data.data.dashboardChartData.feedback[
-                                    index
-                                  ].mwc.toFixed(1)
-                                : Number(
-                                    data.data.dashboardChartData.feedback[index]
-                                      .mwc
-                                  ).toFixed(1)}
+                              {
+                                summaryPayload?.dashboardChartData
+                                  .upiCollection[index].mwc
+                              }
                             </td>
                             <td>
-                              {typeof data?.data?.dashboardChartData.feedback[
-                                index
-                              ].fwc === "number"
-                                ? data.data.dashboardChartData.feedback[
-                                    index
-                                  ].fwc.toFixed(1)
-                                : Number(
-                                    data.data.dashboardChartData.feedback[index]
-                                      .fwc
-                                  ).toFixed(1)}
+                              {
+                                summaryPayload?.dashboardChartData
+                                  .upiCollection[index].fwc
+                              }
                             </td>
                             <td>
-                              {typeof data?.data?.dashboardChartData.feedback[
-                                index
-                              ].pwc === "number"
-                                ? data.data.dashboardChartData.feedback[
-                                    index
-                                  ].pwc.toFixed(1)
-                                : Number(
-                                    data.data.dashboardChartData.feedback[index]
-                                      .pwc
-                                  ).toFixed(1)}
+                              {
+                                summaryPayload?.dashboardChartData
+                                  .upiCollection[index].pwc
+                              }
                             </td>
                             <td>
-                              {typeof data?.data?.dashboardChartData.feedback[
-                                index
-                              ].mur === "number"
-                                ? data.data.dashboardChartData.feedback[
-                                    index
-                                  ].mur.toFixed(1)
-                                : Number(
-                                    data.data.dashboardChartData.feedback[index]
-                                      .mur
-                                  ).toFixed(1)}
+                              {
+                                summaryPayload?.dashboardChartData
+                                  .upiCollection[index].mur
+                              }
+                            </td>
+                            <td>
+                              {Number(
+                                summaryPayload?.dashboardChartData.feedback[
+                                  index
+                                ].all
+                              ).toFixed(1)}
+                            </td>
+                            <td>
+                              {Number(
+                                summaryPayload?.dashboardChartData.feedback[
+                                  index
+                                ].mwc
+                              ).toFixed(1)}
+                            </td>
+                            <td>
+                              {Number(
+                                summaryPayload?.dashboardChartData.feedback[
+                                  index
+                                ].fwc
+                              ).toFixed(1)}
+                            </td>
+                            <td>
+                              {Number(
+                                summaryPayload?.dashboardChartData.feedback[
+                                  index
+                                ].pwc
+                              ).toFixed(1)}
+                            </td>
+                            <td>
+                              {Number(
+                                summaryPayload?.dashboardChartData.feedback[
+                                  index
+                                ].mur
+                              ).toFixed(1)}
                             </td>
                             <td>NA</td>
                           </tr>
@@ -1203,9 +922,340 @@ const PdfGenerate = ({
                 </table>
               </div>
             </div>
-          ))}
+            {reportData.map((data, index) => (
+              <div
+                key={index}
+                style={{ marginBottom: "20px" }}
+                className="pdf-section"
+              >
+                <div
+                  className="row"
+                  style={{
+                    ...statsStyle.elementTitle,
+                    width: "98%",
+                    margin: "auto",
+                    padding: "10px",
+                    background: colorTheme.primary,
+                  }}
+                >
+                  {`Data Report for complex : ${data?.data?.complexName}`}
+                </div>
+                <table
+                  style={{ width: "95%", height: "95%", margin: "30px" }}
+                  className="table table-bordered"
+                  key={index}
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col">Cabin</th>
+                      <th scope="col">Usage</th>
+                      <th scope="col">Collection</th>
+                      <th scope="col">UPI</th>
+                      <th scope="col">Feedback</th>
+                      <th scope="col">Recycled</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">MWC</th>
+                      <td>{data?.data?.pieChartData?.usage[0].value}</td>
+                      <td>{data?.data?.pieChartData?.collection[0].value}</td>
+                      <td>
+                        {data?.data?.pieChartData?.upiCollection[0].value}
+                      </td>
+                      <td>
+                        {Number(
+                          data?.data?.pieChartData?.feedback[0].value
+                        ).toFixed(1)}
+                      </td>
+                      <td>NA</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">FWC</th>
+                      <td>{data?.data?.pieChartData?.usage[1].value}</td>
+                      <td>{data?.data?.pieChartData?.collection[1].value}</td>
+                      <td>
+                        {data?.data?.pieChartData?.upiCollection[1].value}
+                      </td>
+                      <td>
+                        {Number(
+                          data?.data?.pieChartData?.feedback[1].value
+                        ).toFixed(1)}
+                      </td>
+                      <td>NA</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">PWC</th>
+                      <td>{data?.data?.pieChartData?.usage[2].value}</td>
+                      <td>{data?.data?.pieChartData?.collection[2].value}</td>
+                      <td>
+                        {data?.data?.pieChartData?.upiCollection[2].value}
+                      </td>
+                      <td>
+                        {Number(
+                          data?.data?.pieChartData?.feedback[2].value
+                        ).toFixed(1)}
+                      </td>
+                      <td>NA</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">MUR</th>
+                      <td>{data?.data?.pieChartData?.usage[3].value}</td>
+                      <td>{data?.data?.pieChartData?.collection[3].value}</td>
+                      <td>
+                        {data?.data?.pieChartData?.upiCollection[3].value}
+                      </td>
+                      <td>
+                        {Number(
+                          data?.data?.pieChartData?.feedback[3].value
+                        ).toFixed(1)}
+                      </td>
+                      <td>NA</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">BWT</th>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0.0</td>
+                      <td>0</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table style={{ width: "95%", height: "95%", margin: "30px" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ width: "80%" }}>
+                        <div style={{ width: "100" }}>
+                          <Stats
+                            isDuration={false}
+                            chartData={data?.data?.dashboardChartData}
+                            pieChartData={data?.data?.pieChartData}
+                            dataSummary={data?.data?.dataSummary}
+                            bwtChartData={data?.data?.bwtdashboardChartData}
+                            bwtPieChartData={data?.data?.bwtpieChartData}
+                            bwtDataSummary={data?.data?.bwtdataSummary}
+                            dashboardUpiChartData={
+                              data?.data?.dashboardUpiChartData
+                            }
+                            pieChartUpiData={data?.data?.pieChartUpiData}
+                            uiResult={dashboard_data?.uiResult?.data}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div>
+                  <table
+                    style={{ width: "100%", height: "100%", padding: "0px" }}
+                    className="table table-bordered"
+                  >
+                    <thead>
+                      <tr>
+                        <th colSpan="1" scope="colgroup"></th>
+                        <th colSpan="5" scope="colgroup">
+                          Usage
+                        </th>
+                        <th colSpan="5" scope="colgroup">
+                          Collection
+                        </th>
+                        <th colSpan="5" scope="colgroup">
+                          Upi
+                        </th>
+                        <th colSpan="5" scope="colgroup">
+                          Feedback
+                        </th>
+                        <th colSpan="1" scope="colgroup">
+                          Recycled
+                        </th>
+                      </tr>
+                      <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">All</th>
+                        <th scope="col">MWC</th>
+                        <th scope="col">FWC</th>
+                        <th scope="col">PWC</th>
+                        <th scope="col">MUR</th>
+                        <th scope="col">BWT</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data?.data?.dashboardChartData.usage.map(
+                        (usage, index) => {
+                          return (
+                            <tr key={index}>
+                              <td style={{ "font-weight": "bold" }}>
+                                {usage.date}
+                              </td>
+                              <td>{usage.all}</td>
+                              <td>{usage.mwc}</td>
+                              <td>{usage.fwc}</td>
+                              <td>{usage.pwc}</td>
+                              <td>{usage.mur}</td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.collection[
+                                    index
+                                  ].all
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.collection[
+                                    index
+                                  ].mwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.collection[
+                                    index
+                                  ].fwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.collection[
+                                    index
+                                  ].pwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.collection[
+                                    index
+                                  ].mur
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.upiCollection[
+                                    index
+                                  ].all
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.upiCollection[
+                                    index
+                                  ].mwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.upiCollection[
+                                    index
+                                  ].fwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.upiCollection[
+                                    index
+                                  ].pwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  data?.data?.dashboardChartData.upiCollection[
+                                    index
+                                  ].mur
+                                }
+                              </td>
+                              <td>
+                                {typeof data?.data?.dashboardChartData.feedback[
+                                  index
+                                ].all === "number"
+                                  ? data.data.dashboardChartData.feedback[
+                                      index
+                                    ].all.toFixed(1)
+                                  : Number(
+                                      data.data.dashboardChartData.feedback[
+                                        index
+                                      ].all
+                                    ).toFixed(1)}
+                              </td>
+                              <td>
+                                {typeof data?.data?.dashboardChartData.feedback[
+                                  index
+                                ].mwc === "number"
+                                  ? data.data.dashboardChartData.feedback[
+                                      index
+                                    ].mwc.toFixed(1)
+                                  : Number(
+                                      data.data.dashboardChartData.feedback[
+                                        index
+                                      ].mwc
+                                    ).toFixed(1)}
+                              </td>
+                              <td>
+                                {typeof data?.data?.dashboardChartData.feedback[
+                                  index
+                                ].fwc === "number"
+                                  ? data.data.dashboardChartData.feedback[
+                                      index
+                                    ].fwc.toFixed(1)
+                                  : Number(
+                                      data.data.dashboardChartData.feedback[
+                                        index
+                                      ].fwc
+                                    ).toFixed(1)}
+                              </td>
+                              <td>
+                                {typeof data?.data?.dashboardChartData.feedback[
+                                  index
+                                ].pwc === "number"
+                                  ? data.data.dashboardChartData.feedback[
+                                      index
+                                    ].pwc.toFixed(1)
+                                  : Number(
+                                      data.data.dashboardChartData.feedback[
+                                        index
+                                      ].pwc
+                                    ).toFixed(1)}
+                              </td>
+                              <td>
+                                {typeof data?.data?.dashboardChartData.feedback[
+                                  index
+                                ].mur === "number"
+                                  ? data.data.dashboardChartData.feedback[
+                                      index
+                                    ].mur.toFixed(1)
+                                  : Number(
+                                      data.data.dashboardChartData.feedback[
+                                        index
+                                      ].mur
+                                    ).toFixed(1)}
+                              </td>
+                              <td>NA</td>
+                            </tr>
+                          );
+                        }
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 };
