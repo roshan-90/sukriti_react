@@ -50,46 +50,43 @@ const PdfGenerate = ({
       .toPdf()
       .get("pdf")
       .then(function (pdf) {
-        let totalPages = pdf.internal.getNumberOfPages();
-        let pageHeight = pdf.internal.pageSize.height;
+        const totalPages = pdf.internal.getNumberOfPages();
+        const pageHeight = pdf.internal.pageSize.height;
 
+        // Iterate over each page
         for (let i = 1; i <= totalPages; i++) {
+          // Go to current page
           pdf.setPage(i);
-          let pageContentHeight = pdf.internal.getPageInfo(i).height;
+
+          // Calculate height of content on the current page
+          const pageContentHeight = pdf.internal.getPageInfo(i).height;
 
           if (pageContentHeight > pageHeight) {
             // If content height exceeds page height, split the content
-            let remainingContentHeight = pageContentHeight;
-            let pageSections = input.querySelectorAll(".pdf-section");
-            let currentSectionIndex = 0;
+            const remainingContentHeight = pageContentHeight - pageHeight;
             let startY = 0;
+            let contentOffset = 0;
 
-            // Iterate over each section of content within the page
-            while (
-              currentSectionIndex < pageSections.length &&
-              remainingContentHeight > 0
-            ) {
-              let section = pageSections[currentSectionIndex];
-              let sectionHeight = section.offsetHeight;
+            // Iterate over content sections
+            while (contentOffset < remainingContentHeight) {
+              // Insert page break
+              pdf.addPage();
+              i++; // Increment page number
 
-              // Check if section fits within remaining space on page
-              if (startY + sectionHeight > pageHeight) {
-                pdf.addPage();
-                startY = 0; // Reset startY for new page
-              }
+              // Move content to new page
+              pdf.setPage(i);
+              pdf.fromHTML(input, 0, -startY); // Add content to new page
 
-              // Add the section content to the PDF
-              pdf.fromHTML(section, 0, startY);
-
-              // Update startY and remaining content height
-              startY += sectionHeight;
-              remainingContentHeight -= sectionHeight;
-              currentSectionIndex++;
+              // Calculate remaining content height and adjust startY
+              contentOffset += pageHeight;
+              startY += pageHeight;
             }
           }
         }
-      })
-      .save();
+
+        // Save the PDF
+        pdf.save();
+      });
   };
 
   const filter_date = (data, duration) => {
@@ -542,6 +539,208 @@ const PdfGenerate = ({
     // });
   };
 
+  const StatsItem = (props) => {
+    let pageBreakClass;
+    if (props.className) {
+      pageBreakClass = props.className.includes("page-break")
+        ? "page-break"
+        : "";
+    } else {
+      pageBreakClass = "";
+    }
+    return (
+      <div
+        className={`stats-item ${pageBreakClass}`}
+        style={{
+          marginTop: "20px",
+          pageBreakAfter: pageBreakClass ? "always" : "auto",
+        }}
+      >
+        <div
+          className="row"
+          style={{
+            ...statsStyle.elementTitle,
+            width: "98%",
+            margin: "auto",
+            padding: "10px",
+            background: colorTheme.primary,
+          }}
+        >
+          {props.name}
+        </div>
+
+        <div className="row" style={{ width: "100%", margin: "auto" }}>
+          <div className="col-md-4">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  height: "180px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: "90%",
+                    height: "100%",
+                    margin: "auto",
+                    fontSize: "12px",
+                  }}
+                >
+                  <HalfPieChart data={props.pieChartData} />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: "-30px",
+                }}
+              >
+                {props.total}
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {props.name}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-8">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+                fontSize: "12px",
+              }}
+            >
+              <FullLineChart data={props.data} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const BWTStatsItem = (props) => {
+    return (
+      <div style={{ marginTop: "20px" }}>
+        <div
+          className="row"
+          style={{
+            ...statsStyle.elementTitle,
+            width: "98%",
+            margin: "auto",
+            padding: "10px",
+            background: colorTheme.primary,
+          }}
+        >
+          {props.name}
+        </div>
+
+        <div className="row" style={{ width: "100%", margin: "auto" }}>
+          <div className="col-md-4">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  height: "180px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div style={{ width: "90%", height: "100%", margin: "auto" }}>
+                  <BWTHalfPieChart data={props.pieChartData} />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: "-30px",
+                }}
+              >
+                {props.total}
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {props.name}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-8">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+              }}
+            >
+              <BWTFullLineChart data={props.data} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (hasdata) {
     console.log("hasdata", hasdata);
     console.log("reportData", reportData);
@@ -726,13 +925,13 @@ const PdfGenerate = ({
               </table>
               <table
                 style={{ width: "95%", height: "95%", margin: "30px" }}
-                className="pdf-section"
+                className="pdf-section page-break"
               >
                 <tbody>
                   <tr>
                     <td style={{ width: "80%" }}>
                       <div style={{ width: "100" }}>
-                        <Stats
+                        {/* <Stats
                           isDuration={false}
                           chartData={summaryPayload?.dashboardChartData}
                           pieChartData={summaryPayload?.pieChartData}
@@ -745,7 +944,71 @@ const PdfGenerate = ({
                           // }
                           // pieChartUpiData={summaryPayload?.pieChartUpiData}
                           uiResult={dashboard_data?.uiResult?.data}
-                        />
+                        /> */}
+
+                        <div
+                          style={{
+                            ...whiteSurface,
+                            background: "white",
+                            marginTop: "20px",
+                            width: "100%",
+                            height: "100%",
+                            padding: "10px",
+                            paddingBottom: "20px",
+                            display: "flexbox",
+                            alignItems: "center",
+                          }}
+                        >
+                          <StatsItem
+                            className="page-break"
+                            name="Usage Stats"
+                            total={summaryPayload?.dataSummary?.usage}
+                            data={summaryPayload?.dashboardChartData?.usage}
+                            pieChartData={summaryPayload?.pieChartData?.usage}
+                          />
+
+                          <StatsItem
+                            name="Collection Stats"
+                            total={summaryPayload?.dataSummary?.collection}
+                            data={
+                              summaryPayload?.dashboardChartData?.collection
+                            }
+                            pieChartData={
+                              summaryPayload?.pieChartData?.collection
+                            }
+                          />
+                          <StatsItem
+                            className="page-break"
+                            name="UPI Stats"
+                            total={summaryPayload?.dataSummary?.upiCollection}
+                            data={
+                              summaryPayload?.dashboardChartData?.upiCollection
+                            }
+                            pieChartData={
+                              summaryPayload?.pieChartData?.upiCollection
+                            }
+                          />
+                          <BWTStatsItem
+                            name="Recycled Water"
+                            total={
+                              summaryPayload?.bwtDataSummary?.waterRecycled
+                            }
+                            data={summaryPayload?.bwtChartData?.waterRecycled}
+                            pieChartData={
+                              summaryPayload?.bwtpieChartData?.usage
+                            }
+                          />
+
+                          <StatsItem
+                            className="page-break"
+                            name="Feedback Stats"
+                            total={summaryPayload?.dataSummary?.feedback}
+                            data={summaryPayload?.dashboardChartData?.feedback}
+                            pieChartData={
+                              summaryPayload?.pieChartData?.feedback
+                            }
+                          />
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -753,7 +1016,13 @@ const PdfGenerate = ({
               </table>
               <div>
                 <table
-                  style={{ width: "100%", height: "100%", padding: "0px" }}
+                  style={{
+                    width: "95%",
+                    height: "100%",
+                    padding: "0px",
+                    marginLeft: "37px",
+                    fontSize: "13px",
+                  }}
                   className="table table-bordered"
                 >
                   <thead>
@@ -803,118 +1072,144 @@ const PdfGenerate = ({
                   <tbody>
                     {summaryPayload?.dashboardChartData.usage.map(
                       (usage, index) => {
+                        const rowCount = index + 1; // Adding 1 to start the count from 1
+                        const shouldBreakPage =
+                          rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
+
                         return (
-                          <tr key={index}>
-                            <td style={{ "font-weight": "bold" }}>
-                              {usage.date}
-                            </td>
-                            <td>{usage.all}</td>
-                            <td>{usage.mwc}</td>
-                            <td>{usage.fwc}</td>
-                            <td>{usage.pwc}</td>
-                            <td>{usage.mur}</td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData.collection[
-                                  index
-                                ].all
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData.collection[
-                                  index
-                                ].mwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData.collection[
-                                  index
-                                ].fwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData.collection[
-                                  index
-                                ].pwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData.collection[
-                                  index
-                                ].mur
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData
-                                  .upiCollection[index].all
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData
-                                  .upiCollection[index].mwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData
-                                  .upiCollection[index].fwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData
-                                  .upiCollection[index].pwc
-                              }
-                            </td>
-                            <td>
-                              {
-                                summaryPayload?.dashboardChartData
-                                  .upiCollection[index].mur
-                              }
-                            </td>
-                            <td>
-                              {Number(
-                                summaryPayload?.dashboardChartData.feedback[
-                                  index
-                                ].all
-                              ).toFixed(1)}
-                            </td>
-                            <td>
-                              {Number(
-                                summaryPayload?.dashboardChartData.feedback[
-                                  index
-                                ].mwc
-                              ).toFixed(1)}
-                            </td>
-                            <td>
-                              {Number(
-                                summaryPayload?.dashboardChartData.feedback[
-                                  index
-                                ].fwc
-                              ).toFixed(1)}
-                            </td>
-                            <td>
-                              {Number(
-                                summaryPayload?.dashboardChartData.feedback[
-                                  index
-                                ].pwc
-                              ).toFixed(1)}
-                            </td>
-                            <td>
-                              {Number(
-                                summaryPayload?.dashboardChartData.feedback[
-                                  index
-                                ].mur
-                              ).toFixed(1)}
-                            </td>
-                            <td>NA</td>
-                          </tr>
+                          <React.Fragment key={index}>
+                            <tr key={index}>
+                              <td style={{ "font-weight": "bold" }}>
+                                {usage.date}
+                              </td>
+                              <td>{usage.all}</td>
+                              <td>{usage.mwc}</td>
+                              <td>{usage.fwc}</td>
+                              <td>{usage.pwc}</td>
+                              <td>{usage.mur}</td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData.collection[
+                                    index
+                                  ].all
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData.collection[
+                                    index
+                                  ].mwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData.collection[
+                                    index
+                                  ].fwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData.collection[
+                                    index
+                                  ].pwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData.collection[
+                                    index
+                                  ].mur
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData
+                                    .upiCollection[index].all
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData
+                                    .upiCollection[index].mwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData
+                                    .upiCollection[index].fwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData
+                                    .upiCollection[index].pwc
+                                }
+                              </td>
+                              <td>
+                                {
+                                  summaryPayload?.dashboardChartData
+                                    .upiCollection[index].mur
+                                }
+                              </td>
+                              <td>
+                                {Number(
+                                  summaryPayload?.dashboardChartData.feedback[
+                                    index
+                                  ].all
+                                ).toFixed(1)}
+                              </td>
+                              <td>
+                                {Number(
+                                  summaryPayload?.dashboardChartData.feedback[
+                                    index
+                                  ].mwc
+                                ).toFixed(1)}
+                              </td>
+                              <td>
+                                {Number(
+                                  summaryPayload?.dashboardChartData.feedback[
+                                    index
+                                  ].fwc
+                                ).toFixed(1)}
+                              </td>
+                              <td>
+                                {Number(
+                                  summaryPayload?.dashboardChartData.feedback[
+                                    index
+                                  ].pwc
+                                ).toFixed(1)}
+                              </td>
+                              <td>
+                                {Number(
+                                  summaryPayload?.dashboardChartData.feedback[
+                                    index
+                                  ].mur
+                                ).toFixed(1)}
+                              </td>
+                              <td>NA</td>
+                            </tr>
+                            {shouldBreakPage && (
+                              <tr
+                                className="page-break"
+                                style={{
+                                  marginBottom: "10px",
+                                  pageBreakAfter: "always",
+                                }}
+                              ></tr>
+                            )}
+                            {index ===
+                              summaryPayload.dashboardChartData.usage.length -
+                                1 && (
+                              <tr
+                                className="page-break"
+                                style={{
+                                  marginBottom: "10px",
+                                  pageBreakAfter: "always",
+                                }}
+                              ></tr>
+                            )}
+                          </React.Fragment>
                         );
                       }
                     )}
@@ -1027,7 +1322,7 @@ const PdfGenerate = ({
                     <tr>
                       <td style={{ width: "80%" }}>
                         <div style={{ width: "100" }}>
-                          <Stats
+                          {/* <Stats
                             isDuration={false}
                             chartData={data?.data?.dashboardChartData}
                             pieChartData={data?.data?.pieChartData}
@@ -1040,6 +1335,43 @@ const PdfGenerate = ({
                             }
                             pieChartUpiData={data?.data?.pieChartUpiData}
                             uiResult={dashboard_data?.uiResult?.data}
+                          /> */}
+                          <StatsItem
+                            className="page-break"
+                            name="Usage Stats"
+                            total={data?.data?.dataSummary?.usage}
+                            data={data?.data?.dashboardChartData?.usage}
+                            pieChartData={data?.data?.pieChartData?.usage}
+                          />
+
+                          <StatsItem
+                            name="Collection Stats"
+                            total={data?.data?.dataSummary?.collection}
+                            data={data?.data?.dashboardChartData?.collection}
+                            pieChartData={data?.data?.pieChartData?.collection}
+                          />
+                          <StatsItem
+                            className="page-break"
+                            name="UPI Stats"
+                            total={data?.data?.dataSummary?.upiCollection}
+                            data={data?.data?.dashboardChartData?.upiCollection}
+                            pieChartData={
+                              data?.data?.pieChartData?.upiCollection
+                            }
+                          />
+                          <BWTStatsItem
+                            name="Recycled Water"
+                            total={data?.data?.bwtDataSummary?.waterRecycled}
+                            data={data?.data?.bwtChartData?.waterRecycled}
+                            pieChartData={data?.data?.bwtpieChartData?.usage}
+                          />
+
+                          <StatsItem
+                            className="page-break"
+                            name="Feedback Stats"
+                            total={data?.data?.dataSummary?.feedback}
+                            data={data?.data?.dashboardChartData?.feedback}
+                            pieChartData={data?.data?.pieChartData?.feedback}
                           />
                         </div>
                       </td>
@@ -1048,7 +1380,12 @@ const PdfGenerate = ({
                 </table>
                 <div>
                   <table
-                    style={{ width: "100%", height: "100%", padding: "0px" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      padding: "0px",
+                      fontSize: "13px",
+                    }}
                     className="table table-bordered"
                   >
                     <thead>
@@ -1098,153 +1435,169 @@ const PdfGenerate = ({
                     <tbody>
                       {data?.data?.dashboardChartData.usage.map(
                         (usage, index) => {
+                          const rowCount = index + 1; // Adding 1 to start the count from 1
+                          const shouldBreakPage =
+                            rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
+
                           return (
-                            <tr key={index}>
-                              <td style={{ "font-weight": "bold" }}>
-                                {usage.date}
-                              </td>
-                              <td>{usage.all}</td>
-                              <td>{usage.mwc}</td>
-                              <td>{usage.fwc}</td>
-                              <td>{usage.pwc}</td>
-                              <td>{usage.mur}</td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.collection[
-                                    index
-                                  ].all
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.collection[
-                                    index
-                                  ].mwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.collection[
-                                    index
-                                  ].fwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.collection[
-                                    index
-                                  ].pwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.collection[
-                                    index
-                                  ].mur
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.upiCollection[
-                                    index
-                                  ].all
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.upiCollection[
-                                    index
-                                  ].mwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.upiCollection[
-                                    index
-                                  ].fwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.upiCollection[
-                                    index
-                                  ].pwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  data?.data?.dashboardChartData.upiCollection[
-                                    index
-                                  ].mur
-                                }
-                              </td>
-                              <td>
-                                {typeof data?.data?.dashboardChartData.feedback[
-                                  index
-                                ].all === "number"
-                                  ? data.data.dashboardChartData.feedback[
+                            <React.Fragment key={index}>
+                              <tr key={index}>
+                                <td style={{ "font-weight": "bold" }}>
+                                  {usage.date}
+                                </td>
+                                <td>{usage.all}</td>
+                                <td>{usage.mwc}</td>
+                                <td>{usage.fwc}</td>
+                                <td>{usage.pwc}</td>
+                                <td>{usage.mur}</td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData.collection[
                                       index
-                                    ].all.toFixed(1)
-                                  : Number(
-                                      data.data.dashboardChartData.feedback[
-                                        index
-                                      ].all
-                                    ).toFixed(1)}
-                              </td>
-                              <td>
-                                {typeof data?.data?.dashboardChartData.feedback[
-                                  index
-                                ].mwc === "number"
-                                  ? data.data.dashboardChartData.feedback[
+                                    ].all
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData.collection[
                                       index
-                                    ].mwc.toFixed(1)
-                                  : Number(
-                                      data.data.dashboardChartData.feedback[
-                                        index
-                                      ].mwc
-                                    ).toFixed(1)}
-                              </td>
-                              <td>
-                                {typeof data?.data?.dashboardChartData.feedback[
-                                  index
-                                ].fwc === "number"
-                                  ? data.data.dashboardChartData.feedback[
+                                    ].mwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData.collection[
                                       index
-                                    ].fwc.toFixed(1)
-                                  : Number(
-                                      data.data.dashboardChartData.feedback[
-                                        index
-                                      ].fwc
-                                    ).toFixed(1)}
-                              </td>
-                              <td>
-                                {typeof data?.data?.dashboardChartData.feedback[
-                                  index
-                                ].pwc === "number"
-                                  ? data.data.dashboardChartData.feedback[
+                                    ].fwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData.collection[
                                       index
-                                    ].pwc.toFixed(1)
-                                  : Number(
-                                      data.data.dashboardChartData.feedback[
-                                        index
-                                      ].pwc
-                                    ).toFixed(1)}
-                              </td>
-                              <td>
-                                {typeof data?.data?.dashboardChartData.feedback[
-                                  index
-                                ].mur === "number"
-                                  ? data.data.dashboardChartData.feedback[
+                                    ].pwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData.collection[
                                       index
-                                    ].mur.toFixed(1)
-                                  : Number(
-                                      data.data.dashboardChartData.feedback[
+                                    ].mur
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData
+                                      .upiCollection[index].all
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData
+                                      .upiCollection[index].mwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData
+                                      .upiCollection[index].fwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData
+                                      .upiCollection[index].pwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    data?.data?.dashboardChartData
+                                      .upiCollection[index].mur
+                                  }
+                                </td>
+                                <td>
+                                  {typeof data?.data?.dashboardChartData
+                                    .feedback[index].all === "number"
+                                    ? data.data.dashboardChartData.feedback[
                                         index
-                                      ].mur
-                                    ).toFixed(1)}
-                              </td>
-                              <td>NA</td>
-                            </tr>
+                                      ].all.toFixed(1)
+                                    : Number(
+                                        data.data.dashboardChartData.feedback[
+                                          index
+                                        ].all
+                                      ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {typeof data?.data?.dashboardChartData
+                                    .feedback[index].mwc === "number"
+                                    ? data.data.dashboardChartData.feedback[
+                                        index
+                                      ].mwc.toFixed(1)
+                                    : Number(
+                                        data.data.dashboardChartData.feedback[
+                                          index
+                                        ].mwc
+                                      ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {typeof data?.data?.dashboardChartData
+                                    .feedback[index].fwc === "number"
+                                    ? data.data.dashboardChartData.feedback[
+                                        index
+                                      ].fwc.toFixed(1)
+                                    : Number(
+                                        data.data.dashboardChartData.feedback[
+                                          index
+                                        ].fwc
+                                      ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {typeof data?.data?.dashboardChartData
+                                    .feedback[index].pwc === "number"
+                                    ? data.data.dashboardChartData.feedback[
+                                        index
+                                      ].pwc.toFixed(1)
+                                    : Number(
+                                        data.data.dashboardChartData.feedback[
+                                          index
+                                        ].pwc
+                                      ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {typeof data?.data?.dashboardChartData
+                                    .feedback[index].mur === "number"
+                                    ? data.data.dashboardChartData.feedback[
+                                        index
+                                      ].mur.toFixed(1)
+                                    : Number(
+                                        data.data.dashboardChartData.feedback[
+                                          index
+                                        ].mur
+                                      ).toFixed(1)}
+                                </td>
+                                <td>NA</td>
+                              </tr>
+                              {shouldBreakPage && (
+                                <tr
+                                  className="page-break"
+                                  style={{
+                                    marginBottom: "10px",
+                                    pageBreakAfter: "always",
+                                  }}
+                                ></tr>
+                              )}
+                              {index ===
+                                summaryPayload.dashboardChartData.usage.length -
+                                  1 && (
+                                <tr
+                                  className="page-break"
+                                  style={{
+                                    marginBottom: "10px",
+                                    pageBreakAfter: "always",
+                                  }}
+                                ></tr>
+                              )}
+                            </React.Fragment>
                           );
                         }
                       )}
