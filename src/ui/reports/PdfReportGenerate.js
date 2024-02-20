@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useOnlineStatus from "../../services/useOnlineStatus";
 import Stats from "./Stats";
 import html2pdf from "html2pdf.js";
+import { stopLoading } from "../../features/loadingSlice";
 
 const PdfGenerate = ({
   StartDate,
@@ -30,9 +31,18 @@ const PdfGenerate = ({
   const [hasdata, setHasdata] = useState(0);
 
   let summaryPayload = {};
-
+  console.log('check report generated',{
+    StartDate,
+    EndDate,
+    usageStats,
+    collectionStats,
+    upiStats,
+    feedbackStats,
+    bwtStats,
+    complexData,
+  })
   const generatePDF = () => {
-    const input = document.getElementById("pdf-content");
+    const input = document.getElementById("pdf-generate-content");
 
     // Define options for html2pdf
     const options = {
@@ -805,6 +815,7 @@ const PdfGenerate = ({
       { name: "MUR", value: 0 },
     ];
     console.log("summaryPayload test", summaryPayload);
+    dispatch(stopLoading()); // Dispatch the stopLoading action
     // Assuming you want to render each item in the reportData array horizontally
     return (
       <>
@@ -827,7 +838,7 @@ const PdfGenerate = ({
               display: "flex",
               flexDirection: "column", // Stack tables vertically
             }}
-            id="pdf-content"
+            id="pdf-generate-content"
           >
             <div style={{ marginBottom: "20px" }}>
               <div

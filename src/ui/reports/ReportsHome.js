@@ -71,6 +71,7 @@ const ReportsHome = ({ isOnline }) => {
   const { setLocalStorageItem, chunkArray, getLocalStorageItem } =
     useOnlineStatus();
   const complexComposition = useRef();
+  const [openComponet, setOpenComponet] = useState(false);
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const navigate = useNavigate();
@@ -806,6 +807,10 @@ const ReportsHome = ({ isOnline }) => {
       console.log("complexData", complexDataValue);
       // this.loadingDialog.current.showDialog();
       console.log("executeFetchReportLambda2 triggered");
+      if (!isOnline) {
+        setOpenComponet(true);
+        return;
+      }
       var result = await executeFetchReportLambda2(
         user?.user.userName,
         user?.user.clientName,
@@ -916,29 +921,6 @@ const ReportsHome = ({ isOnline }) => {
     }
   };
 
-  const generatePdf = () => {
-    const { StartDate, EndDate } = assignDetails;
-    console.log("checking data", {
-      StartDate,
-      EndDate,
-      usageStats,
-      collectionStats,
-      upiStats,
-      feedbackStats,
-      bwtStats,
-      complexData,
-    });
-    PdfGenerate({
-      StartDate,
-      EndDate,
-      usageStats,
-      collectionStats,
-      upiStats,
-      feedbackStats,
-      bwtStats,
-      complexData,
-    });
-  };
   const getPDF = () => {
     fetchReportData();
   };
@@ -1659,10 +1641,24 @@ const ReportsHome = ({ isOnline }) => {
                 style={{ margin: "auto" }}
                 color="primary"
                 className="px-4"
-                onClick={isOnline ? getPDF : generatePdf}
+                onClick={getPDF}
               >
                 Download Pdf
               </Button>
+              <>
+                {openComponet && (
+                  <PdfGenerate
+                    StartDate={assignDetails.StartDate}
+                    EndDate={assignDetails.EndDate}
+                    usageStats={usageStats}
+                    collectionStats={collectionStats}
+                    upiStats={upiStats}
+                    feedbackStats={feedbackStats}
+                    bwtStats={bwtStats}
+                    complexData={complexData}
+                  />
+                )}
+              </>
             </ModalFooter>
           </Modal>
         </div>
