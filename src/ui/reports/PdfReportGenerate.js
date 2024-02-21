@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Button } from "reactstrap";
 import { colorTheme, statsStyle } from "../../jsStyles/Style";
 import { whiteSurface } from "../../jsStyles/Style";
 import {
@@ -11,7 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import useOnlineStatus from "../../services/useOnlineStatus";
 import Stats from "./Stats";
 import html2pdf from "html2pdf.js";
-import { stopLoading } from "../../features/loadingSlice";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { useNavigate } from "react-router-dom";
 
 const PdfGenerate = ({
   StartDate,
@@ -21,7 +23,6 @@ const PdfGenerate = ({
   upiStats,
   feedbackStats,
   bwtStats,
-  complexData,
 }) => {
   const dispatch = useDispatch();
   const { getLocalStorageItem } = useOnlineStatus();
@@ -29,9 +30,10 @@ const PdfGenerate = ({
   const [reportData, setReportData] = useState([]);
   const reportParms = { complex: "REGISTRY_OFFICE_MSCL", duration: "15" };
   const [hasdata, setHasdata] = useState(0);
+  const navigate = useNavigate();
 
   let summaryPayload = {};
-  console.log('check report generated',{
+  console.log("check report generated", {
     StartDate,
     EndDate,
     usageStats,
@@ -39,8 +41,7 @@ const PdfGenerate = ({
     upiStats,
     feedbackStats,
     bwtStats,
-    complexData,
-  })
+  });
   const generatePDF = () => {
     const input = document.getElementById("pdf-generate-content");
 
@@ -95,14 +96,33 @@ const PdfGenerate = ({
         }
 
         // Save the PDF
+        // dispatch(stopLoading()); // Dispatch the stopLoading action
         pdf.save();
+        // navigate('/reports')
       });
   };
 
-  const filter_date = (data, duration) => {
+  const format_data = (data) => {
+    var originalDate = new Date(data);
+
+    // Extract year, month, and day
+    var year = originalDate.getFullYear();
+    var month = originalDate.getMonth() + 1; // Months are zero-based, so we add 1
+    var day = originalDate.getDate();
+
+    // Format month and day to have leading zeros if necessary
+    month = month < 10 ? "0" + month : month;
+    day = day < 10 ? "0" + day : day;
+
+    // Formatted date
+    let formattedDate = year + "-" + month + "-" + day;
+    return formattedDate;
+  };
+
+  const filter_date = (data) => {
     // Define start and end dates
-    const startDateString = "2023-12-10"; // Example start date string
-    const endDateString = "2024-01-30"; // Example end date string
+    const startDateString = format_data(StartDate); // Example start date string
+    const endDateString = format_data(EndDate); // Example end date string
 
     // Function to filter data based on date range
     function filterDataByDateRange(data, startDateString, endDateString) {
@@ -282,7 +302,7 @@ const PdfGenerate = ({
     // console.log("data totalCount", totalCount);
   };
 
-  const filter_complex = (all_report_data, name, duration) => {
+  const filter_complex = (all_report_data, name) => {
     // console.log("all_report_data :-->", all_report_data);
     let shouldContinue = true;
     // console.log("name :--> ", name);
@@ -297,7 +317,7 @@ const PdfGenerate = ({
           if (obj.complexName === name) {
             console.log(obj.complexName);
             // console.log("object data", obj);
-            filter_date(obj, duration);
+            filter_date(obj);
             // dispatch(setReportData(obj));
             // Update the flag to stop further iterations
             shouldContinue = false;
@@ -313,14 +333,14 @@ const PdfGenerate = ({
     }
   };
 
-  let array = ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"];
+  let array = JSON.parse(localStorage.getItem("array_data"));
   // let array = ["REGISTRY_OFFICE_MSCL"];
   console.log("test props data");
   useEffect(() => {
     let value = localStorage.getItem("report_dashboard");
     console.log("check dashboard data", JSON.parse(value));
     array.forEach((name) => {
-      filter_complex(JSON.parse(value), name, 90);
+      filter_complex(JSON.parse(value), name);
     });
     setHasdata(1);
   }, []);
@@ -478,9 +498,8 @@ const PdfGenerate = ({
       }
     };
 
-    // Define start and end dates
-    const startDateString = "2023-12-10"; // Example start date string
-    const endDateString = "2024-01-30"; // Example end date string
+    const startDateString = format_data(StartDate); // Example start date string
+    const endDateString = format_data(EndDate); // Example end date string
 
     // Function to filter data based on date range
     const filterByDateRange = (data, startDateString, endDateString) => {
@@ -815,11 +834,9 @@ const PdfGenerate = ({
       { name: "MUR", value: 0 },
     ];
     console.log("summaryPayload test", summaryPayload);
-    dispatch(stopLoading()); // Dispatch the stopLoading action
     // Assuming you want to render each item in the reportData array horizontally
     return (
       <>
-        <button onClick={generatePDF}>Generate PDF</button>
         <div
           style={{
             ...whiteSurface,
@@ -860,77 +877,117 @@ const PdfGenerate = ({
                 <thead>
                   <tr>
                     <th scope="col">Cabin</th>
-                    <th scope="col">Usage</th>
-                    <th scope="col">Collection</th>
-                    <th scope="col">UPI</th>
-                    <th scope="col">Feedback</th>
-                    <th scope="col">Recycled</th>
+                    {usageStats && <th scope="col">Usage</th>}
+                    {collectionStats && <th scope="col">Collection</th>}
+                    {upiStats && <th scope="col">UPI</th>}
+                    {feedbackStats && <th scope="col">Feedback</th>}
+                    {bwtStats && <th scope="col">Recycled</th>}
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <th scope="row">MWC</th>
-                    <td>{summaryPayload?.pieChartData?.usage[0].value}</td>
-                    <td>{summaryPayload?.pieChartData?.collection[0].value}</td>
-                    <td>
-                      {summaryPayload?.pieChartData?.upiCollection[0].value}
-                    </td>
-                    <td>
-                      {Number(
-                        summaryPayload?.pieChartData?.feedback[0].value
-                      ).toFixed(1)}
-                    </td>
-                    <td>NA</td>
+                    {usageStats && (
+                      <td>{summaryPayload?.pieChartData?.usage[0].value}</td>
+                    )}
+                    {collectionStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.collection[0].value}
+                      </td>
+                    )}
+                    {upiStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.upiCollection[0].value}
+                      </td>
+                    )}
+                    {feedbackStats && (
+                      <td>
+                        {Number(
+                          summaryPayload?.pieChartData?.feedback[0].value
+                        ).toFixed(1)}
+                      </td>
+                    )}
+                    {bwtStats && <td>NA</td>}
                   </tr>
                   <tr>
                     <th scope="row">FWC</th>
-                    <td>{summaryPayload?.pieChartData?.usage[1].value}</td>
-                    <td>{summaryPayload?.pieChartData?.collection[1].value}</td>
-                    <td>
-                      {summaryPayload?.pieChartData?.upiCollection[1].value}
-                    </td>
-                    <td>
-                      {Number(
-                        summaryPayload?.pieChartData?.feedback[1].value
-                      ).toFixed(1)}
-                    </td>
-                    <td>NA</td>
+                    {usageStats && (
+                      <td>{summaryPayload?.pieChartData?.usage[1].value}</td>
+                    )}
+                    {collectionStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.collection[1].value}
+                      </td>
+                    )}
+                    {upiStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.upiCollection[1].value}
+                      </td>
+                    )}
+                    {feedbackStats && (
+                      <td>
+                        {Number(
+                          summaryPayload?.pieChartData?.feedback[1].value
+                        ).toFixed(1)}
+                      </td>
+                    )}
+                    {bwtStats && <td>NA</td>}
                   </tr>
                   <tr>
                     <th scope="row">PWC</th>
-                    <td>{summaryPayload?.pieChartData?.usage[2].value}</td>
-                    <td>{summaryPayload?.pieChartData?.collection[2].value}</td>
-                    <td>
-                      {summaryPayload?.pieChartData?.upiCollection[2].value}
-                    </td>
-                    <td>
-                      {Number(
-                        summaryPayload?.pieChartData?.feedback[2].value
-                      ).toFixed(1)}
-                    </td>
-                    <td>NA</td>
+                    {usageStats && (
+                      <td>{summaryPayload?.pieChartData?.usage[2].value}</td>
+                    )}
+                    {collectionStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.collection[2].value}
+                      </td>
+                    )}
+                    {upiStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.upiCollection[2].value}
+                      </td>
+                    )}
+                    {feedbackStats && (
+                      <td>
+                        {Number(
+                          summaryPayload?.pieChartData?.feedback[2].value
+                        ).toFixed(1)}
+                      </td>
+                    )}
+                    {bwtStats && <td>NA</td>}
                   </tr>
                   <tr>
                     <th scope="row">MUR</th>
-                    <td>{summaryPayload?.pieChartData?.usage[3].value}</td>
-                    <td>{summaryPayload?.pieChartData?.collection[3].value}</td>
-                    <td>
-                      {summaryPayload?.pieChartData?.upiCollection[3].value}
-                    </td>
-                    <td>
-                      {Number(
-                        summaryPayload?.pieChartData?.feedback[3].value
-                      ).toFixed(1)}
-                    </td>
-                    <td>NA</td>
+                    {usageStats && (
+                      <td>{summaryPayload?.pieChartData?.usage[3].value}</td>
+                    )}
+                    {collectionStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.collection[3].value}
+                      </td>
+                    )}
+                    {upiStats && (
+                      <td>
+                        {summaryPayload?.pieChartData?.upiCollection[3].value}
+                      </td>
+                    )}
+                    {feedbackStats && (
+                      <td>
+                        {Number(
+                          summaryPayload?.pieChartData?.feedback[3].value
+                        ).toFixed(1)}
+                      </td>
+                    )}
+                    {bwtStats && <td>NA</td>}
                   </tr>
                   <tr>
                     <th scope="row">BWT</th>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0.0</td>
-                    <td>0</td>
+                    {usageStats && <td>0</td>}
+                    {collectionStats && <td>0</td>}
+                    {upiStats && <td>0</td>}
+                    {feedbackStats && <td>0.0</td>}
+                    {bwtStats && <td>0</td>}
                   </tr>
                 </tbody>
               </table>
@@ -970,55 +1027,66 @@ const PdfGenerate = ({
                             alignItems: "center",
                           }}
                         >
-                          <StatsItem
-                            className="page-break"
-                            name="Usage Stats"
-                            total={summaryPayload?.dataSummary?.usage}
-                            data={summaryPayload?.dashboardChartData?.usage}
-                            pieChartData={summaryPayload?.pieChartData?.usage}
-                          />
-
-                          <StatsItem
-                            name="Collection Stats"
-                            total={summaryPayload?.dataSummary?.collection}
-                            data={
-                              summaryPayload?.dashboardChartData?.collection
-                            }
-                            pieChartData={
-                              summaryPayload?.pieChartData?.collection
-                            }
-                          />
-                          <StatsItem
-                            className="page-break"
-                            name="UPI Stats"
-                            total={summaryPayload?.dataSummary?.upiCollection}
-                            data={
-                              summaryPayload?.dashboardChartData?.upiCollection
-                            }
-                            pieChartData={
-                              summaryPayload?.pieChartData?.upiCollection
-                            }
-                          />
-                          <BWTStatsItem
-                            name="Recycled Water"
-                            total={
-                              summaryPayload?.bwtDataSummary?.waterRecycled
-                            }
-                            data={summaryPayload?.bwtChartData?.waterRecycled}
-                            pieChartData={
-                              summaryPayload?.bwtpieChartData?.usage
-                            }
-                          />
-
-                          <StatsItem
-                            className="page-break"
-                            name="Feedback Stats"
-                            total={summaryPayload?.dataSummary?.feedback}
-                            data={summaryPayload?.dashboardChartData?.feedback}
-                            pieChartData={
-                              summaryPayload?.pieChartData?.feedback
-                            }
-                          />
+                          {usageStats && (
+                            <StatsItem
+                              className="page-break"
+                              name="Usage Stats"
+                              total={summaryPayload?.dataSummary?.usage}
+                              data={summaryPayload?.dashboardChartData?.usage}
+                              pieChartData={summaryPayload?.pieChartData?.usage}
+                            />
+                          )}
+                          {collectionStats && (
+                            <StatsItem
+                              name="Collection Stats"
+                              total={summaryPayload?.dataSummary?.collection}
+                              data={
+                                summaryPayload?.dashboardChartData?.collection
+                              }
+                              pieChartData={
+                                summaryPayload?.pieChartData?.collection
+                              }
+                            />
+                          )}
+                          {upiStats && (
+                            <StatsItem
+                              className="page-break"
+                              name="UPI Stats"
+                              total={summaryPayload?.dataSummary?.upiCollection}
+                              data={
+                                summaryPayload?.dashboardChartData
+                                  ?.upiCollection
+                              }
+                              pieChartData={
+                                summaryPayload?.pieChartData?.upiCollection
+                              }
+                            />
+                          )}
+                          {bwtStats && (
+                            <BWTStatsItem
+                              name="Recycled Water"
+                              total={
+                                summaryPayload?.bwtDataSummary?.waterRecycled
+                              }
+                              data={summaryPayload?.bwtChartData?.waterRecycled}
+                              pieChartData={
+                                summaryPayload?.bwtpieChartData?.usage
+                              }
+                            />
+                          )}
+                          {feedbackStats && (
+                            <StatsItem
+                              className="page-break"
+                              name="Feedback Stats"
+                              total={summaryPayload?.dataSummary?.feedback}
+                              data={
+                                summaryPayload?.dashboardChartData?.feedback
+                              }
+                              pieChartData={
+                                summaryPayload?.pieChartData?.feedback
+                              }
+                            />
+                          )}
                         </div>
                       </div>
                     </td>
@@ -1254,77 +1322,109 @@ const PdfGenerate = ({
                   <thead>
                     <tr>
                       <th scope="col">Cabin</th>
-                      <th scope="col">Usage</th>
-                      <th scope="col">Collection</th>
-                      <th scope="col">UPI</th>
-                      <th scope="col">Feedback</th>
-                      <th scope="col">Recycled</th>
+                      {usageStats && <th scope="col">Usage</th>}
+                      {collectionStats && <th scope="col">Collection</th>}
+                      {upiStats && <th scope="col">UPI</th>}
+                      {feedbackStats && <th scope="col">Feedback</th>}
+                      {bwtStats && <th scope="col">Recycled</th>}
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <th scope="row">MWC</th>
-                      <td>{data?.data?.pieChartData?.usage[0].value}</td>
-                      <td>{data?.data?.pieChartData?.collection[0].value}</td>
-                      <td>
-                        {data?.data?.pieChartData?.upiCollection[0].value}
-                      </td>
-                      <td>
-                        {Number(
-                          data?.data?.pieChartData?.feedback[0].value
-                        ).toFixed(1)}
-                      </td>
-                      <td>NA</td>
+                      {usageStats && (
+                        <td>{data?.data?.pieChartData?.usage[0].value}</td>
+                      )}
+                      {collectionStats && (
+                        <td>{data?.data?.pieChartData?.collection[0].value}</td>
+                      )}
+                      {upiStats && (
+                        <td>
+                          {data?.data?.pieChartData?.upiCollection[0].value}
+                        </td>
+                      )}
+                      {feedbackStats && (
+                        <td>
+                          {Number(
+                            data?.data?.pieChartData?.feedback[0].value
+                          ).toFixed(1)}
+                        </td>
+                      )}
+                      {bwtStats && <td>NA</td>}
                     </tr>
                     <tr>
                       <th scope="row">FWC</th>
-                      <td>{data?.data?.pieChartData?.usage[1].value}</td>
-                      <td>{data?.data?.pieChartData?.collection[1].value}</td>
-                      <td>
-                        {data?.data?.pieChartData?.upiCollection[1].value}
-                      </td>
-                      <td>
-                        {Number(
-                          data?.data?.pieChartData?.feedback[1].value
-                        ).toFixed(1)}
-                      </td>
-                      <td>NA</td>
+                      {usageStats && (
+                        <td>{data?.data?.pieChartData?.usage[1].value}</td>
+                      )}
+                      {collectionStats && (
+                        <td>{data?.data?.pieChartData?.collection[1].value}</td>
+                      )}
+                      {upiStats && (
+                        <td>
+                          {data?.data?.pieChartData?.upiCollection[1].value}
+                        </td>
+                      )}
+                      {feedbackStats && (
+                        <td>
+                          {Number(
+                            data?.data?.pieChartData?.feedback[1].value
+                          ).toFixed(1)}
+                        </td>
+                      )}
+                      {bwtStats && <td>NA</td>}
                     </tr>
                     <tr>
                       <th scope="row">PWC</th>
-                      <td>{data?.data?.pieChartData?.usage[2].value}</td>
-                      <td>{data?.data?.pieChartData?.collection[2].value}</td>
-                      <td>
-                        {data?.data?.pieChartData?.upiCollection[2].value}
-                      </td>
-                      <td>
-                        {Number(
-                          data?.data?.pieChartData?.feedback[2].value
-                        ).toFixed(1)}
-                      </td>
-                      <td>NA</td>
+                      {usageStats && (
+                        <td>{data?.data?.pieChartData?.usage[2].value}</td>
+                      )}
+                      {collectionStats && (
+                        <td>{data?.data?.pieChartData?.collection[2].value}</td>
+                      )}
+                      {upiStats && (
+                        <td>
+                          {data?.data?.pieChartData?.upiCollection[2].value}
+                        </td>
+                      )}
+                      {feedbackStats && (
+                        <td>
+                          {Number(
+                            data?.data?.pieChartData?.feedback[2].value
+                          ).toFixed(1)}
+                        </td>
+                      )}
+                      {bwtStats && <td>NA</td>}
                     </tr>
                     <tr>
                       <th scope="row">MUR</th>
-                      <td>{data?.data?.pieChartData?.usage[3].value}</td>
-                      <td>{data?.data?.pieChartData?.collection[3].value}</td>
-                      <td>
-                        {data?.data?.pieChartData?.upiCollection[3].value}
-                      </td>
-                      <td>
-                        {Number(
-                          data?.data?.pieChartData?.feedback[3].value
-                        ).toFixed(1)}
-                      </td>
-                      <td>NA</td>
+                      {usageStats && (
+                        <td>{data?.data?.pieChartData?.usage[3].value}</td>
+                      )}
+                      {collectionStats && (
+                        <td>{data?.data?.pieChartData?.collection[3].value}</td>
+                      )}
+                      {upiStats && (
+                        <td>
+                          {data?.data?.pieChartData?.upiCollection[3].value}
+                        </td>
+                      )}
+                      {feedbackStats && (
+                        <td>
+                          {Number(
+                            data?.data?.pieChartData?.feedback[3].value
+                          ).toFixed(1)}
+                        </td>
+                      )}
+                      {bwtStats && <td>NA</td>}
                     </tr>
                     <tr>
                       <th scope="row">BWT</th>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0.0</td>
-                      <td>0</td>
+                      {usageStats && <td>0</td>}
+                      {collectionStats && <td>0</td>}
+                      {upiStats && <td>0</td>}
+                      {feedbackStats && <td>0.0</td>}
+                      {bwtStats && <td>0</td>}
                     </tr>
                   </tbody>
                 </table>
@@ -1347,43 +1447,55 @@ const PdfGenerate = ({
                             pieChartUpiData={data?.data?.pieChartUpiData}
                             uiResult={dashboard_data?.uiResult?.data}
                           /> */}
-                          <StatsItem
-                            className="page-break"
-                            name="Usage Stats"
-                            total={data?.data?.dataSummary?.usage}
-                            data={data?.data?.dashboardChartData?.usage}
-                            pieChartData={data?.data?.pieChartData?.usage}
-                          />
-
-                          <StatsItem
-                            name="Collection Stats"
-                            total={data?.data?.dataSummary?.collection}
-                            data={data?.data?.dashboardChartData?.collection}
-                            pieChartData={data?.data?.pieChartData?.collection}
-                          />
-                          <StatsItem
-                            className="page-break"
-                            name="UPI Stats"
-                            total={data?.data?.dataSummary?.upiCollection}
-                            data={data?.data?.dashboardChartData?.upiCollection}
-                            pieChartData={
-                              data?.data?.pieChartData?.upiCollection
-                            }
-                          />
-                          <BWTStatsItem
-                            name="Recycled Water"
-                            total={data?.data?.bwtDataSummary?.waterRecycled}
-                            data={data?.data?.bwtChartData?.waterRecycled}
-                            pieChartData={data?.data?.bwtpieChartData?.usage}
-                          />
-
-                          <StatsItem
-                            className="page-break"
-                            name="Feedback Stats"
-                            total={data?.data?.dataSummary?.feedback}
-                            data={data?.data?.dashboardChartData?.feedback}
-                            pieChartData={data?.data?.pieChartData?.feedback}
-                          />
+                          {usageStats && (
+                            <StatsItem
+                              className="page-break"
+                              name="Usage Stats"
+                              total={data?.data?.dataSummary?.usage}
+                              data={data?.data?.dashboardChartData?.usage}
+                              pieChartData={data?.data?.pieChartData?.usage}
+                            />
+                          )}
+                          {collectionStats && (
+                            <StatsItem
+                              name="Collection Stats"
+                              total={data?.data?.dataSummary?.collection}
+                              data={data?.data?.dashboardChartData?.collection}
+                              pieChartData={
+                                data?.data?.pieChartData?.collection
+                              }
+                            />
+                          )}
+                          {upiStats && (
+                            <StatsItem
+                              className="page-break"
+                              name="UPI Stats"
+                              total={data?.data?.dataSummary?.upiCollection}
+                              data={
+                                data?.data?.dashboardChartData?.upiCollection
+                              }
+                              pieChartData={
+                                data?.data?.pieChartData?.upiCollection
+                              }
+                            />
+                          )}
+                          {bwtStats && (
+                            <BWTStatsItem
+                              name="Recycled Water"
+                              total={data?.data?.bwtDataSummary?.waterRecycled}
+                              data={data?.data?.bwtChartData?.waterRecycled}
+                              pieChartData={data?.data?.bwtpieChartData?.usage}
+                            />
+                          )}
+                          {feedbackStats && (
+                            <StatsItem
+                              className="page-break"
+                              name="Feedback Stats"
+                              total={data?.data?.dataSummary?.feedback}
+                              data={data?.data?.dashboardChartData?.feedback}
+                              pieChartData={data?.data?.pieChartData?.feedback}
+                            />
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1619,6 +1731,14 @@ const PdfGenerate = ({
             ))}
           </div>
         </div>
+        <Button
+          style={{ margin: "auto" }}
+          color="primary"
+          className="px-4"
+          onClick={generatePDF}
+        >
+          Generate Offline PDF
+        </Button>
       </>
     );
   }

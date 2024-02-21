@@ -88,9 +88,9 @@ const ReportsHome = ({ isOnline }) => {
     console.log("visibility", visibility);
     setVisibility(!visibility);
     resetData(); // call the function to reset the data
-    if (visibility == true) {
-      localStorage.removeItem("array_data");
-    }
+    // if (visibility == true) {
+    //   localStorage.removeItem("array_data");
+    // }
   };
 
   const generatePDF = () => {
@@ -892,7 +892,7 @@ const ReportsHome = ({ isOnline }) => {
       // this.loadingDialog.current.closeDialog();
       // this.messageDialog.current.showDialog("Error Alert!", err.message);
     } finally {
-      localStorage.removeItem("array_data");
+      // localStorage.removeItem("array_data");
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
@@ -1637,14 +1637,17 @@ const ReportsHome = ({ isOnline }) => {
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button
-                style={{ margin: "auto" }}
-                color="primary"
-                className="px-4"
-                onClick={getPDF}
-              >
-                Download Pdf
-              </Button>
+              {openComponet == false && (
+                <Button
+                  style={{ margin: "auto" }}
+                  color="primary"
+                  className="px-4"
+                  onClick={getPDF}
+                >
+                  Download Pdf
+                </Button>
+              )}
+
               <>
                 {openComponet && (
                   <PdfGenerate
