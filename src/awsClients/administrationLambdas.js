@@ -396,7 +396,7 @@ export function executeReportFetchDashboardLambda(
     var request = {
       userName: userName,
       duration: duration,
-      complex: ["REGISTRY_OFFICE_MSCL", "TOWNHALL_MSCL", "MUKTIDHAM_MSCL"],
+      complex: complex,
       startDate: dynamic_duration,
       endDate: currentDateTimestamp,
     };

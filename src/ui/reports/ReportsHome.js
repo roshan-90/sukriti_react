@@ -16,6 +16,7 @@ import { setReportData, hasData } from "../../features/reportSlice";
 import { setResetData, extraData } from "../../features/extraSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { DropDownLabel } from "../../components/DisplayLabels";
 import {
   executeFetchDashboardLambda,
   executeReportFetchDashboardLambda,
@@ -39,6 +40,13 @@ import useOnlineStatus from "../../services/useOnlineStatus";
 import PdfGenerate from "./PdfReportGenerate";
 import { useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
+import {
+  HalfPieChart,
+  FullLineChart,
+  BWTHalfPieChart,
+  BWTFullLineChart,
+} from "../dashboard/component/ReportChart";
+import { colorTheme, whiteSurface } from "../../jsStyles/Style";
 
 const ReportsHome = ({ isOnline }) => {
   const [visibility, setVisibility] = useState(false);
@@ -83,14 +91,21 @@ const ReportsHome = ({ isOnline }) => {
   const reportData = useSelector((state) => state.report);
   const reportParms = { complex: "all", duration: "15" };
   let title = "";
+  const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
+  const actionValues = [15, 30, 45, 60, 90];
 
   const toggleDialog = () => {
     console.log("visibility", visibility);
     setVisibility(!visibility);
     resetData(); // call the function to reset the data
-    // if (visibility == true) {
-    //   localStorage.removeItem("array_data");
-    // }
+    setOpenComponet(false);
+    if (visibility == true) {
+      localStorage.removeItem("array_data");
+    }
+  };
+
+  const generateChildPdf = () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
   };
 
   const generatePDF = () => {
@@ -457,8 +472,6 @@ const ReportsHome = ({ isOnline }) => {
   // };
 
   const setDashboard_data = (selectedDuration) => {
-    navigate("/report/custom-pdf-generate");
-    return;
     switch (true) {
       case selectedDuration === 15:
         let dashboard_15 = getLocalStorageItem("dashboard_15");
@@ -654,6 +667,11 @@ const ReportsHome = ({ isOnline }) => {
 
     setAssignDetails(updatedAssignDetails);
   };
+  const handleUpdate = (configName, configValue) => {
+    console.log("_updateCommand", configName, configValue);
+    const index = actionOptions.indexOf(configValue);
+    setDurationSelection(actionValues[index]);
+  };
 
   useEffect(() => {
     // fetchDashboardData(15);
@@ -809,6 +827,9 @@ const ReportsHome = ({ isOnline }) => {
       console.log("executeFetchReportLambda2 triggered");
       if (!isOnline) {
         setOpenComponet(true);
+        setTimeout(() => {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }, 9000);
         return;
       }
       var result = await executeFetchReportLambda2(
@@ -886,14 +907,18 @@ const ReportsHome = ({ isOnline }) => {
         setResetData();
       }, 1000);
       setVisibility(!visibility);
+      localStorage.removeItem("array_data");
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
       console.log("_lambda", err);
+      localStorage.removeItem("array_data");
       handleError(err, "fetchReportData");
+      dispatch(stopLoading()); // Dispatch the stopLoading action
       // this.loadingDialog.current.closeDialog();
       // this.messageDialog.current.showDialog("Error Alert!", err.message);
     } finally {
       // localStorage.removeItem("array_data");
-      dispatch(stopLoading()); // Dispatch the stopLoading action
+      // dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
@@ -923,6 +948,222 @@ const ReportsHome = ({ isOnline }) => {
 
   const getPDF = () => {
     fetchReportData();
+  };
+
+  const StatsItem = (props) => {
+    let pageBreakClass;
+    if (props.className) {
+      pageBreakClass = props.className.includes("page-break")
+        ? "page-break"
+        : "";
+    } else {
+      pageBreakClass = "";
+    }
+    return (
+      <div
+        className={`stats-item ${pageBreakClass}`}
+        style={{
+          marginTop: "20px",
+          pageBreakAfter: pageBreakClass ? "always" : "auto",
+        }}
+      >
+        <div
+          className="row"
+          style={{
+            ...statsStyle.elementTitle,
+            width: "98%",
+            margin: "auto",
+            padding: "10px",
+            background: colorTheme.primary,
+          }}
+        >
+          {props.name}
+        </div>
+
+        <div className="row" style={{ width: "100%", margin: "auto" }}>
+          <div className="col-md-4">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  height: "180px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: "90%",
+                    height: "100%",
+                    margin: "auto",
+                    fontSize: "12px",
+                  }}
+                >
+                  <HalfPieChart data={props.pieChartData} />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: "-30px",
+                }}
+              >
+                {props.total}
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {props.name}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-8">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+                fontSize: "12px",
+              }}
+            >
+              <FullLineChart data={props.data} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const BWTStatsItem = (props) => {
+    let pageBreakClass;
+    if (props.className) {
+      pageBreakClass = props.className.includes("page-break")
+        ? "page-break"
+        : "";
+    } else {
+      pageBreakClass = "";
+    }
+    return (
+      <div
+        className={`stats-item ${pageBreakClass}`}
+        style={{
+          marginTop: "20px",
+          pageBreakAfter: pageBreakClass ? "always" : "auto",
+        }}
+      >
+        <div
+          className="row"
+          style={{
+            ...statsStyle.elementTitle,
+            width: "98%",
+            margin: "auto",
+            padding: "10px",
+            background: colorTheme.primary,
+          }}
+        >
+          {props.name}
+        </div>
+
+        <div className="row" style={{ width: "100%", margin: "auto" }}>
+          <div className="col-md-4">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  height: "180px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div style={{ width: "90%", height: "100%", margin: "auto" }}>
+                  <BWTHalfPieChart data={props.pieChartData} />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: "-30px",
+                }}
+              >
+                {props.total}
+              </div>
+
+              <div
+                style={{
+                  ...statsStyle.pieLabel,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {props.name}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-8">
+            <div
+              className="col-md-12"
+              style={{
+                ...whiteSurface,
+                background: "white",
+                width: "100%",
+                height: "220px",
+                padding: "10px",
+                display: "flexbox",
+                alignItems: "center",
+              }}
+            >
+              <BWTFullLineChart data={props.data} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   console.log(hasReportData, "hasReportData");
@@ -999,7 +1240,7 @@ const ReportsHome = ({ isOnline }) => {
                 </td>
                 <td style={{ width: "80%" }} id="pdf-content">
                   <div style={{ width: "100" }} className="pdf-section">
-                    <Stats
+                    {/* <Stats
                       setDurationSelection={setDurationSelection}
                       // handleComplexSelection={handleComplexSelection}
                       chartData={reportData?.data?.dashboardChartData}
@@ -1013,16 +1254,79 @@ const ReportsHome = ({ isOnline }) => {
                       }
                       pieChartUpiData={reportData?.data?.pieChartUpiData}
                       uiResult={dashboard_data?.uiResult?.data}
-                    />
+                    /> */}
+                    <div
+                      style={{
+                        ...whiteSurface,
+                        background: "white",
+                        marginTop: "20px",
+                        width: "100%",
+                        height: "100%",
+                        padding: "10px",
+                        paddingBottom: "20px",
+                        display: "flexbox",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ width: "30%", float: "right" }}>
+                        <DropDownLabel
+                          label={"Duration"}
+                          handleUpdate={handleUpdate}
+                          options={actionOptions}
+                        />
+                      </div>
+                      <StatsItem
+                        name="Usage Stats"
+                        total={reportData?.data?.dataSummary?.usage}
+                        data={reportData?.data?.dashboardChartData?.usage}
+                        pieChartData={reportData?.data?.pieChartData?.usage}
+                      />
+                      <StatsItem
+                        className="page-break"
+                        name="Collection Stats"
+                        total={reportData?.data?.dataSummary?.collection}
+                        data={reportData?.data?.dashboardChartData?.collection}
+                        pieChartData={
+                          reportData?.data?.pieChartData?.collection
+                        }
+                      />
+                      <StatsItem
+                        name="UPI Stats"
+                        total={reportData?.data?.dataSummary?.upiCollection}
+                        data={
+                          reportData?.data?.dashboardChartData?.upiCollection
+                        }
+                        pieChartData={
+                          reportData?.data?.pieChartData?.upiCollection
+                        }
+                      />
+                      <BWTStatsItem
+                        className="page-break"
+                        name="Recycled Water"
+                        total={reportData?.data?.bwtdataSummary?.waterRecycled}
+                        data={
+                          reportData?.data?.bwtdashboardChartData?.waterRecycled
+                        }
+                        pieChartData={reportData?.data?.bwtpieChartData.usage}
+                      />
+                      <StatsItem
+                        className="page-break"
+                        name="Feedback Stats"
+                        total={reportData?.data?.dataSummary?.feedback}
+                        data={reportData?.data?.dashboardChartData?.feedback}
+                        pieChartData={reportData?.data?.pieChartData?.feedback}
+                      />
+                    </div>
                   </div>
                   <table
                     style={{
-                      width: "80%",
+                      width: "100%",
                       fontSize: "14px",
                     }}
                     className="table table-bordered  pdf-section pagebreak"
                   >
                     <thead>
+                      <tr></tr>
                       <tr>
                         <th colSpan="1" scope="colgroup"></th>
                         <th colSpan="5" scope="colgroup">
@@ -1041,6 +1345,7 @@ const ReportsHome = ({ isOnline }) => {
                           Recycled
                         </th>
                       </tr>
+                      <tr></tr>
                       <tr>
                         <th scope="col">Date</th>
                         <th scope="col">All</th>
@@ -1069,133 +1374,148 @@ const ReportsHome = ({ isOnline }) => {
                     <tbody>
                       {reportData?.data?.dashboardChartData.usage.map(
                         (usage, index) => {
+                          const rowCount = index + 1; // Adding 1 to start the count from 1
+                          const shouldBreakPage =
+                            rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
+
                           return (
-                            <tr key={index}>
-                              <td style={{ "font-weight": "bold" }}>
-                                {usage.date}
-                              </td>
-                              <td>{usage.all}</td>
-                              <td>{usage.mwc}</td>
-                              <td>{usage.fwc}</td>
-                              <td>{usage.pwc}</td>
-                              <td>{usage.mur}</td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .collection[index].all
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .collection[index].mwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .collection[index].fwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .collection[index].pwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .collection[index].mur
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .upiCollection[index].all
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .upiCollection[index].mwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .upiCollection[index].fwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .upiCollection[index].pwc
-                                }
-                              </td>
-                              <td>
-                                {
-                                  reportData?.data?.dashboardChartData
-                                    .upiCollection[index].mur
-                                }
-                              </td>
-                              <td>
-                                {typeof reportData?.data?.dashboardChartData
-                                  .feedback[index].all === "number"
-                                  ? reportData.data.dashboardChartData.feedback[
-                                      index
-                                    ].all.toFixed(1)
-                                  : Number(
-                                      reportData.data.dashboardChartData
-                                        .feedback[index].all
-                                    ).toFixed(1)}
-                              </td>
-                              <td>
-                                {typeof reportData?.data?.dashboardChartData
-                                  .feedback[index].mwc === "number"
-                                  ? reportData.data.dashboardChartData.feedback[
-                                      index
-                                    ].mwc.toFixed(1)
-                                  : Number(
-                                      reportData.data.dashboardChartData
-                                        .feedback[index].mwc
-                                    ).toFixed(1)}
-                              </td>
-                              <td>
-                                {typeof reportData?.data?.dashboardChartData
-                                  .feedback[index].fwc === "number"
-                                  ? reportData.data.dashboardChartData.feedback[
-                                      index
-                                    ].fwc.toFixed(0)
-                                  : Number(
-                                      reportData.data.dashboardChartData
-                                        .feedback[index].fwc
-                                    ).toFixed(0)}
-                              </td>
-                              <td>
-                                {typeof reportData?.data?.dashboardChartData
-                                  .feedback[index].pwc === "number"
-                                  ? reportData.data.dashboardChartData.feedback[
-                                      index
-                                    ].pwc.toFixed(0)
-                                  : Number(
-                                      reportData.data.dashboardChartData
-                                        .feedback[index].pwc
-                                    ).toFixed(0)}
-                              </td>
-                              <td>
-                                {typeof reportData?.data?.dashboardChartData
-                                  .feedback[index].mur === "number"
-                                  ? reportData.data.dashboardChartData.feedback[
-                                      index
-                                    ].mur.toFixed(0)
-                                  : Number(
-                                      reportData.data.dashboardChartData
-                                        .feedback[index].mur
-                                    ).toFixed(0)}
-                              </td>
-                              <td>NA</td>
-                            </tr>
+                            <React.Fragment key={index}>
+                              <tr key={index}>
+                                <td style={{ "font-weight": "bold" }}>
+                                  {usage.date}
+                                </td>
+                                <td>{usage.all}</td>
+                                <td>{usage.mwc}</td>
+                                <td>{usage.fwc}</td>
+                                <td>{usage.pwc}</td>
+                                <td>{usage.mur}</td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .collection[index].all
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .collection[index].mwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .collection[index].fwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .collection[index].pwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .collection[index].mur
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .upiCollection[index].all
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .upiCollection[index].mwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .upiCollection[index].fwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .upiCollection[index].pwc
+                                  }
+                                </td>
+                                <td>
+                                  {
+                                    reportData?.data?.dashboardChartData
+                                      .upiCollection[index].mur
+                                  }
+                                </td>
+                                <td>
+                                  {typeof reportData?.data?.dashboardChartData
+                                    .feedback[index].all === "number"
+                                    ? reportData.data.dashboardChartData.feedback[
+                                        index
+                                      ].all.toFixed(1)
+                                    : Number(
+                                        reportData.data.dashboardChartData
+                                          .feedback[index].all
+                                      ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {typeof reportData?.data?.dashboardChartData
+                                    .feedback[index].mwc === "number"
+                                    ? reportData.data.dashboardChartData.feedback[
+                                        index
+                                      ].mwc.toFixed(1)
+                                    : Number(
+                                        reportData.data.dashboardChartData
+                                          .feedback[index].mwc
+                                      ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {typeof reportData?.data?.dashboardChartData
+                                    .feedback[index].fwc === "number"
+                                    ? reportData.data.dashboardChartData.feedback[
+                                        index
+                                      ].fwc.toFixed(0)
+                                    : Number(
+                                        reportData.data.dashboardChartData
+                                          .feedback[index].fwc
+                                      ).toFixed(0)}
+                                </td>
+                                <td>
+                                  {typeof reportData?.data?.dashboardChartData
+                                    .feedback[index].pwc === "number"
+                                    ? reportData.data.dashboardChartData.feedback[
+                                        index
+                                      ].pwc.toFixed(0)
+                                    : Number(
+                                        reportData.data.dashboardChartData
+                                          .feedback[index].pwc
+                                      ).toFixed(0)}
+                                </td>
+                                <td>
+                                  {typeof reportData?.data?.dashboardChartData
+                                    .feedback[index].mur === "number"
+                                    ? reportData.data.dashboardChartData.feedback[
+                                        index
+                                      ].mur.toFixed(0)
+                                    : Number(
+                                        reportData.data.dashboardChartData
+                                          .feedback[index].mur
+                                      ).toFixed(0)}
+                                </td>
+                                <td>NA</td>
+                              </tr>
+                              {shouldBreakPage && (
+                                <tr
+                                  className="page-break"
+                                  style={{
+                                    marginBottom: "10px",
+                                    pageBreakAfter: "always",
+                                  }}
+                                ></tr>
+                              )}
+                            </React.Fragment>
                           );
                         }
                       )}
@@ -1219,423 +1539,425 @@ const ReportsHome = ({ isOnline }) => {
               style={{ background: "#5DC0A6", color: `white` }}
               toggle={toggleDialog}
             >
-              {title}
+              {title} {openComponet == true && "Download Offline PDF"}
             </ModalHeader>
-            <ModalBody
-              style={{
-                width: "100%",
-                height: "540px",
-                display: "flex",
-              }}
-            >
-              <div
+            {openComponet == false && (
+              <ModalBody
                 style={{
                   width: "100%",
-                  ...whiteSurfaceForScheduler,
-                  background: "white",
-                }}
-              >
-                <label
-                  style={{
-                    marginBottom: "0px",
-                  }}
-                >
-                  <h5>Select Complex</h5>
-                </label>
-                <ComplexNavigationFullHeight2
-                  setComplexSelection={setComplexSelection}
-                />
-              </div>
-              <div
-                className="scheduleReport"
-                style={{
-                  width: "100%",
-                  marginLeft: "15px",
+                  height: "540px",
+                  display: "flex",
                 }}
               >
                 <div
-                  className="scheduleReport"
                   style={{
+                    width: "100%",
                     ...whiteSurfaceForScheduler,
                     background: "white",
-                    height: "36%",
+                  }}
+                >
+                  <label
+                    style={{
+                      marginBottom: "0px",
+                    }}
+                  >
+                    <h5>Select Complex</h5>
+                  </label>
+                  <ComplexNavigationFullHeight2
+                    setComplexSelection={setComplexSelection}
+                  />
+                </div>
+                <div
+                  className="scheduleReport"
+                  style={{
+                    width: "100%",
+                    marginLeft: "15px",
                   }}
                 >
                   <div
+                    className="scheduleReport"
                     style={{
-                      ...statsStyle.scheduleTitle,
-                      display: "flex",
+                      ...whiteSurfaceForScheduler,
+                      background: "white",
+                      height: "36%",
                     }}
                   >
-                    <Label
+                    <div
                       style={{
-                        marginRight: "67px",
-                        width: "108px",
+                        ...statsStyle.scheduleTitle,
+                        display: "flex",
                       }}
                     >
-                      Select Date
-                    </Label>
-
-                    <InputDatePicker
-                      value={assignDetails.StartDate}
-                      onSelect={(value) =>
-                        updateAssignDetailsField("duration1", value)
-                      }
-                      minDate={new Date("01-02-2023")}
-                      maxDate={new Date()}
-                      onlyDate
-                      // label="Select Start Date"
-                      type="date"
-                      placeholder="Start Date"
-                      className="date-picker-input"
-                    />
-                    <InputDatePicker
-                      value={assignDetails.EndDate}
-                      onSelect={(value) =>
-                        updateAssignDetailsField("duration2", value)
-                      }
-                      minDate={new Date("01-02-2023")}
-                      maxDate={new Date()}
-                      onlyDate
-                      // label="Select End Date"
-                      type="date"
-                      placeholder="End Date"
-                      className="date-picker-input"
-                    />
-                  </div>
-                  <Form>
-                    <FormGroup>
-                      <InputGroup
-                        style={{ marginTop: "15px" }}
-                        className="mb-3"
-                      >
-                        <Label
-                          style={{
-                            ...statsStyle.scheduleTitle,
-                            width: "33.5%",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          Email
-                        </Label>
-                        <Input
-                          style={{
-                            width: "200px",
-                          }}
-                          type="email"
-                          placeholder="Email"
-                          onChange={(event) =>
-                            updateAssignDetailsField(
-                              "email",
-                              event.target.value
-                            )
-                          }
-                        />
-                      </InputGroup>
-                      <InputGroup
-                        className="mb-3"
+                      <Label
                         style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          justifyContent: "space-evenly",
+                          marginRight: "67px",
+                          width: "108px",
                         }}
                       >
-                        <Label
+                        Select Date
+                      </Label>
+
+                      <InputDatePicker
+                        value={assignDetails.StartDate}
+                        onSelect={(value) =>
+                          updateAssignDetailsField("duration1", value)
+                        }
+                        minDate={new Date("01-02-2023")}
+                        maxDate={new Date()}
+                        onlyDate
+                        // label="Select Start Date"
+                        type="date"
+                        placeholder="Start Date"
+                        className="date-picker-input"
+                      />
+                      <InputDatePicker
+                        value={assignDetails.EndDate}
+                        onSelect={(value) =>
+                          updateAssignDetailsField("duration2", value)
+                        }
+                        minDate={new Date("01-02-2023")}
+                        maxDate={new Date()}
+                        onlyDate
+                        // label="Select End Date"
+                        type="date"
+                        placeholder="End Date"
+                        className="date-picker-input"
+                      />
+                    </div>
+                    <Form>
+                      <FormGroup>
+                        <InputGroup
+                          style={{ marginTop: "15px" }}
+                          className="mb-3"
+                        >
+                          <Label
+                            style={{
+                              ...statsStyle.scheduleTitle,
+                              width: "33.5%",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            Email
+                          </Label>
+                          <Input
+                            style={{
+                              width: "200px",
+                            }}
+                            type="email"
+                            placeholder="Email"
+                            onChange={(event) =>
+                              updateAssignDetailsField(
+                                "email",
+                                event.target.value
+                              )
+                            }
+                          />
+                        </InputGroup>
+                        <InputGroup
+                          className="mb-3"
                           style={{
-                            ...statsStyle.scheduleTitle,
-                            width: "33.5%",
                             display: "flex",
-                            alignItems: "center",
+                            flexDirection: "row",
+                            justifyContent: "space-evenly",
                           }}
                         >
-                          Select Stats
-                        </Label>
+                          <Label
+                            style={{
+                              ...statsStyle.scheduleTitle,
+                              width: "33.5%",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            Select Stats
+                          </Label>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            width: "65%",
-                          }}
-                        >
-                          <div className="React__checkbox">
-                            <Label>
-                              Usage&nbsp;&nbsp;
-                              <Input
-                                type="checkbox"
-                                name="usageStats"
-                                className="React__checkbox--input"
-                                onChange={_handleChange}
-                              />
-                              <span className="React__checkbox--span" />
-                            </Label>
-                          </div>
-
-                          {reportData?.data?.uiResult?.data.collection_stats ===
-                            "true" && (
-                            <>
-                              <div className="React__checkbox">
-                                <Label>
-                                  Collection&nbsp;&nbsp;
-                                  <Input
-                                    type="checkbox"
-                                    name="collectionStats"
-                                    className="React__checkbox--input"
-                                    onChange={_handleChange}
-                                  />
-                                  <span className="React__checkbox--span" />
-                                </Label>
-                              </div>
-                              <div className="React__checkbox">
-                                <Label>
-                                  UPI&nbsp;&nbsp;
-                                  <Input
-                                    type="checkbox"
-                                    name="upiStats"
-                                    className="React__checkbox--input"
-                                    onChange={_handleChange}
-                                  />
-                                  <span className="React__checkbox--span" />
-                                </Label>
-                              </div>
-                            </>
-                          )}
-                          <div className="React__checkbox">
-                            <Label>
-                              Feedback&nbsp;&nbsp;
-                              <Input
-                                type="checkbox"
-                                name="feedbackStats"
-                                className="React__checkbox--input"
-                                onChange={_handleChange}
-                              />
-                              <span className="React__checkbox--span" />
-                            </Label>
-                          </div>
-                          {reportData?.data?.uiResult?.data.bwt_stats ===
-                            "true" && (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              width: "65%",
+                            }}
+                          >
                             <div className="React__checkbox">
                               <Label>
-                                BWT&nbsp;&nbsp;
+                                Usage&nbsp;&nbsp;
                                 <Input
                                   type="checkbox"
-                                  name="bwtStats"
+                                  name="usageStats"
                                   className="React__checkbox--input"
                                   onChange={_handleChange}
                                 />
                                 <span className="React__checkbox--span" />
                               </Label>
                             </div>
-                          )}
-                          {/* {this.props.dashboardData.uiResult.data} */}
-                        </div>
-                      </InputGroup>
-                    </FormGroup>
-                  </Form>
-                </div>
-                <div
-                  className="scheduleReport"
-                  style={{
-                    ...whiteSurfaceForScheduler,
-                    background: "white",
-                    margin: "10px 0px 0px 0px",
-                  }}
-                >
-                  <Form style={{ margin: "10px 0px 0px 0px" }}>
-                    <FormGroup>
-                      <InputGroup
-                        className="mb-3"
-                        style={{ display: "flex", flexDirection: "row" }}
-                      >
-                        <div
-                          style={{
-                            ...statsStyle.scheduleTitle,
-                            width: "34%",
-                          }}
+
+                            {reportData?.data?.uiResult?.data
+                              .collection_stats === "true" && (
+                              <>
+                                <div className="React__checkbox">
+                                  <Label>
+                                    Collection&nbsp;&nbsp;
+                                    <Input
+                                      type="checkbox"
+                                      name="collectionStats"
+                                      className="React__checkbox--input"
+                                      onChange={_handleChange}
+                                    />
+                                    <span className="React__checkbox--span" />
+                                  </Label>
+                                </div>
+                                <div className="React__checkbox">
+                                  <Label>
+                                    UPI&nbsp;&nbsp;
+                                    <Input
+                                      type="checkbox"
+                                      name="upiStats"
+                                      className="React__checkbox--input"
+                                      onChange={_handleChange}
+                                    />
+                                    <span className="React__checkbox--span" />
+                                  </Label>
+                                </div>
+                              </>
+                            )}
+                            <div className="React__checkbox">
+                              <Label>
+                                Feedback&nbsp;&nbsp;
+                                <Input
+                                  type="checkbox"
+                                  name="feedbackStats"
+                                  className="React__checkbox--input"
+                                  onChange={_handleChange}
+                                />
+                                <span className="React__checkbox--span" />
+                              </Label>
+                            </div>
+                            {reportData?.data?.uiResult?.data.bwt_stats ===
+                              "true" && (
+                              <div className="React__checkbox">
+                                <Label>
+                                  BWT&nbsp;&nbsp;
+                                  <Input
+                                    type="checkbox"
+                                    name="bwtStats"
+                                    className="React__checkbox--input"
+                                    onChange={_handleChange}
+                                  />
+                                  <span className="React__checkbox--span" />
+                                </Label>
+                              </div>
+                            )}
+                            {/* {this.props.dashboardData.uiResult.data} */}
+                          </div>
+                        </InputGroup>
+                      </FormGroup>
+                    </Form>
+                  </div>
+                  <div
+                    className="scheduleReport"
+                    style={{
+                      ...whiteSurfaceForScheduler,
+                      background: "white",
+                      margin: "10px 0px 0px 0px",
+                    }}
+                  >
+                    <Form style={{ margin: "10px 0px 0px 0px" }}>
+                      <FormGroup>
+                        <InputGroup
+                          className="mb-3"
+                          style={{ display: "flex", flexDirection: "row" }}
                         >
-                          <p>Schedule Report</p>
-                        </div>
-                        <div style={{ display: "flex" }}>
-                          <Label className="container-report">
-                            YES&nbsp;&nbsp;
-                            <Input
-                              type="radio"
-                              className="radio-input"
-                              value="yesschedule"
-                              name="radio"
-                              disabled={isOnline ? false : true}
-                              onChange={showFields}
-                            />
-                            <span class="checkmark"></span>
-                          </Label>
-                          <Label
-                            className="container-report"
-                            style={{ marginLeft: "170%" }}
-                          >
-                            NO&nbsp;&nbsp;
-                            <Input
-                              type="radio"
-                              className="radio-input"
-                              value="noschedule"
-                              name="radio"
-                              onChange={showFields}
-                              defaultChecked
-                            />
-                            <span class="checkmark"></span>
-                          </Label>
-                        </div>
-                      </InputGroup>
-                      <Form
-                        id="dropdown"
-                        className="disabledbutton"
-                        style={{ marginTop: "-30px" }}
-                      >
-                        <FormGroup>
-                          <p
+                          <div
                             style={{
-                              ...statsStyle.scheduleLabel,
+                              ...statsStyle.scheduleTitle,
+                              width: "34%",
                             }}
                           >
-                            This report provides details of all Complexes that
-                            were used in the selected time range.
-                          </p>
-                          <InputGroup style={{}} className="mb-3">
-                            <div style={{ width: "33%" }}>
+                            <p>Schedule Report</p>
+                          </div>
+                          <div style={{ display: "flex" }}>
+                            <Label className="container-report">
+                              YES&nbsp;&nbsp;
+                              <Input
+                                type="radio"
+                                className="radio-input"
+                                value="yesschedule"
+                                name="radio"
+                                disabled={isOnline ? false : true}
+                                onChange={showFields}
+                              />
+                              <span class="checkmark"></span>
+                            </Label>
+                            <Label
+                              className="container-report"
+                              style={{ marginLeft: "170%" }}
+                            >
+                              NO&nbsp;&nbsp;
+                              <Input
+                                type="radio"
+                                className="radio-input"
+                                value="noschedule"
+                                name="radio"
+                                onChange={showFields}
+                                defaultChecked
+                              />
+                              <span class="checkmark"></span>
+                            </Label>
+                          </div>
+                        </InputGroup>
+                        <Form
+                          id="dropdown"
+                          className="disabledbutton"
+                          style={{ marginTop: "-30px" }}
+                        >
+                          <FormGroup>
+                            <p
+                              style={{
+                                ...statsStyle.scheduleLabel,
+                              }}
+                            >
+                              This report provides details of all Complexes that
+                              were used in the selected time range.
+                            </p>
+                            <InputGroup style={{}} className="mb-3">
+                              <div style={{ width: "33%" }}>
+                                <Label
+                                  style={{
+                                    ...statsStyle.scheduleTitle,
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  Rate
+                                </Label>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  width: "67%",
+                                }}
+                              >
+                                <Input
+                                  style={{}}
+                                  type="number"
+                                  placeholder="Value"
+                                  min="0"
+                                  onChange={(event) => {
+                                    const inputValue = event.target.value;
+                                    if (inputValue >= 0) {
+                                      updateAssignDetailsField(
+                                        "rateValue",
+                                        inputValue
+                                      );
+                                    }
+                                  }}
+                                />
+                                <Input
+                                  type="text"
+                                  id="exampleSelect"
+                                  placeholder="Days"
+                                  defaultValue="Days"
+                                  disabled="true"
+                                />
+                              </div>
+                            </InputGroup>
+                            <p
+                              style={{
+                                ...statsStyle.scheduleLabel,
+                              }}
+                            >
+                              A schedule that runs at a regular rate, such as
+                              every "{" "}
+                              {assignDetails.rateValue
+                                ? assignDetails.rateValue
+                                : "10"}{" "}
+                              Days ".
+                            </p>
+                            <div style={{ display: "flex" }}>
                               <Label
                                 style={{
                                   ...statsStyle.scheduleTitle,
+
                                   display: "flex",
                                   alignItems: "center",
+                                  width: "51%",
                                 }}
                               >
-                                Rate
+                                Report Duration
                               </Label>
+                              <Input
+                                type="select"
+                                name="select"
+                                id="exampleSelect"
+                                onChange={(event) =>
+                                  updateAssignDetailsField(
+                                    "scheduleDuration",
+                                    event.target.value
+                                  )
+                                }
+                              >
+                                <option>Last 15 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 45 days</option>
+                                <option>Last 60 days</option>
+                                <option>Last 75 days</option>
+                                <option>Last 90 days</option>
+                              </Input>
                             </div>
                             <div
                               style={{
-                                display: "flex",
-                                width: "67%",
+                                ...statsStyle.scheduleTitle,
+                                margin: "10px 0px",
                               }}
                             >
-                              <Input
-                                style={{}}
-                                type="number"
-                                placeholder="Value"
-                                min="0"
-                                onChange={(event) => {
-                                  const inputValue = event.target.value;
-                                  if (inputValue >= 0) {
-                                    updateAssignDetailsField(
-                                      "rateValue",
-                                      inputValue
-                                    );
-                                  }
-                                }}
-                              />
-                              <Input
-                                type="text"
-                                id="exampleSelect"
-                                placeholder="Days"
-                                defaultValue="Days"
-                                disabled="true"
+                              <InputDatePicker
+                                value={assignDetails.ScheduleStartDate}
+                                // onSelect={(value) => this.updateAssignDetailsField("ScheduleStartDate", value)}
+                                onSelect={handleStartDateSelect}
+                                minDate={moment().add(1, "days").toDate()}
+                                maxDate={new Date("01-12-2030")}
+                                onlyDate
+                                label="Schedule start time"
+                                type="date"
+                                placeholder="Schedule start"
+                                className="date-picker-input"
                               />
                             </div>
-                          </InputGroup>
-                          <p
-                            style={{
-                              ...statsStyle.scheduleLabel,
-                            }}
-                          >
-                            A schedule that runs at a regular rate, such as
-                            every "{" "}
-                            {assignDetails.rateValue
-                              ? assignDetails.rateValue
-                              : "10"}{" "}
-                            Days ".
-                          </p>
-                          <div style={{ display: "flex" }}>
-                            <Label
+
+                            <div
                               style={{
                                 ...statsStyle.scheduleTitle,
-
-                                display: "flex",
-                                alignItems: "center",
-                                width: "51%",
                               }}
                             >
-                              Report Duration
-                            </Label>
-                            <Input
-                              type="select"
-                              name="select"
-                              id="exampleSelect"
-                              onChange={(event) =>
-                                updateAssignDetailsField(
-                                  "scheduleDuration",
-                                  event.target.value
-                                )
-                              }
-                            >
-                              <option>Last 15 days</option>
-                              <option>Last 30 days</option>
-                              <option>Last 45 days</option>
-                              <option>Last 60 days</option>
-                              <option>Last 75 days</option>
-                              <option>Last 90 days</option>
-                            </Input>
-                          </div>
-                          <div
-                            style={{
-                              ...statsStyle.scheduleTitle,
-                              margin: "10px 0px",
-                            }}
-                          >
-                            <InputDatePicker
-                              value={assignDetails.ScheduleStartDate}
-                              // onSelect={(value) => this.updateAssignDetailsField("ScheduleStartDate", value)}
-                              onSelect={handleStartDateSelect}
-                              minDate={moment().add(1, "days").toDate()}
-                              maxDate={new Date("01-12-2030")}
-                              onlyDate
-                              label="Schedule start time"
-                              type="date"
-                              placeholder="Schedule start"
-                              className="date-picker-input"
-                            />
-                          </div>
-
-                          <div
-                            style={{
-                              ...statsStyle.scheduleTitle,
-                            }}
-                          >
-                            <InputDatePicker
-                              value={assignDetails.ScheduleEndDate}
-                              onSelect={(value) =>
-                                updateAssignDetailsField(
-                                  "ScheduleEndDate",
-                                  value
-                                )
-                              }
-                              // minDate={moment().add(2, "days").toDate()}
-                              minDate={minEndDate}
-                              maxDate={new Date("01-12-2030")}
-                              onlyDate
-                              label="Schedule end time"
-                              type="date"
-                              placeholder="Schedule end"
-                              className="date-picker-input"
-                              disabled={!isEndDateEnabled}
-                            />
-                          </div>
-                        </FormGroup>
-                      </Form>
-                    </FormGroup>
-                  </Form>
+                              <InputDatePicker
+                                value={assignDetails.ScheduleEndDate}
+                                onSelect={(value) =>
+                                  updateAssignDetailsField(
+                                    "ScheduleEndDate",
+                                    value
+                                  )
+                                }
+                                // minDate={moment().add(2, "days").toDate()}
+                                minDate={minEndDate}
+                                maxDate={new Date("01-12-2030")}
+                                onlyDate
+                                label="Schedule end time"
+                                type="date"
+                                placeholder="Schedule end"
+                                className="date-picker-input"
+                                disabled={!isEndDateEnabled}
+                              />
+                            </div>
+                          </FormGroup>
+                        </Form>
+                      </FormGroup>
+                    </Form>
+                  </div>
                 </div>
-              </div>
-            </ModalBody>
+              </ModalBody>
+            )}
             <ModalFooter>
               {openComponet == false && (
                 <Button
@@ -1659,6 +1981,7 @@ const ReportsHome = ({ isOnline }) => {
                     feedbackStats={feedbackStats}
                     bwtStats={bwtStats}
                     complexData={complexData}
+                    onClick={generateChildPdf}
                   />
                 )}
               </>

@@ -45,6 +45,17 @@ const PdfGenerate = ({
   const generatePDF = () => {
     const input = document.getElementById("pdf-generate-content");
 
+    //     const cssStyles = `
+    //     <style>
+    //       thead tr {
+    //         border-color: inherit;
+    //         border-style: solid;
+    //         border-width: 4px; /* Adjust the border width as needed */
+    //       }
+    //     </style>
+    // `;
+    //     // Combine CSS styles with HTML content
+    //     const htmlContent = cssStyles + input.innerHTML;
     // Define options for html2pdf
     const options = {
       margin: 5,
@@ -875,6 +886,7 @@ const PdfGenerate = ({
                 className="table table-bordered pdf-section"
               >
                 <thead>
+                  <tr></tr>
                   <tr>
                     <th scope="col">Cabin</th>
                     {usageStats && <th scope="col">Usage</th>}
@@ -1066,11 +1078,14 @@ const PdfGenerate = ({
                             <BWTStatsItem
                               name="Recycled Water"
                               total={
-                                summaryPayload?.bwtDataSummary?.waterRecycled
+                                summaryPayload?.bwtdataSummary?.waterRecycled
                               }
-                              data={summaryPayload?.bwtChartData?.waterRecycled}
+                              data={
+                                summaryPayload?.bwtdashboardChartData
+                                  ?.waterRecycled
+                              }
                               pieChartData={
-                                summaryPayload?.bwtpieChartData?.usage
+                                summaryPayload?.bwtpieChartData.usage
                               }
                             />
                           )}
@@ -1105,6 +1120,7 @@ const PdfGenerate = ({
                   className="table table-bordered"
                 >
                   <thead>
+                    <tr></tr>
                     <tr>
                       <th colSpan="1" scope="colgroup"></th>
                       <th colSpan="5" scope="colgroup">
@@ -1123,6 +1139,7 @@ const PdfGenerate = ({
                         Recycled
                       </th>
                     </tr>
+                    <tr></tr>
                     <tr>
                       <th scope="col">Date</th>
                       <th scope="col">All</th>
@@ -1320,6 +1337,7 @@ const PdfGenerate = ({
                   key={index}
                 >
                   <thead>
+                    <tr></tr>
                     <tr>
                       <th scope="col">Cabin</th>
                       {usageStats && <th scope="col">Usage</th>}
@@ -1482,9 +1500,11 @@ const PdfGenerate = ({
                           {bwtStats && (
                             <BWTStatsItem
                               name="Recycled Water"
-                              total={data?.data?.bwtDataSummary?.waterRecycled}
-                              data={data?.data?.bwtChartData?.waterRecycled}
-                              pieChartData={data?.data?.bwtpieChartData?.usage}
+                              total={data?.data?.bwtdataSummary?.waterRecycled}
+                              data={
+                                data?.data?.bwtdashboardChartData?.waterRecycled
+                              }
+                              pieChartData={data?.data?.bwtpieChartData.usage}
                             />
                           )}
                           {feedbackStats && (
@@ -1512,6 +1532,7 @@ const PdfGenerate = ({
                     className="table table-bordered"
                   >
                     <thead>
+                      <tr></tr>
                       <tr>
                         <th colSpan="1" scope="colgroup"></th>
                         <th colSpan="5" scope="colgroup">
@@ -1530,6 +1551,7 @@ const PdfGenerate = ({
                           Recycled
                         </th>
                       </tr>
+                      <tr></tr>
                       <tr>
                         <th scope="col">Date</th>
                         <th scope="col">All</th>
@@ -1732,7 +1754,7 @@ const PdfGenerate = ({
           </div>
         </div>
         <Button
-          style={{ margin: "auto" }}
+          style={{ margin: "auto", marginTop: "12px" }}
           color="primary"
           className="px-4"
           onClick={generatePDF}
