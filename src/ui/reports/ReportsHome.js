@@ -12,6 +12,8 @@ import {
   Input,
   InputGroup,
 } from "reactstrap";
+import Stack from "@mui/material/Stack";
+import LinearProgress from "@mui/material/LinearProgress";
 import { setReportData, hasData } from "../../features/reportSlice";
 import { setResetData, extraData } from "../../features/extraSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -83,7 +85,7 @@ const ReportsHome = ({ isOnline }) => {
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const navigate = useNavigate();
-
+  const [loadingPdf, setLoadingPdf] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const hasReportData = useSelector(hasData);
@@ -109,8 +111,9 @@ const ReportsHome = ({ isOnline }) => {
   };
 
   const generatePDF = () => {
-    const input = document.getElementById("pdf-content");
+    setLoadingPdf(true);
 
+    const input = document.getElementById("pdf-content");
     // Define options for html2pdf
     const options = {
       margin: 5,
@@ -167,6 +170,10 @@ const ReportsHome = ({ isOnline }) => {
         }
       })
       .save();
+
+    setTimeout(() => {
+      setLoadingPdf(false);
+    }, 4000);
   };
 
   let dashboard_data = getLocalStorageItem("dashboard_15");
@@ -1233,7 +1240,16 @@ const ReportsHome = ({ isOnline }) => {
                           generatePDF();
                         }}
                       >
-                        Generate PDF
+                        {" "}
+                        {loadingPdf ? "Downloading..." : "Generate PDF"}
+                        {loadingPdf && (
+                          <Stack
+                            sx={{ width: "100%", color: "grey.500" }}
+                            spacing={2}
+                          >
+                            <LinearProgress color="secondary" />
+                          </Stack>
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -1307,7 +1323,7 @@ const ReportsHome = ({ isOnline }) => {
                         data={
                           reportData?.data?.bwtdashboardChartData?.waterRecycled
                         }
-                        pieChartData={reportData?.data?.bwtpieChartData.usage}
+                        pieChartData={reportData?.data?.bwtpieChartData?.usage}
                       />
                       <StatsItem
                         className="page-break"
@@ -1372,7 +1388,7 @@ const ReportsHome = ({ isOnline }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {reportData?.data?.dashboardChartData.usage.map(
+                      {reportData?.data?.dashboardChartData?.usage.map(
                         (usage, index) => {
                           const rowCount = index + 1; // Adding 1 to start the count from 1
                           const shouldBreakPage =
