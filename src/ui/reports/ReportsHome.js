@@ -117,7 +117,7 @@ const ReportsHome = ({ isOnline }) => {
     // Define options for html2pdf
     const options = {
       margin: 5,
-      filename: "summary.pdf",
+      filename: "SmartTolilet.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },

@@ -64,7 +64,7 @@ const PdfGenerate = ({
     // Define options for html2pdf
     const options = {
       margin: 5,
-      filename: "summary.pdf",
+      filename: "SmartTolilet.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },
@@ -1010,6 +1010,7 @@ const PdfGenerate = ({
                       {feedbackStats && <td>0.0</td>}
                       {bwtStats && <td>0</td>}
                     </tr>
+                    <tr></tr>
                   </tbody>
                 </table>
                 <table
@@ -1020,21 +1021,6 @@ const PdfGenerate = ({
                     <tr>
                       <td style={{ width: "80%" }}>
                         <div style={{ width: "100" }}>
-                          {/* <Stats
-                          isDuration={false}
-                          chartData={summaryPayload?.dashboardChartData}
-                          pieChartData={summaryPayload?.pieChartData}
-                          dataSummary={summaryPayload?.dataSummary}
-                          bwtChartData={summaryPayload?.bwtdashboardChartData}
-                          bwtPieChartData={summaryPayload?.bwtpieChartData}
-                          bwtDataSummary={summaryPayload?.bwtdataSummary}
-                          // dashboardUpiChartData={
-                          //   summaryPayload?.dashboardUpiChartData
-                          // }
-                          // pieChartUpiData={summaryPayload?.pieChartUpiData}
-                          uiResult={dashboard_data?.uiResult?.data}
-                        /> */}
-
                           <div
                             style={{
                               ...whiteSurface,
@@ -1136,47 +1122,58 @@ const PdfGenerate = ({
                       <tr></tr>
                       <tr>
                         <th colSpan="1" scope="colgroup"></th>
-                        <th colSpan="5" scope="colgroup">
-                          Usage
-                        </th>
-                        <th colSpan="5" scope="colgroup">
-                          Collection
-                        </th>
-                        <th colSpan="5" scope="colgroup">
-                          Upi
-                        </th>
-                        <th colSpan="5" scope="colgroup">
-                          Feedback
-                        </th>
-                        <th colSpan="1" scope="colgroup">
-                          Recycled
-                        </th>
+                        {usageStats && (
+                          <th colSpan="5" scope="colgroup">
+                            Usage
+                          </th>
+                        )}
+                        {collectionStats && (
+                          <th colSpan="5" scope="colgroup">
+                            Collection
+                          </th>
+                        )}
+                        {upiStats && (
+                          <th colSpan="5" scope="colgroup">
+                            Upi
+                          </th>
+                        )}
+                        {feedbackStats && (
+                          <th colSpan="5" scope="colgroup">
+                            Feedback
+                          </th>
+                        )}
+                        {bwtStats && (
+                          <th colSpan="1" scope="colgroup">
+                            Recycled
+                          </th>
+                        )}
                       </tr>
                       <tr></tr>
                       <tr>
                         <th scope="col">Date</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">BWT</th>
+                        {usageStats && <th scope="col">All</th>}
+                        {usageStats && <th scope="col">MWC</th>}
+                        {usageStats && <th scope="col">FWC</th>}
+                        {usageStats && <th scope="col">PWC</th>}
+                        {usageStats && <th scope="col">MUR</th>}
+                        {collectionStats && <th scope="col">All</th>}
+                        {collectionStats && <th scope="col">MWC</th>}
+                        {collectionStats && <th scope="col">FWC</th>}
+                        {collectionStats && <th scope="col">PWC</th>}
+                        {collectionStats && <th scope="col">MUR</th>}
+                        {upiStats && <th scope="col">All</th>}
+                        {upiStats && <th scope="col">MWC</th>}
+                        {upiStats && <th scope="col">FWC</th>}
+                        {upiStats && <th scope="col">PWC</th>}
+                        {upiStats && <th scope="col">MUR</th>}
+                        {feedbackStats && <th scope="col">All</th>}
+                        {feedbackStats && <th scope="col">MWC</th>}
+                        {feedbackStats && <th scope="col">FWC</th>}
+                        {feedbackStats && <th scope="col">PWC</th>}
+                        {feedbackStats && <th scope="col">MUR</th>}
+                        {bwtStats && <th scope="col">BWT</th>}
                       </tr>
+                      <tr></tr>
                     </thead>
                     <tbody>
                       {summaryPayload?.dashboardChartData.usage.map(
@@ -1191,107 +1188,132 @@ const PdfGenerate = ({
                                 <td style={{ "font-weight": "bold" }}>
                                   {usage.date}
                                 </td>
-                                <td>{usage.all}</td>
-                                <td>{usage.mwc}</td>
-                                <td>{usage.fwc}</td>
-                                <td>{usage.pwc}</td>
-                                <td>{usage.mur}</td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .collection[index].all
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .collection[index].mwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .collection[index].fwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .collection[index].pwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .collection[index].mur
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .upiCollection[index].all
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .upiCollection[index].mwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .upiCollection[index].fwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .upiCollection[index].pwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    summaryPayload?.dashboardChartData
-                                      .upiCollection[index].mur
-                                  }
-                                </td>
-                                <td>
-                                  {Number(
-                                    summaryPayload?.dashboardChartData.feedback[
-                                      index
-                                    ].all
-                                  ).toFixed(1)}
-                                </td>
-                                <td>
-                                  {Number(
-                                    summaryPayload?.dashboardChartData.feedback[
-                                      index
-                                    ].mwc
-                                  ).toFixed(1)}
-                                </td>
-                                <td>
-                                  {Number(
-                                    summaryPayload?.dashboardChartData.feedback[
-                                      index
-                                    ].fwc
-                                  ).toFixed(1)}
-                                </td>
-                                <td>
-                                  {Number(
-                                    summaryPayload?.dashboardChartData.feedback[
-                                      index
-                                    ].pwc
-                                  ).toFixed(1)}
-                                </td>
-                                <td>
-                                  {Number(
-                                    summaryPayload?.dashboardChartData.feedback[
-                                      index
-                                    ].mur
-                                  ).toFixed(1)}
-                                </td>
-                                <td>NA</td>
+                                {usageStats && <td>{usage.all}</td>}
+                                {usageStats && <td>{usage.mwc}</td>}
+                                {usageStats && <td>{usage.fwc}</td>}
+                                {usageStats && <td>{usage.pwc}</td>}
+                                {usageStats && <td>{usage.mur}</td>}
+                                {collectionStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .collection[index].all
+                                    }
+                                  </td>
+                                )}
+                                {collectionStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .collection[index].mwc
+                                    }
+                                  </td>
+                                )}
+                                {collectionStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .collection[index].fwc
+                                    }
+                                  </td>
+                                )}
+                                {collectionStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .collection[index].pwc
+                                    }
+                                  </td>
+                                )}
+                                {collectionStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .collection[index].mur
+                                    }
+                                  </td>
+                                )}
+                                {upiStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .upiCollection[index].all
+                                    }
+                                  </td>
+                                )}
+                                {upiStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .upiCollection[index].mwc
+                                    }
+                                  </td>
+                                )}
+                                {upiStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .upiCollection[index].fwc
+                                    }
+                                  </td>
+                                )}
+                                {upiStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .upiCollection[index].pwc
+                                    }
+                                  </td>
+                                )}
+                                {upiStats && (
+                                  <td>
+                                    {
+                                      summaryPayload?.dashboardChartData
+                                        .upiCollection[index].mur
+                                    }
+                                  </td>
+                                )}
+                                {feedbackStats && (
+                                  <td>
+                                    {Number(
+                                      summaryPayload?.dashboardChartData
+                                        .feedback[index].all
+                                    ).toFixed(1)}
+                                  </td>
+                                )}
+                                {feedbackStats && (
+                                  <td>
+                                    {Number(
+                                      summaryPayload?.dashboardChartData
+                                        .feedback[index].mwc
+                                    ).toFixed(1)}
+                                  </td>
+                                )}
+                                {feedbackStats && (
+                                  <td>
+                                    {Number(
+                                      summaryPayload?.dashboardChartData
+                                        .feedback[index].fwc
+                                    ).toFixed(1)}
+                                  </td>
+                                )}
+                                {feedbackStats && (
+                                  <td>
+                                    {Number(
+                                      summaryPayload?.dashboardChartData
+                                        .feedback[index].pwc
+                                    ).toFixed(1)}
+                                  </td>
+                                )}
+                                {feedbackStats && (
+                                  <td>
+                                    {Number(
+                                      summaryPayload?.dashboardChartData
+                                        .feedback[index].mur
+                                    ).toFixed(1)}
+                                  </td>
+                                )}
+                                {bwtStats && <td>NA</td>}
                               </tr>
                               {shouldBreakPage && (
                                 <tr
@@ -1356,6 +1378,7 @@ const PdfGenerate = ({
                       </tr>
                     </thead>
                     <tbody>
+                      <tr></tr>
                       <tr>
                         <th scope="row">MWC</th>
                         {usageStats && (
@@ -1460,6 +1483,7 @@ const PdfGenerate = ({
                         {feedbackStats && <td>0.0</td>}
                         {bwtStats && <td>0</td>}
                       </tr>
+                      <tr></tr>
                     </tbody>
                   </table>
                   <table
@@ -1560,46 +1584,56 @@ const PdfGenerate = ({
                         <tr></tr>
                         <tr>
                           <th colSpan="1" scope="colgroup"></th>
-                          <th colSpan="5" scope="colgroup">
-                            Usage
-                          </th>
-                          <th colSpan="5" scope="colgroup">
-                            Collection
-                          </th>
-                          <th colSpan="5" scope="colgroup">
-                            Upi
-                          </th>
-                          <th colSpan="5" scope="colgroup">
-                            Feedback
-                          </th>
-                          <th colSpan="1" scope="colgroup">
-                            Recycled
-                          </th>
+                          {usageStats && (
+                            <th colSpan="5" scope="colgroup">
+                              Usage
+                            </th>
+                          )}
+                          {collectionStats && (
+                            <th colSpan="5" scope="colgroup">
+                              Collection
+                            </th>
+                          )}
+                          {upiStats && (
+                            <th colSpan="5" scope="colgroup">
+                              Upi
+                            </th>
+                          )}
+                          {feedbackStats && (
+                            <th colSpan="5" scope="colgroup">
+                              Feedback
+                            </th>
+                          )}
+                          {bwtStats && (
+                            <th colSpan="1" scope="colgroup">
+                              Recycled
+                            </th>
+                          )}
                         </tr>
                         <tr></tr>
                         <tr>
                           <th scope="col">Date</th>
-                          <th scope="col">All</th>
-                          <th scope="col">MWC</th>
-                          <th scope="col">FWC</th>
-                          <th scope="col">PWC</th>
-                          <th scope="col">MUR</th>
-                          <th scope="col">All</th>
-                          <th scope="col">MWC</th>
-                          <th scope="col">FWC</th>
-                          <th scope="col">PWC</th>
-                          <th scope="col">MUR</th>
-                          <th scope="col">All</th>
-                          <th scope="col">MWC</th>
-                          <th scope="col">FWC</th>
-                          <th scope="col">PWC</th>
-                          <th scope="col">MUR</th>
-                          <th scope="col">All</th>
-                          <th scope="col">MWC</th>
-                          <th scope="col">FWC</th>
-                          <th scope="col">PWC</th>
-                          <th scope="col">MUR</th>
-                          <th scope="col">BWT</th>
+                          {usageStats && <th scope="col">All</th>}
+                          {usageStats && <th scope="col">MWC</th>}
+                          {usageStats && <th scope="col">FWC</th>}
+                          {usageStats && <th scope="col">PWC</th>}
+                          {usageStats && <th scope="col">MUR</th>}
+                          {collectionStats && <th scope="col">All</th>}
+                          {collectionStats && <th scope="col">MWC</th>}
+                          {collectionStats && <th scope="col">FWC</th>}
+                          {collectionStats && <th scope="col">PWC</th>}
+                          {collectionStats && <th scope="col">MUR</th>}
+                          {upiStats && <th scope="col">All</th>}
+                          {upiStats && <th scope="col">MWC</th>}
+                          {upiStats && <th scope="col">FWC</th>}
+                          {upiStats && <th scope="col">PWC</th>}
+                          {upiStats && <th scope="col">MUR</th>}
+                          {feedbackStats && <th scope="col">All</th>}
+                          {feedbackStats && <th scope="col">MWC</th>}
+                          {feedbackStats && <th scope="col">FWC</th>}
+                          {feedbackStats && <th scope="col">PWC</th>}
+                          {feedbackStats && <th scope="col">MUR</th>}
+                          {bwtStats && <th scope="col">BWT</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -1615,137 +1649,157 @@ const PdfGenerate = ({
                                   <td style={{ "font-weight": "bold" }}>
                                     {usage.date}
                                   </td>
-                                  <td>{usage.all}</td>
-                                  <td>{usage.mwc}</td>
-                                  <td>{usage.fwc}</td>
-                                  <td>{usage.pwc}</td>
-                                  <td>{usage.mur}</td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData.collection[
-                                        index
-                                      ].all
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData.collection[
-                                        index
-                                      ].mwc
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData.collection[
-                                        index
-                                      ].fwc
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData.collection[
-                                        index
-                                      ].pwc
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData.collection[
-                                        index
-                                      ].mur
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData
-                                        .upiCollection[index].all
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData
-                                        .upiCollection[index].mwc
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData
-                                        .upiCollection[index].fwc
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData
-                                        .upiCollection[index].pwc
-                                    }
-                                  </td>
-                                  <td>
-                                    {
-                                      data?.data?.dashboardChartData
-                                        .upiCollection[index].mur
-                                    }
-                                  </td>
-                                  <td>
-                                    {typeof data?.data?.dashboardChartData
-                                      .feedback[index].all === "number"
-                                      ? data.data.dashboardChartData.feedback[
-                                          index
-                                        ].all.toFixed(1)
-                                      : Number(
-                                          data.data.dashboardChartData.feedback[
+                                  {usageStats && <td>{usage.all}</td>}
+                                  {usageStats && <td>{usage.mwc}</td>}
+                                  {usageStats && <td>{usage.fwc}</td>}
+                                  {usageStats && <td>{usage.pwc}</td>}
+                                  {usageStats && <td>{usage.mur}</td>}
+                                  {collectionStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .collection[index].all
+                                      }
+                                    </td>
+                                  )}
+                                  {collectionStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .collection[index].mwc
+                                      }
+                                    </td>
+                                  )}
+                                  {collectionStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .collection[index].fwc
+                                      }
+                                    </td>
+                                  )}
+                                  {collectionStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .collection[index].pwc
+                                      }
+                                    </td>
+                                  )}
+                                  {collectionStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .collection[index].mur
+                                      }
+                                    </td>
+                                  )}
+                                  {upiStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .upiCollection[index].all
+                                      }
+                                    </td>
+                                  )}
+                                  {upiStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .upiCollection[index].mwc
+                                      }
+                                    </td>
+                                  )}
+                                  {upiStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .upiCollection[index].fwc
+                                      }
+                                    </td>
+                                  )}
+                                  {upiStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .upiCollection[index].pwc
+                                      }
+                                    </td>
+                                  )}
+                                  {upiStats && (
+                                    <td>
+                                      {
+                                        data?.data?.dashboardChartData
+                                          .upiCollection[index].mur
+                                      }
+                                    </td>
+                                  )}
+                                  {feedbackStats && (
+                                    <td>
+                                      {typeof data?.data?.dashboardChartData
+                                        .feedback[index].all === "number"
+                                        ? data.data.dashboardChartData.feedback[
                                             index
-                                          ].all
-                                        ).toFixed(1)}
-                                  </td>
-                                  <td>
-                                    {typeof data?.data?.dashboardChartData
-                                      .feedback[index].mwc === "number"
-                                      ? data.data.dashboardChartData.feedback[
-                                          index
-                                        ].mwc.toFixed(1)
-                                      : Number(
-                                          data.data.dashboardChartData.feedback[
+                                          ].all.toFixed(1)
+                                        : Number(
+                                            data.data.dashboardChartData
+                                              .feedback[index].all
+                                          ).toFixed(1)}
+                                    </td>
+                                  )}
+                                  {feedbackStats && (
+                                    <td>
+                                      {typeof data?.data?.dashboardChartData
+                                        .feedback[index].mwc === "number"
+                                        ? data.data.dashboardChartData.feedback[
                                             index
-                                          ].mwc
-                                        ).toFixed(1)}
-                                  </td>
-                                  <td>
-                                    {typeof data?.data?.dashboardChartData
-                                      .feedback[index].fwc === "number"
-                                      ? data.data.dashboardChartData.feedback[
-                                          index
-                                        ].fwc.toFixed(1)
-                                      : Number(
-                                          data.data.dashboardChartData.feedback[
+                                          ].mwc.toFixed(1)
+                                        : Number(
+                                            data.data.dashboardChartData
+                                              .feedback[index].mwc
+                                          ).toFixed(1)}
+                                    </td>
+                                  )}
+                                  {feedbackStats && (
+                                    <td>
+                                      {typeof data?.data?.dashboardChartData
+                                        .feedback[index].fwc === "number"
+                                        ? data.data.dashboardChartData.feedback[
                                             index
-                                          ].fwc
-                                        ).toFixed(1)}
-                                  </td>
-                                  <td>
-                                    {typeof data?.data?.dashboardChartData
-                                      .feedback[index].pwc === "number"
-                                      ? data.data.dashboardChartData.feedback[
-                                          index
-                                        ].pwc.toFixed(1)
-                                      : Number(
-                                          data.data.dashboardChartData.feedback[
+                                          ].fwc.toFixed(1)
+                                        : Number(
+                                            data.data.dashboardChartData
+                                              .feedback[index].fwc
+                                          ).toFixed(1)}
+                                    </td>
+                                  )}
+                                  {feedbackStats && (
+                                    <td>
+                                      {typeof data?.data?.dashboardChartData
+                                        .feedback[index].pwc === "number"
+                                        ? data.data.dashboardChartData.feedback[
                                             index
-                                          ].pwc
-                                        ).toFixed(1)}
-                                  </td>
-                                  <td>
-                                    {typeof data?.data?.dashboardChartData
-                                      .feedback[index].mur === "number"
-                                      ? data.data.dashboardChartData.feedback[
-                                          index
-                                        ].mur.toFixed(1)
-                                      : Number(
-                                          data.data.dashboardChartData.feedback[
+                                          ].pwc.toFixed(1)
+                                        : Number(
+                                            data.data.dashboardChartData
+                                              .feedback[index].pwc
+                                          ).toFixed(1)}
+                                    </td>
+                                  )}
+                                  {feedbackStats && (
+                                    <td>
+                                      {typeof data?.data?.dashboardChartData
+                                        .feedback[index].mur === "number"
+                                        ? data.data.dashboardChartData.feedback[
                                             index
-                                          ].mur
-                                        ).toFixed(1)}
-                                  </td>
-                                  <td>NA</td>
+                                          ].mur.toFixed(1)
+                                        : Number(
+                                            data.data.dashboardChartData
+                                              .feedback[index].mur
+                                          ).toFixed(1)}
+                                    </td>
+                                  )}
+                                  {bwtStats && <td>NA</td>}
                                 </tr>
                                 {shouldBreakPage && (
                                   <tr
