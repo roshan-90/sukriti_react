@@ -95,7 +95,7 @@ const ReportsHome = ({ isOnline }) => {
   let title = "";
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
-  
+
   const toggleDialog = () => {
     console.log("visibility", visibility);
     setVisibility(!visibility);
@@ -1494,6 +1494,27 @@ const ReportsHome = ({ isOnline }) => {
     return <TreeComponent />;
   }, []);
 
+  const PdfComponent = () => {
+    return (
+      <>
+        <PdfGenerate
+          StartDate={assignDetails.StartDate}
+          EndDate={assignDetails.EndDate}
+          usageStats={usageStats}
+          collectionStats={collectionStats}
+          upiStats={upiStats}
+          feedbackStats={feedbackStats}
+          bwtStats={bwtStats}
+          complexData={complexData}
+          onClick={toggleDialog}
+        />
+      </>
+    );
+  };
+  const memoizedPdfComponent = useMemo(() => {
+    return <PdfComponent />;
+  }, [openComponet]);
+
   console.log(hasReportData, "hasReportData");
   console.log("reportData", reportData);
 
@@ -2023,21 +2044,7 @@ const ReportsHome = ({ isOnline }) => {
                 </Button>
               )}
 
-              <>
-                {openComponet && (
-                  <PdfGenerate
-                    StartDate={assignDetails.StartDate}
-                    EndDate={assignDetails.EndDate}
-                    usageStats={usageStats}
-                    collectionStats={collectionStats}
-                    upiStats={upiStats}
-                    feedbackStats={feedbackStats}
-                    bwtStats={bwtStats}
-                    complexData={complexData}
-                    onClick={generateChildPdf}
-                  />
-                )}
-              </>
+              <>{openComponet && memoizedPdfComponent}</>
             </ModalFooter>
           </Modal>
         </div>
