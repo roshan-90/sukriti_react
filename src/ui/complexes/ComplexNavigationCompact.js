@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   colorTheme,
   whiteSurfaceCircularBorder,
@@ -93,6 +93,7 @@ const ComplexNavigationCompact = (props) => {
   };
 
   const ComponentSelector = () => {
+    console.log("new hello");
     if (authStated?.accessTree == undefined) {
       return <NoDataComponent />;
     } else {
@@ -146,6 +147,10 @@ const ComplexNavigationCompact = (props) => {
     );
   };
 
+  const memoizedTreeComponent = useMemo(() => {
+    return <ComponentSelector />;
+  }, [authStated?.accessTree]);
+
   return (
     <>
       {" "}
@@ -160,7 +165,7 @@ const ComplexNavigationCompact = (props) => {
       <MessageDialog data={dialogData} />
       <div className="row" style={{ background: "white", padding: "5px" }}>
         <Header />
-        <ComponentSelector />
+        {memoizedTreeComponent}
       </div>
     </>
   );

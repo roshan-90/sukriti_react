@@ -5,6 +5,7 @@ import React, {
   useState,
   lazy,
   useCallback,
+  useMemo,
 } from "react";
 // import { connect } from "react-redux";
 // import { mqtt5, auth, iot } from "aws-iot-device-sdk-v2";
@@ -133,6 +134,20 @@ function ComplexDetails(props) {
   //         client.end();
   //     };
   // }, [handleMessage]);
+
+  const TreeComponent = () => {
+    console.log("hellog");
+    return (
+      <>
+        <ComplexNavigationCompact />
+      </>
+    );
+  };
+
+  const memoizedTreeComponent = useMemo(() => {
+    return <TreeComponent />;
+  }, []);
+
   return (
     <ErrorBoundary>
       <div className="animated fadeIn" style={{ padding: "10px" }}>
@@ -140,9 +155,7 @@ function ComplexDetails(props) {
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
-            <ErrorBoundary>
-              <ComplexNavigationCompact />
-            </ErrorBoundary>
+            <ErrorBoundary>{memoizedTreeComponent}</ErrorBoundary>
             <ErrorBoundary>
               <ComplexComposition ref={complexComposition} />
             </ErrorBoundary>

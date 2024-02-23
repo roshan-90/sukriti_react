@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, setAccessTree } from "../../features/authenticationSlice";
 import { updateSelectedComplex } from "../../features/complesStoreSlice";
@@ -201,6 +201,14 @@ const ComplexNavigationFullHeight = (props) => {
     }
   };
 
+  const memoizedTreeComponent = useMemo(() => {
+    return <ComponentSelector />;
+  }, [user?.accessTree]);
+
+  // if (user?.accessTree === undefined) {
+  //   return <NoDataComponent />;
+  // }
+
   return (
     <div style={{ background: "white", width: "100%", padding: "5px" }}>
       {isLoading && (
@@ -213,7 +221,8 @@ const ComplexNavigationFullHeight = (props) => {
       )}
       <MessageDialog data={dialogData} />
       <Header />
-      <ComponentSelector />
+      {/* <ComponentSelector /> */}
+      {memoizedTreeComponent}
     </div>
   );
 };

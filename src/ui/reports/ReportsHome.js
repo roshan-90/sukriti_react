@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
@@ -95,7 +95,7 @@ const ReportsHome = ({ isOnline }) => {
   let title = "";
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
-
+  
   const toggleDialog = () => {
     console.log("visibility", visibility);
     setVisibility(!visibility);
@@ -236,6 +236,34 @@ const ReportsHome = ({ isOnline }) => {
     { name: "PWC", value: 0 },
     { name: "MUR", value: 0 },
   ];
+
+  const resetUsage = () => {
+    totalCount = 0;
+    usage_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    collection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    upiCollection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    feedback_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+  };
 
   const filter_date = (data, duration) => {
     // Define start and end dates
@@ -520,9 +548,9 @@ const ReportsHome = ({ isOnline }) => {
       filter_complex(JSON.parse(value), 15);
     } else {
       console.log("selecte :->");
-
       fetchDashboardReport([selectedComplex.name]);
     }
+    resetUsage();
   };
 
   const setDurationSelection = (selectedDuration) => {
@@ -1173,6 +1201,299 @@ const ReportsHome = ({ isOnline }) => {
     );
   };
 
+  const YourComponent = () => {
+    console.log("YourComponent is rendered");
+    return (
+      <>
+        {" "}
+        <div style={{ width: "100" }} className="pdf-section">
+          <div
+            style={{
+              ...whiteSurface,
+              background: "white",
+              marginTop: "20px",
+              width: "100%",
+              height: "100%",
+              padding: "10px",
+              paddingBottom: "20px",
+              display: "flexbox",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ width: "30%", float: "right" }}>
+              <DropDownLabel
+                label={"Duration"}
+                handleUpdate={handleUpdate}
+                options={actionOptions}
+              />
+            </div>
+            <StatsItem
+              name="Usage Stats"
+              total={reportData?.data?.dataSummary?.usage}
+              data={reportData?.data?.dashboardChartData?.usage}
+              pieChartData={reportData?.data?.pieChartData?.usage}
+            />
+            <StatsItem
+              className="page-break"
+              name="Collection Stats"
+              total={reportData?.data?.dataSummary?.collection}
+              data={reportData?.data?.dashboardChartData?.collection}
+              pieChartData={reportData?.data?.pieChartData?.collection}
+            />
+            <StatsItem
+              name="UPI Stats"
+              total={reportData?.data?.dataSummary?.upiCollection}
+              data={reportData?.data?.dashboardChartData?.upiCollection}
+              pieChartData={reportData?.data?.pieChartData?.upiCollection}
+            />
+            <BWTStatsItem
+              className="page-break"
+              name="Recycled Water"
+              total={reportData?.data?.bwtdataSummary?.waterRecycled}
+              data={reportData?.data?.bwtdashboardChartData?.waterRecycled}
+              pieChartData={reportData?.data?.bwtpieChartData?.usage}
+            />
+            <StatsItem
+              className="page-break"
+              name="Feedback Stats"
+              total={reportData?.data?.dataSummary?.feedback}
+              data={reportData?.data?.dashboardChartData?.feedback}
+              pieChartData={reportData?.data?.pieChartData?.feedback}
+            />
+          </div>
+        </div>
+        <table
+          style={{
+            width: "100%",
+            fontSize: "14px",
+          }}
+          className="table table-bordered  pdf-section pagebreak"
+        >
+          <thead>
+            <tr></tr>
+            <tr>
+              <th colSpan="1" scope="colgroup"></th>
+              <th colSpan="5" scope="colgroup">
+                Usage
+              </th>
+              <th colSpan="5" scope="colgroup">
+                Collection
+              </th>
+              <th colSpan="5" scope="colgroup">
+                Upi
+              </th>
+              <th colSpan="5" scope="colgroup">
+                Feedback
+              </th>
+              <th colSpan="1" scope="colgroup">
+                Recycled
+              </th>
+            </tr>
+            <tr></tr>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">All</th>
+              <th scope="col">MWC</th>
+              <th scope="col">FWC</th>
+              <th scope="col">PWC</th>
+              <th scope="col">MUR</th>
+              <th scope="col">All</th>
+              <th scope="col">MWC</th>
+              <th scope="col">FWC</th>
+              <th scope="col">PWC</th>
+              <th scope="col">MUR</th>
+              <th scope="col">All</th>
+              <th scope="col">MWC</th>
+              <th scope="col">FWC</th>
+              <th scope="col">PWC</th>
+              <th scope="col">MUR</th>
+              <th scope="col">All</th>
+              <th scope="col">MWC</th>
+              <th scope="col">FWC</th>
+              <th scope="col">PWC</th>
+              <th scope="col">MUR</th>
+              <th scope="col">BWT</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reportData?.data?.dashboardChartData?.usage.map((usage, index) => {
+              const rowCount = index + 1; // Adding 1 to start the count from 1
+              const shouldBreakPage = rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
+
+              return (
+                <React.Fragment key={index}>
+                  <tr key={index}>
+                    <td style={{ "font-weight": "bold" }}>{usage.date}</td>
+                    <td>{usage.all}</td>
+                    <td>{usage.mwc}</td>
+                    <td>{usage.fwc}</td>
+                    <td>{usage.pwc}</td>
+                    <td>{usage.mur}</td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.collection[index]
+                          .all
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.collection[index]
+                          .mwc
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.collection[index]
+                          .fwc
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.collection[index]
+                          .pwc
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.collection[index]
+                          .mur
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.upiCollection[
+                          index
+                        ].all
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.upiCollection[
+                          index
+                        ].mwc
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.upiCollection[
+                          index
+                        ].fwc
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.upiCollection[
+                          index
+                        ].pwc
+                      }
+                    </td>
+                    <td>
+                      {
+                        reportData?.data?.dashboardChartData.upiCollection[
+                          index
+                        ].mur
+                      }
+                    </td>
+                    <td>
+                      {typeof reportData?.data?.dashboardChartData.feedback[
+                        index
+                      ].all === "number"
+                        ? reportData.data.dashboardChartData.feedback[
+                            index
+                          ].all.toFixed(1)
+                        : Number(
+                            reportData.data.dashboardChartData.feedback[index]
+                              .all
+                          ).toFixed(1)}
+                    </td>
+                    <td>
+                      {typeof reportData?.data?.dashboardChartData.feedback[
+                        index
+                      ].mwc === "number"
+                        ? reportData.data.dashboardChartData.feedback[
+                            index
+                          ].mwc.toFixed(1)
+                        : Number(
+                            reportData.data.dashboardChartData.feedback[index]
+                              .mwc
+                          ).toFixed(1)}
+                    </td>
+                    <td>
+                      {typeof reportData?.data?.dashboardChartData.feedback[
+                        index
+                      ].fwc === "number"
+                        ? reportData.data.dashboardChartData.feedback[
+                            index
+                          ].fwc.toFixed(0)
+                        : Number(
+                            reportData.data.dashboardChartData.feedback[index]
+                              .fwc
+                          ).toFixed(0)}
+                    </td>
+                    <td>
+                      {typeof reportData?.data?.dashboardChartData.feedback[
+                        index
+                      ].pwc === "number"
+                        ? reportData.data.dashboardChartData.feedback[
+                            index
+                          ].pwc.toFixed(0)
+                        : Number(
+                            reportData.data.dashboardChartData.feedback[index]
+                              .pwc
+                          ).toFixed(0)}
+                    </td>
+                    <td>
+                      {typeof reportData?.data?.dashboardChartData.feedback[
+                        index
+                      ].mur === "number"
+                        ? reportData.data.dashboardChartData.feedback[
+                            index
+                          ].mur.toFixed(0)
+                        : Number(
+                            reportData.data.dashboardChartData.feedback[index]
+                              .mur
+                          ).toFixed(0)}
+                    </td>
+                    <td>NA</td>
+                  </tr>
+                  {shouldBreakPage && (
+                    <tr
+                      className="page-break"
+                      style={{
+                        marginBottom: "10px",
+                        pageBreakAfter: "always",
+                      }}
+                    ></tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </>
+    );
+  };
+
+  // Memoize the YourComponent instance
+  const memoizedYourComponent = useMemo(() => {
+    return <YourComponent />;
+  }, [reportData]);
+
+  const TreeComponent = () => {
+    console.log("hellog");
+    return (
+      <>
+        <ComplexNavigationFullHeight
+          setComplexSelection={setComplexSelection}
+        />
+      </>
+    );
+  };
+
+  const memoizedTreeComponent = useMemo(() => {
+    return <TreeComponent />;
+  }, []);
+
   console.log(hasReportData, "hasReportData");
   console.log("reportData", reportData);
 
@@ -1189,7 +1510,6 @@ const ReportsHome = ({ isOnline }) => {
             </div>
           )}
           <MessageDialog data={dialogData} />
-
           <table style={{ width: "100%", height: "100%", padding: "0px" }}>
             <tbody>
               <tr>
@@ -1203,9 +1523,7 @@ const ReportsHome = ({ isOnline }) => {
                       alignItems: "flex-start",
                     }}
                   >
-                    <ComplexNavigationFullHeight
-                      setComplexSelection={setComplexSelection}
-                    />
+                    {memoizedTreeComponent}
                     <div
                       style={{
                         backgroundColor: "white",
@@ -1255,288 +1573,7 @@ const ReportsHome = ({ isOnline }) => {
                   </div>
                 </td>
                 <td style={{ width: "80%" }} id="pdf-content">
-                  <div style={{ width: "100" }} className="pdf-section">
-                    {/* <Stats
-                      setDurationSelection={setDurationSelection}
-                      // handleComplexSelection={handleComplexSelection}
-                      chartData={reportData?.data?.dashboardChartData}
-                      pieChartData={reportData?.data?.pieChartData}
-                      dataSummary={reportData?.data?.dataSummary}
-                      bwtChartData={reportData?.data?.bwtdashboardChartData}
-                      bwtPieChartData={reportData?.data?.bwtpieChartData}
-                      bwtDataSummary={reportData?.data?.bwtdataSummary}
-                      dashboardUpiChartData={
-                        reportData?.data?.dashboardUpiChartData
-                      }
-                      pieChartUpiData={reportData?.data?.pieChartUpiData}
-                      uiResult={dashboard_data?.uiResult?.data}
-                    /> */}
-                    <div
-                      style={{
-                        ...whiteSurface,
-                        background: "white",
-                        marginTop: "20px",
-                        width: "100%",
-                        height: "100%",
-                        padding: "10px",
-                        paddingBottom: "20px",
-                        display: "flexbox",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ width: "30%", float: "right" }}>
-                        <DropDownLabel
-                          label={"Duration"}
-                          handleUpdate={handleUpdate}
-                          options={actionOptions}
-                        />
-                      </div>
-                      <StatsItem
-                        name="Usage Stats"
-                        total={reportData?.data?.dataSummary?.usage}
-                        data={reportData?.data?.dashboardChartData?.usage}
-                        pieChartData={reportData?.data?.pieChartData?.usage}
-                      />
-                      <StatsItem
-                        className="page-break"
-                        name="Collection Stats"
-                        total={reportData?.data?.dataSummary?.collection}
-                        data={reportData?.data?.dashboardChartData?.collection}
-                        pieChartData={
-                          reportData?.data?.pieChartData?.collection
-                        }
-                      />
-                      <StatsItem
-                        name="UPI Stats"
-                        total={reportData?.data?.dataSummary?.upiCollection}
-                        data={
-                          reportData?.data?.dashboardChartData?.upiCollection
-                        }
-                        pieChartData={
-                          reportData?.data?.pieChartData?.upiCollection
-                        }
-                      />
-                      <BWTStatsItem
-                        className="page-break"
-                        name="Recycled Water"
-                        total={reportData?.data?.bwtdataSummary?.waterRecycled}
-                        data={
-                          reportData?.data?.bwtdashboardChartData?.waterRecycled
-                        }
-                        pieChartData={reportData?.data?.bwtpieChartData?.usage}
-                      />
-                      <StatsItem
-                        className="page-break"
-                        name="Feedback Stats"
-                        total={reportData?.data?.dataSummary?.feedback}
-                        data={reportData?.data?.dashboardChartData?.feedback}
-                        pieChartData={reportData?.data?.pieChartData?.feedback}
-                      />
-                    </div>
-                  </div>
-                  <table
-                    style={{
-                      width: "100%",
-                      fontSize: "14px",
-                    }}
-                    className="table table-bordered  pdf-section pagebreak"
-                  >
-                    <thead>
-                      <tr></tr>
-                      <tr>
-                        <th colSpan="1" scope="colgroup"></th>
-                        <th colSpan="5" scope="colgroup">
-                          Usage
-                        </th>
-                        <th colSpan="5" scope="colgroup">
-                          Collection
-                        </th>
-                        <th colSpan="5" scope="colgroup">
-                          Upi
-                        </th>
-                        <th colSpan="5" scope="colgroup">
-                          Feedback
-                        </th>
-                        <th colSpan="1" scope="colgroup">
-                          Recycled
-                        </th>
-                      </tr>
-                      <tr></tr>
-                      <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">All</th>
-                        <th scope="col">MWC</th>
-                        <th scope="col">FWC</th>
-                        <th scope="col">PWC</th>
-                        <th scope="col">MUR</th>
-                        <th scope="col">BWT</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reportData?.data?.dashboardChartData?.usage.map(
-                        (usage, index) => {
-                          const rowCount = index + 1; // Adding 1 to start the count from 1
-                          const shouldBreakPage =
-                            rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
-
-                          return (
-                            <React.Fragment key={index}>
-                              <tr key={index}>
-                                <td style={{ "font-weight": "bold" }}>
-                                  {usage.date}
-                                </td>
-                                <td>{usage.all}</td>
-                                <td>{usage.mwc}</td>
-                                <td>{usage.fwc}</td>
-                                <td>{usage.pwc}</td>
-                                <td>{usage.mur}</td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .collection[index].all
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .collection[index].mwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .collection[index].fwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .collection[index].pwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .collection[index].mur
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .upiCollection[index].all
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .upiCollection[index].mwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .upiCollection[index].fwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .upiCollection[index].pwc
-                                  }
-                                </td>
-                                <td>
-                                  {
-                                    reportData?.data?.dashboardChartData
-                                      .upiCollection[index].mur
-                                  }
-                                </td>
-                                <td>
-                                  {typeof reportData?.data?.dashboardChartData
-                                    .feedback[index].all === "number"
-                                    ? reportData.data.dashboardChartData.feedback[
-                                        index
-                                      ].all.toFixed(1)
-                                    : Number(
-                                        reportData.data.dashboardChartData
-                                          .feedback[index].all
-                                      ).toFixed(1)}
-                                </td>
-                                <td>
-                                  {typeof reportData?.data?.dashboardChartData
-                                    .feedback[index].mwc === "number"
-                                    ? reportData.data.dashboardChartData.feedback[
-                                        index
-                                      ].mwc.toFixed(1)
-                                    : Number(
-                                        reportData.data.dashboardChartData
-                                          .feedback[index].mwc
-                                      ).toFixed(1)}
-                                </td>
-                                <td>
-                                  {typeof reportData?.data?.dashboardChartData
-                                    .feedback[index].fwc === "number"
-                                    ? reportData.data.dashboardChartData.feedback[
-                                        index
-                                      ].fwc.toFixed(0)
-                                    : Number(
-                                        reportData.data.dashboardChartData
-                                          .feedback[index].fwc
-                                      ).toFixed(0)}
-                                </td>
-                                <td>
-                                  {typeof reportData?.data?.dashboardChartData
-                                    .feedback[index].pwc === "number"
-                                    ? reportData.data.dashboardChartData.feedback[
-                                        index
-                                      ].pwc.toFixed(0)
-                                    : Number(
-                                        reportData.data.dashboardChartData
-                                          .feedback[index].pwc
-                                      ).toFixed(0)}
-                                </td>
-                                <td>
-                                  {typeof reportData?.data?.dashboardChartData
-                                    .feedback[index].mur === "number"
-                                    ? reportData.data.dashboardChartData.feedback[
-                                        index
-                                      ].mur.toFixed(0)
-                                    : Number(
-                                        reportData.data.dashboardChartData
-                                          .feedback[index].mur
-                                      ).toFixed(0)}
-                                </td>
-                                <td>NA</td>
-                              </tr>
-                              {shouldBreakPage && (
-                                <tr
-                                  className="page-break"
-                                  style={{
-                                    marginBottom: "10px",
-                                    pageBreakAfter: "always",
-                                  }}
-                                ></tr>
-                              )}
-                            </React.Fragment>
-                          );
-                        }
-                      )}
-                    </tbody>
-                  </table>
+                  {memoizedYourComponent}
                 </td>
               </tr>
             </tbody>
