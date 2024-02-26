@@ -103,6 +103,7 @@ const App = () => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
       localStorage.setItem("lastVisitedPage", window.location.pathname);
+      window.location.reload(true); // Force reload the page from the server, clearing cache
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);

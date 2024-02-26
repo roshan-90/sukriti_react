@@ -33,7 +33,7 @@ const ComplexNavigationCompact = (props) => {
   const [dialogData, setDialogData] = useState(null);
 
   const initFetchCompletedUserAccessTreeAction = async () => {
-    dispatch(startLoading()); // Dispatch the startLoading action
+    // dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchCompletedUserAccessTree(
         user?.username,
@@ -70,9 +70,10 @@ const ComplexNavigationCompact = (props) => {
   console.log("auth state ---", authStated?.accessTree);
 
   useEffect(() => {
-    if (authStated?.accessTree == undefined) {
-      initFetchCompletedUserAccessTreeAction();
-    }
+    dispatch(startLoading()); // Dispatch the startLoading action
+    // if (authStated?.accessTree == undefined) {
+    initFetchCompletedUserAccessTreeAction();
+    // }
   }, []);
 
   const handleComplexSelection = (treeEdge) => {

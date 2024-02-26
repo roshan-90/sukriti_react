@@ -92,7 +92,9 @@ const ComplexComposition = React.forwardRef((props, ref) => {
         );
       }
       console.log(" props complex-compostion--->", props);
-      fetchComplexComposition();
+      if (complex_store?.complex?.name) {
+        fetchComplexComposition();
+      }
       console.log("props is changed", complex_store?.complex?.name);
     }
   }
