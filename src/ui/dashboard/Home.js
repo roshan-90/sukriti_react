@@ -103,6 +103,7 @@ const Home = ({ isOnline }) => {
       if (reportParms.duration == "15") {
         setLocalStorageItem("dashboard_15", JSON.stringify(result));
       }
+      dispatch(stopLoading()); // Dispatch the stopLoading action
       let result_90 = await executeFetchDashboardLambda(
         user?.username,
         "90",
@@ -113,11 +114,11 @@ const Home = ({ isOnline }) => {
       setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
     } catch (err) {
       handleError(err, "fetchDashboardData");
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     } finally {
       if (isOnline == true) {
         fetch_dashboard();
       }
-      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
