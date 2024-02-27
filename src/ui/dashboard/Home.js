@@ -26,8 +26,13 @@ import { clearUser } from "../../features/authenticationSlice";
 import useOnlineStatus from "../../services/useOnlineStatus";
 
 const Home = ({ isOnline }) => {
-  const { handleOnlineState, setLocalStorageItem, getLocalStorageItem } =
-    useOnlineStatus();
+  const {
+    handleOnlineState,
+    setLocalStorageItem,
+    getLocalStorageItem,
+    setCookie,
+    getCookie,
+  } = useOnlineStatus();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -87,6 +92,32 @@ const Home = ({ isOnline }) => {
     }
   };
 
+  // Function to check if it's been 24 hours since the last function call
+  const checkAndUpdateFunction = async (name) => {
+    console.log("hour check", name);
+
+    var lastRunTime = getCookie(`lastRunTime${name}`);
+    var currentTime = new Date().getTime();
+    if (
+      !lastRunTime ||
+      currentTime - parseInt(lastRunTime) >= name * 60 * 60 * 1000
+    ) {
+      let result_90 = await executeFetchDashboardLambda(
+        user?.username,
+        "90",
+        reportParms.complex,
+        user?.credentials
+      );
+      console.log("result_90", result_90);
+      setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
+      if (isOnline == true) {
+        fetch_dashboard();
+      }
+      // Update the last run time
+      setCookie(`lastRunTime${name}`, currentTime.toString(), name); // Expires in 24 hours
+    }
+  };
+
   const fetchDashboardData = async (duration) => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
@@ -103,22 +134,13 @@ const Home = ({ isOnline }) => {
       if (reportParms.duration == "15") {
         setLocalStorageItem("dashboard_15", JSON.stringify(result));
       }
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-      let result_90 = await executeFetchDashboardLambda(
-        user?.username,
-        "90",
-        reportParms.complex,
-        user?.credentials
-      );
-      console.log("result_90", result_90);
-      setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
+      await checkAndUpdateFunction(24);
+      await checkAndUpdateFunction(2);
     } catch (err) {
       handleError(err, "fetchDashboardData");
       dispatch(stopLoading()); // Dispatch the stopLoading action
     } finally {
-      if (isOnline == true) {
-        fetch_dashboard();
-      }
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
