@@ -193,6 +193,7 @@ const ReportsHome = ({ isOnline }) => {
   // };
 
   const fetchDashboardReport = async (complex) => {
+    console.log('checking fetch report',complex)
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
       console.log("fetchDashboardData--> 1111", reportParms);
