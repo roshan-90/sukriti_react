@@ -151,6 +151,16 @@ const AppBar = ({ isOnline }) => {
                 </NavLink>
               </NavItem>
             ) : null}
+            <NavItem>
+              <NavLink
+                style={navLinkStyle}
+                onClick={() => {
+                  navigate("/android_management");
+                }}
+              >
+                Android Management
+              </NavLink>
+            </NavItem>
           </Nav>
           <span
             style={{

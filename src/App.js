@@ -46,6 +46,9 @@ const CreateNewTicket = lazy(() => import("./ui/incidence/CreateNewTicket"));
 const IncidenceTicketDetails = lazy(() =>
   import("./ui/incidence/IncidenceTicketDetails")
 );
+const AndroidManagement = lazy(() =>
+  import("./ui/android_management/AndroidDetails")
+);
 
 const App = () => {
   const dispatch = useDispatch();
@@ -103,7 +106,8 @@ const App = () => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
       localStorage.setItem("lastVisitedPage", window.location.pathname);
-      window.location.reload(true); // Force reload the page from the server, clearing cache
+      window.location.href = `${window.location.origin}/index.html`;
+      console.log("check href", window.location.href);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -135,6 +139,7 @@ const App = () => {
   console.log("isOnline", isOnline);
   console.log("user--->", authentication);
   console.log("count", offlinecount);
+
   if (isOnline == false && offlinecount == 1) {
     console.log("function work");
     handleOfflineState(isOnline, authentication);
@@ -260,6 +265,12 @@ const App = () => {
                       exact={true}
                       name={"Update Vendor Member"}
                       element={<UpdateVendorMember />}
+                    />
+                    <Route
+                      path={"/android_management"}
+                      exact={true}
+                      name={"Android Management"}
+                      element={<AndroidManagement />}
                     />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
