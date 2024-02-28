@@ -27,6 +27,63 @@ import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+} from "reactstrap";
+
+const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
+  const [formData, setFormData] = useState({
+    // Define form fields and initial values here
+    enterpriseName: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission here, e.g., send data to server
+    console.log(formData);
+    // Close the modal after form submission
+    toggleModal();
+  };
+
+  return (
+    <Modal isOpen={isOpen} toggle={toggleModal}>
+      <ModalHeader toggle={toggleModal}>Create Enterprise</ModalHeader>
+      <ModalBody>
+        <Form onSubmit={handleSubmit}>
+          <FormGroup>
+            <Label for="enterpriseName">Enterprise Name</Label>
+            <Input
+              type="text"
+              name="enterpriseName"
+              id="enterpriseName"
+              value={formData.enterpriseName}
+              onChange={handleChange}
+            />
+          </FormGroup>
+          {/* Add more form fields as needed */}
+          <Button type="submit" color="primary">
+            Submit
+          </Button>{" "}
+          <Button color="secondary" onClick={toggleModal}>
+            Cancel
+          </Button>
+        </Form>
+      </ModalBody>
+    </Modal>
+  );
+};
 
 function AndroidDetails() {
   const dispatch = useDispatch();
@@ -36,7 +93,11 @@ function AndroidDetails() {
   const [listEnterprise, setListEnterprise] = useState(undefined);
   const [listDevices, setListDevices] = useState(undefined);
   const [showDeviceData, setShowDeviceData] = useState(undefined);
+  const [modalOpen, setModalOpen] = useState(false);
 
+  const toggleModal = () => {
+    setModalOpen(!modalOpen);
+  };
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
     let text = err.message.includes("expired");
@@ -436,10 +497,15 @@ function AndroidDetails() {
               style={{ float: "right", padding: "0px 0px 0px 0px" }}
               color="primary"
               className="px-4"
-              //   onClick={() => setSelectedCabin(props.cabin)}
+              onClick={toggleModal}
             >
               + Create Enterprise
             </Button>
+            <CreateEnterpriseModal
+              isOpen={modalOpen}
+              toggleModal={toggleModal}
+            />
+
             <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
           </div>
         </div>
