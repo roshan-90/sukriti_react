@@ -271,8 +271,9 @@ function AndroidDetails() {
 
   const textStyle = {
     color: "black",
-    fontSize: "8px",
-    fontWeight: "normal",
+    fontSize: "11px",
+    // fontWeight: "normal",
+    fontWeight: "700",
     fontStyle: "normal",
   };
 
@@ -324,6 +325,11 @@ function AndroidDetails() {
     return <ListEnterpriseComponent />;
   }, [listEnterprise]);
 
+  const deviceName = (name) => {
+    let array = name.split("/");
+    return `${array[2]}/${array[3]}`;
+  };
+
   const ListsDeviceComponent = () => {
     console.log("listDevices", listDevices);
     return (
@@ -346,18 +352,31 @@ function AndroidDetails() {
               }}
             >
               {listDevices.map((data, index) => {
+                const circleColor =
+                  data.state == "PROVISIONING" ? "red" : "green";
+
+                let circleActive = {
+                  boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 8px 0px",
+                  backgroundColor: circleColor,
+                  borderRadius: "50%",
+                  width: "10px",
+                  height: "10px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                };
                 return (
                   <>
                     <div className="row" style={rowStyle} key={index}>
                       <div className="col-md-2" style={colStyle}>
-                        <div style={circleStyle}></div>
+                        <div style={circleActive}></div>
                       </div>
                       <div
                         className="col-md-8"
                         style={textStyle}
                         onClick={() => handleClickDevice(data)}
                       >
-                        {data.name}
+                        {deviceName(data.name)} {/* Call the function here */}
                       </div>
                     </div>
                   </>
@@ -429,11 +448,11 @@ function AndroidDetails() {
                       <CardText>
                         <p>
                           Android Version:{" "}
-                          {showDeviceData.softwareInfo.androidVersion}
+                          {showDeviceData?.softwareInfo?.androidVersion}
                         </p>
                         <p>
                           Build Number:{" "}
-                          {showDeviceData.softwareInfo.androidBuildNumber}
+                          {showDeviceData?.softwareInfo?.androidBuildNumber}
                         </p>
                         {/* Add more software info fields as needed */}
                       </CardText>
