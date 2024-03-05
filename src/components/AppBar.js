@@ -31,6 +31,18 @@ const AppBar = ({ isOnline }) => {
     dispatch(clearUser());
   };
 
+  const syncFunction = async () => {
+    console.log("click");
+    let result_90 = await executeFetchDashboardLambda(
+      user?.username,
+      "90",
+      "all",
+      user?.credentials
+    );
+    console.log("result_90", result_90);
+    setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
+  };
+
   const setOfflineMessage = (title) => {
     return (message) => {
       return (name) => {
@@ -185,6 +197,18 @@ const AppBar = ({ isOnline }) => {
                 <p style={{ color: "red" }}>Offline</p>
               )}
             </Button> */}
+            <Button
+              outline
+              color="primary"
+              className="px-4"
+              style={{
+                float: "right",
+                marginLeft: "7px",
+              }}
+              onClick={syncFunction}
+            >
+              Sync Data
+            </Button>
             <Badge
               color={isOnline ? "success" : "error"}
               anchorOrigin={{
