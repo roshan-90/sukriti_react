@@ -33,7 +33,7 @@ const authSlice = createSlice({
       state.username = null;
       state.credentials = null;
       state.authenticated = false;
-      localStorage.clear();
+      // localStorage.clear();
     },
   },
 });
