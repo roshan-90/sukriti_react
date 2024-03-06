@@ -135,7 +135,6 @@ const Home = ({ isOnline }) => {
         setLocalStorageItem("dashboard_15", JSON.stringify(result));
       }
       await checkAndUpdateFunction(24);
-      await checkAndUpdateFunction(2);
     } catch (err) {
       handleError(err, "fetchDashboardData");
       dispatch(stopLoading()); // Dispatch the stopLoading action
@@ -413,7 +412,7 @@ const Home = ({ isOnline }) => {
   const fetch_dashboard = async () => {
     console.log(" after fetch_dashboard");
     let dashboard_90 = getLocalStorageItem("dashboard_90");
-    let array = [30, 45, 60];
+    let array = [60,45,30,15];
     array.forEach((duration) => {
       filter_date(dashboard_90, duration);
     });
