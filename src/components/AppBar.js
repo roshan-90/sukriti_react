@@ -59,9 +59,10 @@ const AppBar = ({ isOnline }) => {
   }
 
   const confirmSignOut = () => {
-    storageClear();
+    localStorage.setItem("set_user", user?.username);
     window.location.reload();
     dispatch(clearUser());
+    storageClear();
   };
 
   const handleError = (err, Custommessage, onclick = null) => {

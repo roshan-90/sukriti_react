@@ -58,8 +58,21 @@ const Home = ({ isOnline }) => {
     if (!isAuthenticated) {
       navigate("/login");
     } else {
-      fetchDashboardData(15);
+      let getuser =  localStorage.getItem('set_user');  
+      console.log('getuser',getuser);
+      console.log('user?.username', user?.username);   
+      if(getuser !== user?.username && getuser !== null){
+        console.log('1:-->')
+        fetchDashboardData(15);
+      } else {
+        console.log('2:-->')
+        let dashboard_15 = getLocalStorageItem("dashboard_15");
+        dispatch(setDashboardData(dashboard_15));
+      }
       localStorage.setItem("selection_key", "15 Days");
+      if(getuser){
+        localStorage.removeItem("set_user");
+      }
     }
   }, [isAuthenticated, navigate]);
 
@@ -161,7 +174,7 @@ const Home = ({ isOnline }) => {
   const setDurationSelection = async (duration) => {
     console.log("duration", duration);
     reportParms.duration = duration;
-    if (isOnline == false) {
+    // if (isOnline == false) {
       console.log("reportParms.duration", typeof reportParms.duration);
       console.log("reportParms.duration", reportParms.duration);
       switch (true) {
@@ -193,9 +206,9 @@ const Home = ({ isOnline }) => {
         default:
           console.log("default switch working");
       }
-    } else {
-      await fetchDashboardData();
-    }
+    // } else {
+    //   await fetchDashboardData();
+    // }
   };
 
   // Check if dashboard_data and its required properties exist
