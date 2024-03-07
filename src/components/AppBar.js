@@ -43,7 +43,7 @@ const AppBar = ({ isOnline }) => {
     const keys = Object.keys(localStorage);
     // Define the words you want to remove
     const wordsToRemove = ['selection_key','userDetails','data','complex_name','adminstration','historyStore'
-   ,'extra'];
+   ,'extra','lastVisitedPage'];
 
     // Loop through the keys and remove corresponding items from localStorage
     keys.forEach(key => {
@@ -51,20 +51,18 @@ const AppBar = ({ isOnline }) => {
       if(key.includes('aws.cognito')) localStorage.removeItem(key);
       else if (key.includes('CognitoIdentityServiceProvider')) localStorage.removeItem(key);
       wordsToRemove.forEach(word => {
-        if (key.includes(word)) {
-            localStorage.removeItem(key);
-        }
-    });
+          if (key.includes(word)) {
+              localStorage.removeItem(key);
+          }
+      });
     });
   }
 
   const confirmSignOut = () => {
     storageClear();
-    return;
     window.location.reload();
     dispatch(clearUser());
   };
-
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);

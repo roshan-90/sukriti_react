@@ -95,26 +95,29 @@ const Home = ({ isOnline }) => {
   // Function to check if it's been 24 hours since the last function call
   const checkAndUpdateFunction = async (name) => {
     console.log("hour check", name);
+    let hours = new Date().getHours();
 
-    var lastRunTime = getCookie(`lastRunTime${name}`);
-    var currentTime = new Date().getTime();
-    if (
-      !lastRunTime ||
-      currentTime - parseInt(lastRunTime) >= name * 60 * 60 * 1000
-    ) {
-      let result_90 = await executeFetchDashboardLambda(
-        user?.username,
-        "90",
-        reportParms.complex,
-        user?.credentials
-      );
-      console.log("result_90", result_90);
-      setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
-      if (isOnline == true) {
-        fetch_dashboard();
+    if(hours > 10) {
+      var lastRunTime = getCookie(`lastRunTime${name}`);
+      var currentTime = new Date().getTime();
+      if (
+        !lastRunTime ||
+        currentTime - parseInt(lastRunTime) >= name * 60 * 60 * 1000
+      ) {
+        let result_90 = await executeFetchDashboardLambda(
+          user?.username,
+          "90",
+          reportParms.complex,
+          user?.credentials
+        );
+        console.log("result_90", result_90);
+        setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
+        if (isOnline == true) {
+          fetch_dashboard();
+        }
+        // Update the last run time
+        setCookie(`lastRunTime${name}`, currentTime.toString(), name); // Expires in 24 hours
       }
-      // Update the last run time
-      setCookie(`lastRunTime${name}`, currentTime.toString(), name); // Expires in 24 hours
     }
   };
 

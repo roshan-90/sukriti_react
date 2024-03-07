@@ -97,27 +97,30 @@ const ComplexNavigationFullHeight = (props) => {
   async function overloopData(dataArray) {
     try {
       var lastRunTime = getCookie("lastReportRunTime24");
-      var currentTime = new Date().getTime();
-      if (
-        !lastRunTime ||
-        currentTime - parseInt(lastRunTime) >= 24 * 60 * 60 * 1000
-      ) {
-        const chunks = chunkArray(dataArray, 15);
-        for (const chunk of chunks) {
-          await fetchDashboardReport(chunk);
-          console.log("chunck :->", chunk);
+      let hours = new Date().getHours();
+      if(hours > 10) {
+        var currentTime = new Date().getTime();
+          if (
+            !lastRunTime ||
+            currentTime - parseInt(lastRunTime) >= 24 * 60 * 60 * 1000
+          ) {
+            const chunks = chunkArray(dataArray, 15);
+            for (const chunk of chunks) {
+              await fetchDashboardReport(chunk);
+              console.log("chunck :->", chunk);
+            }
+            console.log("all_report_data", all_report_data);
+            localStorage.setItem(
+              "report_dashboard",
+              JSON.stringify(all_report_data)
+            );
+            setCookie("lastReportRunTime24", currentTime.toString(), 24); // Expires in 24 hours
+          }
         }
-        console.log("all_report_data", all_report_data);
-        localStorage.setItem(
-          "report_dashboard",
-          JSON.stringify(all_report_data)
-        );
-        setCookie("lastReportRunTime24", currentTime.toString(), 24); // Expires in 24 hours
+      } catch (err) {
+        // Catch an error here
+        handleError(err, "overloopData");
       }
-    } catch (err) {
-      // Catch an error here
-      handleError(err, "overloopData");
-    }
   }
 
   const initFetchCompletedUserAccessTreeAction = async () => {
