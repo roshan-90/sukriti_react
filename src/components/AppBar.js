@@ -42,7 +42,7 @@ const AppBar = ({ isOnline }) => {
     // List of keys to remove
     const keys = Object.keys(localStorage);
     // Define the words you want to remove
-    const wordsToRemove = ['user','selection_key','userDetails','data','complex_name','adminstration','historyStore'
+    const wordsToRemove = ['selection_key','userDetails','data','complex_name','adminstration','historyStore'
    ,'extra','lastVisitedPage'];
 
     // Loop through the keys and remove corresponding items from localStorage
@@ -61,8 +61,9 @@ const AppBar = ({ isOnline }) => {
   const confirmSignOut = () => {
     localStorage.setItem("set_user", user?.username);
     window.location.reload();
-    dispatch(clearUser());
     storageClear();
+    dispatch(clearUser());
+    localStorage.removeItem('user');
   };
 
   const handleError = (err, Custommessage, onclick = null) => {
