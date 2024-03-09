@@ -1036,7 +1036,7 @@ const PdfGenerate = ({
                           >
                             {usageStats && (
                               <StatsItem
-                                className="page-break"
+                                // className="page-break"
                                 name="Usage Stats"
                                 total={summaryPayload?.dataSummary?.usage}
                                 data={summaryPayload?.dashboardChartData?.usage}
@@ -1045,6 +1045,8 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
+                            {usageStats && <div  className="page-break" ></div> }
+
                             {collectionStats && (
                               <StatsItem
                                 name="Collection Stats"
@@ -1057,6 +1059,8 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
+                            {usageStats !== true && <div  className="page-break" ></div> }
+
                             {upiStats && (
                               <StatsItem
                                 className="page-break"
@@ -1073,6 +1077,7 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
+                            {((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false )) && <div  className="page-break" ></div> }
                             {bwtStats && (
                               <BWTStatsItem
                                 name="Recycled Water"
@@ -1088,6 +1093,7 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
+                            {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false )) && <div  className="page-break" ></div> }
                             {feedbackStats && (
                               <StatsItem
                                 className="page-break"
@@ -1507,15 +1513,17 @@ const PdfGenerate = ({
                             pieChartUpiData={data?.data?.pieChartUpiData}
                             uiResult={dashboard_data?.uiResult?.data}
                           /> */}
+                              {/* {usageStats && <div  className="page-break" ></div> } */}
                             {usageStats && (
                               <StatsItem
-                                className="page-break"
+                                // className="page-break"
                                 name="Usage Stats"
                                 total={data?.data?.dataSummary?.usage}
                                 data={data?.data?.dashboardChartData?.usage}
                                 pieChartData={data?.data?.pieChartData?.usage}
                               />
                             )}
+                            
                             {collectionStats && (
                               <StatsItem
                                 name="Collection Stats"
@@ -1528,6 +1536,8 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
+                            {/* {usageStats != true && <div  className="page-break" ></div> } */}
+
                             {upiStats && (
                               <StatsItem
                                 className="page-break"
