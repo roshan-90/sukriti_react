@@ -544,13 +544,13 @@ const ReportsHome = ({ isOnline }) => {
     reportParms.complex = selectedComplex.name;
     reportParms.duration = 15;
     localStorage.setItem("complex_name", selectedComplex.name);
-    if (isOnline == false) {
+    // if (isOnline == false) {
       let value = localStorage.getItem("report_dashboard");
       filter_complex(JSON.parse(value), 15);
-    } else {
-      console.log("selecte :->");
-      fetchDashboardReport([selectedComplex.name]);
-    }
+    // } else {
+    //   console.log("selecte :->");
+    //   fetchDashboardReport([selectedComplex.name]);
+    // }
     resetUsage();
   };
 
@@ -558,7 +558,7 @@ const ReportsHome = ({ isOnline }) => {
     reportParms.duration = selectedDuration;
     reportParms.complex = localStorage.getItem("complex_name");
     console.log("reportParam", reportParms);
-    if (isOnline == false) {
+    // if (isOnline == false) {
       if (reportParms.complex === "all") {
         setDashboard_data(selectedDuration);
       } else {
@@ -585,14 +585,14 @@ const ReportsHome = ({ isOnline }) => {
           }
         }
       }
-    } else {
-      if (reportParms.complex === "all") {
-        console.log("report complex all");
-        setDashboard_data(selectedDuration);
-      } else {
-        fetchDashboardReport([reportParms.complex]);
-      }
-    }
+    // } else {
+    //   if (reportParms.complex === "all") {
+    //     console.log("report complex all");
+    //     setDashboard_data(selectedDuration);
+    //   } else {
+    //     fetchDashboardReport([reportParms.complex]);
+    //   }
+    // }
   };
 
   const handleChange = (event) => {

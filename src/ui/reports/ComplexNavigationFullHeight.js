@@ -117,6 +117,19 @@ const ComplexNavigationFullHeight = (props) => {
             setCookie("lastReportRunTime24", currentTime.toString(), 24); // Expires in 24 hours
           }
         }
+          let report_dashboard_data = localStorage.getItem('report_dashboard');
+          if(report_dashboard_data == undefined || report_dashboard_data == null) {
+            const chunks = chunkArray(dataArray, 15);
+            for (const chunk of chunks) {
+              await fetchDashboardReport(chunk);
+              console.log("chunck :->", chunk);
+            }
+            console.log("all_report_data", all_report_data);
+            localStorage.setItem(
+              "report_dashboard",
+              JSON.stringify(all_report_data)
+            );
+          }
       } catch (err) {
         // Catch an error here
         handleError(err, "overloopData");

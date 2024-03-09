@@ -59,15 +59,17 @@ const Home = ({ isOnline }) => {
       navigate("/login");
     } else {
       let getuser =  localStorage.getItem('set_user');  
+      let dashboard_15 = getLocalStorageItem("dashboard_15");
       console.log('getuser',getuser);
       console.log('user?.username', user?.username);   
-      if(getuser !== user?.username && getuser !== null){
+      console.log('condition change',getuser == user?.username);
+      console.log('dashboard_15',dashboard_15);
+      if(getuser == user?.username  || dashboard_15 !== undefined){
         console.log('1:-->')
-        fetchDashboardData(15);
+        dispatch(setDashboardData(dashboard_15));
       } else {
         console.log('2:-->')
-        let dashboard_15 = getLocalStorageItem("dashboard_15");
-        dispatch(setDashboardData(dashboard_15));
+        fetchDashboardData(15);
       }
       localStorage.setItem("selection_key", "15 Days");
       if(getuser){
@@ -151,6 +153,17 @@ const Home = ({ isOnline }) => {
         setLocalStorageItem("dashboard_15", JSON.stringify(result));
       }
       await checkAndUpdateFunction(24);
+      let result_90 = await executeFetchDashboardLambda(
+        user?.username,
+        "90",
+        reportParms.complex,
+        user?.credentials
+      );
+      console.log("result_90", result_90);
+      setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
+      if (isOnline == true) {
+        fetch_dashboard();
+      }
     } catch (err) {
       handleError(err, "fetchDashboardData");
       dispatch(stopLoading()); // Dispatch the stopLoading action
