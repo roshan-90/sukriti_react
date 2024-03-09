@@ -21,6 +21,8 @@ import {
   executeFetchCompletedUserAccessTree
 } from "../awsClients/administrationLambdas";
 import useOnlineStatus from "../services/useOnlineStatus";
+import Stack from "@mui/material/Stack";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
@@ -33,6 +35,7 @@ const AppBar = ({ isOnline }) => {
     getLocalStorageItem,
     chunkArray
   } = useOnlineStatus();
+  const [loadingPdf, setLoadingPdf] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -362,6 +365,7 @@ const AppBar = ({ isOnline }) => {
   };
 
   const syncFunction = async () => {
+    setLoadingPdf(true);
     console.log("syncFunction click");
     if(isOnline == false) {
       setDialogData({
@@ -385,6 +389,7 @@ const AppBar = ({ isOnline }) => {
     await fetch_dashboard();
     await initFetchCompletedUserAccessTreeAction()
     console.log("syncFunction is Complete");
+    setLoadingPdf(false);
   };
 
   const setOfflineMessage = (title) => {
@@ -551,7 +556,15 @@ const AppBar = ({ isOnline }) => {
               }}
               onClick={syncFunction}
             >
-              Sync Data
+            {loadingPdf ? "Syncing ..." : "Sync Data"}
+            {loadingPdf && (
+              <Stack
+                sx={{ width: "100%", color: "grey.500" }}
+                spacing={2}
+              >
+                <LinearProgress color="secondary" />
+              </Stack>
+            )}
             </Button>
             <Badge
               color={isOnline ? "success" : "error"}
