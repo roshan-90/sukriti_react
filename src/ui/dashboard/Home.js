@@ -64,12 +64,12 @@ const Home = ({ isOnline }) => {
       console.log('user?.username', user?.username);   
       console.log('condition change',getuser == user?.username);
       console.log('dashboard_15',dashboard_15);
-      if(getuser == user?.username  || dashboard_15 !== undefined){
+      if(getuser !== user?.username  || dashboard_15 == undefined){
         console.log('1:-->')
-        dispatch(setDashboardData(dashboard_15));
+        fetchDashboardData(15);
       } else {
         console.log('2:-->')
-        fetchDashboardData(15);
+        dispatch(setDashboardData(dashboard_15));
       }
       localStorage.setItem("selection_key", "15 Days");
       if(getuser){
