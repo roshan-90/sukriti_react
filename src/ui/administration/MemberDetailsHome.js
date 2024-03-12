@@ -25,6 +25,7 @@ import {
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog";
+import "./custom.css";
 
 const MemberDetailsHome = (props) => {
   const dispatch = useDispatch();
