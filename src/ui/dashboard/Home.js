@@ -68,6 +68,7 @@ const Home = ({ isOnline }) => {
       if((getuser !== null && getuser !== user?.username ) || dashboard_15 == undefined){
         console.log('1:-->')
         fetchDashboardData(15);
+        localStorage.setItem("settrigger", "1");
       } else {
         console.log('2:-->')
         dispatch(setDashboardData(dashboard_15));

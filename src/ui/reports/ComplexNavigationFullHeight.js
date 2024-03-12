@@ -64,7 +64,6 @@ const ComplexNavigationFullHeight = (props) => {
 
   const fetchDashboardReport = async (complex) => {
     try {
-      dispatch(startLoading()); // Dispatch the startLoading action
       console.log("fetchDashboardData--> 1111", reportParms);
       var result = await executeReportFetchDashboardLambda(
         user?.username,
@@ -118,7 +117,8 @@ const ComplexNavigationFullHeight = (props) => {
           }
         }
           let report_dashboard_data = localStorage.getItem('report_dashboard');
-          if(report_dashboard_data == undefined || report_dashboard_data == null) {
+          let check = localStorage.getItem('settrigger');
+          if(report_dashboard_data == undefined || report_dashboard_data == null || check ==  "1") {
             const chunks = chunkArray(dataArray, 15);
             for (const chunk of chunks) {
               await fetchDashboardReport(chunk);
@@ -129,6 +129,7 @@ const ComplexNavigationFullHeight = (props) => {
               "report_dashboard",
               JSON.stringify(all_report_data)
             );
+            localStorage.removeItem('settrigger');
           }
       } catch (err) {
         // Catch an error here
@@ -138,6 +139,7 @@ const ComplexNavigationFullHeight = (props) => {
 
   const initFetchCompletedUserAccessTreeAction = async () => {
     try {
+      dispatch(startLoading()); // Dispatch the startLoading action
       const result = await executeFetchCompletedUserAccessTree(
         user?.user.userName,
         user?.credentials
@@ -147,6 +149,7 @@ const ComplexNavigationFullHeight = (props) => {
       await overloopData(complex_array);
       // localStorage.setItem("accessTree", JSON.stringify(complex_array));
       console.log("_defineAccess", result);
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
       handleError(err, "initFetchCompletedUserAccessTreeAction");
     }

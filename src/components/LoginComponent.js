@@ -51,7 +51,9 @@ const LoginComponent = () => {
           },
         });
       });
-    dispatch(stopLoading()); // Dispatch the stopLoading action
+      setTimeout(() => {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }, 3000);
   };
 
   const HeaderComponent = () => {
