@@ -149,9 +149,10 @@ const ComplexNavigationFullHeight = (props) => {
       await overloopData(complex_array);
       // localStorage.setItem("accessTree", JSON.stringify(complex_array));
       console.log("_defineAccess", result);
-      dispatch(stopLoading()); // Dispatch the stopLoading action
     } catch (err) {
       handleError(err, "initFetchCompletedUserAccessTreeAction");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
