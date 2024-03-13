@@ -90,17 +90,11 @@ function NameValueLabel2(props) {
         borderRadius: "10px",
       }}
     >
-      <div style={{ textAlign: "right", padding: "0" }}>
+      <div style={{ flex: 1, textAlign: "left", padding: "0" }}>
         <b>{props.data.name}</b>
       </div>
 
-      <div
-        style={{
-          textAlign: "left",
-          padding: "0",
-          paddingLeft: "2px",
-        }}
-      >
+      <div style={{ flex: 1, textAlign: "right", padding: "0", paddingLeft: "2px" }}>
         {props.data.value}
       </div>
     </div>
