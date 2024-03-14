@@ -22,6 +22,7 @@ import "./android.css";
 import {
   executelistEnterprisesAndroidManagementLambda,
   executelistDevicesAndroidManagementLambda,
+  executeCreateEnterpriseAndroidManagementLambda,
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -122,6 +123,17 @@ function AndroidDetails() {
     }
   };
 
+  const createEnterprise = async () => {
+    try {
+      console.log('create android enterprise');
+      var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials);
+      console.log('executeCreateEnterpriseAndroidManagementLambda',result);
+      window.open(`${result?.body?.signupUrl}`,"_blank");
+    } catch( err) {
+      handleError(err, 'Error create android enterprise')
+    }
+  }
+
   const fetchListEnterprisesData = async () => {
     try {
       setListDevices(null);
@@ -183,19 +195,36 @@ function AndroidDetails() {
             src={icToilet}
             alt=""
             style={{
-              width: "30px",
-              height: "30px",
+              width: "20px",
+              height: "20px",
               borderRadius: "5%",
             }}
           />
         </div>
 
-        <div style={{ float: "left", marginLeft: "10px" }}>
+        <div style={{ float: "left", marginLeft: "10px",marginRight: "10px" }}>
           <div style={{ ...complexCompositionStyle.complexTitleClient }}>
-            {"Android Enterprise"}
+            {"Enterprise"}
           </div>
         </div>
+        <Button
+              onClick={() => {
+                createEnterprise();
+              }}
+              outline
+              color="primary"
+              className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+              style={{
+                width: "70px",
+                height: "30px",
+                borderRadius: "8%",
+                fontSize: "14px", // Adjust font size here
+              }}
+            >
+  <span style={{ marginRight: '5px' }}>+</span> New {/* Wrap the + sign in a span */}
+            </Button>
       </div>
+      
     );
   };
 
@@ -234,6 +263,7 @@ function AndroidDetails() {
           <div style={{ ...complexCompositionStyle.complexTitleClient }}>
             {"Android Device List"}
           </div>
+          
           {/* <div style={{ ...complexCompositionStyle.complexTitle }}>
             {"Client: " + "dsf"}
           </div>
@@ -512,19 +542,46 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
-            <Button
+            {/* <Button
               style={{ float: "right", padding: "0px 0px 0px 0px" }}
               color="primary"
               className="px-4"
               onClick={toggleModal}
             >
-              + Create Enterprise
+              Add Enterprise
             </Button>
             <CreateEnterpriseModal
               isOpen={modalOpen}
               toggleModal={toggleModal}
-            />
-
+            /> */}
+            <Button
+              onClick={() => {
+                createEnterprise();
+              }}
+              outline
+              color="primary"
+              className="px-4"
+              style={{
+                float: "right",
+                marginLeft: "3px"
+              }}
+            >
+              Update
+            </Button>
+            <Button
+              onClick={() => {
+                createEnterprise();
+              }}
+              outline
+              color="primary"
+              className="px-4"
+              style={{
+                float: "right",
+              }}
+            >
+              Delete
+            </Button>
+            
             <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
           </div>
         </div>

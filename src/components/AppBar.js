@@ -519,7 +519,7 @@ const AppBar = ({ isOnline }) => {
                   navigate("/android_management");
                 }}
               >
-                Android Management
+                Devices Management
               </NavLink>
             </NavItem>
           </Nav>
