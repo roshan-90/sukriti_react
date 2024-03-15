@@ -23,6 +23,7 @@ import {
   executelistEnterprisesAndroidManagementLambda,
   executelistDevicesAndroidManagementLambda,
   executeCreateEnterpriseAndroidManagementLambda,
+  executeDeleteEnterpriseAndroidManagementLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -38,6 +39,7 @@ import {
   Label,
   Input,
 } from "reactstrap";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -95,6 +97,28 @@ function AndroidDetails() {
   const [listDevices, setListDevices] = useState(undefined);
   const [showDeviceData, setShowDeviceData] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
+  const [showEnterpriseCheck, setShowEnterpriseCheck] = useState(false)
+  const [selectedEnterprises, setSelectedEnterprises] = useState([]);
+
+  
+  const handleDeleteEnterprises = async () => {
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      console.log('create android enterprise');
+      selectedEnterprises.forEach(async (enterprise) => {
+        var result = await executeDeleteEnterpriseAndroidManagementLambda(user?.credentials,enterprise);
+        console.log('enterprise:-->', enterprise);
+        console.log('result',result);
+      });
+      setSelectedEnterprises([]);
+      setTimeout(() => {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }, 3000);
+    } catch( err) {
+      handleError(err, 'Error create android enterprise')
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
 
   const toggleModal = () => {
     setModalOpen(!modalOpen);
@@ -125,12 +149,15 @@ function AndroidDetails() {
 
   const createEnterprise = async () => {
     try {
+      dispatch(startLoading()); // Dispatch the startLoading action
       console.log('create android enterprise');
       var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials);
       console.log('executeCreateEnterpriseAndroidManagementLambda',result);
       window.open(`${result?.body?.signupUrl}`,"_blank");
     } catch( err) {
       handleError(err, 'Error create android enterprise')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
 
@@ -211,17 +238,17 @@ function AndroidDetails() {
               onClick={() => {
                 createEnterprise();
               }}
-              outline
               color="primary"
               className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
               style={{
+                ...whiteSurfaceCircularBorder,
                 width: "70px",
                 height: "30px",
-                borderRadius: "8%",
+                // borderRadius: "8%",
                 fontSize: "14px", // Adjust font size here
               }}
             >
-  <span style={{ marginRight: '5px' }}>+</span> New {/* Wrap the + sign in a span */}
+         <span style={{ marginRight: '5px', color: "black"}}>+ New</span>
             </Button>
       </div>
       
@@ -285,27 +312,31 @@ function AndroidDetails() {
     justifyContent: "center",
     alignItems: "center",
   };
-
+  
   const rowStyle = {
-    margin: "10px 0px 0px",
+    margin: "10px 0px", // Adjusted margin to add space between rows
     padding: "10px",
     cursor: "pointer",
   };
-
+  
   const colStyle = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     padding: "0px",
   };
-
+  
   const textStyle = {
     color: "black",
     fontSize: "11px",
-    // fontWeight: "normal",
     fontWeight: "700",
     fontStyle: "normal",
+    marginRight: "5px", // Added margin to separate text from checkbox
   };
+
+  const checkboxStyle = {
+    width: "22px"
+  }
 
   const handleClickEnterpise = (data) => {
     fetchListDevicesData(data);
@@ -320,40 +351,55 @@ function AndroidDetails() {
   // Rename the function to start with an uppercase letter
   const ListEnterpriseComponent = () => {
     console.log("listEnterprise", listEnterprise);
-    return (
-      <div className="row" style={{ background: "white", padding: "5px" }}>
-        <Header />
-        {/* <NoDataComponent /> */}
-        {listEnterprise && (
-          <div style={{ width: "100%" }}>
-            <div style={{ padding: "10px", overflow: "auto" }}>
-              {listEnterprise.map((data, index) => {
-                console.log("chekcing dagta", data);
-                return (
-                  <div className="row" style={rowStyle} key={index}>
-                    <div className="col-md-2" style={colStyle}>
-                      <div style={circleStyle}></div>
-                    </div>
-                    <div
-                      className="col-md-8"
-                      style={textStyle}
-                      onClick={() => handleClickEnterpise(data.name)}
-                    >
-                      {data.name}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+
+  const handleCheckboxChange = (name) => {
+    setSelectedEnterprises((prevSelected) => {
+      if (prevSelected.includes(name)) {
+        return prevSelected.filter((enterprise) => enterprise !== name);
+      } else {
+        return [...prevSelected, name];
+      }
+    });
+  };
+
+  
+
+  return (
+    <div className="row" style={{ background: "white", padding: "5px" }}>
+      {/* Header Component */}
+      <Header />
+
+      {listEnterprise && (
+        <div style={{ width: "100%", maxHeight: "300px", overflowY: "auto" }}>
+            {listEnterprise.map((data, index) => (
+              <div className="row" style={rowStyle} key={index}>
+                <div className="col-md-2" style={colStyle}>
+                  {showEnterpriseCheck && (
+                    <input
+                    type="checkbox"
+                    onChange={() => handleCheckboxChange(data.name)}
+                    checked={selectedEnterprises.includes(data.name)}
+                    />
+                  )}
+                  {showEnterpriseCheck == false && (
+                    <div style={circleStyle}></div>
+                  )}
+                </div>
+                <div className="col-md-7" style={{ ...textStyle, alignSelf: 'center' }}>
+                  {data.name}
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
-    );
+
+      )}
+    </div>
+  );
   };
 
   const memoizedDeviceComponent = useMemo(() => {
     return <ListEnterpriseComponent />;
-  }, [listEnterprise]);
+  }, [listEnterprise,showEnterpriseCheck,selectedEnterprises]);
 
   const deviceName = (name) => {
     let array = name.split("/");
@@ -524,6 +570,7 @@ function AndroidDetails() {
     return <DeviceInfoComponent />;
   }, [showDeviceData]);
 
+  console.log('selectedEnterprises.length',selectedEnterprises.length);
   return (
     <ErrorBoundary>
       <div className="animated fadeIn" style={{ padding: "10px" }}>
@@ -554,33 +601,38 @@ function AndroidDetails() {
               isOpen={modalOpen}
               toggleModal={toggleModal}
             /> */}
-            <Button
-              onClick={() => {
-                createEnterprise();
-              }}
-              outline
-              color="primary"
-              className="px-4"
-              style={{
-                float: "right",
-                marginLeft: "3px"
-              }}
-            >
-              Update
-            </Button>
-            <Button
-              onClick={() => {
-                createEnterprise();
-              }}
-              outline
-              color="primary"
-              className="px-4"
-              style={{
-                float: "right",
-              }}
-            >
-              Delete
-            </Button>
+            {selectedEnterprises.length > 0 && (
+              <Button
+                onClick={() => {
+                  handleDeleteEnterprises()
+                }}
+                outline
+                color="primary"
+                className="px-2"
+                style={{
+                  float: "right",
+                  marginLeft: "3px"
+                }}
+              >
+                <DeleteIcon  color="error"/>
+              </Button>
+            )}
+            {selectedEnterprises.length == 0 && (
+              <Button
+                onClick={() => {
+                  console.log('showEnterpriseCheck',showEnterpriseCheck);
+                  setShowEnterpriseCheck(!showEnterpriseCheck)
+                }}
+                outline
+                color="primary"
+                className="px-4"
+                style={{
+                  float: "right",
+                }}
+              >
+                Delete enterprise
+              </Button>
+            )}
             
             <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
           </div>

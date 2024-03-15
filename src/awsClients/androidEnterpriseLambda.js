@@ -89,3 +89,32 @@ export function executeCreateEnterpriseAndroidManagementLambda(credentials) {
     });
   });
 }
+
+export function executeDeleteEnterpriseAndroidManagementLambda(credentials,enterpriseId) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials-executeDeleteEnterpriseAndroidManagementLambda",
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "enterprise_delete_api",
+      Payload: "{ " + '"enterpriseId": "' + enterpriseId + '"' + "}",
+    };
+
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
