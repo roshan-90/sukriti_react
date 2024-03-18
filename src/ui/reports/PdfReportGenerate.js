@@ -700,8 +700,22 @@ const PdfGenerate = ({
   };
 
   const BWTStatsItem = (props) => {
-    return (
-      <div style={{ marginTop: "20px" }}>
+          let pageBreakClass;
+          if (props.className) {
+            pageBreakClass = props.className.includes("page-break")
+              ? "page-break"
+              : "";
+          } else {
+            pageBreakClass = "";
+          }
+          return (
+            <div
+            className={`stats-item ${pageBreakClass}`}
+            style={{
+              marginTop: "20px",
+              pageBreakAfter: pageBreakClass ? "always" : "auto",
+            }}
+          >
         <div
           className="row"
           style={{
@@ -779,6 +793,7 @@ const PdfGenerate = ({
                 padding: "10px",
                 display: "flexbox",
                 alignItems: "center",
+                fontSize: "12px",
               }}
             >
               <BWTFullLineChart data={props.data} />
@@ -1078,7 +1093,7 @@ const PdfGenerate = ({
                             {/* {((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false )) && <div  className="page-break" ></div> } */}
                             {bwtStats && (
                               <BWTStatsItem
-                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false )) ? "page-break" : ""}
+                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true )) ? "page-break" : ""}
                                 name="Recycled Water"
                                 total={
                                   summaryPayload?.bwtdataSummary?.waterRecycled
@@ -1095,7 +1110,7 @@ const PdfGenerate = ({
                             {/* {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false )) && <div  className="page-break" ></div> } */}
                             {feedbackStats && (
                               <StatsItem
-                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false)) ? "page-break" : ""}
+                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true )) ? "page-break" : ""}
                                 name="Feedback Stats"
                                 total={summaryPayload?.dataSummary?.feedback}
                                 data={
@@ -1515,7 +1530,7 @@ const PdfGenerate = ({
                               {/* {usageStats && <div  className="page-break" ></div> } */}
                             {usageStats && (
                               <StatsItem
-                                // className="page-break"
+                                className="page-break"
                                 name="Usage Stats"
                                 total={data?.data?.dataSummary?.usage}
                                 data={data?.data?.dashboardChartData?.usage}
@@ -1525,6 +1540,7 @@ const PdfGenerate = ({
                             
                             {collectionStats && (
                               <StatsItem
+                                className={usageStats ? "" : "page-break"}
                                 name="Collection Stats"
                                 total={data?.data?.dataSummary?.collection}
                                 data={
@@ -1539,7 +1555,7 @@ const PdfGenerate = ({
 
                             {upiStats && (
                               <StatsItem
-                                className="page-break"
+                                className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ) ? "page-break" : ""}
                                 name="UPI Stats"
                                 total={data?.data?.dataSummary?.upiCollection}
                                 data={
@@ -1552,6 +1568,7 @@ const PdfGenerate = ({
                             )}
                             {bwtStats && (
                               <BWTStatsItem
+                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true )) ? "page-break" : ""}
                                 name="Recycled Water"
                                 total={
                                   data?.data?.bwtdataSummary?.waterRecycled
@@ -1565,7 +1582,7 @@ const PdfGenerate = ({
                             )}
                             {feedbackStats && (
                               <StatsItem
-                                className="page-break"
+                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true )) ? "page-break" : ""}
                                 name="Feedback Stats"
                                 total={data?.data?.dataSummary?.feedback}
                                 data={data?.data?.dashboardChartData?.feedback}
