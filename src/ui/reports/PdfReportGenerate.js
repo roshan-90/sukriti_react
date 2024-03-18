@@ -1036,7 +1036,7 @@ const PdfGenerate = ({
                           >
                             {usageStats && (
                               <StatsItem
-                                // className="page-break"
+                                className="page-break"
                                 name="Usage Stats"
                                 total={summaryPayload?.dataSummary?.usage}
                                 data={summaryPayload?.dashboardChartData?.usage}
@@ -1045,10 +1045,9 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
-                            {usageStats && <div  className="page-break" ></div> }
-
                             {collectionStats && (
                               <StatsItem
+                                className={usageStats ? "" : "page-break"}
                                 name="Collection Stats"
                                 total={summaryPayload?.dataSummary?.collection}
                                 data={
@@ -1059,11 +1058,10 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
-                            {usageStats !== true && <div  className="page-break" ></div> }
 
                             {upiStats && (
                               <StatsItem
-                                className="page-break"
+                                className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ) ? "page-break" : ""}
                                 name="UPI Stats"
                                 total={
                                   summaryPayload?.dataSummary?.upiCollection
@@ -1077,9 +1075,10 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
-                            {((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false )) && <div  className="page-break" ></div> }
+                            {/* {((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false )) && <div  className="page-break" ></div> } */}
                             {bwtStats && (
                               <BWTStatsItem
+                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false )) ? "page-break" : ""}
                                 name="Recycled Water"
                                 total={
                                   summaryPayload?.bwtdataSummary?.waterRecycled
@@ -1093,10 +1092,10 @@ const PdfGenerate = ({
                                 }
                               />
                             )}
-                            {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false )) && <div  className="page-break" ></div> }
+                            {/* {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false )) && <div  className="page-break" ></div> } */}
                             {feedbackStats && (
                               <StatsItem
-                                className="page-break"
+                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false)) ? "page-break" : ""}
                                 name="Feedback Stats"
                                 total={summaryPayload?.dataSummary?.feedback}
                                 data={
