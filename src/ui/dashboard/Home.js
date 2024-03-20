@@ -72,6 +72,7 @@ const Home = ({ isOnline }) => {
       } else {
         console.log('2:-->')
         dispatch(setDashboardData(dashboard_15));
+        dispatch(stopLoading()); // Dispatch the stopLoading action
       }
       localStorage.setItem("selection_key", "15 Days");
       if(getuser){
