@@ -77,6 +77,7 @@ const Home = ({ isOnline }) => {
       localStorage.setItem("selection_key", "15 Days");
       if(getuser){
         localStorage.removeItem("set_user");
+        
       }
     }
   }, [isAuthenticated, navigate]);
