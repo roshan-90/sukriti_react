@@ -40,6 +40,7 @@ const LoginComponent = () => {
         // Additional logic with the credentials if needed
       })
       .catch((error) => {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
         // Handle errors from the signIn function
         console.error("Sign in failed:", error);
         setDialogData({
