@@ -7,7 +7,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginComponent from "./components/LoginComponent";
-// import DashboardComponent from "./components/DashboardComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectIsAuthenticated,
@@ -62,7 +61,6 @@ const App = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      // const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
       const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
       const user = localStorage.getItem("user");
       const userDetails = JSON.parse(localStorage.getItem("userDetails"));
@@ -117,25 +115,6 @@ const App = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log("reload --> 1");
-
-  //   const handleLoad = () => {
-  //     // Function to be called after page reload
-  //     console.log("Page has completed reloading", authentication);
-  //     setRefreshCount(1);
-
-  //     // You can call your function here
-  //     // yourFunction();
-  //   };
-
-  //   window.addEventListener("load", handleLoad);
-
-  //   return () => {
-  //     window.removeEventListener("load", handleLoad);
-  //   };
-  // }, []);
-
   console.log("isOnline", isOnline);
   console.log("user--->", authentication);
   console.log("count", offlinecount);
@@ -146,16 +125,11 @@ const App = () => {
     setOfflineCount(0);
   }
 
-  // if (isOnline == false && refreshcount == 1) {
-  //   console.log("after page refresh", authentication);
-  // }
+  const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+  console.log('lastVisitedPage',lastVisitedPage);
+  
 
-  // setLocalStorageItem("myKey", JSON.parse(localStorage.getItem("userDetails")));
-  // // Get decoded item from localStorage
-  // const retrievedData = getLocalStorageItem("myKey");
-
-  // console.log("retrievedData", retrievedData);
-  if (isAuthenticated) {
+  // if (isAuthenticated) {
     return (
       <React.Suspense fallback={loading()}>
         <div
@@ -165,7 +139,10 @@ const App = () => {
           }}
         >
           <Router>
-            <AppBar style={{ width: "100%" }} isOnline={isOnline} />
+          
+          {isAuthenticated ? (
+          <>
+          <AppBar style={{ width: "100%" }} isOnline={isOnline} />
             <div className="app-body">
               <main className="main">
                 <Container fluid>
@@ -268,7 +245,7 @@ const App = () => {
                     />
                     <Route
                       path={"/android_management"}
-                      exact={true}
+                      exact={false}
                       name={"Android Management"}
                       element={<AndroidManagement />}
                     />
@@ -280,23 +257,41 @@ const App = () => {
             <Suspense fallback={loading()}>
               <DefaultFooter />
             </Suspense>
+            </>
+            ) : (<Routes>
+          <Route path="/login" element={<LoginComponent />} />
+          {/* <Route path="/*" element={<Navigate to="/login" />} />
+          <Route path="/activation_user" element={<ConfigureUser />} /> */}
+        </Routes>)
+        }
           </Router>
         </div>
       </React.Suspense>
     );
-  }
+  // }
 
-  return (
-    <React.Suspense fallback={loading()}>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<LoginComponent />} />
-          <Route path="/*" element={<Navigate to="/login" />} />
-          <Route path="/activation_user" element={<ConfigureUser />} />
-        </Routes>
-      </Router>
-    </React.Suspense>
-  );
+  // if (lastVisitedPage) {
+  //   return (
+  //     <Router>
+  //       <Routes>
+  //       <Route path="/login" element={<LoginComponent />} />
+  //       {lastVisitedPage ? <Route path="/" element={<Navigate to="/android_management" replace />} /> : null}
+  //       </Routes>
+  //     </Router>
+  //   );
+  // }
+  
+  // return (
+  //   <React.Suspense fallback={loading()}>
+  //     <Router>
+  //       <Routes>
+  //         <Route path="/login" element={<LoginComponent />} />
+  //         <Route path="/*" element={<Navigate to="/login" />} />
+  //         <Route path="/activation_user" element={<ConfigureUser />} />
+  //       </Routes>
+  //     </Router>
+  //   </React.Suspense>
+  // );
 };
 
 export default App;
