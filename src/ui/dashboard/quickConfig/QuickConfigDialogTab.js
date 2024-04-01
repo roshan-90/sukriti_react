@@ -15,7 +15,7 @@ import { dashboardStyle } from "../../../jsStyles/Style";
 import { executePublishConfigLambda } from "../../../awsClients/complexLambdas";
 import { whiteSurface } from "../../../jsStyles/Style";
 import DropDown from "../../../components/DropDown";
-import RxInputCheckbox from "../../../components/RxInputCheckbox";
+import RxInputCheckbox from "./utils/RxInputCheckbox";
 import { CabinType } from "../../../nomenclature/nomenclature";
 import { UsageChargeConfigView } from "../../../components/QuickConfigLabels";
 
