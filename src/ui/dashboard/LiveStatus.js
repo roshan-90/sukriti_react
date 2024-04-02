@@ -156,7 +156,7 @@ const LiveStatus = (data) => {
                       showDialog1(mData);
                     }}
                   >
-                    View
+                    Viewdd
                   </Button>
                 </div>
               </div>
@@ -333,7 +333,82 @@ const LiveStatus = (data) => {
       }
       return (
         <div className="row">
-          <Modal
+          {displayData.map((item, index) => ComplexStatusItem(item))}
+
+          {displayData2.length > 10 ? ComplexStatusItem2(displayData2) : null}
+        </div>
+      );
+    }
+    return (
+      <div
+        className="col-md-12"
+        style={{ margin: "10px 0px 0px 0px", padding: "0px 0px 0px 0px" }}
+      >
+        <NoFaultElement
+          icon={icEarth}
+          title="No active faults listed. Faults once detected will be listed here."
+        />
+      </div>
+    );
+  };
+  if(visibility1) {
+    var displayData = [...data?.data];
+    var displayData2 = [...data?.data];
+    if (data?.data?.length > 10) {
+      displayData = data?.data?.slice(0, 10);
+      displayData2 = data?.data;
+    }
+    return (
+       
+      <Modal
+      isOpen={visibility1}
+      toggle={toggleDialog1}
+      className={"modal-xl"}
+    >
+      <ModalHeader
+        style={{
+          background: "#5DC0A6",
+          color: `white`,
+        }}
+        toggle={toggleDialog1}
+      >
+        <div style={{}}>
+          <div>Complex : {title1}</div>
+        </div>
+      </ModalHeader>
+      <ModalBody
+        style={{
+          width: "100%",
+          height: "200px",
+        }}
+      >
+        <div style={{}}>
+          <LiveTable />
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          color="primary"
+          className="px-4"
+          outline
+          onClick={toggleDialog1}
+        >
+          Cancel
+        </Button>
+      </ModalFooter>
+    </Modal>
+    )
+  }
+
+  if(visibility) {
+    var displayData = [...data?.data];
+    var displayData2 = [...data?.data];
+    if (data?.data?.length > 10) {
+      displayData = data?.data?.slice(0, 10);
+      displayData2 = data?.data;
+    }
+    return (
+      <Modal
             isOpen={visibility}
             toggle={toggleDialog}
             className={"modal-xl"}
@@ -371,62 +446,11 @@ const LiveStatus = (data) => {
               </Button>
             </ModalFooter>
           </Modal>
-          <Modal
-            isOpen={visibility1}
-            toggle={toggleDialog1}
-            className={"modal-xl"}
-          >
-            <ModalHeader
-              style={{
-                background: "#5DC0A6",
-                color: `white`,
-              }}
-              toggle={toggleDialog1}
-            >
-              <div style={{}}>
-                <div>Complex : {title1}</div>
-              </div>
-            </ModalHeader>
-            <ModalBody
-              style={{
-                width: "100%",
-                height: "200px",
-              }}
-            >
-              <div style={{}}>
-                <LiveTable />
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="primary"
-                className="px-4"
-                outline
-                onClick={toggleDialog1}
-              >
-                Cancel
-              </Button>
-            </ModalFooter>
-          </Modal>
+    )
+  }
 
-          {displayData.map((item, index) => ComplexStatusItem(item))}
 
-          {displayData2.length > 10 ? ComplexStatusItem2(displayData2) : null}
-        </div>
-      );
-    }
-    return (
-      <div
-        className="col-md-12"
-        style={{ margin: "10px 0px 0px 0px", padding: "0px 0px 0px 0px" }}
-      >
-        <NoFaultElement
-          icon={icEarth}
-          title="No active faults listed. Faults once detected will be listed here."
-        />
-      </div>
-    );
-  };
+  
 
   return (
     <div
