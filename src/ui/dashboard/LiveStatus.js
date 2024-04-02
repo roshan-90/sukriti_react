@@ -156,7 +156,7 @@ const LiveStatus = (data) => {
                       showDialog1(mData);
                     }}
                   >
-                    Viewdd
+                    View
                   </Button>
                 </div>
               </div>
@@ -334,7 +334,6 @@ const LiveStatus = (data) => {
       return (
         <div className="row">
           {displayData.map((item, index) => ComplexStatusItem(item))}
-
           {displayData2.length > 10 ? ComplexStatusItem2(displayData2) : null}
         </div>
       );
@@ -351,6 +350,7 @@ const LiveStatus = (data) => {
       </div>
     );
   };
+
   if(visibility1) {
     var displayData = [...data?.data];
     var displayData2 = [...data?.data];
@@ -359,7 +359,6 @@ const LiveStatus = (data) => {
       displayData2 = data?.data;
     }
     return (
-       
       <Modal
       isOpen={visibility1}
       toggle={toggleDialog1}
@@ -448,9 +447,6 @@ const LiveStatus = (data) => {
           </Modal>
     )
   }
-
-
-  
 
   return (
     <div
