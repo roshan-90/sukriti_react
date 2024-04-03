@@ -44,15 +44,15 @@ const Home = ({ isOnline }) => {
   const [dialogData, setDialogData] = useState(null);
 
   useEffect(() => {
-    const lastVisitedPage = localStorage.getItem("lastVisitedPage");
-    if (lastVisitedPage) {
-      navigate(lastVisitedPage);
-    }
+    // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+    // if (lastVisitedPage) {
+    //   navigate(lastVisitedPage);
+    // }
     if (isOnline == false) {
       handleOnlineState();
     }
-    localStorage.removeItem("lastVisitedPage");
-  }, [navigate]);
+    // localStorage.removeItem("lastVisitedPage");
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {

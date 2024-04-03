@@ -58,11 +58,11 @@ const App = () => {
   const authentication = useSelector(selectUser);
   const [offlinecount, setOfflineCount] = useState(0);
   const [refreshcount, setRefreshCount] = useState(0);
+  const user = localStorage.getItem("user");
 
   useEffect(() => {
     if (!isAuthenticated) {
       const userFromLocalStorage = JSON.parse(localStorage.getItem("data"));
-      const user = localStorage.getItem("user");
       const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
       if (userFromLocalStorage) {
@@ -99,21 +99,21 @@ const App = () => {
     };
   }, [isOnline]); // Add isOnline as a dependency
 
-  useEffect(() => {
-    console.log("beforeunload");
-    const handleBeforeUnload = (event) => {
-      event.preventDefault();
-      localStorage.setItem("lastVisitedPage", window.location.pathname);
-      window.location.href = `${window.location.origin}/index.html`;
-      console.log("check href", window.location.href);
-    };
+  // useEffect(() => {
+  //   console.log("beforeunload");
+  //   const handleBeforeUnload = (event) => {
+  //     event.preventDefault();
+  //     localStorage.setItem("lastVisitedPage", window.location.pathname);
+  //     window.location.href = `${window.location.origin}/index.html`;
+  //     console.log("check href", window.location.href);
+  //   };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []);
 
   console.log("isOnline", isOnline);
   console.log("user--->", authentication);
@@ -125,8 +125,8 @@ const App = () => {
     setOfflineCount(0);
   }
 
-  const lastVisitedPage = localStorage.getItem("lastVisitedPage");
-  console.log('lastVisitedPage',lastVisitedPage);
+  // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+  // console.log('lastVisitedPage',lastVisitedPage);
   
 
   // if (isAuthenticated) {
@@ -140,7 +140,7 @@ const App = () => {
         >
           <Router>
           
-          {isAuthenticated ? (
+          {user ? (
           <>
           <AppBar style={{ width: "100%" }} isOnline={isOnline} />
             <div className="app-body">
@@ -260,8 +260,8 @@ const App = () => {
             </>
             ) : (<Routes>
           <Route path="/login" element={<LoginComponent />} />
-          {/* <Route path="/*" element={<Navigate to="/login" />} />
-          <Route path="/activation_user" element={<ConfigureUser />} /> */}
+          <Route path="/*" element={<Navigate to="/login" />} />
+          <Route path="/activation_user" element={<ConfigureUser />} />
         </Routes>)
         }
           </Router>

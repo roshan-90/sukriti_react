@@ -66,8 +66,8 @@ const AppBar = ({ isOnline }) => {
     window.location.reload();
     storageClear();
     dispatch(clearUser());
-    navigate('/login');
     localStorage.removeItem('user');
+    navigate('/login');
   };
 
   const handleError = (err, Custommessage, onclick = null) => {
