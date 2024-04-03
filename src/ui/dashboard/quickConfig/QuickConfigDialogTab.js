@@ -141,22 +141,17 @@ const QuickConfigDialogTab = (props) => {
                       withLabel
                       label={"Male WC"}
                       selected={false}
-                      onChange={(e) =>
-                        onScopeSelected(e.target.checked, CabinType.MWC)
-                      }
+                      onChange={onScopeSelected(CabinType.MWC)} // Partially applying the function
                     />
                   </div>
                 </td>
-
                 <td style={{ width: "50%" }}>
                   <div>
                     <RxInputCheckbox
                       withLabel
                       label={"Female WC"}
                       selected={false}
-                      onChange={(e) =>
-                        onScopeSelected(e.target.checked, CabinType.FWC)
-                      }
+                      onChange={onScopeSelected(CabinType.FWC)} // Partially applying the function
                     />
                   </div>
                 </td>
@@ -169,9 +164,7 @@ const QuickConfigDialogTab = (props) => {
                       withLabel
                       label={"PD WC"}
                       selected={false}
-                      onChange={(e) =>
-                        onScopeSelected(e.target.checked, CabinType.PD)
-                      }
+                      onChange={onScopeSelected(CabinType.PD)} // Partially applying the function
                     />
                   </div>
                 </td>
@@ -182,9 +175,7 @@ const QuickConfigDialogTab = (props) => {
                       withLabel
                       label={"Male Urinal"}
                       selected={false}
-                      onChange={(e) =>
-                        onScopeSelected(e.target.checked, CabinType.MUR)
-                      }
+                      onChange={onScopeSelected(CabinType.MUR)} // Partially applying the function
                     />
                   </div>
                 </td>
@@ -196,13 +187,27 @@ const QuickConfigDialogTab = (props) => {
     );
   };
 
-  const onScopeSelected = (selected, cabinType) => {
-    setSelectedScope((prevScope) => ({
-      ...prevScope,
-      [cabinType]: selected,
-    }));
-    props.handleUpdate(props.configTab, "configScope", selectedScope);
-  };
+  // Function to handle selection changes
+  const onScopeSelected = (cabinType) => (selected) => {
+    console.log(`Selected: ${selected}, CabinType: ${cabinType}`);
+    setSelectedScope((prevScope) => {
+      const updatedScope = {
+        ...prevScope,
+        [cabinType]: selected,
+      };
+      // Use the updated state in the callback
+      console.log('selectedScope', updatedScope);
+      props.handleUpdate(props.configTab, "configScope", updatedScope);
+    });
+};
+
+  // const onScopeSelected = (selected, cabinType) => {
+    // setSelectedScope((prevScope) => ({
+    //   ...prevScope,
+    //   [cabinType]: selected,
+    // }));
+    // props.handleUpdate(props.configTab, "configScope", selectedScope);
+  // };
 
   return render();
 };
