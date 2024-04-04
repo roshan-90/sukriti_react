@@ -59,6 +59,7 @@ const App = () => {
   const [offlinecount, setOfflineCount] = useState(0);
   const [refreshcount, setRefreshCount] = useState(0);
   const user = localStorage.getItem("user");
+  const [checkstatus, setCheckStatus] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -66,14 +67,17 @@ const App = () => {
       const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
       if (userFromLocalStorage) {
+        setCheckStatus(1);
         dispatch(setUsername(user));
         dispatch(setLoggedIn(userFromLocalStorage));
         dispatch(setUser(userDetails));
+      } 
+    } else {
+      if(isAuthenticated){
+        setCheckStatus(1);
       }
-      console.log("sdsd");
     }
   }, [isAuthenticated, dispatch]);
-  console.log("sdsd2");
   const loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
   );
@@ -127,7 +131,12 @@ const App = () => {
 
   // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
   // console.log('lastVisitedPage',lastVisitedPage);
-  
+ 
+  if(user) {
+    if(checkstatus == 0) {
+      return loading();
+    }
+  }
 
   // if (isAuthenticated) {
     return (
@@ -193,7 +202,7 @@ const App = () => {
                       path={"/administration"}
                       exact={true}
                       name={"Administration"}
-                      element={<AdministrationHome />}
+                      element={<AdministrationHome authentication={authentication} />}
                     />
                     <Route
                       path={"/administration/memberDetails/:id"}
