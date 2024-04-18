@@ -414,18 +414,16 @@ function AndroidDetails() {
         className="row"
         style={{ marginTop: "10px", background: "white", padding: "5px" }}
       >
-        {listDevices && (
           <>
             <ListDeviceHeader />
+        {listDevices && (
             <div
               style={{
                 ...whiteSurface,
                 background: "white",
                 width: "100%",
                 overflow: "auto",
-                //   display: "flex",
-                //   alignItems: "center",
-                //   justifyContent: "space-between",
+                maxHeight: "200px",
               }}
             >
               {listDevices.map((data, index) => {
@@ -460,8 +458,8 @@ function AndroidDetails() {
                 );
               })}
             </div>
-          </>
         )}
+        </>
       </div>
     );
   };
