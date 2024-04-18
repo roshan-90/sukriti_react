@@ -385,7 +385,8 @@ function AndroidDetails() {
                     <div style={circleStyle}></div>
                   )}
                 </div>
-                <div className="col-md-7" style={{ ...textStyle, alignSelf: 'center' }}>
+                <div className="col-md-7" style={{ ...textStyle, alignSelf: 'center' }}
+                onClick={ () => handleClickEnterpise(data.name)}>
                   {data.name}
                 </div>
               </div>

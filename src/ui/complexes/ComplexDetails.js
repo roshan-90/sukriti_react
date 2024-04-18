@@ -28,6 +28,7 @@ import AWS from "aws-sdk";
 // import * as mqtt from "mqtt";
 
 // const LazyMqtt = lazy(() => import("./Mqtt"));
+// import "./customStyles.css"; // Import the custom CSS file
 
 function ComplexDetails(props) {
   const complexComposition = useRef();

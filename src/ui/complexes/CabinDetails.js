@@ -142,7 +142,7 @@ const CabinDetails = (props, ref) => {
       );
     } else {
       return (
-        <div style={{ width: "95%", margin: "auto" }}>
+        <div style={{ width: "95%", marginLeft: "60px" }}>
           <CabinUsageFeedback
             usageAndFeedback={cabinDetails.usageAndFeedback}
             uiResult={cabinDetails.uiResult.data}

@@ -164,7 +164,7 @@ const ComplexNavigationCompact = (props) => {
         </div>
       )}
       <MessageDialog data={dialogData} />
-      <div className="row" style={{ background: "white", padding: "5px" }}>
+      <div className="row" style={{ background: "white", padding: "5px", width: "143%"}}>
         <Header />
         {memoizedTreeComponent}
       </div>

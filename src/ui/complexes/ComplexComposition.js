@@ -358,7 +358,7 @@ const ComplexComposition = React.forwardRef((props, ref) => {
   return (
     <div
       className="row"
-      style={{ marginTop: "10px", background: "white", padding: "5px" }}
+      style={{ marginTop: "10px", background: "white", padding: "5px", width: "143%" }}
     >
       {/* <MessageDialog ref={messageDialog} />
       <LoadingDialog ref={loadingDialog} /> */}
