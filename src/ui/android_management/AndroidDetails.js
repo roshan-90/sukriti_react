@@ -757,7 +757,7 @@ function AndroidDetails() {
                 </ModalBody>
               <ModalFooter>
                 <Button color="primary" onClick={ListOfIotState}>
-                  Do Something
+                  Submit
                 </Button>{' '}
                 <Button color="secondary" onClick={toggle}>
                   Cancel
