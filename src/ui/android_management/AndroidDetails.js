@@ -103,6 +103,7 @@ function AndroidDetails() {
   const [showEnterpriseCheck, setShowEnterpriseCheck] = useState(false)
   const [selectedEnterprises, setSelectedEnterprises] = useState([]);
   const [modal, setModal] = useState(false);
+  
   const toggle = () => setModal(!modal);
 
   const [selectedOption, setSelectedOption] = useState(null); // State for react-select
@@ -112,7 +113,7 @@ function AndroidDetails() {
 
 
   // Handle change in react-select 
-  const handleChange = (selectedOption) => {
+  const handleChangeIotState = (selectedOption) => {
     console.log('check', selectedOption.value);
       setSelectedOption(selectedOption); // Update state if selectedOption is not null
       ListOfIotDistrict(selectedOption.value)
@@ -657,14 +658,29 @@ function AndroidDetails() {
           </div>
           <div className="col-md-10" style={{}}>
           <div>
-            <Modal isOpen={modal} toggle={toggle}>
+            <Modal isOpen={modal} toggle={toggle} onClosed={() => {
+                setSelectedOption(null); // Reset selected option for listIotState
+                setSelectedOptionIotDistrict(null); // Reset selected option for listIotDistrict
+                setListIotState(null);
+                setListIotDistrict(null);
+              }}>
+            {isLoading && (
+                <div className="loader-container">
+                  <CircularProgress
+                    className="loader"
+                    style={{ color: "rgb(93 192 166)" }}
+                  />
+                </div>
+              )}
               <ModalHeader toggle={toggle}>Complex List</ModalHeader>
                 <ModalBody>
-                  <Select options={listIotState || []} value={selectedOption} onChange={handleChange}         onMenuOpen={() => {
+                  <Select options={listIotState || []} value={selectedOption} onChange={handleChangeIotState}         
+                  onMenuOpen={() => {
                     if (!listIotState || listIotState.length === 0) {
                       ListOfIotState();
                     }
                   }}/>
+                  <br />
                   <Select options={listIotDistrict || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict}/>
                 </ModalBody>
               <ModalFooter>
