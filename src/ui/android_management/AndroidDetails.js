@@ -17,13 +17,13 @@ import {
   whiteSurface,
 } from "../../jsStyles/Style";
 import icToilet from "../../assets/img/icons/ic_toilet.png";
-import { Button } from "reactstrap";
 import "./android.css";
 import {
   executelistEnterprisesAndroidManagementLambda,
   executelistDevicesAndroidManagementLambda,
   executeCreateEnterpriseAndroidManagementLambda,
-  executeDeleteEnterpriseAndroidManagementLambda
+  executeDeleteEnterpriseAndroidManagementLambda,
+  executelistIotStateLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -38,8 +38,10 @@ import {
   FormGroup,
   Label,
   Input,
+  Button  
 } from "reactstrap";
 import DeleteIcon from '@mui/icons-material/Delete';
+import Select from 'react-select'; // Importing react-select
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -99,8 +101,21 @@ function AndroidDetails() {
   const [modalOpen, setModalOpen] = useState(false);
   const [showEnterpriseCheck, setShowEnterpriseCheck] = useState(false)
   const [selectedEnterprises, setSelectedEnterprises] = useState([]);
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
+  const [selectedOption, setSelectedOption] = useState(null); // State for react-select
+  const [listIotState, setListIotState] = useState(null);
 
-  
+  // Handle change in react-select 
+  const handleChange = (selectedOption) => {
+    console.log('check', selectedOption);
+    if (!selectedOption && (!listIotState || listIotState.length === 0)) {
+      ListOfIotState(); // Call ListOfIotState if selectedOption is null
+    } else {
+      setSelectedOption(selectedOption); // Update state if selectedOption is not null
+    }
+  };
+
   const handleDeleteEnterprises = async () => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
@@ -119,6 +134,24 @@ function AndroidDetails() {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
+
+  const ListOfIotState = async () => {
+    try {
+      dispatch(startLoading());
+      var result = await executelistIotStateLambda('test_rk_mandi',user?.credentials);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.CODE,
+        label: item.NAME
+      }));
+      setListIotState(options);
+    } catch (error) {
+      handleError(error, 'Error create android enterprise')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
 
   const toggleModal = () => {
     setModalOpen(!modalOpen);
@@ -298,6 +331,22 @@ function AndroidDetails() {
             {"ds" + ": " + "sd" + ": " + "dsf"}
           </div> */}
         </div>
+        <Button
+              onClick={() => {
+                toggle()
+              }}
+              color="primary"
+              className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+              style={{
+                ...whiteSurfaceCircularBorder,
+                width: "70px",
+                height: "30px",
+                // borderRadius: "8%",
+                fontSize: "14px", // Adjust font size here
+              }}
+            >
+         <span style={{ marginRight: '2px', color: "black"}}>+ New</span>
+            </Button>
       </div>
     );
   };
@@ -588,6 +637,26 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
+          <div>
+            <Modal isOpen={modal} toggle={toggle}>
+              <ModalHeader toggle={toggle}>Complex List</ModalHeader>
+                <ModalBody>
+                <Select options={listIotState || []} value={selectedOption} onChange={handleChange}  onMenuOpen={() => {
+              if (!listIotState || listIotState.length === 0) {
+                ListOfIotState();
+              }
+            }}/>
+                </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onClick={ListOfIotState}>
+                  Do Something
+                </Button>{' '}
+                <Button color="secondary" onClick={toggle}>
+                  Cancel
+                </Button>
+              </ModalFooter>
+            </Modal>
+          </div>
             {/* <Button
               style={{ float: "right", padding: "0px 0px 0px 0px" }}
               color="primary"
