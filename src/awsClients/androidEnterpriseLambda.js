@@ -152,14 +152,15 @@ export function executelistIotStateLambda(
   });
 }
 
-export function executelistIotDistrictLambda(
+export function executelistIotDynamicLambda(
   userName,
   credentials,
-  value
+  value,
+  command
 ) {
   return new Promise(function (resolve, reject) {
     console.log(
-      "credentials-executelistIotDistrictLambda",
+      "credentials "+ command,
       credentials
     );
     var lambda = new AWS.Lambda({
@@ -170,7 +171,7 @@ export function executelistIotDistrictLambda(
     var pullParams = {
       FunctionName: "Enterprise_Crud_Iot_ComplexTree",
       Payload: "{ " + '"userName": "' + userName + '",' +
-      '"command": "' + "list-iot-state"+
+      '"command": "' + command +
       '",' + '"value": "' + value +
       '"' + "}",
     };

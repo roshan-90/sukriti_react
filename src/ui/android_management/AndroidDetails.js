@@ -23,7 +23,8 @@ import {
   executelistDevicesAndroidManagementLambda,
   executeCreateEnterpriseAndroidManagementLambda,
   executeDeleteEnterpriseAndroidManagementLambda,
-  executelistIotStateLambda
+  executelistIotStateLambda,
+  executelistIotDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -103,18 +104,24 @@ function AndroidDetails() {
   const [selectedEnterprises, setSelectedEnterprises] = useState([]);
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
+
   const [selectedOption, setSelectedOption] = useState(null); // State for react-select
   const [listIotState, setListIotState] = useState(null);
+  const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
+  const [listIotDistrict, setListIotDistrict] = useState(null);
+
 
   // Handle change in react-select 
   const handleChange = (selectedOption) => {
-    console.log('check', selectedOption);
-    if (!selectedOption && (!listIotState || listIotState.length === 0)) {
-      ListOfIotState(); // Call ListOfIotState if selectedOption is null
-    } else {
+    console.log('check', selectedOption.value);
       setSelectedOption(selectedOption); // Update state if selectedOption is not null
-    }
+      ListOfIotDistrict(selectedOption.value)
   };
+
+  const handleChangeIotDistrict = (selectedOption) => {
+    console.log('handleChangeIotDistrict',selectedOption);
+    setSelectedOptionIotDistrict(selectedOption);
+  }
 
   const handleDeleteEnterprises = async () => {
     try {
@@ -146,6 +153,25 @@ function AndroidDetails() {
         label: item.NAME
       }));
       setListIotState(options);
+    } catch (error) {
+      handleError(error, 'Error create android enterprise')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotDistrict = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-district";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.CODE,
+        label: item.NAME
+      }));
+      setListIotDistrict(options);
     } catch (error) {
       handleError(error, 'Error create android enterprise')
     } finally {
@@ -323,13 +349,6 @@ function AndroidDetails() {
           <div style={{ ...complexCompositionStyle.complexTitleClient }}>
             {"Android Device List"}
           </div>
-          
-          {/* <div style={{ ...complexCompositionStyle.complexTitle }}>
-            {"Client: " + "dsf"}
-          </div>
-          <div style={{ ...complexCompositionStyle.complexSubTitle }}>
-            {"ds" + ": " + "sd" + ": " + "dsf"}
-          </div> */}
         </div>
         <Button
               onClick={() => {
@@ -641,11 +660,12 @@ function AndroidDetails() {
             <Modal isOpen={modal} toggle={toggle}>
               <ModalHeader toggle={toggle}>Complex List</ModalHeader>
                 <ModalBody>
-                <Select options={listIotState || []} value={selectedOption} onChange={handleChange}  onMenuOpen={() => {
-              if (!listIotState || listIotState.length === 0) {
-                ListOfIotState();
-              }
-            }}/>
+                  <Select options={listIotState || []} value={selectedOption} onChange={handleChange}         onMenuOpen={() => {
+                    if (!listIotState || listIotState.length === 0) {
+                      ListOfIotState();
+                    }
+                  }}/>
+                  <Select options={listIotDistrict || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict}/>
                 </ModalBody>
               <ModalFooter>
                 <Button color="primary" onClick={ListOfIotState}>
