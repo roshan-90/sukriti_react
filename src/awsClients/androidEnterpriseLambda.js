@@ -119,13 +119,14 @@ export function executeDeleteEnterpriseAndroidManagementLambda(credentials,enter
   });
 }
 
-export function executelistIotStateLambda(
+export function executelistIotSingleLambda(
   userName,
-  credentials
+  credentials,
+  command
 ) {
   return new Promise(function (resolve, reject) {
     console.log(
-      "credentials-executelistIotStateLambda",
+      "credentials-" + command,
       credentials
     );
     var lambda = new AWS.Lambda({
@@ -136,7 +137,7 @@ export function executelistIotStateLambda(
     var pullParams = {
       FunctionName: "Enterprise_Crud_Iot_ComplexTree",
       Payload: "{ " + '"userName": "' + userName + '",' +
-      '"command": "' + "list-iot-state"+
+      '"command": "' + command +
       '"' + "}",
     };
     lambda.invoke(pullParams, function (err, data) {

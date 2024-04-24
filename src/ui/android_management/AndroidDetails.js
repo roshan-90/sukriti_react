@@ -23,7 +23,7 @@ import {
   executelistDevicesAndroidManagementLambda,
   executeCreateEnterpriseAndroidManagementLambda,
   executeDeleteEnterpriseAndroidManagementLambda,
-  executelistIotStateLambda,
+  executelistIotSingleLambda,
   executelistIotDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -102,27 +102,61 @@ function AndroidDetails() {
   const [modalOpen, setModalOpen] = useState(false);
   const [showEnterpriseCheck, setShowEnterpriseCheck] = useState(false)
   const [selectedEnterprises, setSelectedEnterprises] = useState([]);
-  const [modal, setModal] = useState(false);
-  
+  const [modal, setModal] = useState(false); 
   const toggle = () => setModal(!modal);
 
   const [selectedOption, setSelectedOption] = useState(null); // State for react-select
   const [listIotState, setListIotState] = useState(null);
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
   const [listIotDistrict, setListIotDistrict] = useState(null);
-
+  const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
+  const [listIotCity, setListIotCity] = useState(null);
+  const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
+  const [listIotComplex, setListIotComplex] = useState(null);
 
   // Handle change in react-select 
   const handleChangeIotState = (selectedOption) => {
     console.log('check', selectedOption.value);
-      setSelectedOption(selectedOption); // Update state if selectedOption is not null
-      ListOfIotDistrict(selectedOption.value)
+    setListIotDistrict(null);
+    setSelectedOptionIotDistrict(null)
+    setListIotCity(null);
+    setSelectedOptionIotCity(null);
+    setListIotComplex(null);
+    setSelectedOptionIotComplex(null)
+    setSelectedOption(selectedOption); // Update state if selectedOption is not null
+    ListOfIotDistrict(selectedOption.value)
   };
 
   const handleChangeIotDistrict = (selectedOption) => {
+    setListIotCity(null)
+    setSelectedOptionIotCity(null)
+    setListIotComplex(null)
+    setSelectedOptionIotComplex(null)
     console.log('handleChangeIotDistrict',selectedOption);
     setSelectedOptionIotDistrict(selectedOption);
+    ListOfIotCity(selectedOption.value)
   }
+
+  const handleChangeIotCity = (selectedOption) => {
+    setListIotComplex(null)
+    setSelectedOptionIotComplex(null)
+    console.log('handleChangeIotCity',selectedOption);
+    setSelectedOptionIotCity(selectedOption);
+    ListOfIotComplex(selectedOption.value)
+  }
+  const handleChangeIotComplex = (selectedOption) => {
+    console.log('handleChangeIotComplex',selectedOption);
+    setSelectedOptionIotComplex(selectedOption);
+  }
+
+  useEffect(() => {
+    if (!modal) {
+      setSelectedOption(null);
+      setSelectedOptionIotDistrict(null);
+      setListIotState(null);
+      setListIotDistrict(null);
+    }
+  }, [modal]);
 
   const handleDeleteEnterprises = async () => {
     try {
@@ -146,7 +180,8 @@ function AndroidDetails() {
   const ListOfIotState = async () => {
     try {
       dispatch(startLoading());
-      var result = await executelistIotStateLambda('test_rk_mandi',user?.credentials);
+      let command = "list-iot-state";
+      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
       console.log('result',result);
       // Map raw data to react-select format
       const options = result.body.map(item => ({
@@ -155,7 +190,7 @@ function AndroidDetails() {
       }));
       setListIotState(options);
     } catch (error) {
-      handleError(error, 'Error create android enterprise')
+      handleError(error, 'Error ListOfIotState')
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -174,7 +209,45 @@ function AndroidDetails() {
       }));
       setListIotDistrict(options);
     } catch (error) {
-      handleError(error, 'Error create android enterprise')
+      handleError(error, 'Error ListOfIotDistrict')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotCity = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-city";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.CODE,
+        label: item.NAME
+      }));
+      setListIotCity(options);
+    } catch (error) {
+      handleError(error, 'Error ListOfIotCity')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotComplex = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-complex";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      setListIotComplex(options);
+    } catch (error) {
+      handleError(error, 'Error ListOfIotComplex')
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -658,12 +731,7 @@ function AndroidDetails() {
           </div>
           <div className="col-md-10" style={{}}>
           <div>
-            <Modal isOpen={modal} toggle={toggle} onClosed={() => {
-                setSelectedOption(null); // Reset selected option for listIotState
-                setSelectedOptionIotDistrict(null); // Reset selected option for listIotDistrict
-                setListIotState(null);
-                setListIotDistrict(null);
-              }}>
+            <Modal isOpen={modal} toggle={toggle} >
             {isLoading && (
                 <div className="loader-container">
                   <CircularProgress
@@ -679,9 +747,13 @@ function AndroidDetails() {
                     if (!listIotState || listIotState.length === 0) {
                       ListOfIotState();
                     }
-                  }}/>
+                  }} placeholder="Select State" />
                   <br />
-                  <Select options={listIotDistrict || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict}/>
+                  <Select options={listIotDistrict || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
+                  <br />
+                  <Select options={listIotCity || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
+                  <br />
+                  <Select options={listIotComplex || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/>
                 </ModalBody>
               <ModalFooter>
                 <Button color="primary" onClick={ListOfIotState}>
