@@ -28,6 +28,8 @@ const DefineMemberAccess = lazy(() =>
   import("./ui/administration/DefineMemberAccess")
 );
 const AddTeamMember = lazy(() => import("./ui/administration/AddTeamMember"));
+const EnrollDevice = lazy(() => import("./ui/android_management/EnrollDevice"));
+
 const GrantPermissions = lazy(() =>
   import("./ui/administration/GrantPermissions")
 );
@@ -257,6 +259,12 @@ const App = () => {
                       exact={false}
                       name={"Android Management"}
                       element={<AndroidManagement />}
+                    />
+                    <Route
+                      path={"/android_management/enroll_device"}
+                      exact={true}
+                      name={"Enroll Device"}
+                      element={<EnrollDevice />}
                     />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
