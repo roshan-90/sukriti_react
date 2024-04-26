@@ -42,7 +42,7 @@ import {
   Button  
 } from "reactstrap";
 import DeleteIcon from '@mui/icons-material/Delete';
-import Select from 'react-select'; // Importing react-select
+import { useNavigate } from "react-router-dom";
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -104,59 +104,7 @@ function AndroidDetails() {
   const [selectedEnterprises, setSelectedEnterprises] = useState([]);
   const [modal, setModal] = useState(false); 
   const toggle = () => setModal(!modal);
-
-  const [selectedOption, setSelectedOption] = useState(null); // State for react-select
-  const [listIotState, setListIotState] = useState(null);
-  const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
-  const [listIotDistrict, setListIotDistrict] = useState(null);
-  const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
-  const [listIotCity, setListIotCity] = useState(null);
-  const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
-  const [listIotComplex, setListIotComplex] = useState(null);
-
-  // Handle change in react-select 
-  const handleChangeIotState = (selectedOption) => {
-    console.log('check', selectedOption.value);
-    setListIotDistrict(null);
-    setSelectedOptionIotDistrict(null)
-    setListIotCity(null);
-    setSelectedOptionIotCity(null);
-    setListIotComplex(null);
-    setSelectedOptionIotComplex(null)
-    setSelectedOption(selectedOption); // Update state if selectedOption is not null
-    ListOfIotDistrict(selectedOption.value)
-  };
-
-  const handleChangeIotDistrict = (selectedOption) => {
-    setListIotCity(null)
-    setSelectedOptionIotCity(null)
-    setListIotComplex(null)
-    setSelectedOptionIotComplex(null)
-    console.log('handleChangeIotDistrict',selectedOption);
-    setSelectedOptionIotDistrict(selectedOption);
-    ListOfIotCity(selectedOption.value)
-  }
-
-  const handleChangeIotCity = (selectedOption) => {
-    setListIotComplex(null)
-    setSelectedOptionIotComplex(null)
-    console.log('handleChangeIotCity',selectedOption);
-    setSelectedOptionIotCity(selectedOption);
-    ListOfIotComplex(selectedOption.value)
-  }
-  const handleChangeIotComplex = (selectedOption) => {
-    console.log('handleChangeIotComplex',selectedOption);
-    setSelectedOptionIotComplex(selectedOption);
-  }
-
-  useEffect(() => {
-    if (!modal) {
-      setSelectedOption(null);
-      setSelectedOptionIotDistrict(null);
-      setListIotState(null);
-      setListIotDistrict(null);
-    }
-  }, [modal]);
+  const navigate = useNavigate();
 
   const handleDeleteEnterprises = async () => {
     try {
@@ -177,85 +125,7 @@ function AndroidDetails() {
     }
   };
 
-  const ListOfIotState = async () => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-state";
-      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
-      console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.CODE,
-        label: item.NAME
-      }));
-      setListIotState(options);
-    } catch (error) {
-      handleError(error, 'Error ListOfIotState')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
 
-  const ListOfIotDistrict = async (value) => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-district";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
-      console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.CODE,
-        label: item.NAME
-      }));
-      setListIotDistrict(options);
-    } catch (error) {
-      handleError(error, 'Error ListOfIotDistrict')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
-  const ListOfIotCity = async (value) => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-city";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
-      console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.CODE,
-        label: item.NAME
-      }));
-      setListIotCity(options);
-    } catch (error) {
-      handleError(error, 'Error ListOfIotCity')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
-  const ListOfIotComplex = async (value) => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-complex";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
-      console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.Name,
-        label: item.Name
-      }));
-      setListIotComplex(options);
-    } catch (error) {
-      handleError(error, 'Error ListOfIotComplex')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
-  const toggleModal = () => {
-    setModalOpen(!modalOpen);
-  };
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
     let text = err.message.includes("expired");
@@ -426,7 +296,7 @@ function AndroidDetails() {
         </div>
         <Button
               onClick={() => {
-                toggle()
+                navigate("/android_management/enroll_device")
               }}
               color="primary"
               className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
@@ -730,53 +600,6 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
-          <div>
-            <Modal isOpen={modal} toggle={toggle} >
-            {isLoading && (
-                <div className="loader-container">
-                  <CircularProgress
-                    className="loader"
-                    style={{ color: "rgb(93 192 166)" }}
-                  />
-                </div>
-              )}
-              <ModalHeader toggle={toggle}>Complex List</ModalHeader>
-                <ModalBody>
-                  <Select options={listIotState || []} value={selectedOption} onChange={handleChangeIotState}         
-                  onMenuOpen={() => {
-                    if (!listIotState || listIotState.length === 0) {
-                      ListOfIotState();
-                    }
-                  }} placeholder="Select State" />
-                  <br />
-                  <Select options={listIotDistrict || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
-                  <br />
-                  <Select options={listIotCity || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
-                  <br />
-                  <Select options={listIotComplex || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/>
-                </ModalBody>
-              <ModalFooter>
-                <Button color="primary" onClick={ListOfIotState}>
-                  Submit
-                </Button>{' '}
-                <Button color="secondary" onClick={toggle}>
-                  Cancel
-                </Button>
-              </ModalFooter>
-            </Modal>
-          </div>
-            {/* <Button
-              style={{ float: "right", padding: "0px 0px 0px 0px" }}
-              color="primary"
-              className="px-4"
-              onClick={toggleModal}
-            >
-              Add Enterprise
-            </Button>
-            <CreateEnterpriseModal
-              isOpen={modalOpen}
-              toggleModal={toggleModal}
-            /> */}
             {selectedEnterprises.length > 0 && (
               <Button
                 onClick={() => {
