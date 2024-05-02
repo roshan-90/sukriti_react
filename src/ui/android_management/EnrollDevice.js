@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";import Box from '@mui/material/Box';
+import { useNavigate } from "react-router-dom";
+import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import {
@@ -10,31 +11,35 @@ import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
 import {
   Card,
-  CardBody
 } from "reactstrap";
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import TextField from '@mui/material/TextField';
 import { selectUser } from "../../features/authenticationSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
-import ValidationMessageDialog from "../../dialogs/MessageDialog";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+
 import Select from 'react-select'; // Importing react-select
 
-const steps = ['Step 1', 'Step 2', 'Step 3'];
+const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
 
 export default function EnrollDevice() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isLoading = useSelector((state) => state.loading.isLoading);
-  const clientList = useSelector((state) => state.adminstration.clientList);
+  const stateIotList = useSelector((state) => state.androidManagement.stateIotList);
+  const districtIotList = useSelector((state) => state.androidManagement.districtIotList);
+  const cityIotList = useSelector((state) => state.androidManagement.cityIotList);
+  const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
+  const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+
+
   const [dialogData, setDialogData] = useState(null);
 
 
@@ -47,13 +52,9 @@ export default function EnrollDevice() {
   });
 
   const [selectedOption, setSelectedOption] = useState(null); // State for react-select
-  const [listIotState, setListIotState] = useState(null);
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
-  const [listIotDistrict, setListIotDistrict] = useState(null);
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
-  const [listIotCity, setListIotCity] = useState(null);
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
-  const [listIotComplex, setListIotComplex] = useState(null);
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -90,7 +91,7 @@ export default function EnrollDevice() {
         value: item.CODE,
         label: item.NAME
       }));
-      setListIotState(options);
+      dispatch(setStateIotList(options));
     } catch (error) {
       handleError(error, 'Error ListOfIotState')
     } finally {
@@ -109,7 +110,7 @@ export default function EnrollDevice() {
         value: item.CODE,
         label: item.NAME
       }));
-      setListIotDistrict(options);
+      dispatch(setDistrictIotList(options));
     } catch (error) {
       handleError(error, 'Error ListOfIotDistrict')
     } finally {
@@ -128,7 +129,7 @@ export default function EnrollDevice() {
         value: item.CODE,
         label: item.NAME
       }));
-      setListIotCity(options);
+      dispatch(setCityIotList(options));
     } catch (error) {
       handleError(error, 'Error ListOfIotCity')
     } finally {
@@ -147,7 +148,7 @@ export default function EnrollDevice() {
         value: item.Name,
         label: item.Name
       }));
-      setListIotComplex(options);
+      dispatch(setComplexIotList(options));
     } catch (error) {
       handleError(error, 'Error ListOfIotComplex')
     } finally {
@@ -155,23 +156,36 @@ export default function EnrollDevice() {
     }
   }
   
+  const ListOfIotComplexDetails = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-complexDetail";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result complexDetail',result.body);
+      dispatch(setComplexIotDetail(result.body));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotComplex')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
   // Handle change in react-select 
   const handleChangeIotState = (selectedOption) => {
     console.log('check', selectedOption.value);
-    setListIotDistrict(null);
+    dispatch(setDistrictIotList([]));
+    dispatch(setCityIotList([]));
+    dispatch(setComplexIotList([]));
     setSelectedOptionIotDistrict(null)
-    setListIotCity(null);
     setSelectedOptionIotCity(null);
-    setListIotComplex(null);
     setSelectedOptionIotComplex(null)
     setSelectedOption(selectedOption); // Update state if selectedOption is not null
     ListOfIotDistrict(selectedOption.value)
   };
 
   const handleChangeIotDistrict = (selectedOption) => {
-    setListIotCity(null)
+    dispatch(setCityIotList([]));
+    dispatch(setComplexIotList([]));
     setSelectedOptionIotCity(null)
-    setListIotComplex(null)
     setSelectedOptionIotComplex(null)
     console.log('handleChangeIotDistrict',selectedOption);
     setSelectedOptionIotDistrict(selectedOption);
@@ -179,7 +193,7 @@ export default function EnrollDevice() {
   }
 
   const handleChangeIotCity = (selectedOption) => {
-    setListIotComplex(null)
+    dispatch(setComplexIotList([]));
     setSelectedOptionIotComplex(null)
     console.log('handleChangeIotCity',selectedOption);
     setSelectedOptionIotCity(selectedOption);
@@ -188,6 +202,7 @@ export default function EnrollDevice() {
   const handleChangeIotComplex = (selectedOption) => {
     console.log('handleChangeIotComplex',selectedOption);
     setSelectedOptionIotComplex(selectedOption);
+    ListOfIotComplexDetails(selectedOption.value)
   }
   const totalSteps = () => {
     return steps.length;
@@ -246,8 +261,18 @@ export default function EnrollDevice() {
     }));
   };
 
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <div className="container-fluid" style={{ backgroundColor: '#fff' }}>
+    <Box sx={{ width: '62%', backgroundColor: '#fff', padding: '20px', marginLeft: '20%'}}>
+       {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={label} completed={completed[index]}>
@@ -258,6 +283,7 @@ export default function EnrollDevice() {
         ))}
       </Stepper>
       <div>
+        <br />
         {activeStep === steps.length ? (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
@@ -275,25 +301,26 @@ export default function EnrollDevice() {
                 {steps[activeStep]}
               </Typography>
               {activeStep === 0 && (
-                 <Card className="p-4">
-                 <CardBody>
-                 <Select options={listIotState || []} value={selectedOption} onChange={handleChangeIotState}         
-                     onMenuOpen={() => {
-                       if (!listIotState || listIotState.length === 0) {
-                         ListOfIotState();
-                       }
-                     }} placeholder="Select State" />
-                     <br />
-                     <Select options={listIotDistrict || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
-                     <br />
-                     <Select options={listIotCity || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
-                     <br />
-                     <Select options={listIotComplex || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/>
-                  
-                 </CardBody>
-               </Card>
+                <div>
+                 {/* <Card className="p-4">
+                   <CardContent> */}
+                    <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
+                      onMenuOpen={() => {
+                        if (!stateIotList || stateIotList.length === 0) {
+                          ListOfIotState();
+                        }
+                      }} placeholder="Select State" />
+                    <br />
+                    <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
+                    <br />
+                    <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
+                    <br />
+                    <Select options={complexIotList || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/> 
+                   {/* </CardContent>
+                </Card> */}
+                </div>
               )}
-              {activeStep == 1 && (
+              {activeStep === 1 && (
                 <FormControl fullWidth>
                   <InputLabel>Select</InputLabel>
                   <Select
@@ -310,6 +337,7 @@ export default function EnrollDevice() {
             </CardContent>
           </Card>
         )}
+        <br />
         <div sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
           <Button disabled={activeStep === 0} onClick={handleBack}>
             Back
@@ -323,5 +351,6 @@ export default function EnrollDevice() {
         </div>
       </div>
     </Box>
+    </div>
   );
-}
+};

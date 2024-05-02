@@ -17,6 +17,7 @@ import incidenceReducer from "./features/incidenceSlice";
 import reportReducer from "./features/reportSlice";
 import extraReducer from "./features/extraSlice";
 import vendorSlice from "./features/vendorSlice";
+import androidManagementSlice from "./features/androidManagementSlice";
 
 // if ("serviceWorker" in navigator) {
 //   navigator.serviceWorker
@@ -42,6 +43,7 @@ const store = configureStore({
     report: reportReducer,
     extra: extraReducer,
     vendor: vendorSlice,
+    androidManagement: androidManagementSlice
   },
 });
 const loading = () => (
