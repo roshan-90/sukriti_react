@@ -22,9 +22,8 @@ import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList,
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
-import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-
 import Select from 'react-select'; // Importing react-select
+import UpdateComplex from './UpdateComplex'
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
 
@@ -38,6 +37,7 @@ export default function EnrollDevice() {
   const cityIotList = useSelector((state) => state.androidManagement.cityIotList);
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+  const [complexChanged, setComplexChanged] = useState(false);
 
 
   const [dialogData, setDialogData] = useState(null);
@@ -203,6 +203,7 @@ export default function EnrollDevice() {
     console.log('handleChangeIotComplex',selectedOption);
     setSelectedOptionIotComplex(selectedOption);
     ListOfIotComplexDetails(selectedOption.value)
+    setComplexChanged(true)
   }
   const totalSteps = () => {
     return steps.length;
@@ -302,8 +303,9 @@ export default function EnrollDevice() {
               </Typography>
               {activeStep === 0 && (
                 <div>
-                 {/* <Card className="p-4">
-                   <CardContent> */}
+                  {(ComplexIotDetails['key'] !== null && complexChanged) && (
+                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex}/> // Pass complexChanged as a prop
+                  )}
                     <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
                       onMenuOpen={() => {
                         if (!stateIotList || stateIotList.length === 0) {
@@ -316,23 +318,11 @@ export default function EnrollDevice() {
                     <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
                     <br />
                     <Select options={complexIotList || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/> 
-                   {/* </CardContent>
-                </Card> */}
+                 
                 </div>
               )}
               {activeStep === 1 && (
-                <FormControl fullWidth>
-                  <InputLabel>Select</InputLabel>
-                  <Select
-                    value={formData[steps[activeStep].toLowerCase()]}
-                    onChange={handleChange}
-                    name={steps[activeStep].toLowerCase()}
-                  >
-                    <MenuItem value="option1">Option 1</MenuItem>
-                    <MenuItem value="option2">Option 2</MenuItem>
-                    <MenuItem value="option3">Option 3</MenuItem>
-                  </Select>
-                </FormControl>
+                <h2>this is step 2</h2>
               )}
             </CardContent>
           </Card>
