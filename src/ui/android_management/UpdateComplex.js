@@ -2,14 +2,28 @@ import React, { useState } from 'react';
 import {Row, Col, Button, Modal, ModalHeader, ModalBody, ModalFooter, Card, CardBody, CardTitle, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useDispatch, useSelector } from "react-redux";
 import './enrollDevice.css';
+import Select from 'react-select'; // Importing react-select
 
 
 export const UpdateComplex = ({ complexChanged , selected}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+  const ListclientName = useSelector((state) => state.androidManagement.clientName);
+  const ListbillingGroups = useSelector((state) => state.androidManagement.billingGroups);
+  const [selectedClientName, setSelectedClientName] = useState(null); // State for react-select
+  const [selectedbillingGroups, setSelectedbillingGroups] = useState(null); // State for react-select
+
   console.log('ComplexIotDetails',ComplexIotDetails);
   console.log('selected', selected);
   const toggle = () => setModal(!modal);
+
+  // const handleChangeClientName = (selectedOption) => {
+  //   console.log('handleChangeClientName',selectedOption)
+  // }
+
+  // const handleChangeBillingGroup = (selectedOption) => {
+  //   console.log('handleChangeBillingGroup',selectedOption)
+  // }
 
   return (
     <div>
@@ -107,7 +121,6 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                           id="address"
                           name="address"
                           type="textarea"
-                          disabled={true}
                           value={ComplexIotDetails.ADDR}
                         />
                       </Col>
@@ -129,7 +142,6 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                             name="latitude"
                             placeholder="latitude"
                             type="text"
-                            disabled={true}
                             value={ComplexIotDetails.LATT}
                           />
                         </FormGroup>
@@ -144,7 +156,6 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                             name="longitude"
                             placeholder="longitude placeholder"
                             type="text"
-                            disabled={true}
                             value={ComplexIotDetails.LONG}
                           />
                         </FormGroup>
@@ -166,15 +177,9 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                     >
                       <b>Client Name</b>
                     </Label>
+
                     <Col sm={10}>
-                      <Input
-                        id="client_name"
-                        name="client_name"
-                        placeholder="client_name"
-                        type="text"
-                        disabled={true}
-                        value={ComplexIotDetails.CLNT}
-                      />
+                    <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>

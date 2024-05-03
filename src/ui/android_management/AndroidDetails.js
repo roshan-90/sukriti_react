@@ -302,7 +302,7 @@ function AndroidDetails() {
               className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
               style={{
                 ...whiteSurfaceCircularBorder,
-                width: "70px",
+                width: "90px",
                 height: "30px",
                 // borderRadius: "8%",
                 fontSize: "14px", // Adjust font size here

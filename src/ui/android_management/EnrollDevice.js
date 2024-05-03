@@ -18,7 +18,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { selectUser } from "../../features/authenticationSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -169,6 +169,35 @@ export default function EnrollDevice() {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
+
+  const ListOfIotClientName = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-clientName";
+      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
+      console.log('result ClientName', result.body);
+      dispatch(setClientName(result.body));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotClientName')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotBillingGroup = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-billing-groups";
+      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
+      console.log('result ListOfIotBillingGroup', result.body);
+      dispatch(setBillingGroup(result.body));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotBillingGroup')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
   // Handle change in react-select 
   const handleChangeIotState = (selectedOption) => {
     console.log('check', selectedOption.value);
@@ -203,6 +232,8 @@ export default function EnrollDevice() {
     console.log('handleChangeIotComplex',selectedOption);
     setSelectedOptionIotComplex(selectedOption);
     ListOfIotComplexDetails(selectedOption.value)
+    ListOfIotClientName();
+    ListOfIotBillingGroup();
     setComplexChanged(true)
   }
   const totalSteps = () => {
