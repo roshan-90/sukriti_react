@@ -3,5 +3,6 @@
 } */
 
 .modal-content {
-    width: 125%;
+    width: 145%;
+    margin-left : -45px
 }

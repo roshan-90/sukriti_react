@@ -14,6 +14,21 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   const [selectedClientName, setSelectedClientName] = useState(null); // State for react-select
   const [selectedbillingGroups, setSelectedbillingGroups] = useState(null); // State for react-select
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedSmartness, setSelectedSmartness] = useState(null);
+  const [selectedCommission, setSelectedCommission] = useState(null);
+
+  const smartnessLevels = [
+    { label: 'None', value: 'None' },
+    { label: 'Basic', value: 'Basic' },
+    { label: 'Premium', value: 'Premium' },
+    { label: 'Extra-Premium', value: 'Extra-Premium' }
+  ];
+
+  const options = [
+    { value: true, label: 'True' },
+    { value: false, label: 'False' }
+  ];
+
 
   const [formData, setFormData] = useState({
     ADDR : "",
@@ -97,6 +112,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
         UUID : ComplexIotDetails.UUID
       })
     }
+
     // Check if ComplexIotDetails is available and DATE is in the correct format
     if (ComplexIotDetails && ComplexIotDetails.DATE) {
       const initialDateString = ComplexIotDetails.DATE;
@@ -111,6 +127,17 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
       setSelectedDate(new Date());
     }
   }, [ComplexIotDetails]);
+
+  
+  useEffect(() => {
+    // Find the option corresponding to ComplexIotDetails.SLVL
+    const selectedOption = smartnessLevels.find(option => option.value === ComplexIotDetails.SLVL);
+    
+    // If the option is found, set it as the smartnessLevel, otherwise set it to null
+    setSelectedSmartness(selectedOption || null);
+  }, [ComplexIotDetails.SLVL]);
+
+
   
   console.log('ComplexIotDetails',ComplexIotDetails);
   console.log('ListclientName',ListclientName);
@@ -123,23 +150,38 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
 
   const handleChangeClientName = (selectedOption) => {
     console.log('handleChangeClientName',selectedOption)
+    setFormData({ ...formData, CLNT: selectedOption.value });
+    setSelectedClientName(selectedOption)
+
   }
 
   const handleChangeBillingGroup = (selectedOption) => {
     console.log('handleChangeBillingGroup',selectedOption)
+    setFormData({ ...formData, BILL: selectedOption.value });
+    setSelectedbillingGroups(selectedOption)
   }
 
+  const handleChangeSmartnessLevel = (selectedOption) => {
+    console.log('handleChangeSmartnessLevel',selectedOption);
+    setFormData({ ...formData, SLVL: selectedOption.value });
+    setSelectedSmartness(selectedOption)
+  }
+
+  const handleChangeCommission = (selectedOption) => {
+    console.log('handleChangeCommission', selectedOption);
+  }
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
     const formattedDate = formatDate(date);
     console.log('formattedDate',formattedDate);
-    setFormData({ ...formData, selectedDate: formattedDate });
+    setFormData({ ...formData, DATE: formattedDate });
   };
 
   // Update form state when form values change
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log('cheking :->',{ name, value });
     setFormData({ ...formData, [name]: value });
   };
 
@@ -153,6 +195,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   };
 
   console.log('complexChanged',complexChanged);
+  console.log('formData',formData);
   return (
     <div>
       {(complexChanged) && ( // Conditionally render based on complexChanged prop
@@ -246,10 +289,11 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       </Label>
                       <Col sm={10}>
                         <Input
-                          id="address"
-                          name="address"
+                          id="ADDR"
+                          name="ADDR"
                           type="textarea"
-                          value={ComplexIotDetails.ADDR}
+                          value={formData.ADDR}
+                          onChange={handleChange}
                         />
                       </Col>
                   </FormGroup>
@@ -262,15 +306,16 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       </Label>
                       <Col md={5}>
                         <FormGroup>
-                          <Label for="latitude">
+                          <Label for="lattitude">
                             Latitude
                           </Label>
                           <Input
-                            id="latitude"
-                            name="latitude"
+                            id="LATT"
+                            name="LATT"
                             placeholder="latitude"
                             type="text"
-                            value={ComplexIotDetails.LATT}
+                            value={formData.LATT}
+                            onChange={handleChange}
                           />
                         </FormGroup>
                       </Col>
@@ -280,11 +325,12 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                             Longitude
                           </Label>
                           <Input
-                            id="longitude"
-                            name="longitude"
+                            id="LONG"
+                            name="LONG"
                             placeholder="longitude placeholder"
                             type="text"
-                            value={ComplexIotDetails.LONG}
+                            value={formData.LONG}
+                            onChange={handleChange}
                           />
                         </FormGroup>
                       </Col>
@@ -294,334 +340,477 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
               </Card>
                     <br/>
               <Card>
-              <CardBody>
-                  <CardTitle><b>Client Details</b></CardTitle>
-                  <br/>
-                  <Form>
-                  <FormGroup row>
-                    <Label
-                      for="client name"
-                      sm={2}
-                    >
-                      <b>Client Name</b>
-                    </Label>
+                <CardBody>
+                    <CardTitle><b>Client Details</b></CardTitle>
+                    <br/>
+                    <Form>
+                    <FormGroup row>
+                      <Label
+                        for="client name"
+                        sm={2}
+                      >
+                        <b>Client Name</b>
+                      </Label>
 
-                    <Col sm={10}>
-                    <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
-                    <Label
-                      for="Billing Group"
-                      sm={2}
-                    >
-                    <b>  Billing Group</b>
-                    </Label>
-                    <Col sm={10}>
-                    <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
-                    <Label
-                      for="Select Date"
-                      sm={2}
-                    >
-                    <b> Select Date </b>
-                    </Label>
-                    <Col sm={10}>
-                    <DatePicker
-                      id="selectDate"
-                      selected={selectedDate}
-                      onChange={handleDateChange}
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Select date"
-                    />
-                    </Col>
-                  </FormGroup>
-                  </Form>
-              </CardBody>
+                      <Col sm={10}>
+                      <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
+                      </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Billing Group"
+                        sm={2}
+                      >
+                      <b>  Billing Group</b>
+                      </Label>
+                      <Col sm={10}>
+                      <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
+                      </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Select Date"
+                        sm={2}
+                      >
+                      <b> Select Date </b>
+                      </Label>
+                      <Col sm={10} style={{ width: '286px' }}>
+                      <DatePicker
+                        id="selectDate"
+                        selected={selectedDate}
+                        onChange={handleDateChange}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Select date"
+                      />
+                      </Col>
+                    </FormGroup>
+                    </Form>
+                </CardBody>
               </Card>
               <br/>
               <Card>
-              <CardBody>
-                  <CardTitle><b>Complex Attribute</b></CardTitle>
-                  <br/>
-                  <Form>
-                  <FormGroup row>
-                    <Label
-                      for="commissioning status"
-                      sm={2}
-                    >
-                      <b>Commissioning Status</b>
-                    </Label>
-                    <Col sm={10}>
-                    <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Commissioning Status" />
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
-                    <Label
-                      for="Device Type"
-                      sm={2}
-                    >
-                    <b>  Device Type</b>
-                    </Label>
-                    <Col sm={10}>
-                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Device Type" />
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
-                  <Label
-                      for="Smartness Level"
-                      sm={2}
-                    >
-                    <b>  Smartness Level</b>
-                    </Label>
-                    <Col sm={10}>
-                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Smartness Level" />
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
-                    <Label
-                        for="Wc Count"
+                <CardBody>
+                    <CardTitle><b>Complex Attribute</b></CardTitle>
+                    <br/>
+                    <Form>
+                    <FormGroup row>
+                      <Label
+                        for="commissioning status"
                         sm={2}
                       >
-                      <b> WC Count </b>
+                        <b>Commissioning Status</b>
                       </Label>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="mwc">
-                            Male WCs
-                          </Label>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={ComplexIotDetails.LATT}
-                          />
-                        </FormGroup>
+                      <Col sm={10}>
+                      <Select options={options || []} value={selectedCommission} onChange={handleChangeCommission} placeholder="Commissioning Status" />
                       </Col>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="longitude">
-                            Female WCs
-                          </Label>
-                          <Input
-                            id="longitude"
-                            name="longitude"
-                            placeholder="longitude placeholder"
-                            type="text"
-                            value={ComplexIotDetails.LONG}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="longitude">
-                            PD WCs
-                          </Label>
-                          <Input
-                            id="longitude"
-                            name="longitude"
-                            placeholder="longitude placeholder"
-                            type="text"
-                            value={ComplexIotDetails.LONG}
-                          />
-                        </FormGroup>
-                      </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
-                    <Label
-                        for="Wc Count"
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Device Type"
                         sm={2}
                       >
-                      <b> Urinal Count </b>
+                      <b>  Device Type</b>
                       </Label>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="mwc">
-                            Urinal count
-                          </Label>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={ComplexIotDetails.LATT}
-                          />
-                        </FormGroup>
+                      <Col sm={10}>
+                          <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Device Type" />
                       </Col>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="longitude">
-                            Urinal cabin
-                          </Label>
-                          <Input
-                            id="longitude"
-                            name="longitude"
-                            placeholder="longitude placeholder"
-                            type="text"
-                            value={ComplexIotDetails.LONG}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="longitude">
-                            Number of BWT
-                          </Label>
-                          <Input
-                            id="longitude"
-                            name="longitude"
-                            placeholder="longitude placeholder"
-                            type="text"
-                            value={ComplexIotDetails.LONG}
-                          />
-                        </FormGroup>
-                      </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
+                    </FormGroup>
+                    <FormGroup row>
                     <Label
-                        for="Wc Count"
+                        for="Smartness Level"
                         sm={2}
                       >
-                      <b> Napkin Vending Machine </b>
+                      <b>  Smartness Level</b>
                       </Label>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="mwc">
-                            Number Napkin Vending Machine
-                          </Label>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={ComplexIotDetails.LATT}
-                          />
-                        </FormGroup>
+                      <Col sm={10}>
+                          <Select options={smartnessLevels || []} value={selectedSmartness} onChange={handleChangeSmartnessLevel} placeholder="Smartness Level" />
                       </Col>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="longitude">
-                            Manufacturer of Napkin incinerator
+                    </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Wc Count"
+                            sm={2}
+                          >
+                          <b> WC Count </b>
                           </Label>
-                          <Input
-                            id="longitude"
-                            name="longitude"
-                            placeholder="longitude placeholder"
-                            type="text"
-                            value={ComplexIotDetails.LONG}
-                          />
-                        </FormGroup>
-                      </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
-                    <Label
-                        for="Wc Count"
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number of Male WC's">
+                                Male WCs
+                              </Label>
+                              <Input
+                                id="QMWC"
+                                name="QMWC"
+                                placeholder="Number of Male WC's"
+                                type="text"
+                                value={formData.QMWC}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number of female WC's">
+                                Female WCs
+                              </Label>
+                              <Input
+                                id="QFWC"
+                                name="QFWC"
+                                placeholder="Number of female WC's"
+                                type="text"
+                                value={formData.QFWC}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="number of PD WC's">
+                                PD WCs
+                              </Label>
+                              <Input
+                                id="QPWC"
+                                name="QPWC"
+                                placeholder="Number of PD WC's"
+                                type="text"
+                                value={formData.
+                                  QPWC}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Urinal Count"
+                            sm={2}
+                          >
+                          <b> Urinal Count </b>
+                          </Label>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number of Urinals">
+                                Number of Urinals
+                              </Label>
+                              <Input
+                                id="QURI"
+                                name="QURI"
+                                placeholder="latitude"
+                                type="text"
+                                value={formData.QURI}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number of Urinal Cabins">
+                                Number of Urinal Cabins
+                              </Label>
+                              <Input
+                                id="QURC"
+                                name="QURC"
+                                placeholder="Number of Urinal Cabins"
+                                type="text"
+                                value={formData.QURC}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number of BWTs">
+                                Number of BWTs
+                              </Label>
+                              <Input
+                                id="QBWT"
+                                name="QBWT"
+                                placeholder="Number of BWTs"
+                                type="text"
+                                value={formData.QBWT}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Napkin Vending Machine"
+                            sm={2}
+                          >
+                          <b> Napkin Vending Machine </b>
+                          </Label>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number Napkin Vending Machine">
+                                Number of Napkin Vending Machine
+                              </Label>
+                              <Input
+                                id="QSNV"
+                                name="QSNV"
+                                placeholder="Number Napkin Vending Machine"
+                                type="text"
+                                value={formData.QSNV}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Manufacturer of Napkin VM">
+                                Manufacturer of Napkin VM
+                              </Label>
+                              <Input
+                                id="MSNV"
+                                name="MSNV"
+                                placeholder="Manufacturer of Napkin VM"
+                                type="text"
+                                value={formData.MSNV}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Napkin incinerator"
+                            sm={2}
+                          >
+                          <b> Napkin incinerator</b>
+                          </Label>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Number Napkin incinerator">
+                                Number Napkin incinerator
+                              </Label>
+                              <Input
+                                id="QSNI"
+                                name="QSNI"
+                                placeholder="Number Napkin incinerator"
+                                type="text"
+                                value={formData.QSNI}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Label for="Manufacturer of Napkin incinerator">
+                                Manufacturer of Napkin incinerator
+                              </Label>
+                              <Input
+                                id="MSNI"
+                                name="MSNI"
+                                placeholder="Manufacturer of Napkin incinerator"
+                                type="text"
+                                value={formData.MSNI}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Area of KIOSK"
+                            sm={2}
+                          >
+                          <b> Area of KIOSK</b>
+                          </Label>
+                          <Col md={3}>
+                            <FormGroup>
+                              <Input
+                                id="AR_K"
+                                name="AR_K"
+                                placeholder="Area of KIOSK"
+                                type="text"
+                                value={formData.AR_K}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Water Atm Capacity"
+                            sm={2}
+                          >
+                          <b> Water Atm Capacity</b>
+                          </Label>
+                          <Col md={5}>
+                            <FormGroup>
+                              <Label for="LPH">
+                                LPH
+                              </Label>
+                              <Input
+                                id="CWTM"
+                                name="CWTM"
+                                placeholder="LPH"
+                                type="text"
+                                value={formData.CWTM}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                      <FormGroup row>                    
+                        <Label
+                            for="Supervisior Room Size"
+                            sm={2}
+                          >
+                          <b> Supervisior Room Size</b>
+                          </Label>
+                          <Col md={5}>
+                            <FormGroup>
+                              <Input
+                                id="ARSR"
+                                name="ARSR"
+                                placeholder="ARSR"
+                                type="text"
+                                value={formData.ARSR}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </Col>
+                      </FormGroup>
+                    </Form>
+                </CardBody>
+              </Card>
+              <br/>
+              <Card>
+                <CardBody>
+                    <CardTitle><b>Partners & Providers</b></CardTitle>
+                    <br/>
+                    <Form>
+                    <FormGroup row>
+                      <Label
+                        for="Manufacturer"
                         sm={2}
                       >
-                      <b> Napkin incinerator</b>
+                        <b>Manufacturer</b>
                       </Label>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="mwc">
-                            Number Napkin incinerator
-                          </Label>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={ComplexIotDetails.LATT}
-                          />
-                        </FormGroup>
+
+                      <Col sm={10}>
+                        <Input
+                          id="MANU"
+                          name="MANU"
+                          placeholder="manufacturer placeholder"
+                          type="text"
+                          value={formData.MANU}
+                          onChange={handleChange}
+                        />
                       </Col>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Label for="longitude">
-                            Manufacturer of Napkin incinerator
-                          </Label>
-                          <Input
-                            id="longitude"
-                            name="longitude"
-                            placeholder="longitude placeholder"
-                            type="text"
-                            value={ComplexIotDetails.LONG}
-                          />
-                        </FormGroup>
-                      </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
-                    <Label
-                        for="Wc Count"
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Tech Provider"
                         sm={2}
                       >
-                      <b> Area of KIOSK</b>
+                        <b>Tech Provider</b>
                       </Label>
-                      <Col md={3}>
-                        <FormGroup>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={"N/A"}
-                          />
-                        </FormGroup>
+
+                      <Col sm={10}>
+                        <Input
+                          id="TECH"
+                          name="TECH"
+                          placeholder="Tech Provider placeholder"
+                          type="text"
+                          value={formData.TECH}
+                          onChange={handleChange}
+                        />
                       </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
-                    <Label
-                        for="Wc Count"
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Civil Partner"
                         sm={2}
                       >
-                      <b> Water Atm Capacity</b>
+                        <b>Civil Partner</b>
                       </Label>
-                      <Col md={5}>
-                        <FormGroup>
-                          <Label for="mwc">
-                            LPH
-                          </Label>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={ComplexIotDetails.LATT}
-                          />
-                        </FormGroup>
+
+                      <Col sm={10}>
+                        <Input
+                          id="CIVL"
+                          name="CIVL"
+                          placeholder="CivilPartner placeholder"
+                          type="text"
+                          value={formData.CIVL}
+                          onChange={handleChange}
+                        />
                       </Col>
-                  </FormGroup>
-                  <FormGroup row>                    
-                    <Label
-                        for="Wc Count"
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="O&M Partner"
                         sm={2}
                       >
-                      <b> Supervisior Room Size</b>
+                        <b>O&M Partner</b>
                       </Label>
-                      <Col md={5}>
-                        <FormGroup>
-                          <Label for="mwc">
-                            LPH
-                          </Label>
-                          <Input
-                            id="latitude"
-                            name="latitude"
-                            placeholder="latitude"
-                            type="text"
-                            value={ComplexIotDetails.LATT}
-                          />
-                        </FormGroup>
+
+                      <Col sm={10}>
+                        <Input
+                          id="ONMP"
+                          name="ONMP"
+                          placeholder="O&M Partner placeholder"
+                          type="text"
+                          value={formData.ONMP}
+                          onChange={handleChange}
+                        />
                       </Col>
-                  </FormGroup>
-                   </Form>
-              </CardBody>
+                    </FormGroup>
+                    </Form>
+                </CardBody>
+              </Card>
+              <br/>
+              <Card>
+                <CardBody>
+                    <CardTitle><b>Router Details</b></CardTitle>
+                    <br/>
+                    <Form>
+                    <FormGroup row>
+                      <Label
+                        for="Router IMEI"
+                        sm={3}
+                      >
+                        <b>Router IMEI</b>
+                      </Label>
+
+                      <Col sm={9}>
+                        <Input
+                          id="ROUTER_IMEI"
+                          name="ROUTER_IMEI"
+                          placeholder="Router IMEI placeholder"
+                          type="text"
+                          value={formData.ROUTER_IMEI}
+                          onChange={handleChange}
+                        />
+                      </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Router Mobile"
+                        sm={3}
+                      >
+                        <b>Router Mobile</b>
+                      </Label>
+
+                      <Col sm={9}>
+                        <Input
+                          id="ROUTER_MOBILE"
+                          name="ROUTER_MOBILE"
+                          placeholder="Router Mobile placeholder"
+                          type="text"
+                          value={formData.ROUTER_MOBILE}
+                          onChange={handleChange}
+                        />
+                      </Col>
+                    </FormGroup>
+                    </Form>
+                </CardBody>
               </Card>
             </ModalBody>
             <ModalFooter>
               <Button color="primary" onClick={toggle}>
-                Do Something
+                Update
               </Button>{' '}
               <Button color="secondary" onClick={toggle}>
                 Cancel
