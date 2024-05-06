@@ -176,7 +176,11 @@ export default function EnrollDevice() {
       let command = "list-iot-clientName";
       var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
       console.log('result ClientName', result.body);
-      dispatch(setClientName(result.body));
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setClientName(options));
     } catch (error) {
       handleError(error, 'Error ListOfIotClientName')
     } finally {
@@ -190,7 +194,11 @@ export default function EnrollDevice() {
       let command = "list-billing-groups";
       var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
       console.log('result ListOfIotBillingGroup', result.body);
-      dispatch(setBillingGroup(result.body));
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setBillingGroup(options));
     } catch (error) {
       handleError(error, 'Error ListOfIotBillingGroup')
     } finally {
@@ -335,7 +343,7 @@ export default function EnrollDevice() {
               {activeStep === 0 && (
                 <div>
                   {(ComplexIotDetails['key'] !== null && complexChanged) && (
-                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex}/> // Pass complexChanged as a prop
+                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged}/> // Pass complexChanged as a prop
                   )}
                     <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
                       onMenuOpen={() => {

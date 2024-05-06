@@ -1,30 +1,158 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import {Row, Col, Button, Modal, ModalHeader, ModalBody, ModalFooter, Card, CardBody, CardTitle, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useDispatch, useSelector } from "react-redux";
 import './enrollDevice.css';
 import Select from 'react-select'; // Importing react-select
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-
-export const UpdateComplex = ({ complexChanged , selected}) => { // Receive complexChanged as a prop
+export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const ListclientName = useSelector((state) => state.androidManagement.clientName);
   const ListbillingGroups = useSelector((state) => state.androidManagement.billingGroups);
   const [selectedClientName, setSelectedClientName] = useState(null); // State for react-select
   const [selectedbillingGroups, setSelectedbillingGroups] = useState(null); // State for react-select
+  const [selectedDate, setSelectedDate] = useState(null);
 
+  const [formData, setFormData] = useState({
+    ADDR : "",
+    ARSR : "",
+    AR_K : "",
+    BILL : "",
+    CITY_CODE : "",
+    CITY_NAME : "",
+    CIVL : "",
+    CLNT : "",
+    COCO : "",
+    CWTM : "",
+    DATE : "",
+    DEVT : "",
+    DISTRICT_CODE : "",
+    DISTRICT_NAME : "",
+    LATT : "",
+    LONG : "",
+    MANU : "", 
+    MODIFIED_BY : "",
+    MSNI : "",
+    MSNV : "",
+    ONMP : "",
+    QBWT : "",
+    QFWC : "",
+    QMWC : "",
+    QPWC : "",
+    QSNI : "",
+    QSNV : "",
+    QURC : "",
+    QURI : "",
+    ROUTER_IMEI : "",
+    ROUTER_MOBILE : "",
+    SLVL : "",
+    STATE_CODE : "",
+    STATE_NAME : "",
+    TECH : "",
+    THINGGROUPTYPE : "", 
+    UUID : ""
+  });
+
+  useEffect(() => {
+    if(ComplexIotDetails){
+      setFormData({
+        ADDR : ComplexIotDetails.ADDR,
+        ARSR : ComplexIotDetails.ARSR,
+        AR_K : ComplexIotDetails.AR_K,
+        BILL : ComplexIotDetails.BILL,
+        CITY_CODE : ComplexIotDetails.CITY_CODE,
+        CITY_NAME : ComplexIotDetails.CITY_NAME,
+        CIVL : ComplexIotDetails.CIVL,
+        CLNT : ComplexIotDetails.CLNT,
+        COCO : ComplexIotDetails.COCO,
+        CWTM : ComplexIotDetails.CWTM,
+        DATE : ComplexIotDetails.DATE,
+        DEVT : ComplexIotDetails.DEVT,
+        DISTRICT_CODE : ComplexIotDetails.DISTRICT_CODE,
+        DISTRICT_NAME : ComplexIotDetails.DISTRICT_NAME,
+        LATT : ComplexIotDetails.LATT,
+        LONG : ComplexIotDetails.LONG,
+        MANU : ComplexIotDetails.MANU, 
+        MODIFIED_BY : ComplexIotDetails.MODIFIED_BY,
+        MSNI : ComplexIotDetails.MSNI,
+        MSNV : ComplexIotDetails.MSNV,
+        ONMP : ComplexIotDetails.ONMP,
+        QBWT : ComplexIotDetails.QBWT,
+        QFWC : ComplexIotDetails.QFWC,
+        QMWC : ComplexIotDetails.QMWC,
+        QPWC : ComplexIotDetails.QPWC,
+        QSNI : ComplexIotDetails.QSNI,
+        QSNV : ComplexIotDetails.QSNV,
+        QURC : ComplexIotDetails.QURC,
+        QURI : ComplexIotDetails.QURI,
+        ROUTER_IMEI : ComplexIotDetails.ROUTER_IMEI,
+        ROUTER_MOBILE : ComplexIotDetails.ROUTER_MOBILE,
+        SLVL : ComplexIotDetails.SLVL,
+        STATE_CODE : ComplexIotDetails.STATE_CODE,
+        STATE_NAME : ComplexIotDetails.STATE_NAME,
+        TECH : ComplexIotDetails.TECH,
+        THINGGROUPTYPE : ComplexIotDetails.THINGGROUPTYPE, 
+        UUID : ComplexIotDetails.UUID
+      })
+    }
+    // Check if ComplexIotDetails is available and DATE is in the correct format
+    if (ComplexIotDetails && ComplexIotDetails.DATE) {
+      const initialDateString = ComplexIotDetails.DATE;
+      const dateParts = initialDateString.split("/");
+      if (dateParts.length === 3) {
+        // Parse the initial date string into a Date object
+        const initialDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+        setSelectedDate(initialDate);
+      }
+    } else {
+      // If ComplexIotDetails or DATE is not available, set the initial date to the current date
+      setSelectedDate(new Date());
+    }
+  }, [ComplexIotDetails]);
+  
   console.log('ComplexIotDetails',ComplexIotDetails);
+  console.log('ListclientName',ListclientName);
   console.log('selected', selected);
-  const toggle = () => setModal(!modal);
 
-  // const handleChangeClientName = (selectedOption) => {
-  //   console.log('handleChangeClientName',selectedOption)
-  // }
+  const toggle = () => {
+    setModal(!modal)
+    setComplexChanged(false)
+  };
 
-  // const handleChangeBillingGroup = (selectedOption) => {
-  //   console.log('handleChangeBillingGroup',selectedOption)
-  // }
+  const handleChangeClientName = (selectedOption) => {
+    console.log('handleChangeClientName',selectedOption)
+  }
 
+  const handleChangeBillingGroup = (selectedOption) => {
+    console.log('handleChangeBillingGroup',selectedOption)
+  }
+
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    const formattedDate = formatDate(date);
+    console.log('formattedDate',formattedDate);
+    setFormData({ ...formData, selectedDate: formattedDate });
+  };
+
+  // Update form state when form values change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+
+  const formatDate = (date) => {
+    // Format the date to 'dd/MM/yyyy' format
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  console.log('complexChanged',complexChanged);
   return (
     <div>
       {(complexChanged) && ( // Conditionally render based on complexChanged prop
@@ -190,14 +318,7 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                     <b>  Billing Group</b>
                     </Label>
                     <Col sm={10}>
-                      <Input
-                        id="billing_group"
-                        name="billing_group"
-                        placeholder="billing_group"
-                        type="text"
-                        disabled={true}
-                        value={ComplexIotDetails.BILL}
-                      />
+                    <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -208,14 +329,13 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                     <b> Select Date </b>
                     </Label>
                     <Col sm={10}>
-                      <Input
-                        id="select_date"
-                        name="select_date"
-                        placeholder="select_date"
-                        type="text"
-                        disabled={true}
-                        value={ComplexIotDetails.DATE}
-                      />
+                    <DatePicker
+                      id="selectDate"
+                      selected={selectedDate}
+                      onChange={handleDateChange}
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="Select date"
+                    />
                     </Col>
                   </FormGroup>
                   </Form>
@@ -235,14 +355,7 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                       <b>Commissioning Status</b>
                     </Label>
                     <Col sm={10}>
-                      <Input
-                        id="commissioning_status"
-                        name="commissioning_status"
-                        placeholder="commissioning_status"
-                        type="text"
-                        disabled={true}
-                        value={ComplexIotDetails.CLNT}
-                      />
+                    <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Commissioning Status" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -253,35 +366,256 @@ export const UpdateComplex = ({ complexChanged , selected}) => { // Receive comp
                     <b>  Device Type</b>
                     </Label>
                     <Col sm={10}>
-                      <Input
-                        id="device_type"
-                        name="device_type"
-                        placeholder="device_type"
-                        type="text"
-                        disabled={true}
-                        value={ComplexIotDetails.BILL}
-                      />
+                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Device Type" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
-                    <Label
-                      for="Select Date"
+                  <Label
+                      for="Smartness Level"
                       sm={2}
                     >
-                    <b> Select Date </b>
+                    <b>  Smartness Level</b>
                     </Label>
                     <Col sm={10}>
-                      <Input
-                        id="select_date"
-                        name="select_date"
-                        placeholder="select_date"
-                        type="text"
-                        disabled={true}
-                        value={ComplexIotDetails.DATE}
-                      />
+                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Smartness Level" />
                     </Col>
                   </FormGroup>
-                  </Form>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> WC Count </b>
+                      </Label>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="mwc">
+                            Male WCs
+                          </Label>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={ComplexIotDetails.LATT}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="longitude">
+                            Female WCs
+                          </Label>
+                          <Input
+                            id="longitude"
+                            name="longitude"
+                            placeholder="longitude placeholder"
+                            type="text"
+                            value={ComplexIotDetails.LONG}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="longitude">
+                            PD WCs
+                          </Label>
+                          <Input
+                            id="longitude"
+                            name="longitude"
+                            placeholder="longitude placeholder"
+                            type="text"
+                            value={ComplexIotDetails.LONG}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> Urinal Count </b>
+                      </Label>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="mwc">
+                            Urinal count
+                          </Label>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={ComplexIotDetails.LATT}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="longitude">
+                            Urinal cabin
+                          </Label>
+                          <Input
+                            id="longitude"
+                            name="longitude"
+                            placeholder="longitude placeholder"
+                            type="text"
+                            value={ComplexIotDetails.LONG}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="longitude">
+                            Number of BWT
+                          </Label>
+                          <Input
+                            id="longitude"
+                            name="longitude"
+                            placeholder="longitude placeholder"
+                            type="text"
+                            value={ComplexIotDetails.LONG}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> Napkin Vending Machine </b>
+                      </Label>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="mwc">
+                            Number Napkin Vending Machine
+                          </Label>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={ComplexIotDetails.LATT}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="longitude">
+                            Manufacturer of Napkin incinerator
+                          </Label>
+                          <Input
+                            id="longitude"
+                            name="longitude"
+                            placeholder="longitude placeholder"
+                            type="text"
+                            value={ComplexIotDetails.LONG}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> Napkin incinerator</b>
+                      </Label>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="mwc">
+                            Number Napkin incinerator
+                          </Label>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={ComplexIotDetails.LATT}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Label for="longitude">
+                            Manufacturer of Napkin incinerator
+                          </Label>
+                          <Input
+                            id="longitude"
+                            name="longitude"
+                            placeholder="longitude placeholder"
+                            type="text"
+                            value={ComplexIotDetails.LONG}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> Area of KIOSK</b>
+                      </Label>
+                      <Col md={3}>
+                        <FormGroup>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={"N/A"}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> Water Atm Capacity</b>
+                      </Label>
+                      <Col md={5}>
+                        <FormGroup>
+                          <Label for="mwc">
+                            LPH
+                          </Label>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={ComplexIotDetails.LATT}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                  <FormGroup row>                    
+                    <Label
+                        for="Wc Count"
+                        sm={2}
+                      >
+                      <b> Supervisior Room Size</b>
+                      </Label>
+                      <Col md={5}>
+                        <FormGroup>
+                          <Label for="mwc">
+                            LPH
+                          </Label>
+                          <Input
+                            id="latitude"
+                            name="latitude"
+                            placeholder="latitude"
+                            type="text"
+                            value={ComplexIotDetails.LATT}
+                          />
+                        </FormGroup>
+                      </Col>
+                  </FormGroup>
+                   </Form>
               </CardBody>
               </Card>
             </ModalBody>
