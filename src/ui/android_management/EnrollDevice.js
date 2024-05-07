@@ -14,11 +14,8 @@ import {
 } from "reactstrap";
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import { selectUser } from "../../features/authenticationSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -238,6 +235,7 @@ export default function EnrollDevice() {
   }
   const handleChangeIotComplex = (selectedOption) => {
     console.log('handleChangeIotComplex',selectedOption);
+    dispatch(setComplexName(selectedOption.value));
     setSelectedOptionIotComplex(selectedOption);
     ListOfIotComplexDetails(selectedOption.value)
     ListOfIotClientName();

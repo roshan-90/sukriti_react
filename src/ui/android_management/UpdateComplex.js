@@ -4,18 +4,28 @@ import { useDispatch, useSelector } from "react-redux";
 import './enrollDevice.css';
 import Select from 'react-select'; // Importing react-select
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for react-datepicker
+import {
+  executeUpdateComplexLambda,
+} from "../../awsClients/androidEnterpriseLambda";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { selectUser } from "../../features/authenticationSlice";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const ListclientName = useSelector((state) => state.androidManagement.clientName);
   const ListbillingGroups = useSelector((state) => state.androidManagement.billingGroups);
+  const complexName = useSelector((state) => state.androidManagement.complexName);
   const [selectedClientName, setSelectedClientName] = useState(null); // State for react-select
   const [selectedbillingGroups, setSelectedbillingGroups] = useState(null); // State for react-select
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSmartness, setSelectedSmartness] = useState(null);
-  const [selectedCommission, setSelectedCommission] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -132,13 +142,44 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   useEffect(() => {
     // Find the option corresponding to ComplexIotDetails.SLVL
     const selectedOption = smartnessLevels.find(option => option.value === ComplexIotDetails.SLVL);
-    
     // If the option is found, set it as the smartnessLevel, otherwise set it to null
     setSelectedSmartness(selectedOption || null);
   }, [ComplexIotDetails.SLVL]);
 
 
-  
+  useEffect(() => {
+    if(ListclientName && ListbillingGroups ) {
+      const selectedClientOption = ListclientName.find(option => option.value === ComplexIotDetails.CLNT)
+      const selectetBillingOption = ListbillingGroups.find(option => option.value === ComplexIotDetails.BILL)
+      setSelectedClientName(selectedClientOption || null);
+      setSelectedbillingGroups(selectetBillingOption || null);
+    }
+  },[ListclientName,ListbillingGroups])
+
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   console.log('ComplexIotDetails',ComplexIotDetails);
   console.log('ListclientName',ListclientName);
   console.log('selected', selected);
@@ -167,10 +208,6 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
     setSelectedSmartness(selectedOption)
   }
 
-  const handleChangeCommission = (selectedOption) => {
-    console.log('handleChangeCommission', selectedOption);
-  }
-
   const handleDateChange = (date) => {
     setSelectedDate(date);
     const formattedDate = formatDate(date);
@@ -194,6 +231,35 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
     return `${day}/${month}/${year}`;
   };
 
+  const updateComplex = async (value) => {
+    try {
+      if(!complexName) {
+        alert('Please select Complex')
+      }
+      dispatch(startLoading());
+      let command = "update-iot-complex";
+      var result = await executeUpdateComplexLambda('test_rk_mandi', user?.credentials, command, value, complexName);
+      console.log('result ClientName', result.body);
+      
+    } catch (error) {
+      handleError(error, 'Error ListOfIotClientName')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const submitForm = (e) => {
+      const outputArray = [];
+      for (const key in formData) {
+          if (formData.hasOwnProperty(key)) {
+              const value = formData[key];
+              outputArray.push({ "Name": key, "Value": value });
+          }
+      }
+    console.log('formData',outputArray)
+    updateComplex(outputArray);
+  }
+
   console.log('complexChanged',complexChanged);
   console.log('formData',formData);
   return (
@@ -201,6 +267,14 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
       {(complexChanged) && ( // Conditionally render based on complexChanged prop
         <div>
           <Modal isOpen={modal} toggle={toggle}>
+            {isLoading && (
+              <div className="loader-container">
+                <CircularProgress
+                  className="loader"
+                  style={{ color: "rgb(93 192 166)" }}
+                />
+              </div>
+            )}
             <ModalHeader toggle={toggle}><b>Complex Details</b></ModalHeader>
             <ModalBody>
             <Card>
@@ -374,7 +448,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       >
                       <b> Select Date </b>
                       </Label>
-                      <Col sm={10} style={{ width: '286px' }}>
+                      <Col sm={10} >
                       <DatePicker
                         id="selectDate"
                         selected={selectedDate}
@@ -401,7 +475,14 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         <b>Commissioning Status</b>
                       </Label>
                       <Col sm={10}>
-                      <Select options={options || []} value={selectedCommission} onChange={handleChangeCommission} placeholder="Commissioning Status" />
+                      <Input
+                        id="COCO"
+                        name="COCO"
+                        placeholder="COCO"
+                        type="text"
+                        disabled={true}
+                        value={formData.COCO}
+                      />
                       </Col>
                     </FormGroup>
                     <FormGroup row>
@@ -412,7 +493,14 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       <b>  Device Type</b>
                       </Label>
                       <Col sm={10}>
-                          <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Device Type" />
+                        <Input
+                          id="DEVT"
+                          name="DEVT"
+                          placeholder="DEVT"
+                          type="text"
+                          disabled={true}
+                          value={formData.DEVT}
+                        />                      
                       </Col>
                     </FormGroup>
                     <FormGroup row>
@@ -809,7 +897,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
               </Card>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={toggle}>
+              <Button color="primary" onClick={submitForm}>
                 Update
               </Button>{' '}
               <Button color="secondary" onClick={toggle}>
