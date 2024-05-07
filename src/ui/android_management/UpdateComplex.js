@@ -11,6 +11,7 @@ import {
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -218,7 +219,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   // Update form state when form values change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('cheking :->',{ name, value });
+    console.log('cheking :->', { name, value });
     setFormData({ ...formData, [name]: value });
   };
 
@@ -234,7 +235,15 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   const updateComplex = async (value) => {
     try {
       if(!complexName) {
-        alert('Please select Complex')
+        setDialogData({
+          title: "Error",
+          message: "complex is not Selected",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log('complex is not select');
+          },
+        });
+        return
       }
       dispatch(startLoading());
       let command = "update-iot-complex";
@@ -275,6 +284,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                 />
               </div>
             )}
+            <MessageDialog data={dialogData} />
             <ModalHeader toggle={toggle}><b>Complex Details</b></ModalHeader>
             <ModalBody>
             <Card>

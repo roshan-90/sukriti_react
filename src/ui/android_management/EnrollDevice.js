@@ -21,6 +21,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import Select from 'react-select'; // Importing react-select
 import UpdateComplex from './UpdateComplex'
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
 
@@ -311,6 +312,7 @@ export default function EnrollDevice() {
             />
           </div>
         )}
+        <MessageDialog data={dialogData} />
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={label} completed={completed[index]}>
