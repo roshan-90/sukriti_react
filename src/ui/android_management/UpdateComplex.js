@@ -7,11 +7,13 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for react-datepicker
 import {
   executeUpdateComplexLambda,
+  executelistIotDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import { setResetData } from "../../features/androidManagementSlice";
 
 export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -268,6 +270,40 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
     console.log('formData',outputArray)
     updateComplex(outputArray);
   }
+
+  const deleteComplex = async() => {
+    try{
+      console.log('deleted complex');
+      let command = "delete-iot-complex";
+      var result = await executelistIotDynamicLambda('dev_000000', user?.credentials, complexName, command );
+      console.log('result deleteComplex', result.body);
+      setDialogData({
+        title: "Deleted",
+        message: result.body,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          toggle();        },
+      });
+      } catch (error) {
+        handleError(error, 'Error deleteComplex')
+      } finally {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }
+  }
+
+  const setWarnings = () => {
+    setDialogData({
+      title: "Confirms",
+      message: `Are you Sure Delete ${complexName} Complex`,
+      onClickAction: () => {
+        // Handle the action when the user clicks OK
+        console.log('delete complex');
+        deleteComplex();
+      },
+    });
+  }
+
+
 
   console.log('complexChanged',complexChanged);
   console.log('formData',formData);
@@ -907,10 +943,13 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
               </Card>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={submitForm}>
+              <Button color="success" onClick={submitForm}>
                 Update
               </Button>{' '}
-              <Button color="secondary" onClick={toggle}>
+              <Button color="danger" onClick={setWarnings}>
+                Delete
+              </Button>{' '}
+              <Button color="warning" onClick={toggle}>
                 Cancel
               </Button>
             </ModalFooter>

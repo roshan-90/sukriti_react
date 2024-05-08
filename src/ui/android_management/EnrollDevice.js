@@ -243,6 +243,7 @@ export default function EnrollDevice() {
     ListOfIotBillingGroup();
     setComplexChanged(true)
   }
+
   const totalSteps = () => {
     return steps.length;
   };
@@ -343,7 +344,7 @@ export default function EnrollDevice() {
               {activeStep === 0 && (
                 <div>
                   {(ComplexIotDetails['key'] !== null && complexChanged) && (
-                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged}/> // Pass complexChanged as a prop
+                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} /> // Pass complexChanged as a prop
                   )}
                     <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
                       onMenuOpen={() => {

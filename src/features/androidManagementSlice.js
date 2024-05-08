@@ -49,6 +49,7 @@ const androidManagementSlice = createSlice({
         state.complexIotDetail = {};
         state.clientName = null;
         state.billingGroups = null;
+        state.complexName= null
     },
   },
 });
