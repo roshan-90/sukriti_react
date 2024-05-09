@@ -21,6 +21,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import Select from 'react-select'; // Importing react-select
 import UpdateComplex from './UpdateComplex'
+import RegisterComplex from './RegisterComplex';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
@@ -36,7 +37,7 @@ export default function EnrollDevice() {
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const [complexChanged, setComplexChanged] = useState(false);
-
+  const [registerComplex, setRegisterComplex] = useState(false);
 
   const [dialogData, setDialogData] = useState(null);
 
@@ -301,6 +302,10 @@ export default function EnrollDevice() {
     }));
   };
 
+  const OpenRegisterModal = () => {
+    setRegisterComplex(!registerComplex);
+  }
+
 
   return (
     <div className="container-fluid" style={{ backgroundColor: '#fff' }}>
@@ -346,6 +351,9 @@ export default function EnrollDevice() {
                   {(ComplexIotDetails['key'] !== null && complexChanged) && (
                     <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} /> // Pass complexChanged as a prop
                   )}
+                  {(registerComplex) && (
+                    <RegisterComplex openModal={registerComplex} selected={selectedOptionIotComplex} setModalToggle={OpenRegisterModal} /> // Pass complexChanged as a prop
+                  )}
                     <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
                       onMenuOpen={() => {
                         if (!stateIotList || stateIotList.length === 0) {
@@ -358,7 +366,13 @@ export default function EnrollDevice() {
                     <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
                     <br />
                     <Select options={complexIotList || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/> 
-                 
+                    <br />
+                    <Button
+                      variant="contained"
+                      onClick={OpenRegisterModal}
+                    >
+                      Register New Complex
+                    </Button>
                 </div>
               )}
               {activeStep === 1 && (
