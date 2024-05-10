@@ -7,13 +7,15 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for react-datepicker
 import {
   executeUpdateComplexLambda,
-  executelistIotDynamicLambda
+  executelistIotDynamicLambda,
+  executelistIotSingleLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { setResetData } from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
 
 export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -29,6 +31,12 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const user = useSelector(selectUser);
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const stateIotList = useSelector((state) => state.androidManagement.stateIotList);
+  const [selectedOption, setSelectedOption] = useState(null); // State for react-select
+  const districtIotList = useSelector((state) => state.androidManagement.districtIotList);
+  const cityIotList = useSelector((state) => state.androidManagement.cityIotList);
+  const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
+  const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -158,6 +166,89 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       setSelectedbillingGroups(selectetBillingOption || null);
     }
   },[ListclientName,ListbillingGroups])
+
+  const ListOfIotState = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-state";
+      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.CODE,
+        label: item.NAME
+      }));
+      dispatch(setStateIotList(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotState')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+
+  const handleChangeIotState = (selectedOption) => {
+    console.log('check', selectedOption.value);
+    dispatch(setDistrictIotList([]));
+    dispatch(setCityIotList([]));
+    dispatch(setComplexIotList([]));
+    setSelectedOptionIotDistrict(null)
+    setSelectedOptionIotCity(null);
+    setSelectedOption(selectedOption); // Update state if selectedOption is not null
+    ListOfIotDistrict(selectedOption.value)
+  };
+
+  const handleChangeIotDistrict = (selectedOption) => {
+    dispatch(setCityIotList([]));
+    setSelectedOptionIotCity(null)
+    console.log('handleChangeIotDistrict',selectedOption);
+    setSelectedOptionIotDistrict(selectedOption);
+    ListOfIotCity(selectedOption.value)
+  }
+
+  const ListOfIotDistrict = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-district";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.CODE,
+        label: item.NAME
+      }));
+      dispatch(setDistrictIotList(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotDistrict')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotCity = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-city";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.CODE,
+        label: item.NAME
+      }));
+      dispatch(setCityIotList(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotCity')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const handleChangeIotCity = (selectedOption) => {
+    dispatch(setComplexIotList([]));
+    console.log('handleChangeIotCity',selectedOption);
+    setSelectedOptionIotCity(selectedOption);
+  }
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -318,11 +409,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
               </div>
             )}
             <MessageDialog data={dialogData} />
-            <ModalHeader toggle={toggle}><b>Complex Details</b></ModalHeader>
+            <ModalHeader toggle={toggle}><b>Register Complex</b></ModalHeader>
             <ModalBody>
             <Card>
                 <CardBody>
-                  <CardTitle><b>Complex Details</b></CardTitle>
+                  <CardTitle><b>Location Details</b></CardTitle>
                   <br/>
                   <Form>
                   <FormGroup row>
@@ -332,14 +423,18 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     >
                       <b>State</b>
                     </Label>
-                    <Col sm={10}>
-                      <Input
-                        id="state"
-                        name="state"
-                        placeholder="state"
-                        type="text"
-                        value={""}
-                      />
+                    <Col sm={7}>
+                    <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
+                      onMenuOpen={() => {
+                        if (!stateIotList || stateIotList.length === 0) {
+                          ListOfIotState();
+                        }
+                      }} placeholder="Select State" />
+                    </Col>
+                    <Col sm={3}>
+                      <Button color="success" onClick={submitForm}>
+                        New State
+                      </Button>{' '}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -349,14 +444,13 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     >
                     <b>  District</b>
                     </Label>
-                    <Col sm={10}>
-                      <Input
-                        id="district"
-                        name="district"
-                        placeholder="district"
-                        type="text"
-                        value={""}
-                      />
+                    <Col sm={7}>
+                      <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
+                    </Col>
+                    <Col sm={3}>
+                      <Button color="success" onClick={submitForm}>
+                        New District
+                      </Button>{' '}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -366,14 +460,13 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     >
                     <b> City </b>
                     </Label>
-                    <Col sm={10}>
-                      <Input
-                        id="city"
-                        name="city"
-                        placeholder="city"
-                        type="text"
-                        value={""}
-                      />
+                    <Col sm={7}>
+                      <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select District" />
+                    </Col>
+                    <Col sm={3}>
+                      <Button color="success" onClick={submitForm}>
+                        New City
+                      </Button>{' '}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
