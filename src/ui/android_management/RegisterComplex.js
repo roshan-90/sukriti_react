@@ -16,6 +16,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { setResetData } from "../../features/androidManagementSlice";
 import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
+import ModalSelect from '../../dialogs/ModalSelect';
 
 export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -37,7 +38,8 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const cityIotList = useSelector((state) => state.androidManagement.cityIotList);
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
-
+  const [dialogDatas, setdialogDatas] = useState(null);
+  
   const smartnessLevels = [
     { label: 'None', value: 'None' },
     { label: 'Basic', value: 'Basic' },
@@ -394,6 +396,32 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     });
   }
 
+  const handleState = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-ddb-state";
+      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
+      console.log('result',result);
+      const options = result.body.map(item => ({
+        value: item.Code,
+        label: item.Name
+      }));
+      setdialogDatas({
+        title: "Add New State",
+        options: options,
+        placeHolder: 'Select State',
+        onClickAction: (data) => {
+          // Handle the action when the user clicks OK
+          console.log('handleState triggers',data);
+        },
+      });
+    } catch (error) {
+      handleError(error, 'Error handleState')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
   console.log('formData',formData);
   return (
     <div>
@@ -409,6 +437,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
               </div>
             )}
             <MessageDialog data={dialogData} />
+            <ModalSelect data={dialogDatas} />
             <ModalHeader toggle={toggle}><b>Register Complex</b></ModalHeader>
             <ModalBody>
             <Card>
@@ -432,7 +461,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       }} placeholder="Select State" />
                     </Col>
                     <Col sm={3}>
-                      <Button color="success" onClick={submitForm}>
+                      <Button color="success" onClick={handleState}>
                         New State
                       </Button>{' '}
                     </Col>
