@@ -8,7 +8,8 @@ import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for
 import {
   executeUpdateComplexLambda,
   executelistIotDynamicLambda,
-  executelistIotSingleLambda
+  executelistIotSingleLambda,
+  executelistDDbCityLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
@@ -395,6 +396,83 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       },
     });
   }
+  const handleNewDistrict = async (value) => {
+    try {
+      console.log('selectedOption', selectedOption);
+      if(selectedOption == null) {
+        setDialogData({
+          title: "Error",
+          message: "Please Select State",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`Empty data found ${selectedOption}`);
+          },
+        });
+        return;
+      }
+      dispatch(startLoading());
+      let command = "list-ddb-district";
+      var result = await executelistIotDynamicLambda('test_rk_mandi',user?.credentials, selectedOption.value, command);
+      console.log('result New District',result);
+      const options = result.body.map(item => ({
+        value: item.Code,
+        label: item.Name
+      }));
+      setdialogDatas({
+        title: "Add New District",
+        options: options,
+        placeHolder: 'Select District',
+        onClickAction: (data) => {
+          // Handle the action when the user clicks OK
+          console.log('handleState triggers',data);
+        },
+      });
+    } catch (error) {
+      handleError(error, 'Error handleNewDistrict')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const handleNewCity = async (value) => {
+    try {
+      console.log('selectedOption', selectedOption);
+      console.log('selectedOptionIotDistrict',selectedOptionIotDistrict);
+      if(selectedOption == null || selectedOptionIotDistrict == null ) {
+        setDialogData({
+          title: "Error",
+          message: "Please Select State and District",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleNewCity Empty data found ${selectedOption}`);
+          },
+        });
+        return;
+      }
+      dispatch(startLoading());
+      let command = "list-ddb-city";
+      var result = await executelistDDbCityLambda('test_rk_mandi',user?.credentials, selectedOption.value, selectedOptionIotDistrict.value, command);
+      console.log('result New City',result);
+      const options = result.body.map(item => ({
+        value: item.Code,
+        label: item.Name
+      }));
+      setdialogDatas({
+        title: "Add New City",
+        options: options,
+        placeHolder: 'Select City',
+        onClickAction: (data) => {
+          // Handle the action when the user clicks OK
+          console.log('handleState triggers',data);
+        },
+      });
+    } catch (error) {
+      handleError(error, 'Error handleNewDistrict')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
 
   const handleState = async () => {
     try {
@@ -477,7 +555,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
                     </Col>
                     <Col sm={3}>
-                      <Button color="success" onClick={submitForm}>
+                      <Button color="success" onClick={handleNewDistrict}>
                         New District
                       </Button>{' '}
                     </Col>
@@ -493,7 +571,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select District" />
                     </Col>
                     <Col sm={3}>
-                      <Button color="success" onClick={submitForm}>
+                      <Button color="success" onClick={handleNewCity}>
                         New City
                       </Button>{' '}
                     </Col>
