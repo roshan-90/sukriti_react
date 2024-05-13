@@ -27,12 +27,15 @@ const ModalSelect = ({ data }) => {
 
   const handleClose = () => {
     setOpen(false);
+    setSelectedOption(null);
   };
 
   const handleButtonClick = () => {
     handleClose();
     if (onClickAction !== undefined) {
       onClickAction(selectedOption);
+      setOpen(false);
+      setSelectedOption(null);
     }
   };
 
@@ -44,7 +47,12 @@ const ModalSelect = ({ data }) => {
   if(data) {
     console.log('data.options',data.options);
     return (
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="sm" fullWidth
+      PaperProps={{
+        style: {
+          height: '55%', // Adjust the maximum height as needed
+        },
+      }}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <div style={{ margin: "auto", width: "90%" }}>

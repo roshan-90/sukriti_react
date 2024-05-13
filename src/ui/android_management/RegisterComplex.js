@@ -9,7 +9,8 @@ import {
   executeUpdateComplexLambda,
   executelistIotDynamicLambda,
   executelistIotSingleLambda,
-  executelistDDbCityLambda
+  executelistDDbCityLambda,
+  executeAddDdbStateLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
@@ -215,12 +216,15 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       let command = "list-iot-district";
       var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
       console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.CODE,
-        label: item.NAME
-      }));
-      dispatch(setDistrictIotList(options));
+      console.log('result.body',result.body);
+      if(result.statusCode !== 404){
+        // Map raw data to react-select format
+        const options = result.body.map(item => ({
+          value: item.CODE,
+          label: item.NAME
+        }));
+        dispatch(setDistrictIotList(options));
+      }
     } catch (error) {
       handleError(error, 'Error ListOfIotDistrict')
     } finally {
@@ -234,12 +238,14 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       let command = "list-iot-city";
       var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
       console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.CODE,
-        label: item.NAME
-      }));
-      dispatch(setCityIotList(options));
+      if(result.statusCode !== 404){
+        // Map raw data to react-select format
+        const options = result.body.map(item => ({
+          value: item.CODE,
+          label: item.NAME
+        }));
+        dispatch(setCityIotList(options));
+      }
     } catch (error) {
       handleError(error, 'Error ListOfIotCity')
     } finally {
@@ -424,7 +430,17 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
         placeHolder: 'Select District',
         onClickAction: (data) => {
           // Handle the action when the user clicks OK
-          console.log('handleState triggers',data);
+          console.log('handleNewDistrict triggers', data);
+
+          let modify_data = {
+            CODE: '"' + data.value + '"',
+            NAME: '"' + data.label.toUpperCase() + '"',
+            PARENT: '"' + selectedOption.value + '"'
+          }
+          console.log('modify_data',modify_data);
+          return;
+          let command = "add-iot-district";
+          saveDdbSDC(command, modify_data);
         },
       });
     } catch (error) {
@@ -478,7 +494,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     try {
       dispatch(startLoading());
       let command = "list-ddb-state";
-      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
+      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
       console.log('result',result);
       const options = result.body.map(item => ({
         value: item.Code,
@@ -491,10 +507,29 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
         onClickAction: (data) => {
           // Handle the action when the user clicks OK
           console.log('handleState triggers',data);
+          let modify_data = {
+            CODE: data.value,
+            NAME: data.label.toUpperCase()
+          }
+          let command = "add-iot-state";
+          saveDdbSDC(command,modify_data);
         },
       });
     } catch (error) {
       handleError(error, 'Error handleState')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const saveDdbSDC = async (command,data) => {
+    try {
+      console.log(`saveDdbSDC ${command}`, data);
+      dispatch(startLoading());
+      var output = await executeAddDdbStateLambda(user.username, user?.credentials, command, data);
+      console.log('output', output)
+    } catch (error) {
+      handleError(error, `Error saveDdbSDC ${command}`)
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
