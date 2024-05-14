@@ -490,7 +490,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       for="Complex Name"
                       sm={3}
                     >
-                    <b> Complex Name</b>
+                    <b style={{fontSize:"small"}}> Complex Name</b>
                     </Label>
                     <Col sm={7}>
                       <Input
@@ -510,9 +510,9 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                   <FormGroup row>
                     <Label
                       for="State"
-                      sm={2}
+                      sm={3}
                     >
-                      <b>State</b>
+                      <b style={{fontSize:"small"}}>State</b>
                     </Label>
                     <Col sm={7}>
                     <Select options={stateIotList || []} value={selectedOption} onChange={handleChangeIotState}         
@@ -522,52 +522,52 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                         }
                       }} placeholder="Select State" />
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={2}>
                       <Button color="success" onClick={handleState}>
-                        New State
+                        New
                       </Button>{' '}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Label
                       for="District"
-                      sm={2}
+                      sm={3}
                     >
-                    <b>  District</b>
+                    <b style={{fontSize:"small"}}> District</b>
                     </Label>
                     <Col sm={7}>
                       <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={2}>
                       <Button color="success" onClick={handleNewDistrict}>
-                        New District
+                        New
                       </Button>{' '}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Label
                       for="City"
-                      sm={2}
+                      sm={3}
                     >
-                    <b> City </b>
+                    <b style={{fontSize:"small"}}> City </b>
                     </Label>
                     <Col sm={7}>
                       <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={2}>
                       <Button color="success" onClick={handleNewCity}>
-                        New City
+                        New
                       </Button>{' '}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                       <Label
                         for="Address"
-                        sm={2}
+                        sm={3}
                       >
-                      <b> Address </b> 
+                      <b style={{fontSize:"small"}}> Address </b> 
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={9}>
                         <Input
                           id="ADDR"
                           name="ADDR"
@@ -580,11 +580,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <Row>
                     <Label
                         for="GeoLocation"
-                        sm={2}
+                        sm={3}
                       >
-                      <b> Geo Location </b>
+                      <b style={{fontSize:"small"}}> Geo Location </b>
                       </Label>
-                      <Col md={5}>
+                      <Col md={4}>
                         <FormGroup>
                           <Label for="lattitude">
                             Latitude
@@ -599,7 +599,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           />
                         </FormGroup>
                       </Col>
-                      <Col md={5}>
+                      <Col md={4}>
                         <FormGroup>
                           <Label for="longitude">
                             Longitude
@@ -629,29 +629,29 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                         for="client name"
                         sm={3}
                       >
-                        <b>Client Name</b>
+                        <b style={{fontSize:"small"}}>Client Name</b>
                       </Label>
 
-                      <Col sm={6}>
+                      <Col sm={7}>
                       <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
                       </Col>
-                      <Col sm={3}>
+                      <Col sm={2}>
                         <Button color="success" onClick={handleVerify}>
-                          New Client
+                          New
                         </Button>{' '}
                     </Col>
                     </FormGroup>
                     <FormGroup row>
                       <Label
                         for="Billing Group"
-                        sm={2}
+                        sm={3}
                       >
-                      <b>  Billing Group</b>
+                      <b style={{fontSize:"small"}}>  Billing Group</b>
                       </Label>
                       <Col sm={7}>
                         <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
                       </Col>
-                      <Col sm={3}>
+                      <Col sm={2}>
                         <Button color="success" onClick={handleVerify}>
                           New
                         </Button>{' '}
@@ -660,11 +660,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="Select Date"
-                        sm={2}
+                        sm={3}
                       >
-                      <b> Select Date </b>
+                      <b style={{fontSize:"small"}}> Select Date </b>
                       </Label>
-                      <Col sm={10} >
+                      <Col sm={9} >
                       <DatePicker
                         id="selectDate"
                         selected={selectedDate}
@@ -686,11 +686,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="commissioning status"
-                        sm={2}
+                        sm={4}
                       >
-                        <b>Commissioning Status</b>
+                        <b style={{fontSize:"small"}}>Commissioning Status</b>
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={8}>
                       <Input
                         id="COCO"
                         name="COCO"
@@ -704,11 +704,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="Device Type"
-                        sm={2}
+                        sm={4}
                       >
-                      <b>  Device Type</b>
+                      <b style={{fontSize:"small"}}>  Device Type</b>
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={8}>
                         <Input
                           id="DEVT"
                           name="DEVT"
@@ -722,20 +722,20 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                     <Label
                         for="Smartness Level"
-                        sm={2}
+                        sm={4}
                       >
-                      <b>  Smartness Level</b>
+                      <b style={{fontSize:"small"}}> Smartness Level</b>
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={8}>
                           <Select options={smartnessLevels || []} value={selectedSmartness} onChange={handleChangeSmartnessLevel} placeholder="Smartness Level" />
                       </Col>
                     </FormGroup>
                       <FormGroup row>                    
                         <Label
                             for="Wc Count"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> WC Count </b>
+                          <b style={{fontSize:"small"}}> WC Count </b>
                           </Label>
                           <Col md={3}>
                             <FormGroup>
@@ -786,9 +786,9 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <FormGroup row>                    
                         <Label
                             for="Urinal Count"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Urinal Count </b>
+                          <b style={{fontSize:"small"}}> Urinal Count </b>
                           </Label>
                           <Col md={3}>
                             <FormGroup>
@@ -808,7 +808,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           <Col md={3}>
                             <FormGroup>
                               <Label for="Number of Urinal Cabins">
-                                Number of Urinal Cabins
+                                 Urinal Cabins
                               </Label>
                               <Input
                                 id="QURC"
@@ -839,14 +839,14 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <FormGroup row>                    
                         <Label
                             for="Napkin Vending Machine"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Napkin Vending Machine </b>
+                          <b style={{fontSize:"small"}} > Napkin Vending Machine </b>
                           </Label>
-                          <Col md={3}>
+                          <Col md={4}>
                             <FormGroup>
                               <Label for="Number Napkin Vending Machine">
-                                Number of Napkin Vending Machine
+                                 Napkin Vending Machine
                               </Label>
                               <Input
                                 id="QSNV"
@@ -858,7 +858,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                               />
                             </FormGroup>
                           </Col>
-                          <Col md={3}>
+                          <Col md={5}>
                             <FormGroup>
                               <Label for="Manufacturer of Napkin VM">
                                 Manufacturer of Napkin VM
@@ -877,11 +877,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <FormGroup row>                    
                         <Label
                             for="Napkin incinerator"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Napkin incinerator</b>
+                          <b style={{fontSize:"small"}}> Napkin incinerator</b>
                           </Label>
-                          <Col md={3}>
+                          <Col md={4}>
                             <FormGroup>
                               <Label for="Number Napkin incinerator">
                                 Number Napkin incinerator
@@ -896,7 +896,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                               />
                             </FormGroup>
                           </Col>
-                          <Col md={3}>
+                          <Col md={5}>
                             <FormGroup>
                               <Label for="Manufacturer of Napkin incinerator">
                                 Manufacturer of Napkin incinerator
@@ -915,11 +915,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <FormGroup row>                    
                         <Label
                             for="Area of KIOSK"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Area of KIOSK</b>
+                          <b style={{fontSize:"small"}}> Area of KIOSK</b>
                           </Label>
-                          <Col md={3}>
+                          <Col md={9}>
                             <FormGroup>
                               <Input
                                 id="AR_K"
@@ -935,15 +935,13 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <FormGroup row>                    
                         <Label
                             for="Water Atm Capacity"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Water Atm Capacity</b>
+                          <b style={{fontSize:"small"}}> Water Atm Capacity</b>
                           </Label>
-                          <Col md={5}>
+                          <Col md={8}>
                             <FormGroup>
-                              <Label for="LPH">
-                                LPH
-                              </Label>
+                              
                               <Input
                                 id="CWTM"
                                 name="CWTM"
@@ -954,15 +952,20 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                               />
                             </FormGroup>
                           </Col>
+                          <Col md={1}>
+                              <Label for="LPH">
+                                <b>LPH</b>
+                              </Label>
+                          </Col>
                       </FormGroup>
                       <FormGroup row>                    
                         <Label
                             for="Supervisior Room Size"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Supervisior Room Size</b>
+                          <b style={{fontSize:"small"}}> Supervisior Room Size</b>
                           </Label>
-                          <Col md={5}>
+                          <Col md={9}>
                             <FormGroup>
                               <Input
                                 id="ARSR"
@@ -987,12 +990,12 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="Manufacturer"
-                        sm={2}
+                        sm={3}
                       >
-                        <b>Manufacturer</b>
+                        <b style={{fontSize:"small"}}>Manufacturer</b>
                       </Label>
 
-                      <Col sm={10}>
+                      <Col sm={9}>
                         <Input
                           id="MANU"
                           name="MANU"
@@ -1006,12 +1009,12 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="Tech Provider"
-                        sm={2}
+                        sm={3}
                       >
-                        <b>Tech Provider</b>
+                        <b style={{fontSize:"small"}}>Tech Provider</b>
                       </Label>
 
-                      <Col sm={10}>
+                      <Col sm={9}>
                         <Input
                           id="TECH"
                           name="TECH"
@@ -1025,12 +1028,12 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="Civil Partner"
-                        sm={2}
+                        sm={3}
                       >
-                        <b>Civil Partner</b>
+                        <b style={{fontSize:"small"}}>Civil Partner</b>
                       </Label>
 
-                      <Col sm={10}>
+                      <Col sm={9}>
                         <Input
                           id="CIVL"
                           name="CIVL"
@@ -1044,12 +1047,12 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="O&M Partner"
-                        sm={2}
+                        sm={3}
                       >
-                        <b>O&M Partner</b>
+                        <b style={{fontSize:"small"}}>O&M Partner</b>
                       </Label>
 
-                      <Col sm={10}>
+                      <Col sm={9}>
                         <Input
                           id="ONMP"
                           name="ONMP"
@@ -1074,7 +1077,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                         for="Router IMEI"
                         sm={3}
                       >
-                        <b>Router IMEI</b>
+                        <b style={{fontSize:"small"}}>Router IMEI</b>
                       </Label>
 
                       <Col sm={9}>
@@ -1093,7 +1096,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                         for="Router Mobile"
                         sm={3}
                       >
-                        <b>Router Mobile</b>
+                        <b style={{fontSize:"small"}}>Router Mobile</b>
                       </Label>
 
                       <Col sm={9}>

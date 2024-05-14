@@ -333,7 +333,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       for="State"
                       sm={2}
                     >
-                      <b>State</b>
+                      <b style={{fontSize:"small"}}>State</b>
                     </Label>
                     <Col sm={10}>
                       <Input
@@ -351,7 +351,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       for="District"
                       sm={2}
                     >
-                    <b>  District</b>
+                    <b style={{fontSize:"small"}}> District</b>
                     </Label>
                     <Col sm={10}>
                       <Input
@@ -369,7 +369,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       for="City"
                       sm={2}
                     >
-                    <b> City </b>
+                    <b style={{fontSize:"small"}}> City </b>
                     </Label>
                     <Col sm={10}>
                       <Input
@@ -387,7 +387,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       for="Complex"
                       sm={2}
                     >
-                    <b> Complex </b>
+                    <b style={{fontSize:"small"}}> Complex </b>
                     </Label>
                     <Col sm={10}>
                       <Input
@@ -405,7 +405,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Address"
                         sm={2}
                       >
-                      <b> Address </b> 
+                      <b style={{fontSize:"small"}}> Address </b> 
                       </Label>
                       <Col sm={10}>
                         <Input
@@ -422,7 +422,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="GeoLocation"
                         sm={2}
                       >
-                      <b> Geo Location </b>
+                      <b style={{fontSize:"small"}}> Geo Location </b>
                       </Label>
                       <Col md={5}>
                         <FormGroup>
@@ -469,7 +469,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="client name"
                         sm={2}
                       >
-                        <b>Client Name</b>
+                        <b style={{fontSize:"small"}}>Client Name</b>
                       </Label>
 
                       <Col sm={10}>
@@ -481,7 +481,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Billing Group"
                         sm={2}
                       >
-                      <b>  Billing Group</b>
+                      <b style={{fontSize:"small"}}>  Billing Group</b>
                       </Label>
                       <Col sm={10}>
                       <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
@@ -492,7 +492,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Select Date"
                         sm={2}
                       >
-                      <b> Select Date </b>
+                      <b style={{fontSize:"small"}}> Select Date </b>
                       </Label>
                       <Col sm={10} >
                       <DatePicker
@@ -516,11 +516,11 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                     <FormGroup row>
                       <Label
                         for="commissioning status"
-                        sm={2}
+                        sm={3}
                       >
-                        <b>Commissioning Status</b>
+                        <b style={{fontSize:"small"}}>Commissioning Status</b>
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={9}>
                       <Input
                         id="COCO"
                         name="COCO"
@@ -534,11 +534,11 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                     <FormGroup row>
                       <Label
                         for="Device Type"
-                        sm={2}
+                        sm={3}
                       >
-                      <b>  Device Type</b>
+                      <b style={{fontSize:"small"}}> Device Type</b>
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={9}>
                         <Input
                           id="DEVT"
                           name="DEVT"
@@ -552,20 +552,20 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                     <FormGroup row>
                     <Label
                         for="Smartness Level"
-                        sm={2}
+                        sm={3}
                       >
-                      <b>  Smartness Level</b>
+                      <b style={{fontSize:"small"}}> Smartness Level</b>
                       </Label>
-                      <Col sm={10}>
+                      <Col sm={9}>
                           <Select options={smartnessLevels || []} value={selectedSmartness} onChange={handleChangeSmartnessLevel} placeholder="Smartness Level" />
                       </Col>
                     </FormGroup>
                       <FormGroup row>                    
                         <Label
                             for="Wc Count"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> WC Count </b>
+                          <b style={{fontSize:"small"}}> WC Count </b>
                           </Label>
                           <Col md={3}>
                             <FormGroup>
@@ -617,9 +617,9 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       <FormGroup row>                    
                         <Label
                             for="Urinal Count"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Urinal Count </b>
+                          <b style={{fontSize:"small"}}> Urinal Count </b>
                           </Label>
                           <Col md={3}>
                             <FormGroup>
@@ -639,7 +639,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                           <Col md={3}>
                             <FormGroup>
                               <Label for="Number of Urinal Cabins">
-                                Number of Urinal Cabins
+                                Urinal Cabins
                               </Label>
                               <Input
                                 id="QURC"
@@ -670,11 +670,11 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       <FormGroup row>                    
                         <Label
                             for="Napkin Vending Machine"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Napkin Vending Machine </b>
+                          <b style={{fontSize:"small"}}> Napkin Vending Machine </b>
                           </Label>
-                          <Col md={3}>
+                          <Col md={5}>
                             <FormGroup>
                               <Label for="Number Napkin Vending Machine">
                                 Number of Napkin Vending Machine
@@ -689,7 +689,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                               />
                             </FormGroup>
                           </Col>
-                          <Col md={3}>
+                          <Col md={4}>
                             <FormGroup>
                               <Label for="Manufacturer of Napkin VM">
                                 Manufacturer of Napkin VM
@@ -708,11 +708,11 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       <FormGroup row>                    
                         <Label
                             for="Napkin incinerator"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Napkin incinerator</b>
+                          <b style={{fontSize:"small"}}> Napkin incinerator</b>
                           </Label>
-                          <Col md={3}>
+                          <Col md={4}>
                             <FormGroup>
                               <Label for="Number Napkin incinerator">
                                 Number Napkin incinerator
@@ -727,7 +727,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                               />
                             </FormGroup>
                           </Col>
-                          <Col md={3}>
+                          <Col md={5}>
                             <FormGroup>
                               <Label for="Manufacturer of Napkin incinerator">
                                 Manufacturer of Napkin incinerator
@@ -746,11 +746,11 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       <FormGroup row>                    
                         <Label
                             for="Area of KIOSK"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Area of KIOSK</b>
+                          <b style={{fontSize:"small"}}> Area of KIOSK</b>
                           </Label>
-                          <Col md={3}>
+                          <Col md={9}>
                             <FormGroup>
                               <Input
                                 id="AR_K"
@@ -766,15 +766,13 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                       <FormGroup row>                    
                         <Label
                             for="Water Atm Capacity"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Water Atm Capacity</b>
+                          <b style={{fontSize:"small"}}> Water Atm Capacity</b>
                           </Label>
-                          <Col md={5}>
+                          <Col md={8}>
                             <FormGroup>
-                              <Label for="LPH">
-                                LPH
-                              </Label>
+                              
                               <Input
                                 id="CWTM"
                                 name="CWTM"
@@ -785,15 +783,20 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                               />
                             </FormGroup>
                           </Col>
+                          <Col md={1}>
+                            <Label for="LPH">
+                              <b> LPH </b> 
+                            </Label>
+                          </Col>
                       </FormGroup>
                       <FormGroup row>                    
                         <Label
                             for="Supervisior Room Size"
-                            sm={2}
+                            sm={3}
                           >
-                          <b> Supervisior Room Size</b>
+                          <b style={{fontSize:"small"}}> Supervisior Room Size</b>
                           </Label>
-                          <Col md={5}>
+                          <Col md={9}>
                             <FormGroup>
                               <Input
                                 id="ARSR"
@@ -820,7 +823,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Manufacturer"
                         sm={2}
                       >
-                        <b>Manufacturer</b>
+                        <b style={{fontSize:"small"}}>Manufacturer</b>
                       </Label>
 
                       <Col sm={10}>
@@ -839,7 +842,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Tech Provider"
                         sm={2}
                       >
-                        <b>Tech Provider</b>
+                        <b style={{fontSize:"small"}}>Tech Provider</b>
                       </Label>
 
                       <Col sm={10}>
@@ -858,7 +861,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Civil Partner"
                         sm={2}
                       >
-                        <b>Civil Partner</b>
+                        <b style={{fontSize:"small"}}>Civil Partner</b>
                       </Label>
 
                       <Col sm={10}>
@@ -877,7 +880,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="O&M Partner"
                         sm={2}
                       >
-                        <b>O&M Partner</b>
+                        <b style={{fontSize:"small"}}>O&M Partner</b>
                       </Label>
 
                       <Col sm={10}>
@@ -905,7 +908,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Router IMEI"
                         sm={3}
                       >
-                        <b>Router IMEI</b>
+                        <b style={{fontSize:"small"}}>Router IMEI</b>
                       </Label>
 
                       <Col sm={9}>
@@ -924,7 +927,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         for="Router Mobile"
                         sm={3}
                       >
-                        <b>Router Mobile</b>
+                        <b style={{fontSize:"small"}}>Router Mobile</b>
                       </Label>
 
                       <Col sm={9}>
