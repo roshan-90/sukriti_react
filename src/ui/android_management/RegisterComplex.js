@@ -95,71 +95,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     UUID : ""
   });
 
-  useEffect(() => {
-    if(ComplexIotDetails){
-      setFormData({
-        ADDR : ComplexIotDetails.ADDR,
-        ARSR : ComplexIotDetails.ARSR,
-        AR_K : ComplexIotDetails.AR_K,
-        BILL : ComplexIotDetails.BILL,
-        CITY_CODE : ComplexIotDetails.CITY_CODE,
-        CITY_NAME : ComplexIotDetails.CITY_NAME,
-        CIVL : ComplexIotDetails.CIVL,
-        CLNT : ComplexIotDetails.CLNT,
-        COCO : ComplexIotDetails.COCO,
-        CWTM : ComplexIotDetails.CWTM,
-        DATE : ComplexIotDetails.DATE,
-        DEVT : ComplexIotDetails.DEVT,
-        DISTRICT_CODE : ComplexIotDetails.DISTRICT_CODE,
-        DISTRICT_NAME : ComplexIotDetails.DISTRICT_NAME,
-        LATT : ComplexIotDetails.LATT,
-        LONG : ComplexIotDetails.LONG,
-        MANU : ComplexIotDetails.MANU, 
-        MODIFIED_BY : ComplexIotDetails.MODIFIED_BY,
-        MSNI : ComplexIotDetails.MSNI,
-        MSNV : ComplexIotDetails.MSNV,
-        ONMP : ComplexIotDetails.ONMP,
-        QBWT : ComplexIotDetails.QBWT,
-        QFWC : ComplexIotDetails.QFWC,
-        QMWC : ComplexIotDetails.QMWC,
-        QPWC : ComplexIotDetails.QPWC,
-        QSNI : ComplexIotDetails.QSNI,
-        QSNV : ComplexIotDetails.QSNV,
-        QURC : ComplexIotDetails.QURC,
-        QURI : ComplexIotDetails.QURI,
-        ROUTER_IMEI : ComplexIotDetails.ROUTER_IMEI,
-        ROUTER_MOBILE : ComplexIotDetails.ROUTER_MOBILE,
-        SLVL : ComplexIotDetails.SLVL,
-        STATE_CODE : ComplexIotDetails.STATE_CODE,
-        STATE_NAME : ComplexIotDetails.STATE_NAME,
-        TECH : ComplexIotDetails.TECH,
-        THINGGROUPTYPE : ComplexIotDetails.THINGGROUPTYPE, 
-        UUID : ComplexIotDetails.UUID
-      })
-    }
-
-    // Check if ComplexIotDetails is available and DATE is in the correct format
-    if (ComplexIotDetails && ComplexIotDetails.DATE) {
-      const initialDateString = ComplexIotDetails.DATE;
-      const dateParts = initialDateString.split("/");
-      if (dateParts.length === 3) {
-        // Parse the initial date string into a Date object
-        const initialDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-        setSelectedDate(initialDate);
-      }
-    } else {
-      // If ComplexIotDetails or DATE is not available, set the initial date to the current date
-      setSelectedDate(new Date());
-    }
-  }, [ComplexIotDetails]);
-
-  
-  useEffect(() => {
-    // Find the option corresponding to ComplexIotDetails.SLVL
-    const selectedOption = smartnessLevels.find(option => option.value === ComplexIotDetails.SLVL);
-    // If the option is found, set it as the smartnessLevel, otherwise set it to null
-    setSelectedSmartness(selectedOption || null);
-  }, [ComplexIotDetails.SLVL]);
 
 
   useEffect(() => {
@@ -371,34 +306,15 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     updateComplex(outputArray);
   }
 
-  const deleteComplex = async() => {
-    try{
-      console.log('deleted complex');
-      let command = "delete-iot-complex";
-      var result = await executelistIotDynamicLambda('dev_000000', user?.credentials, complexName, command );
-      console.log('result deleteComplex', result.body);
-      setDialogData({
-        title: "Deleted",
-        message: result.body,
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          toggle();        },
-      });
-      } catch (error) {
-        handleError(error, 'Error deleteComplex')
-      } finally {
-        dispatch(stopLoading()); // Dispatch the stopLoading action
-      }
-  }
 
   const setWarnings = () => {
     setDialogData({
       title: "Confirms",
-      message: `Are you Sure Delete ${complexName} Complex`,
+      message: `Are you Sure submitForm ${complexName} Complex`,
       onClickAction: () => {
         // Handle the action when the user clicks OK
-        console.log('delete complex');
-        deleteComplex();
+        console.log('submitForm complex');
+        submitForm();
       },
     });
   }
@@ -542,6 +458,10 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     }
   }
 
+  const handleVerify = () => {
+    console.log('check');
+  }
+
   console.log('formData',formData);
   return (
     <div>
@@ -565,6 +485,28 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                   <CardTitle><b>Location Details</b></CardTitle>
                   <br/>
                   <Form>
+                  <FormGroup row>
+                    <Label
+                      for="Complex Name"
+                      sm={3}
+                    >
+                    <b> Complex Name</b>
+                    </Label>
+                    <Col sm={7}>
+                      <Input
+                        id="complex_name"
+                        name="complex_name"
+                        placeholder="complex Name"
+                        type="text"
+                        value={""}
+                      />
+                    </Col>
+                    <Col sm={2}>
+                      <Button color="light" onClick={handleVerify}>
+                        Check
+                      </Button>{' '}
+                    </Col>
+                  </FormGroup>
                   <FormGroup row>
                     <Label
                       for="State"
@@ -610,29 +552,12 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <b> City </b>
                     </Label>
                     <Col sm={7}>
-                      <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select District" />
+                      <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
                     </Col>
                     <Col sm={3}>
                       <Button color="success" onClick={handleNewCity}>
                         New City
                       </Button>{' '}
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
-                    <Label
-                      for="Complex"
-                      sm={2}
-                    >
-                    <b> Complex </b>
-                    </Label>
-                    <Col sm={10}>
-                      <Input
-                        id="complex"
-                        name="complex"
-                        placeholder="complex"
-                        type="text"
-                        value={""}
-                      />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -702,14 +627,19 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                     <FormGroup row>
                       <Label
                         for="client name"
-                        sm={2}
+                        sm={3}
                       >
                         <b>Client Name</b>
                       </Label>
 
-                      <Col sm={10}>
+                      <Col sm={6}>
                       <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
                       </Col>
+                      <Col sm={3}>
+                        <Button color="success" onClick={handleVerify}>
+                          New Client
+                        </Button>{' '}
+                    </Col>
                     </FormGroup>
                     <FormGroup row>
                       <Label
@@ -718,9 +648,14 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       >
                       <b>  Billing Group</b>
                       </Label>
-                      <Col sm={10}>
-                      <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
+                      <Col sm={7}>
+                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
                       </Col>
+                      <Col sm={3}>
+                        <Button color="success" onClick={handleVerify}>
+                          New
+                        </Button>{' '}
+                    </Col>
                     </FormGroup>
                     <FormGroup row>
                       <Label
@@ -780,7 +715,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           placeholder="DEVT"
                           type="text"
                           disabled={true}
-                          value={""}
+                          value={"Toilet"}
                         />                      
                       </Col>
                     </FormGroup>
@@ -1177,11 +1112,8 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
               </Card>
             </ModalBody>
             <ModalFooter>
-              <Button color="success" onClick={submitForm}>
-                Update
-              </Button>{' '}
               <Button color="danger" onClick={setWarnings}>
-                Delete
+              Submit
               </Button>{' '}
               <Button color="warning" onClick={toggle}>
                 Cancel
