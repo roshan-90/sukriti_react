@@ -428,19 +428,18 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
         title: "Add New District",
         options: options,
         placeHolder: 'Select District',
-        onClickAction: (data) => {
+        onClickAction: async (data) => {
           // Handle the action when the user clicks OK
           console.log('handleNewDistrict triggers', data);
 
           let modify_data = {
-            CODE: '"' + data.value + '"',
-            NAME: '"' + data.label.toUpperCase() + '"',
-            PARENT: '"' + selectedOption.value + '"'
+            CODE: data.value,
+            NAME: data.label.toUpperCase().replace(/ /g, "_"),
+            PARENT: selectedOption.value
           }
-          console.log('modify_data',modify_data);
-          return;
           let command = "add-iot-district";
-          saveDdbSDC(command, modify_data);
+          await saveDdbSDC(command, modify_data);
+          setSelectedOption(null);
         },
       });
     } catch (error) {
@@ -477,9 +476,17 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
         title: "Add New City",
         options: options,
         placeHolder: 'Select City',
-        onClickAction: (data) => {
+        onClickAction: async (data) => {
           // Handle the action when the user clicks OK
-          console.log('handleState triggers',data);
+          console.log('handleNewCity triggers',data);
+          let modify_data = {
+            CODE: data.value,
+            NAME: data.label.toUpperCase().replace(/ /g, "_"),
+            PARENT: selectedOptionIotDistrict.value
+          }
+          let command = "add-iot-city";
+          await saveDdbSDC(command, modify_data);
+          setSelectedOptionIotDistrict(null);
         },
       });
     } catch (error) {
