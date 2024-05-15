@@ -19,6 +19,8 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import { setResetData } from "../../features/androidManagementSlice";
 import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
 import ModalSelect from '../../dialogs/ModalSelect';
+import ModalClient from './ModalClient';
+import ModalBillingGroup from './ModalBillingGroup';
 
 export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -41,7 +43,9 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
   const [dialogDatas, setdialogDatas] = useState(null);
-  
+  const [modalClient, setModalClient] = useState(null);
+  const [modalBillingGroup, setModalBillingGroup] = useState(null);
+
   const smartnessLevels = [
     { label: 'None', value: 'None' },
     { label: 'Basic', value: 'Basic' },
@@ -462,6 +466,26 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     console.log('check');
   }
 
+  const handleModalClient = () => {
+    setModalClient({
+      title: "Add New Client",
+      onClickAction: (data) => {
+        // Handle the action when the user clicks OK
+        console.log('handleModalClient triggers');
+      },
+    });
+  }
+
+  const handleBillingGroup = () => {
+    setModalBillingGroup({
+      title: "Add New Billing Group",
+      onClickAction: (data) => {
+        // Handle the action when the user clicks OK
+        console.log('handleBillingGroup triggers');
+      },
+    });
+  }
+
   console.log('formData',formData);
   return (
     <div>
@@ -478,6 +502,8 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
             )}
             <MessageDialog data={dialogData} />
             <ModalSelect data={dialogDatas} />
+            <ModalClient data={modalClient} />
+            <ModalBillingGroup data={modalBillingGroup} />
             <ModalHeader toggle={toggle}><b>Register Complex</b></ModalHeader>
             <ModalBody>
             <Card>
@@ -636,7 +662,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
                       </Col>
                       <Col sm={2}>
-                        <Button color="success" onClick={handleVerify}>
+                        <Button color="success" onClick={handleModalClient}>
                           New
                         </Button>{' '}
                     </Col>
@@ -652,7 +678,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                         <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
                       </Col>
                       <Col sm={2}>
-                        <Button color="success" onClick={handleVerify}>
+                        <Button color="success" onClick={handleBillingGroup}>
                           New
                         </Button>{' '}
                     </Col>
