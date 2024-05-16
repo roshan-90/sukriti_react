@@ -15,6 +15,10 @@ const ModalBillingGroup = ({ data }) => {
   const [title, setTitle] = useState("");
   const [onClickAction, setOnClickAction] = useState(undefined);
   const [selectedOption, setSelectedOption] = useState(null); // State for react-select
+  const [formData, setFormData] = useState({
+    name: '',
+    description: ''
+  });
 
   useEffect(() => {
     if (data) {
@@ -30,17 +34,21 @@ const ModalBillingGroup = ({ data }) => {
   };
 
   const handleButtonClick = () => {
+    console.log('formData',formData);
+    if(formData.description == '' || formData.name == ''){
+      return true;
+    }
     handleClose();
     if (onClickAction !== undefined) {
-      onClickAction(selectedOption);
+      onClickAction(formData);
       setOpen(false);
       setSelectedOption(null);
     }
   };
 
-  const handleChange = (selected) => {
-    console.log('selected',selected);
-    setSelectedOption(selected)
+  const handleChange = (e) => {
+    const { name , value } = e.target;
+    setFormData({ ...formData, [name]: value });
   }
   const handleVerify = () => {
     
@@ -61,40 +69,34 @@ const ModalBillingGroup = ({ data }) => {
           <div style={{ margin: "auto", width: "90%" }}>
                   <FormGroup row>
                     <Label
-                      for="Complex Name"
+                      for="Billing Group"
                       sm={3}
                     >
-                    <b style={{fontSize:"small"}}> Complex Name</b>
+                    <b style={{fontSize:"small"}}> Billing Group </b>
                     </Label>
-                    <Col sm={7}>
+                    <Col sm={9}>
                       <Input
-                        id="complex_name"
-                        name="complex_name"
-                        placeholder="complex Name"
+                        id="name"
+                        name="name"
+                        placeholder="name"
                         type="text"
-                        value={""}
                         onChange={handleChange}
                       />
-                    </Col>
-                    <Col sm={2}>
-                      <Button variant="contained" color="primary" onClick={handleVerify}>
-                        Check
-                      </Button>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                       <Label
-                        for="Address"
+                        for="Description"
                         sm={3}
                       >
-                      <b style={{fontSize:"small"}}> Address </b> 
+                      <b style={{fontSize:"small"}}> Description </b> 
                       </Label>
                       <Col sm={9}>
                         <Input
-                          id="ADDR"
-                          name="ADDR"
+                          id="description"
+                          name="description"
                           type="textarea"
-                          value={""}
+                          placeholder="description"
                           onChange={handleChange}
                         />
                       </Col>

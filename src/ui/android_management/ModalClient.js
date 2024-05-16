@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import Select from 'react-select'; // Importing react-select
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import {
@@ -19,7 +19,7 @@ import {
   executeAddDdbStateLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { selectUser } from "../../features/authenticationSlice";
-import {Row, Col, Modal, ModalHeader, ModalBody, ModalFooter, Card, CardBody, CardTitle, Form, FormGroup, Label, Input } from 'reactstrap';
+import {Row, Col, FormGroup, Label, Input } from 'reactstrap';
 
 
 const ModalClient = ({ data }) => {
@@ -35,7 +35,28 @@ const ModalClient = ({ data }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const [dialogData, setDialogData] = useState(null);
-
+  const [formData, setFormData] = useState({
+    STATE: '',
+    DISTRICT: '',
+    CITY: '',
+    HEALTH_LIGHT: '',
+    HEALTH_FAN: '',
+    HEALTH_FLUSH: '',
+    HEALTH_FLOOR_CLEAN: '',
+    AVERAGE_FEEDBACK: '',
+    TOTAL_USAGE: '',
+    WATER_LEVEL: '',
+    AQI_NH3: '',
+    AQI_CO: '',
+    AQI_CH4: '',
+    LUMINOSITY: '',
+    DEVICE_THEFT: '',
+    LATITUDE: '',
+    LONGITUDE: '',
+    TOTAL_WATER_RECYCLED: '',
+    Description: '',
+    Name: ''
+  });
 
   useEffect(() => {
     if (data) {
@@ -43,6 +64,8 @@ const ModalClient = ({ data }) => {
       setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
       setStateIotList([]);
+      setDistrictIotList([]);
+      setCityIotList([]);
     }
   }, [data]);
 
@@ -111,6 +134,7 @@ const ModalClient = ({ data }) => {
     setSelectedOptionIotCity(null);
     setSelectedOption(selectedOption); // Update state if selectedOption is not null
     ListOfIotDistrict(selectedOption.value)
+    setFormData({...formData,STATE: selectedOption.label.toUpperCase().replace(/ /g, "_")})
   };
 
   const ListOfIotDistrict = async (value) => {
@@ -162,11 +186,30 @@ const ModalClient = ({ data }) => {
     console.log('handleChangeIotDistrict',selectedOption);
     setSelectedOptionIotDistrict(selectedOption);
     ListOfIotCity(selectedOption.value)
+    setFormData({...formData, DISTRICT: selectedOption.label.toUpperCase().replace(/ /g, "_")})
+
   }
 
   const handleChangeIotCity = (selectedOption) => {
     console.log('handleChangeIotCity',selectedOption);
     setSelectedOptionIotCity(selectedOption);
+    setFormData({...formData, CITY: selectedOption.label.toUpperCase().replace(/ /g, "_")})
+  }
+
+  const handleVerify = () => {
+    console.log('verify',formData);
+  }
+
+  const handleChange = (e) => {
+    const { name  } = e.target;
+    console.log('name',name)
+    if(name =='Name'){
+      setFormData({...formData, [name]: e.target.value})
+    } else if(name == 'Description') {
+      setFormData({...formData, [name]: e.target.value})
+    } else {
+      setFormData({...formData, [name]: e.target.checked})
+    }
   }
 
   
@@ -176,12 +219,35 @@ const ModalClient = ({ data }) => {
       <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="sm" fullWidth
       PaperProps={{
         style: {
-          height: '85%', // Adjust the maximum height as needed
+          height: '95%', // Adjust the maximum height as needed
+          maxWidth: '1223px'
         },
       }}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <div style={{ margin: "auto", width: "90%" }}>
+          <FormGroup row>
+            <Label
+              for="Client Name"
+              sm={2}
+            >
+            <b style={{fontSize:"small"}}> Client Name</b>
+            </Label>
+            <Col sm={9}>
+              <Input
+                id="Name"
+                name="Name"
+                placeholder="Client Name"
+                type="text"
+                onChange={handleChange}
+              />
+            </Col>
+            <Col sm={1}>
+            <Button variant="contained" color="primary" onClick={handleVerify}>
+              Check
+            </Button>
+            </Col>
+            </FormGroup>
             <FormGroup row>
                 <Label
                   for="State"
@@ -219,7 +285,271 @@ const ModalClient = ({ data }) => {
                 <Col sm={10}>
                   <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
                 </Col>
-              </FormGroup>       
+              </FormGroup>      
+              <FormGroup row>
+                <Label
+                  for="Description"
+                  sm={2}
+                >
+                <b style={{fontSize:"small"}}> Description </b> 
+                </Label>
+                <Col sm={10}>
+                  <Input
+                    id="Description"
+                    name="Description"
+                    type="textarea"
+                    placeholder="Description"
+                    onChange={handleChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Label
+                    for=""
+                    sm={2}
+                  >
+                </Label>
+                <Col sm={3}>
+                    <Input
+                      id="HEALTH_LIGHT"
+                      name="HEALTH_LIGHT"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="HEALTH_LIGHT"
+                    >
+                      Health Light
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="HEALTH_FAN"
+                      name="HEALTH_FAN"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="HEALTH_FAN"
+                    >
+                      Health Fan
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="HEALTH_FLUSH"
+                      name="HEALTH_FLUSH"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="HEALTH_FLUSH"
+                    >
+                      Health Flush
+                  </Label> 
+                </Col>
+              </FormGroup>  
+              <FormGroup row>
+                <Label
+                    for=""
+                    sm={2}
+                  >
+                </Label>
+                <Col sm={3}>
+                    <Input
+                      id="HEALTH_FLOOR_CLEAN"
+                      name="HEALTH_FLOOR_CLEAN"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="HEALTH_FLOOR_CLEAN"
+                    >
+                      Health Floor Clean
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="AVERAGE_FEEDBACK"
+                      name="AVERAGE_FEEDBACK"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="AVERAGE_FEEDBACK"
+                    >
+                      Average Feedback
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="TOTAL_USAGE"
+                      name="TOTAL_USAGE"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="TOTAL_USAGE"
+                    >
+                      Total Usage
+                  </Label> 
+                </Col>
+              </FormGroup>  
+              <FormGroup row>
+                <Label
+                    for="Share Information"
+                    sm={2}
+                  >
+                  <b style={{fontSize:"small"}}> Share Information </b>
+                </Label>
+                <Col sm={3}>
+                    <Input
+                      id="WATER_LEVEL"
+                      name="WATER_LEVEL"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="WATER_LEVEL"
+                    >
+                      Water LEVEL
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="AQI_NH3"
+                      name="AQI_NH3"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="AQI_NH3"
+                    >
+                      AQI_NH3
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="AQI_CO"
+                      name="AQI_CO"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="AQI_CO"
+                    >
+                      AQI_CO
+                  </Label> 
+                </Col>
+              </FormGroup>  
+              <FormGroup row>
+                <Label
+                    for=""
+                    sm={2}
+                  >
+                  
+                </Label>
+                <Col sm={3}>
+                    <Input
+                      id="AQI_CH4"
+                      name="AQI_CH4"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="AQI_CH4"
+                    >
+                      AQI_CH4
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="LUMINOSITY"
+                      name="LUMINOSITY"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="LUMINOSITY"
+                    >
+                      LUMINOSITY
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="DEVICE_THEFT"
+                      name="DEVICE_THEFT"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="DEVICE_THEFT"
+                    >
+                      DEVICE THEFT
+                  </Label> 
+                </Col>
+              </FormGroup>  
+              <FormGroup row>
+                <Label
+                    for=""
+                    sm={2}
+                  >
+                </Label>
+                <Col sm={3}>
+                    <Input
+                      id="LATITUDE"
+                      name="LATITUDE"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="LATITUDE"
+                    >
+                      LATITUDE
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="LONGITUDE"
+                      name="LONGITUDE"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="LONGITUDE"
+                    >
+                      LONGITUDE
+                  </Label> 
+                </Col>
+                <Col sm={3}>
+                    <Input
+                      id="TOTAL_WATER_RECYCLED"
+                      name="TOTAL_WATER_RECYCLED"
+                      type="checkbox"
+                      onChange={handleChange}
+                    />
+                  <Label
+                      check
+                      for="TOTAL_WATER_RECYCLED"
+                    >
+                      TOTAL WATER RECYCLED
+                  </Label> 
+                </Col>
+              </FormGroup>  
             </div>
         </DialogContent>
         <DialogActions>

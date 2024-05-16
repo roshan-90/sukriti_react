@@ -303,3 +303,42 @@ export function executeAddDdbStateLambda(
     });
   });
 }
+
+export function executeAddBillingroupLambda(
+  userName,
+  credentials,
+  command,
+  value,
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+ command,
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Enterprise_Crud_Iot_ComplexTree",
+      Payload: JSON.stringify({
+        userName: userName,
+        command: command,
+        Name: value.name,
+        Description: value.description
+      })
+    };
+    console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}

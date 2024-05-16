@@ -10,7 +10,8 @@ import {
   executelistIotDynamicLambda,
   executelistIotSingleLambda,
   executelistDDbCityLambda,
-  executeAddDdbStateLambda
+  executeAddDdbStateLambda,
+  executeAddBillingroupLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
@@ -479,9 +480,19 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const handleBillingGroup = () => {
     setModalBillingGroup({
       title: "Add New Billing Group",
-      onClickAction: (data) => {
+      onClickAction: async (data) => {
+        try {
+        dispatch(startLoading());
         // Handle the action when the user clicks OK
-        console.log('handleBillingGroup triggers');
+        console.log('handleBillingGroup triggers', data);
+        let command = "create-billing-group";
+        var output = await executeAddBillingroupLambda(user.username, user?.credentials, command, data);
+        console.log('output', output)
+        } catch (error) {
+          handleError(error, `Error handleBillingGroup`)
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
       },
     });
   }
