@@ -20,6 +20,7 @@ import {
 } from "../../awsClients/androidEnterpriseLambda";
 import { selectUser } from "../../features/authenticationSlice";
 import {Row, Col, FormGroup, Label, Input } from 'reactstrap';
+import { FaCheck } from "react-icons/fa";
 
 
 const ModalClient = ({ data }) => {
@@ -57,6 +58,7 @@ const ModalClient = ({ data }) => {
     Description: '',
     Name: ''
   });
+  const [complexVerify, setComplexVerify ] = useState(null);
 
   useEffect(() => {
     if (data) {
@@ -218,7 +220,10 @@ const ModalClient = ({ data }) => {
               console.log(`The value "${valueToCheck}" exists in the array.`);
               },
             });
+            setComplexVerify(false);
+            return;
         }
+        setComplexVerify(true);
     } catch (error) {
       handleError(error, 'Error handleVerify')
     } finally {
@@ -269,9 +274,16 @@ const ModalClient = ({ data }) => {
               />
             </Col>
             <Col sm={1}>
-            <Button variant="contained" color="primary" onClick={handleVerify}>
-              Check
-            </Button>
+              {complexVerify == true ? <>
+                <Button color="success"  disabled>
+                  <FaCheck />
+                </Button>{' '}
+              </> :
+              <>
+                <Button color="info" onClick={handleVerify}>
+                  check
+                </Button>{' '}
+              </>}
             </Col>
             </FormGroup>
             <FormGroup row>

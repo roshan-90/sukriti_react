@@ -23,6 +23,8 @@ import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList,
 import ModalSelect from '../../dialogs/ModalSelect';
 import ModalClient from './ModalClient';
 import ModalBillingGroup from './ModalBillingGroup';
+import { FaCheck } from "react-icons/fa";
+
 
 export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -47,6 +49,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const [dialogDatas, setdialogDatas] = useState(null);
   const [modalClient, setModalClient] = useState(null);
   const [modalBillingGroup, setModalBillingGroup] = useState(null);
+  const [complexVerify, setComplexVerify ] = useState(null);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -578,41 +581,43 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
 
   const handleVerify = async () => {
     try {
-      console.log('selectedOption',selectedOption);
-      console.log('selectedOptionIotDistrict',selectedOptionIotDistrict);
-      console.log('selectedOptionIotCity',selectedOptionIotCity);
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        CITY_NAME: selectedOptionIotCity.label,
-        CITY_CODE: selectedOptionIotCity.value,
-        DISTRICT_CODE: selectedOptionIotDistrict.value,
-        DISTRICT_NAME: selectedOptionIotDistrict.label,
-        STATE_CODE: selectedOption.value,
-        STATE_NAME: selectedOption.label
-    }));
-      dispatch(startLoading());
-      let command = "List-iot-all-complex";
-      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
-      console.log('list of complex', result.body.complexList);
-      console.log('list of complex', result.body.complexList.length);
-
-      // Value to check
-      const valueToCheck = formData.Name;
-
-      // Check if the value exists
-      const valueExists = result.body.complexList.some(item => item.name == valueToCheck);
-
-        if (valueExists) {
-          setDialogData({
-            title: "Not Verified",
-            message: `The value "${valueToCheck}" exists .`,
-            onClickAction: () => {
-              // Handle the action when the user clicks OK
-              console.log(`The value "${valueToCheck}" exists.`);
-              },
-            });
-        }
-        console.log('valueExists',valueExists)
+      if(formData.Name){
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          CITY_NAME: selectedOptionIotCity.label,
+          CITY_CODE: selectedOptionIotCity.value,
+          DISTRICT_CODE: selectedOptionIotDistrict.value,
+          DISTRICT_NAME: selectedOptionIotDistrict.label,
+          STATE_CODE: selectedOption.value,
+          STATE_NAME: selectedOption.label
+      }));
+  
+        dispatch(startLoading());
+        let command = "List-iot-all-complex";
+        var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
+        console.log('list of complex', result.body.complexList);
+        console.log('list of complex', result.body.complexList.length);
+  
+        // Value to check
+        const valueToCheck = formData.Name;
+  
+        // Check if the value exists
+        const valueExists = result.body.complexList.some(item => item.name == valueToCheck);
+  
+          if (valueExists) {
+            setDialogData({
+              title: "Not Verified",
+              message: `The value "${valueToCheck}" exists .`,
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log(`The value "${valueToCheck}" exists.`);
+                },
+              });
+              setComplexVerify(false);
+              return;
+          }
+          setComplexVerify(true);
+      }
     } catch (error) {
       handleError(error, 'Error handleVerify')
     } finally {
@@ -662,9 +667,16 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       />
                     </Col>
                     <Col sm={2}>
-                      <Button color="light" onClick={handleVerify}>
-                        Check
-                      </Button>{' '}
+                      {complexVerify == true ? <>
+                        <Button color="success"  disabled>
+                          <FaCheck />
+                        </Button>{' '}
+                      </> :
+                      <>
+                        <Button color="info" onClick={handleVerify}>
+                          check
+                        </Button>{' '}
+                      </>}
                     </Col>
                   </FormGroup>
                   <FormGroup row>
