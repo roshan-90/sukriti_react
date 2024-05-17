@@ -6,7 +6,7 @@ import Select from 'react-select'; // Importing react-select
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for react-datepicker
 import {
-  executeUpdateComplexLambda,
+  executeCreateComplexLambda,
   executelistIotDynamicLambda,
   executelistIotSingleLambda,
   executelistDDbCityLambda,
@@ -70,16 +70,16 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     CITY_NAME : "",
     CIVL : "",
     CLNT : "",
-    COCO : "",
+    COCO : "false",
     CWTM : "",
     DATE : "",
-    DEVT : "",
+    DEVT : "Toilet",
     DISTRICT_CODE : "",
     DISTRICT_NAME : "",
     LATT : "",
     LONG : "",
     MANU : "", 
-    MODIFIED_BY : "",
+    MODIFIED_BY : user.username,
     MSNI : "",
     MSNV : "",
     ONMP : "",
@@ -97,20 +97,22 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     STATE_CODE : "",
     STATE_NAME : "",
     TECH : "",
-    THINGGROUPTYPE : "", 
-    UUID : ""
+    THINGGROUPTYPE : "COMPLEX", 
+    UUID : "HP0501_08042024_00111",
+    Name: "",
+    Parent: ""
   });
 
 
 
-  useEffect(() => {
-    if(ListclientName && ListbillingGroups ) {
-      const selectedClientOption = ListclientName.find(option => option.value === ComplexIotDetails.CLNT)
-      const selectetBillingOption = ListbillingGroups.find(option => option.value === ComplexIotDetails.BILL)
-      setSelectedClientName(selectedClientOption || null);
-      setSelectedbillingGroups(selectetBillingOption || null);
-    }
-  },[ListclientName,ListbillingGroups])
+  // useEffect(() => {
+  //   if(ListclientName && ListbillingGroups ) {
+  //     const selectedClientOption = ListclientName.find(option => option.value === ComplexIotDetails.CLNT)
+  //     const selectetBillingOption = ListbillingGroups.find(option => option.value === ComplexIotDetails.BILL)
+  //     setSelectedClientName(selectedClientOption || null);
+  //     setSelectedbillingGroups(selectetBillingOption || null);
+  //   }
+  // },[ListclientName,ListbillingGroups])
 
   const ListOfIotState = async () => {
     try {
@@ -133,7 +135,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
 
 
   const handleChangeIotState = (selectedOption) => {
-    console.log('check', selectedOption.value);
+    console.log('check', selectedOption);
     dispatch(setDistrictIotList([]));
     dispatch(setCityIotList([]));
     dispatch(setComplexIotList([]));
@@ -141,12 +143,16 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     setSelectedOptionIotCity(null);
     setSelectedOption(selectedOption); // Update state if selectedOption is not null
     ListOfIotDistrict(selectedOption.value)
+    setFormData({ ...formData,STATE_CODE:selectedOption.value});
+    setFormData({ ...formData,STATE_NAME:selectedOption.label});
   };
 
   const handleChangeIotDistrict = (selectedOption) => {
     dispatch(setCityIotList([]));
     setSelectedOptionIotCity(null)
     console.log('handleChangeIotDistrict',selectedOption);
+    setFormData({ ...formData, DISTRICT_CODE: selectedOption.value });
+    setFormData({ ...formData, DISTRICT_NAME: selectedOption.label });
     setSelectedOptionIotDistrict(selectedOption);
     ListOfIotCity(selectedOption.value)
   }
@@ -186,6 +192,8 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
           label: item.NAME
         }));
         dispatch(setCityIotList(options));
+        ListOfIotClientName();
+        ListOfIotBillingGroup();
       }
     } catch (error) {
       handleError(error, 'Error ListOfIotCity')
@@ -197,6 +205,9 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const handleChangeIotCity = (selectedOption) => {
     dispatch(setComplexIotList([]));
     console.log('handleChangeIotCity',selectedOption);
+    setFormData({ ...formData, CITY_CODE: selectedOption.value });
+    setFormData({ ...formData, CITY_NAME: selectedOption.label });
+    setFormData({ ...formData, Parent: selectedOption.value });
     setSelectedOptionIotCity(selectedOption);
   }
 
@@ -275,32 +286,40 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     return `${day}/${month}/${year}`;
   };
 
-  const updateComplex = async (value) => {
+  const createComplex = async (value, name,parent) => {
     try {
-      if(!complexName) {
-        setDialogData({
-          title: "Error",
-          message: "complex is not Selected",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log('complex is not select');
-          },
-        });
-        return
-      }
+      // if(!complexName) {
+      //   setDialogData({
+      //     title: "Error",
+      //     message: "complex is not Selected",
+      //     onClickAction: () => {
+      //       // Handle the action when the user clicks OK
+      //       console.log('complex is not select');
+      //     },
+      //   });
+      //   return
+      // }
+      console.log('name, parent', {name, parent})
       dispatch(startLoading());
-      let command = "update-iot-complex";
-      var result = await executeUpdateComplexLambda('test_rk_mandi', user?.credentials, command, value, complexName);
+      let command = "add-iot-complex";
+      var result = await executeCreateComplexLambda(user.username, user?.credentials, command, value, name, parent);
       console.log('result ClientName', result.body);
-      
+  
     } catch (error) {
-      handleError(error, 'Error ListOfIotClientName')
+      handleError(error, 'Error createComplex')
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
 
   const submitForm = (e) => {
+    let name = formData.Name
+    let Parent = formData.Parent;
+
+    // Deleting the keys
+    delete formData.Name;
+    delete formData.Parent;
+
       const outputArray = [];
       for (const key in formData) {
           if (formData.hasOwnProperty(key)) {
@@ -309,14 +328,14 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
           }
       }
     console.log('formData',outputArray)
-    updateComplex(outputArray);
+    createComplex(outputArray,name,Parent);
   }
 
 
   const setWarnings = () => {
     setDialogData({
       title: "Confirms",
-      message: `Are you Sure submitForm ${complexName} Complex`,
+      message: `Are you Sure submitForm ${formData.Name} Complex`,
       onClickAction: () => {
         // Handle the action when the user clicks OK
         console.log('submitForm complex');
@@ -464,10 +483,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     }
   }
 
-  const handleVerify = () => {
-    console.log('check');
-  }
-
   const handleModalClient = () => {
     setModalClient({
       title: "Add New Client",
@@ -525,6 +540,86 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     });
   }
 
+  const ListOfIotClientName = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-clientName";
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
+      console.log('result ClientName', result.body);
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setClientName(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotClientName')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotBillingGroup = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-billing-groups";
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
+      console.log('result ListOfIotBillingGroup', result.body);
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setBillingGroup(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotBillingGroup')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const handleVerify = async () => {
+    try {
+      console.log('selectedOption',selectedOption);
+      console.log('selectedOptionIotDistrict',selectedOptionIotDistrict);
+      console.log('selectedOptionIotCity',selectedOptionIotCity);
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        CITY_NAME: selectedOptionIotCity.label,
+        CITY_CODE: selectedOptionIotCity.value,
+        DISTRICT_CODE: selectedOptionIotDistrict.value,
+        DISTRICT_NAME: selectedOptionIotDistrict.label,
+        STATE_CODE: selectedOption.value,
+        STATE_NAME: selectedOption.label
+    }));
+      dispatch(startLoading());
+      let command = "List-iot-all-complex";
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
+      console.log('list of complex', result.body.complexList);
+      console.log('list of complex', result.body.complexList.length);
+
+      // Value to check
+      const valueToCheck = formData.Name;
+
+      // Check if the value exists
+      const valueExists = result.body.complexList.some(item => item.name == valueToCheck);
+
+        if (valueExists) {
+          setDialogData({
+            title: "Not Verified",
+            message: `The value "${valueToCheck}" exists .`,
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`The value "${valueToCheck}" exists.`);
+              },
+            });
+        }
+        console.log('valueExists',valueExists)
+    } catch (error) {
+      handleError(error, 'Error handleVerify')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
   console.log('formData',formData);
   return (
     <div>
@@ -552,18 +647,18 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                   <Form>
                   <FormGroup row>
                     <Label
-                      for="Complex Name"
+                      for="Name"
                       sm={3}
                     >
                     <b style={{fontSize:"small"}}> Complex Name</b>
                     </Label>
                     <Col sm={7}>
                       <Input
-                        id="complex_name"
-                        name="complex_name"
+                        id="Name"
+                        name="Name"
                         placeholder="complex Name"
                         type="text"
-                        value={""}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col sm={2}>
@@ -637,7 +732,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           id="ADDR"
                           name="ADDR"
                           type="textarea"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
@@ -659,7 +753,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                             name="LATT"
                             placeholder="latitude"
                             type="text"
-                            value={""}
                             onChange={handleChange}
                           />
                         </FormGroup>
@@ -674,7 +767,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                             name="LONG"
                             placeholder="longitude placeholder"
                             type="text"
-                            value={""}
                             onChange={handleChange}
                           />
                         </FormGroup>
@@ -781,6 +873,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           type="text"
                           disabled={true}
                           value={"Toilet"}
+                          onChange={handleChange}
                         />                      
                       </Col>
                     </FormGroup>
@@ -812,7 +905,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QMWC"
                                 placeholder="Number of Male WC's"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -827,7 +919,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QFWC"
                                 placeholder="Number of female WC's"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -842,7 +933,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QPWC"
                                 placeholder="Number of PD WC's"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -865,7 +955,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QURI"
                                 placeholder="latitude"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -880,7 +969,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QURC"
                                 placeholder="Number of Urinal Cabins"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -895,7 +983,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QBWT"
                                 placeholder="Number of BWTs"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -918,7 +1005,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QSNV"
                                 placeholder="Number Napkin Vending Machine"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -933,7 +1019,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="MSNV"
                                 placeholder="Manufacturer of Napkin VM"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -956,7 +1041,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="QSNI"
                                 placeholder="Number Napkin incinerator"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -971,7 +1055,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="MSNI"
                                 placeholder="Manufacturer of Napkin incinerator"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -991,7 +1074,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="AR_K"
                                 placeholder="Area of KIOSK"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -1012,7 +1094,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="CWTM"
                                 placeholder="LPH"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -1037,7 +1118,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                                 name="ARSR"
                                 placeholder="ARSR"
                                 type="text"
-                                value={""}
                                 onChange={handleChange}
                               />
                             </FormGroup>
@@ -1066,7 +1146,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           name="MANU"
                           placeholder="manufacturer placeholder"
                           type="text"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
@@ -1085,7 +1164,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           name="TECH"
                           placeholder="Tech Provider placeholder"
                           type="text"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
@@ -1104,7 +1182,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           name="CIVL"
                           placeholder="CivilPartner placeholder"
                           type="text"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
@@ -1123,7 +1200,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           name="ONMP"
                           placeholder="O&M Partner placeholder"
                           type="text"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
@@ -1151,7 +1227,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           name="ROUTER_IMEI"
                           placeholder="Router IMEI placeholder"
                           type="text"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
@@ -1170,7 +1245,6 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           name="ROUTER_MOBILE"
                           placeholder="Router Mobile placeholder"
                           type="text"
-                          value={""}
                           onChange={handleChange}
                         />
                       </Col>
