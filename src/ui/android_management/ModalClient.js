@@ -39,21 +39,21 @@ const ModalClient = ({ data }) => {
     STATE: '',
     DISTRICT: '',
     CITY: '',
-    HEALTH_LIGHT: '',
-    HEALTH_FAN: '',
-    HEALTH_FLUSH: '',
-    HEALTH_FLOOR_CLEAN: '',
-    AVERAGE_FEEDBACK: '',
-    TOTAL_USAGE: '',
-    WATER_LEVEL: '',
-    AQI_NH3: '',
-    AQI_CO: '',
-    AQI_CH4: '',
-    LUMINOSITY: '',
-    DEVICE_THEFT: '',
-    LATITUDE: '',
-    LONGITUDE: '',
-    TOTAL_WATER_RECYCLED: '',
+    HEALTH_LIGHT: false,
+    HEALTH_FAN: false,
+    HEALTH_FLUSH: false,
+    HEALTH_FLOOR_CLEAN: false,
+    AVERAGE_FEEDBACK: false,
+    TOTAL_USAGE: false,
+    WATER_LEVEL: false,
+    AQI_NH3: false,
+    AQI_CO: false,
+    AQI_CH4: false,
+    LUMINOSITY: false,
+    DEVICE_THEFT: false,
+    LATITUDE: false,
+    LONGITUDE: false,
+    TOTAL_WATER_RECYCLED: false,
     Description: '',
     Name: ''
   });
@@ -77,7 +77,7 @@ const ModalClient = ({ data }) => {
   const handleButtonClick = () => {
     handleClose();
     if (onClickAction !== undefined) {
-      onClickAction(selectedOption);
+      onClickAction(formData);
       setOpen(false);
       setSelectedOption(null);
     }
@@ -196,8 +196,34 @@ const ModalClient = ({ data }) => {
     setFormData({...formData, CITY: selectedOption.label.toUpperCase().replace(/ /g, "_")})
   }
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     console.log('verify',formData);
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-clientName";
+      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
+      console.log('result ClientName', result.body);
+      // Value to check
+      const valueToCheck = formData.Name.toUpperCase();
+
+      // Check if the value exists
+      const valueExists = result.body.some(item => item.Name === valueToCheck);
+
+        if (valueExists) {
+          setDialogData({
+            title: "Not Verified",
+            message: `The value "${valueToCheck}" exists .`,
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`The value "${valueToCheck}" exists in the array.`);
+              },
+            });
+        }
+    } catch (error) {
+      handleError(error, 'Error handleVerify')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
   }
 
   const handleChange = (e) => {

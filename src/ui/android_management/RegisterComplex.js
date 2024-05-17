@@ -11,7 +11,8 @@ import {
   executelistIotSingleLambda,
   executelistDDbCityLambda,
   executeAddDdbStateLambda,
-  executeAddBillingroupLambda
+  executeAddBillingroupLambda,
+  executeClientGroupLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
@@ -470,9 +471,36 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const handleModalClient = () => {
     setModalClient({
       title: "Add New Client",
-      onClickAction: (data) => {
+      onClickAction: async (data) => {
         // Handle the action when the user clicks OK
-        console.log('handleModalClient triggers');
+        try {
+        console.log('handleModalClient triggers', data);
+        let name = data.Name;
+        let description = data.Description;
+
+        // Deleting the keys
+        delete data.Name;
+        delete data.Description;
+
+        // Converting to the desired format
+        let resultArray = Object.keys(data).map(key => {
+          return {
+              "Name": key,
+              "Value": data[key].toString()
+          };
+        });
+
+        console.log(resultArray);
+
+        let command = "add-iot-clientgroupName";
+        dispatch(startLoading());
+        var output = await executeClientGroupLambda(user.username, user?.credentials, command, resultArray,name,description);
+        console.log('output', output)
+        } catch (error) { 
+          handleError(error, `Error handleModalClient`)
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
       },
     });
   }
