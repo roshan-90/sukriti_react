@@ -26,6 +26,7 @@ import RegisterComplex from './RegisterComplex';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { Card, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, CardLink ,Row,Col} from 'reactstrap';
 import { BiMaleFemale } from "react-icons/bi";
+import ReadCabinDetails from './ReadCabinDetails';
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
 
@@ -43,7 +44,7 @@ export default function EnrollDevice() {
   const [registerComplex, setRegisterComplex] = useState(false);
   const cabinList = useSelector((state) => state.androidManagement.cabinList);
   const [dialogData, setDialogData] = useState(null);
-
+  const [dialogCabinDetails, setDialogCabinDetails] = useState(false);
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
@@ -327,7 +328,6 @@ export default function EnrollDevice() {
 
   const handleCabinDetails = async (value) => {
     console.log('value',value);
-    return
     try {
       dispatch(startLoading());
       let command = "describe-iot-thing";
@@ -394,7 +394,8 @@ export default function EnrollDevice() {
                         if (!stateIotList || stateIotList.length === 0) {
                           ListOfIotState();
                         }
-                      }} placeholder="Select State" />
+                      }} placeholder="Select State" 
+                      />
                     <br />
                     <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
                     <br />
@@ -412,8 +413,12 @@ export default function EnrollDevice() {
               )}
               {activeStep === 1 && (
                  <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                  {dialogCabinDetails &&(
+                    <ReadCabinDetails dialogCabinDetails={dialogCabinDetails} setDialogCabinDetails={setDialogCabinDetails}/>
+                  )}
                  {cabinList && cabinList.map((cabin, index) => (
-                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'cornflowerblue', width: '100%' }} className="cabin-row clickable-row" onClick={handleCabinDetails(cabin)}>
+                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'darkgray', width: '100%' }} className="cabin-row clickable-row" onClick={() => handleCabinDetails(cabin)}
+                  >
                     <Col xs="auto" className="cabin-icon-col">
                       <BiMaleFemale />
                     </Col>

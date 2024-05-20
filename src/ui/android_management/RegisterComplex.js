@@ -50,6 +50,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const [modalClient, setModalClient] = useState(null);
   const [modalBillingGroup, setModalBillingGroup] = useState(null);
   const [complexVerify, setComplexVerify ] = useState(null);
+  const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -101,7 +102,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     STATE_NAME : "",
     TECH : "",
     THINGGROUPTYPE : "COMPLEX", 
-    UUID : "HP0501_08042024_00111",
+    UUID : "",
     Name: "",
     Parent: ""
   });
@@ -146,16 +147,16 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     setSelectedOptionIotCity(null);
     setSelectedOption(selectedOption); // Update state if selectedOption is not null
     ListOfIotDistrict(selectedOption.value)
-    setFormData({ ...formData,STATE_CODE:selectedOption.value});
-    setFormData({ ...formData,STATE_NAME:selectedOption.label});
+    // setFormData({ ...formData,STATE_CODE:selectedOption.value});
+    // setFormData({ ...formData,STATE_NAME:selectedOption.label});
   };
 
   const handleChangeIotDistrict = (selectedOption) => {
     dispatch(setCityIotList([]));
     setSelectedOptionIotCity(null)
     console.log('handleChangeIotDistrict',selectedOption);
-    setFormData({ ...formData, DISTRICT_CODE: selectedOption.value });
-    setFormData({ ...formData, DISTRICT_NAME: selectedOption.label });
+    // setFormData({ ...formData, DISTRICT_CODE: selectedOption.value });
+    // setFormData({ ...formData, DISTRICT_NAME: selectedOption.label });
     setSelectedOptionIotDistrict(selectedOption);
     ListOfIotCity(selectedOption.value)
   }
@@ -208,10 +209,13 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const handleChangeIotCity = (selectedOption) => {
     dispatch(setComplexIotList([]));
     console.log('handleChangeIotCity',selectedOption);
-    setFormData({ ...formData, CITY_CODE: selectedOption.value });
-    setFormData({ ...formData, CITY_NAME: selectedOption.label });
     setFormData({ ...formData, Parent: selectedOption.value });
     setSelectedOptionIotCity(selectedOption);
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      CITY_NAME: selectedOption.label,
+      CITY_CODE: selectedOption.value,
+  }));
   }
 
   const handleError = (err, Custommessage, onclick = null) => {
@@ -579,19 +583,68 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     }
   }
 
+  const ListOfIotComplex = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-complex";
+      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result',result);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setComplexIotList(options));
+      return options;
+    } catch (error) {
+      handleError(error, 'Error ListOfIotComplex')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const formatted3DigitNumber = async (Count) => {
+    let strCount = "";
+    if(Count<10)
+        strCount = "00" + Count;
+    else if(Count<100)
+        strCount = "0" + Count;
+    else
+        strCount = "" + Count;
+    return strCount;
+  }
+
+  const setUUID = async (count) => {
+    let strCount = await formatted3DigitNumber(count);
+    let UUID;
+    let date = formData.DATE.replace("/", "");
+    UUID = formData.CITY_CODE;
+    UUID += "_" + date.replace("/", "_");
+    UUID += "_" + strCount;
+    return UUID;
+  }
+
   const handleVerify = async () => {
     try {
-      if(formData.Name){
+      if(formData.Name && selectedOptionIotCity.value && selectedOptionIotDistrict.value && selectedOption.value && formData.DATE ){
         setFormData(prevFormData => ({
-          ...prevFormData,
-          CITY_NAME: selectedOptionIotCity.label,
-          CITY_CODE: selectedOptionIotCity.value,
-          DISTRICT_CODE: selectedOptionIotDistrict.value,
-          DISTRICT_NAME: selectedOptionIotDistrict.label,
-          STATE_CODE: selectedOption.value,
-          STATE_NAME: selectedOption.label
-      }));
-  
+            ...prevFormData,
+            DISTRICT_CODE: selectedOptionIotDistrict.value,
+            DISTRICT_NAME: selectedOptionIotDistrict.label,
+            STATE_CODE: selectedOption.value,
+            STATE_NAME: selectedOption.label
+        }));
+
+      if(selectedOptionIotCity.value) {
+        let complexList = await ListOfIotComplex(selectedOptionIotCity.value);
+        console.log('complexList', complexList.length);
+        let uuid = await setUUID(complexList.length);
+        console.log('uuid' , uuid);
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            UUID: uuid,
+        }));
+      }
         dispatch(startLoading());
         let command = "List-iot-all-complex";
         var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
