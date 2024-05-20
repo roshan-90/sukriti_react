@@ -247,6 +247,10 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   console.log('selected', selected);
 
   const toggle = () => {
+    dispatch(setStateIotList([]));
+    dispatch(setDistrictIotList([]));
+    dispatch(setCityIotList([]));
+    dispatch(setComplexIotList([]));
     setModal(!modal)
     setModalToggle(false)
   };
@@ -311,7 +315,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       let command = "add-iot-complex";
       var result = await executeCreateComplexLambda(user.username, user?.credentials, command, value, name, parent);
       console.log('result ClientName', result.body);
-  
+      toggle();
     } catch (error) {
       handleError(error, 'Error createComplex')
     } finally {

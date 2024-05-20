@@ -311,6 +311,10 @@ export default function EnrollDevice() {
     setRegisterComplex(!registerComplex);
   }
 
+  const openCabinModal = () => {
+    setDialogCabinDetails(!dialogCabinDetails);
+  }
+
   const ListOfIotCabin = async (value) => {
     try {
         console.log('selectedOptionIotComplex',value);
@@ -334,8 +338,9 @@ export default function EnrollDevice() {
       var result = await executelistIotCabinDynamicLambda(user?.username, user?.credentials, value, command);
       console.log('result',result.body);
       dispatch(setCabinDetails(result.body));
+      openCabinModal();
     } catch (error) {
-      handleError(error, 'Error ListOfIotCabin')
+      handleError(error, 'Error handleCabinDetails')
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -414,10 +419,10 @@ export default function EnrollDevice() {
               {activeStep === 1 && (
                  <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                   {dialogCabinDetails &&(
-                    <ReadCabinDetails dialogCabinDetails={dialogCabinDetails} setDialogCabinDetails={setDialogCabinDetails}/>
+                    <ReadCabinDetails dialogCabinDetails={dialogCabinDetails} setDialogCabinDetails={openCabinModal}/>
                   )}
                  {cabinList && cabinList.map((cabin, index) => (
-                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'darkgray', width: '100%' }} className="cabin-row clickable-row" onClick={() => handleCabinDetails(cabin)}
+                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handleCabinDetails(cabin)}
                   >
                     <Col xs="auto" className="cabin-icon-col">
                       <BiMaleFemale />
