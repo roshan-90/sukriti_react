@@ -11,3 +11,34 @@
     width: 286%;
 
 }
+
+.cabin-row {
+    margin-bottom: 10px;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+  }
+  
+  .cabin-icon-col {
+    padding-right: 10px;
+  }
+  
+  .cabin-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  
+  .cabin-text {
+    font-size: 1rem;
+  }
+
+  .clickable-row {
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s;
+  }
+  
+  .clickable-row:hover {
+    background-color: lightblue; /* Optional: change background color on hover */
+  }

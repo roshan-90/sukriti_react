@@ -5,17 +5,18 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import {
   executelistIotSingleLambda,
-  executelistIotDynamicLambda
+  executelistIotDynamicLambda,
+  executelistIotCabinDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
-import {
-  Card,
-} from "reactstrap";
+// import {
+//   Card,
+// } from "reactstrap";
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import { selectUser } from "../../features/authenticationSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -23,6 +24,8 @@ import Select from 'react-select'; // Importing react-select
 import UpdateComplex from './UpdateComplex'
 import RegisterComplex from './RegisterComplex';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import { Card, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, CardLink ,Row,Col} from 'reactstrap';
+import { BiMaleFemale } from "react-icons/bi";
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
 
@@ -38,7 +41,7 @@ export default function EnrollDevice() {
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const [complexChanged, setComplexChanged] = useState(false);
   const [registerComplex, setRegisterComplex] = useState(false);
-
+  const cabinList = useSelector((state) => state.androidManagement.cabinList);
   const [dialogData, setDialogData] = useState(null);
 
 
@@ -243,6 +246,7 @@ export default function EnrollDevice() {
     ListOfIotClientName();
     ListOfIotBillingGroup();
     setComplexChanged(true)
+    ListOfIotCabin(selectedOption.value);
   }
 
   const totalSteps = () => {
@@ -304,6 +308,37 @@ export default function EnrollDevice() {
 
   const OpenRegisterModal = () => {
     setRegisterComplex(!registerComplex);
+  }
+
+  const ListOfIotCabin = async (value) => {
+    try {
+        console.log('selectedOptionIotComplex',value);
+      dispatch(startLoading());
+      let command = "list-iot-thing";
+      var result = await executelistIotCabinDynamicLambda(user?.username, user?.credentials, value, command);
+      console.log('result',result.body.things);
+      dispatch(setCabinList(result.body.things));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotCabin')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const handleCabinDetails = async (value) => {
+    console.log('value',value);
+    return
+    try {
+      dispatch(startLoading());
+      let command = "describe-iot-thing";
+      var result = await executelistIotCabinDynamicLambda(user?.username, user?.credentials, value, command);
+      console.log('result',result.body);
+      dispatch(setCabinDetails(result.body));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotCabin')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
   }
 
 
@@ -376,7 +411,18 @@ export default function EnrollDevice() {
                 </div>
               )}
               {activeStep === 1 && (
-                <h2>this is step 2</h2>
+                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                 {cabinList && cabinList.map((cabin, index) => (
+                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'cornflowerblue', width: '100%' }} className="cabin-row clickable-row" onClick={handleCabinDetails(cabin)}>
+                    <Col xs="auto" className="cabin-icon-col">
+                      <BiMaleFemale />
+                    </Col>
+                    <Col className="cabin-text">
+                      <span>{cabin}</span>
+                    </Col>
+                  </Row>
+                ))}
+               </div>
               )}
             </CardContent>
           </Card>
