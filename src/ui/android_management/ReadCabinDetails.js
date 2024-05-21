@@ -17,7 +17,7 @@ import { setResetData } from "../../features/androidManagementSlice";
 
 export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) => { // Receive dialogCabinDetails as a prop
   const [modal, setModal] = useState(true);
-  const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+  const cabinDetails = useSelector((state) => state.androidManagement.cabinDetails);
   const ListclientName = useSelector((state) => state.androidManagement.clientName);
   const ListbillingGroups = useSelector((state) => state.androidManagement.billingGroups);
   const complexName = useSelector((state) => state.androidManagement.complexName);
@@ -29,6 +29,7 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
   const user = useSelector(selectUser);
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const complexIotDetail = useSelector((state) => state.androidManagement.complexIotDetail);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -42,93 +43,12 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
     { value: false, label: 'False' }
   ];
 
-
-  const [formData, setFormData] = useState({
-    ADDR : "",
-    ARSR : "",
-    AR_K : "",
-    BILL : "",
-    CITY_CODE : "",
-    CITY_NAME : "",
-    CIVL : "",
-    CLNT : "",
-    COCO : "",
-    CWTM : "",
-    DATE : "",
-    DEVT : "",
-    DISTRICT_CODE : "",
-    DISTRICT_NAME : "",
-    LATT : "",
-    LONG : "",
-    MANU : "", 
-    MODIFIED_BY : "",
-    MSNI : "",
-    MSNV : "",
-    ONMP : "",
-    QBWT : "",
-    QFWC : "",
-    QMWC : "",
-    QPWC : "",
-    QSNI : "",
-    QSNV : "",
-    QURC : "",
-    QURI : "",
-    ROUTER_IMEI : "",
-    ROUTER_MOBILE : "",
-    SLVL : "",
-    STATE_CODE : "",
-    STATE_NAME : "",
-    TECH : "",
-    THINGGROUPTYPE : "", 
-    UUID : ""
-  });
-
+  console.log('cabinDetails',cabinDetails);
+  
   useEffect(() => {
-    if(ComplexIotDetails){
-      setFormData({
-        ADDR : ComplexIotDetails.ADDR,
-        ARSR : ComplexIotDetails.ARSR,
-        AR_K : ComplexIotDetails.AR_K,
-        BILL : ComplexIotDetails.BILL,
-        CITY_CODE : ComplexIotDetails.CITY_CODE,
-        CITY_NAME : ComplexIotDetails.CITY_NAME,
-        CIVL : ComplexIotDetails.CIVL,
-        CLNT : ComplexIotDetails.CLNT,
-        COCO : ComplexIotDetails.COCO,
-        CWTM : ComplexIotDetails.CWTM,
-        DATE : ComplexIotDetails.DATE,
-        DEVT : ComplexIotDetails.DEVT,
-        DISTRICT_CODE : ComplexIotDetails.DISTRICT_CODE,
-        DISTRICT_NAME : ComplexIotDetails.DISTRICT_NAME,
-        LATT : ComplexIotDetails.LATT,
-        LONG : ComplexIotDetails.LONG,
-        MANU : ComplexIotDetails.MANU, 
-        MODIFIED_BY : ComplexIotDetails.MODIFIED_BY,
-        MSNI : ComplexIotDetails.MSNI,
-        MSNV : ComplexIotDetails.MSNV,
-        ONMP : ComplexIotDetails.ONMP,
-        QBWT : ComplexIotDetails.QBWT,
-        QFWC : ComplexIotDetails.QFWC,
-        QMWC : ComplexIotDetails.QMWC,
-        QPWC : ComplexIotDetails.QPWC,
-        QSNI : ComplexIotDetails.QSNI,
-        QSNV : ComplexIotDetails.QSNV,
-        QURC : ComplexIotDetails.QURC,
-        QURI : ComplexIotDetails.QURI,
-        ROUTER_IMEI : ComplexIotDetails.ROUTER_IMEI,
-        ROUTER_MOBILE : ComplexIotDetails.ROUTER_MOBILE,
-        SLVL : ComplexIotDetails.SLVL,
-        STATE_CODE : ComplexIotDetails.STATE_CODE,
-        STATE_NAME : ComplexIotDetails.STATE_NAME,
-        TECH : ComplexIotDetails.TECH,
-        THINGGROUPTYPE : ComplexIotDetails.THINGGROUPTYPE, 
-        UUID : ComplexIotDetails.UUID
-      })
-    }
-
-    // Check if ComplexIotDetails is available and DATE is in the correct format
-    if (ComplexIotDetails && ComplexIotDetails.DATE) {
-      const initialDateString = ComplexIotDetails.DATE;
+    // Check if cabinDetails is available and DATE is in the correct format
+    if (cabinDetails && cabinDetails.DATE) {
+      const initialDateString = cabinDetails.DATE;
       const dateParts = initialDateString.split("/");
       if (dateParts.length === 3) {
         // Parse the initial date string into a Date object
@@ -136,28 +56,10 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
         setSelectedDate(initialDate);
       }
     } else {
-      // If ComplexIotDetails or DATE is not available, set the initial date to the current date
+      // If cabinDetails or DATE is not available, set the initial date to the current date
       setSelectedDate(new Date());
     }
-  }, [ComplexIotDetails]);
-
-  
-  // useEffect(() => {
-  //   // Find the option corresponding to ComplexIotDetails.SLVL
-  //   const selectedOption = smartnessLevels.find(option => option.value === ComplexIotDetails.SLVL);
-  //   // If the option is found, set it as the smartnessLevel, otherwise set it to null
-  //   setSelectedSmartness(selectedOption || null);
-  // }, [ComplexIotDetails.SLVL]);
-
-
-  // useEffect(() => {
-  //   if(ListclientName && ListbillingGroups ) {
-  //     const selectedClientOption = ListclientName.find(option => option.value === ComplexIotDetails.CLNT)
-  //     const selectetBillingOption = ListbillingGroups.find(option => option.value === ComplexIotDetails.BILL)
-  //     setSelectedClientName(selectedClientOption || null);
-  //     setSelectedbillingGroups(selectetBillingOption || null);
-  //   }
-  // },[ListclientName,ListbillingGroups])
+  }, [cabinDetails]);
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -183,130 +85,124 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
     }
   };
 
-  // console.log('ComplexIotDetails',ComplexIotDetails);
-  // console.log('ListclientName',ListclientName);
-  // console.log('selected', selected);
-
   const toggle = () => {
     setModal(!modal)
     setDialogCabinDetails(false)
   };
 
-  const handleChangeClientName = (selectedOption) => {
-    console.log('handleChangeClientName',selectedOption)
-    setFormData({ ...formData, CLNT: selectedOption.value });
-    setSelectedClientName(selectedOption)
+  // const handleChangeClientName = (selectedOption) => {
+  //   console.log('handleChangeClientName',selectedOption)
+  //   setFormData({ ...formData, CLNT: selectedOption.value });
+  //   setSelectedClientName(selectedOption)
 
-  }
+  // }
 
-  const handleChangeBillingGroup = (selectedOption) => {
-    console.log('handleChangeBillingGroup',selectedOption)
-    setFormData({ ...formData, BILL: selectedOption.value });
-    setSelectedbillingGroups(selectedOption)
-  }
+  // const handleChangeBillingGroup = (selectedOption) => {
+  //   console.log('handleChangeBillingGroup',selectedOption)
+  //   setFormData({ ...formData, BILL: selectedOption.value });
+  //   setSelectedbillingGroups(selectedOption)
+  // }
 
-  const handleChangeSmartnessLevel = (selectedOption) => {
-    console.log('handleChangeSmartnessLevel',selectedOption);
-    setFormData({ ...formData, SLVL: selectedOption.value });
-    setSelectedSmartness(selectedOption)
-  }
+  // const handleChangeSmartnessLevel = (selectedOption) => {
+  //   console.log('handleChangeSmartnessLevel',selectedOption);
+  //   setFormData({ ...formData, SLVL: selectedOption.value });
+  //   setSelectedSmartness(selectedOption)
+  // }
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    const formattedDate = formatDate(date);
-    console.log('formattedDate',formattedDate);
-    setFormData({ ...formData, DATE: formattedDate });
-  };
+  // const handleDateChange = (date) => {
+  //   setSelectedDate(date);
+  //   const formattedDate = formatDate(date);
+  //   console.log('formattedDate',formattedDate);
+  //   setFormData({ ...formData, DATE: formattedDate });
+  // };
 
   // Update form state when form values change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    console.log('cheking :->', { name, value });
-    setFormData({ ...formData, [name]: value });
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   console.log('cheking :->', { name, value });
+  //   setFormData({ ...formData, [name]: value });
+  // };
 
 
-  const formatDate = (date) => {
-    // Format the date to 'dd/MM/yyyy' format
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
+  // const formatDate = (date) => {
+  //   // Format the date to 'dd/MM/yyyy' format
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const year = date.getFullYear();
+  //   return `${day}/${month}/${year}`;
+  // };
 
-  const updateComplex = async (value) => {
-    try {
-      if(!complexName) {
-        setDialogData({
-          title: "Error",
-          message: "complex is not Selected",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log('complex is not select');
-          },
-        });
-        return
-      }
-      dispatch(startLoading());
-      let command = "update-iot-complex";
-      var result = await executeUpdateComplexLambda('test_rk_mandi', user?.credentials, command, value, complexName);
-      console.log('result ClientName', result.body);
+  // const updateComplex = async (value) => {
+  //   try {
+  //     if(!complexName) {
+  //       setDialogData({
+  //         title: "Error",
+  //         message: "complex is not Selected",
+  //         onClickAction: () => {
+  //           // Handle the action when the user clicks OK
+  //           console.log('complex is not select');
+  //         },
+  //       });
+  //       return
+  //     }
+  //     dispatch(startLoading());
+  //     let command = "update-iot-complex";
+  //     var result = await executeUpdateComplexLambda('test_rk_mandi', user?.credentials, command, value, complexName);
+  //     console.log('result ClientName', result.body);
       
-    } catch (error) {
-      handleError(error, 'Error ListOfIotClientName')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
+  //   } catch (error) {
+  //     handleError(error, 'Error ListOfIotClientName')
+  //   } finally {
+  //     dispatch(stopLoading()); // Dispatch the stopLoading action
+  //   }
+  // }
 
-  const submitForm = (e) => {
-      const outputArray = [];
-      for (const key in formData) {
-          if (formData.hasOwnProperty(key)) {
-              const value = formData[key];
-              outputArray.push({ "Name": key, "Value": value });
-          }
-      }
-    console.log('formData',outputArray)
-    updateComplex(outputArray);
-  }
+  // const submitForm = (e) => {
+  //     const outputArray = [];
+  //     for (const key in formData) {
+  //         if (formData.hasOwnProperty(key)) {
+  //             const value = formData[key];
+  //             outputArray.push({ "Name": key, "Value": value });
+  //         }
+  //     }
+  //   console.log('formData',outputArray)
+  //   updateComplex(outputArray);
+  // }
 
-  const deleteComplex = async() => {
-    try{
-      console.log('deleted complex');
-      let command = "delete-iot-complex";
-      var result = await executelistIotDynamicLambda('dev_000000', user?.credentials, complexName, command );
-      console.log('result deleteComplex', result.body);
-      setDialogData({
-        title: "Deleted",
-        message: result.body,
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          toggle();        },
-      });
-      } catch (error) {
-        handleError(error, 'Error deleteComplex')
-      } finally {
-        dispatch(stopLoading()); // Dispatch the stopLoading action
-      }
-  }
+  // const deleteComplex = async() => {
+  //   try{
+  //     console.log('deleted complex');
+  //     let command = "delete-iot-complex";
+  //     var result = await executelistIotDynamicLambda('dev_000000', user?.credentials, complexName, command );
+  //     console.log('result deleteComplex', result.body);
+  //     setDialogData({
+  //       title: "Deleted",
+  //       message: result.body,
+  //       onClickAction: () => {
+  //         // Handle the action when the user clicks OK
+  //         toggle();        },
+  //     });
+  //     } catch (error) {
+  //       handleError(error, 'Error deleteComplex')
+  //     } finally {
+  //       dispatch(stopLoading()); // Dispatch the stopLoading action
+  //     }
+  // }
 
-  const setWarnings = () => {
-    setDialogData({
-      title: "Confirms",
-      message: `Are you Sure Delete ${complexName} Complex`,
-      onClickAction: () => {
-        // Handle the action when the user clicks OK
-        console.log('delete complex');
-        deleteComplex();
-      },
-    });
-  }
-
-
+  // const setWarnings = () => {
+  //   setDialogData({
+  //     title: "Confirms",
+  //     message: `Are you Sure Delete ${complexName} Complex`,
+  //     onClickAction: () => {
+  //       // Handle the action when the user clicks OK
+  //       console.log('delete complex');
+  //       deleteComplex();
+  //     },
+  //   });
+  // }
 
   console.log('dialogCabinDetails',dialogCabinDetails);
-  console.log('formData',formData);
+  // console.log('formData',formData);
   return (
     <div>
       {(dialogCabinDetails) && ( // Conditionally render based on dialogCabinDetails prop
@@ -330,55 +226,55 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                   <Form>
                   <FormGroup row>
                     <Label
-                      for="State"
+                      for="STATE"
                       sm={2}
                     >
-                      <b style={{fontSize:"small"}}>State</b>
+                      <b style={{fontSize:"small"}}>STATE</b>
                     </Label>
                     <Col sm={10}>
                       <Input
-                        id="state"
-                        name="state"
-                        placeholder="state"
+                        id="STATE"
+                        name="STATE"
+                        placeholder="STATE"
                         type="text"
                         disabled={true}
-                        value={ComplexIotDetails.STATE_NAME}
+                        value={cabinDetails.attributes.STATE}
                       />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Label
-                      for="District"
+                      for="DISTRICT"
                       sm={2}
                     >
-                    <b style={{fontSize:"small"}}> District</b>
+                    <b style={{fontSize:"small"}}> DISTRICT </b>
                     </Label>
                     <Col sm={10}>
                       <Input
-                        id="district"
-                        name="district"
-                        placeholder="district"
+                        id="DISTRICT"
+                        name="DISTRICT"
+                        placeholder="DISTRICT"
                         type="text"
                         disabled={true}
-                        value={ComplexIotDetails.DISTRICT_NAME}
+                        value={cabinDetails.attributes.DISTRICT}
                       />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Label
-                      for="City"
+                      for="CITY"
                       sm={2}
                     >
-                    <b style={{fontSize:"small"}}> City </b>
+                    <b style={{fontSize:"small"}}> CITY </b>
                     </Label>
                     <Col sm={10}>
                       <Input
-                        id="city"
-                        name="city"
+                        id="CITY"
+                        name="CITY"
                         placeholder="city"
                         type="text"
                         disabled={true}
-                        value={ComplexIotDetails.CITY_NAME}
+                        value={cabinDetails.attributes.CITY}
                       />
                     </Col>
                   </FormGroup>
@@ -396,7 +292,7 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                         placeholder="complex"
                         type="text"
                         disabled={true}
-                        value={""}
+                        value={cabinDetails.attributes.COMPLEX}
                       />
                     </Col>
                   </FormGroup>
@@ -424,7 +320,7 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                           placeholder="Cabin name"
                           type="text"
                           disabled={true}
-                          value={""}
+                          value={cabinDetails.thingName}
                         />                      
                       </Col>
                     </FormGroup>
@@ -432,7 +328,7 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                       <Label
                         for="Cabin Type"
                         sm={2}
-                      >
+                        >
                       <b style={{fontSize:"small"}}>  Cabin Type</b>
                       </Label>
                       <Col sm={10}>
@@ -442,46 +338,79 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                             placeholder="Cabin type"
                             type="text"
                             disabled={true}
-                            value={""}
+                            value={cabinDetails.thingTypeName}
                           />                         
                       </Col>
                     </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="BWT Capacity"
-                        sm={2}
-                      >
-                      <b style={{fontSize:"small"}}> BWT Capacity</b>
-                      </Label>
-                      <Col sm={10}>
-                        <Input
-                            id="bwt_capacity"
-                            name="cabin_type"
-                            placeholder="BWT Capacity"
-                            type="text"
-                            disabled={true}
-                            value={""}
-                          />                         
-                      </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="BWT Level"
-                        sm={2}
-                      >
-                      <b style={{fontSize:"small"}}> BWT Level</b>
-                      </Label>
-                      <Col sm={10}>
-                        <Input
-                            id="bwt_level"
-                            name="cabin_type"
-                            placeholder="BWT Level"
-                            type="text"
-                            disabled={true}
-                            value={""}
-                          />                         
-                      </Col>
-                    </FormGroup>
+                    {cabinDetails.thingTypeName === "WC" && (
+                      <>
+                        <FormGroup row>
+                          <Label for="User Type" sm={2}>
+                            <b style={{ fontSize: "small" }}>User Type</b>
+                          </Label>
+                          <Col sm={10}>
+                            <Input
+                              id="user_type"
+                              name="user_type"
+                              placeholder="User type"
+                              type="text"
+                              disabled={true}
+                              value={cabinDetails.attributes.USER_TYPE}
+                            />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for="Usage Charge Type" sm={2}>
+                            <b style={{ fontSize: "small" }}>Usage Charge Type</b>
+                          </Label>
+                          <Col sm={10}>
+                            <Input
+                              id="usage_charge_type"
+                              name="usage_charge_type"
+                              placeholder="Usage Charge Type"
+                              type="text"
+                              disabled={true}
+                              value={cabinDetails.attributes.USAGE_CHARGE}
+                            />
+                          </Col>
+                        </FormGroup>
+                      </>
+                    )}
+
+                    {cabinDetails.thingTypeName === "BWT" && (
+                      <>
+                        <FormGroup row>
+                          <Label for="BWT Capacity" sm={2}>
+                            <b style={{ fontSize: "small" }}>BWT Capacity</b>
+                          </Label>
+                          <Col sm={10}>
+                            <Input
+                              id="bwt_capacity"
+                              name="bwt_capacity"
+                              placeholder="BWT Capacity"
+                              type="text"
+                              disabled={true}
+                              value={cabinDetails.attributes.BWT_KLD}
+                            />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for="BWT Level" sm={2}>
+                            <b style={{ fontSize: "small" }}>BWT Level</b>
+                          </Label>
+                          <Col sm={10}>
+                            <Input
+                              id="bwt_level"
+                              name="bwt_level"
+                              placeholder="BWT Level"
+                              type="text"
+                              disabled={true}
+                              value={cabinDetails.attributes.BWT_LVL}
+                            />
+                          </Col>
+                        </FormGroup>
+                      </>
+                    )}
                     </Form>
                 </CardBody>
               </Card>
@@ -505,7 +434,7 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                           placeholder="UUID"
                           type="text"
                           disabled={true}
-                          value={formData.DEVT}
+                          value={complexIotDetail.UUID}
                         />                      
                       </Col>
                     </FormGroup>
@@ -523,7 +452,7 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                         placeholder="COCO"
                         type="text"
                         disabled={true}
-                        value={formData.COCO}
+                        value={complexIotDetail.COCO}
                       />
                       </Col>
                     </FormGroup>
@@ -533,10 +462,17 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                         for="Smartness Level"
                         sm={3}
                       >
-                      <b style={{fontSize:"small"}}> Smartness Level</b>
+                        <b style={{fontSize:"small"}}>Commissioning Status</b>
                       </Label>
                       <Col sm={9}>
-                          <Select options={smartnessLevels || []} value={selectedSmartness} onChange={handleChangeSmartnessLevel} placeholder="Smartness Level" />
+                      <Input
+                        id="SMART_LEVEL"
+                        name="SMART_LEVEL"
+                        placeholder="SMART_LEVEL"
+                        type="text"
+                        disabled={true}
+                        value={cabinDetails.attributes.SMART_LEVEL}
+                      />
                       </Col>
                     </FormGroup>
                       <FormGroup row>                    
@@ -556,9 +492,9 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                                 name="QMWC"
                                 placeholder="Number of Male WC's"
                                 type="text"
-                                value={formData.QMWC}
-                                onChange={handleChange}
-                              />
+                                value={complexIotDetail.QMWC}
+                                disabled={true}
+                                />
                             </FormGroup>
                           </Col>
                           <Col md={3}>
@@ -571,9 +507,9 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                                 name="QFWC"
                                 placeholder="Number of female WC's"
                                 type="text"
-                                value={formData.QFWC}
-                                onChange={handleChange}
-                              />
+                                value={complexIotDetail.QFWC}
+                                disabled={true}
+                                />
                             </FormGroup>
                           </Col>
                           <Col md={3}>
@@ -586,10 +522,10 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                                 name="QPWC"
                                 placeholder="Number of PD WC's"
                                 type="text"
-                                value={formData.
+                                value={complexIotDetail.
                                   QPWC}
-                                onChange={handleChange}
-                              />
+                                  disabled={true}
+                                  />
                             </FormGroup>
                           </Col>
                       </FormGroup>
@@ -610,9 +546,9 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                                 name="QURI"
                                 placeholder="latitude"
                                 type="text"
-                                value={formData.QURI}
-                                onChange={handleChange}
-                              />
+                                value={complexIotDetail.QURI}
+                                disabled={true}
+                                />
                             </FormGroup>
                           </Col>
                           <Col md={3}>
@@ -625,9 +561,9 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                                 name="QURC"
                                 placeholder="Number of Urinal Cabins"
                                 type="text"
-                                value={formData.QURC}
-                                onChange={handleChange}
-                              />
+                                value={complexIotDetail.QURC}
+                                disabled={true}
+                                />
                             </FormGroup>
                           </Col>
                           <Col md={3}>
@@ -640,9 +576,9 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                                 name="QBWT"
                                 placeholder="Number of BWTs"
                                 type="text"
-                                value={formData.QBWT}
-                                onChange={handleChange}
-                              />
+                                value={complexIotDetail.QBWT}
+                                disabled={true}
+                                />
                             </FormGroup>
                           </Col>
                       </FormGroup>
@@ -664,11 +600,11 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                         </Label>
                         <Col sm={10}>
                           <Input
-                            id="ADDR"
-                            name="ADDR"
+                            id="ADDRESS"
+                            name="ADDRESS"
                             type="textarea"
-                            value={formData.ADDR}
-                            onChange={handleChange}
+                            disabled={true}
+                            value={cabinDetails.attributes.ADDRESS}
                           />
                         </Col>
                     </FormGroup>
@@ -681,31 +617,31 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                         </Label>
                         <Col md={5}>
                           <FormGroup>
-                            <Label for="lattitude">
-                              Latitude
+                            <Label for="LATITUDE">
+                            LATITUDE
                             </Label>
                             <Input
-                              id="LATT"
-                              name="LATT"
-                              placeholder="latitude"
+                              id="LATITUDE"
+                              name="LATITUDE"
+                              placeholder="LATITUDE"
                               type="text"
-                              value={formData.LATT}
-                              onChange={handleChange}
-                            />
+                              value={cabinDetails.attributes.LATITUDE}
+                              disabled={true}
+                              />
                           </FormGroup>
                         </Col>
                         <Col md={5}>
                           <FormGroup>
-                            <Label for="longitude">
-                              Longitude
+                            <Label for="LONGITUDE">
+                            LONGITUDE
                             </Label>
                             <Input
-                              id="LONG"
-                              name="LONG"
-                              placeholder="longitude placeholder"
+                              id="LONGITUDE"
+                              name="LONGITUDE"
+                              placeholder="LONGITUDE placeholder"
                               type="text"
-                              value={formData.LONG}
-                              onChange={handleChange}
+                              value={cabinDetails.attributes.LONGITUDE}
+                              disabled={true}
                             />
                           </FormGroup>
                         </Col>
@@ -719,7 +655,14 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                       </Label>
 
                       <Col sm={10}>
-                      <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
+                        <Input
+                              id="CLIENT"
+                              name="CLIENT"
+                              placeholder="CLIENT placeholder"
+                              type="text"
+                              value={cabinDetails.attributes.CLIENT}
+                              disabled={true}
+                            /> 
                       </Col>
                     </FormGroup>
                     <FormGroup row>
@@ -730,8 +673,15 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                       <b style={{fontSize:"small"}}>  Billing Group</b>
                       </Label>
                       <Col sm={10}>
-                      <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
-                      </Col>
+                        <Input
+                              id="BILLING_GROUP"
+                              name="BILLING_GROUP"
+                              placeholder="BILLING_GROUP placeholder"
+                              type="text"
+                              value={cabinDetails.attributes.BILLING_GROUP}
+                              disabled={true}
+                            />                      
+                        </Col>
                     </FormGroup>
                     <FormGroup row>
                       <Label
@@ -743,8 +693,8 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
                       <Col sm={10} >
                       <DatePicker
                         id="selectDate"
-                        selected={selectedDate}
-                        onChange={handleDateChange}
+                        value={cabinDetails.attributes.DATE}
+                        disabled={true}
                         dateFormat="dd/MM/yyyy"
                         placeholderText="Select date"
                       />
@@ -769,12 +719,12 @@ export const ReadCabinDetails = ({ dialogCabinDetails , setDialogCabinDetails}) 
 
                       <Col sm={9}>
                         <Input
-                          id="ROUTER_IMEI"
-                          name="ROUTER_IMEI"
-                          placeholder="Router IMEI placeholder"
+                          id="CAMERA_SERIAL_NUM"
+                          name="CAMERA_SERIAL_NUM"
+                          placeholder="CAMERA_SERIAL_NUM placeholder"
                           type="text"
-                          value={formData.ROUTER_IMEI}
-                          onChange={handleChange}
+                          value={cabinDetails.attributes.CAMERA_SERIAL_NUM}
+                          disabled={true}
                         />
                       </Col>
                     </FormGroup>
