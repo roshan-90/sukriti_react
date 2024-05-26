@@ -27,6 +27,7 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import { Card, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, CardLink ,Row,Col} from 'reactstrap';
 import { BiMaleFemale } from "react-icons/bi";
 import ReadCabinDetails from './ReadCabinDetails';
+import RegisterCabin from './RegisterCabin';
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
 
@@ -42,6 +43,7 @@ export default function EnrollDevice() {
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const [complexChanged, setComplexChanged] = useState(false);
   const [registerComplex, setRegisterComplex] = useState(false);
+  const [registerCabin, setRegisterCabin] = useState(false);
   const cabinList = useSelector((state) => state.androidManagement.cabinList);
   const [dialogData, setDialogData] = useState(null);
   const [dialogCabinDetails, setDialogCabinDetails] = useState(false);
@@ -311,6 +313,10 @@ export default function EnrollDevice() {
     setRegisterComplex(!registerComplex);
   }
 
+  const OpenRegisterCabinModal = () => {
+    setRegisterCabin(!registerCabin);
+  }
+
   const openCabinModal = () => {
     setDialogCabinDetails(!dialogCabinDetails);
   }
@@ -421,6 +427,9 @@ export default function EnrollDevice() {
                   {dialogCabinDetails &&(
                     <ReadCabinDetails dialogCabinDetails={dialogCabinDetails} setDialogCabinDetails={openCabinModal}/>
                   )}
+                  {(registerCabin) && (
+                    <RegisterCabin openModal={registerCabin} selected={selectedOptionIotComplex} setModalToggle={OpenRegisterCabinModal} /> // Pass complexChanged as a prop
+                  )}
                  {cabinList && cabinList.map((cabin, index) => (
                   <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handleCabinDetails(cabin)}
                   >
@@ -432,8 +441,17 @@ export default function EnrollDevice() {
                     </Col>
                   </Row>
                 ))}
-               </div>
-              )}
+                <br />
+                {(registerCabin == false) && (
+                    <Button
+                      variant="contained"
+                      onClick={OpenRegisterCabinModal}
+                    >
+                      Register New Cabin
+                    </Button>
+                  )}
+                  </div>
+                )}
             </CardContent>
           </Card>
         )}
