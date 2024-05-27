@@ -20,7 +20,7 @@ import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { setResetData } from "../../features/androidManagementSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setCabinTypeList} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setCabinTypeList, setUserTypeList} from "../../features/androidManagementSlice";
 import ModalSelect from '../../dialogs/ModalSelect';
 import ModalClient from './ModalClient';
 import ModalBillingGroup from './ModalBillingGroup';
@@ -54,6 +54,9 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
   const [selectedDeviceType, setSelectedDeviceType] = useState(null);
   const cabinTypeList = useSelector((state) => state.androidManagement.cabinTypeList);
+  const userTypeList = useSelector((state) => state.androidManagement.userTypeList);
+  const [selectedUserType, setSelectedUserType] = useState(null);
+  const [selectedUserChargeType, setSelectedUserChargeType] = useState(null);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -62,6 +65,14 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     { label: 'Extra-Premium', value: 'Extra-Premium' }
   ];
 
+  const userChargeType = [
+    { label: 'None', value: 'None' },
+    { label: 'COIN', value: 'COIN' },
+    { label: 'COIN_RF', value: 'COIN_RF' },
+    { label: 'RF', value: 'RF' }
+  ];
+
+  
   const options = [
     { value: true, label: 'True' },
     { value: false, label: 'False' }
@@ -116,96 +127,10 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   useEffect(() => {
     if(complexName) {
       ListOfIotCabinType(complexName)
+      ListOfIotUserType(complexName)
     }
   },[complexName])
 
-  const ListOfIotState = async () => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-state";
-      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
-      console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.CODE,
-        label: item.NAME
-      }));
-      dispatch(setStateIotList(options));
-    } catch (error) {
-      handleError(error, 'Error ListOfIotState')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
-
-  const handleChangeIotState = (selectedOption) => {
-    console.log('check', selectedOption);
-    dispatch(setDistrictIotList([]));
-    dispatch(setCityIotList([]));
-    dispatch(setComplexIotList([]));
-    setSelectedOptionIotDistrict(null)
-    setSelectedOptionIotCity(null);
-    setSelectedOption(selectedOption); // Update state if selectedOption is not null
-    ListOfIotDistrict(selectedOption.value)
-    // setFormData({ ...formData,STATE_CODE:selectedOption.value});
-    // setFormData({ ...formData,STATE_NAME:selectedOption.label});
-  };
-
-  const handleChangeIotDistrict = (selectedOption) => {
-    dispatch(setCityIotList([]));
-    setSelectedOptionIotCity(null)
-    console.log('handleChangeIotDistrict',selectedOption);
-    // setFormData({ ...formData, DISTRICT_CODE: selectedOption.value });
-    // setFormData({ ...formData, DISTRICT_NAME: selectedOption.label });
-    setSelectedOptionIotDistrict(selectedOption);
-    ListOfIotCity(selectedOption.value)
-  }
-
-  const ListOfIotDistrict = async (value) => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-district";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
-      console.log('result',result);
-      console.log('result.body',result.body);
-      if(result.statusCode !== 404){
-        // Map raw data to react-select format
-        const options = result.body.map(item => ({
-          value: item.CODE,
-          label: item.NAME
-        }));
-        dispatch(setDistrictIotList(options));
-      }
-    } catch (error) {
-      handleError(error, 'Error ListOfIotDistrict')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
-  const ListOfIotCity = async (value) => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-city";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
-      console.log('result',result);
-      if(result.statusCode !== 404){
-        // Map raw data to react-select format
-        const options = result.body.map(item => ({
-          value: item.CODE,
-          label: item.NAME
-        }));
-        dispatch(setCityIotList(options));
-        ListOfIotClientName();
-        ListOfIotBillingGroup();
-      }
-    } catch (error) {
-      handleError(error, 'Error ListOfIotCity')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
 
   const ListOfIotCabinType = async (value) => {
     try {
@@ -221,6 +146,28 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
         label: item
       }));
       dispatch(setCabinTypeList(options))
+      }
+    } catch (error) {
+      handleError(error, 'Error ListOfIotCabinType')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotUserType = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-UserType";
+      var result = await executelistIotCabinDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result',result);
+      if(result.statusCode == 200){
+      console.log('result UserType', result.body);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item,
+        label: item
+      }));
+      dispatch(setUserTypeList(options))
       }
     } catch (error) {
       handleError(error, 'Error ListOfIotCabinType')
@@ -300,6 +247,16 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   const handleChangeDeviceType = (selectedOption) => {
     console.log('handleChangeDeviceType',selectedOption);
     setSelectedDeviceType(selectedOption)
+  }
+  
+  const handleChangeUserType = (selectedOption) => {
+    console.log('handleChangeUserType',selectedOption);
+    setSelectedUserType(selectedOption)
+  }
+
+  const handleChangeUserChargeType = (selectedOption) => {
+    console.log('handleChangeUserChargeType',selectedOption);
+    setSelectedUserChargeType(selectedOption);
   }
 
   const handleDateChange = (date) => {
@@ -902,6 +859,92 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                               <Select options={cabinTypeList || []} value={selectedDeviceType} onChange={handleChangeDeviceType} placeholder="Device Type" />
                           </Col>
                       </FormGroup>
+                      {selectedDeviceType?.value == "Wc" && (
+                      <>
+                        <FormGroup row>
+                          <Label for="User Type" sm={4}>
+                            <b style={{ fontSize: "small" }}>User Type</b>
+                          </Label>
+                          <Col sm={8}>
+                              <Select options={userTypeList || []} value={selectedUserType} onChange={handleChangeUserType} placeholder="User Type" />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for="Usage Charge Type" sm={4}>
+                            <b style={{ fontSize: "small" }}>Usage Charge Type</b>
+                          </Label>
+                          <Col sm={8}>
+                            <Select options={userChargeType || []} value={selectedUserChargeType} onChange={handleChangeUserChargeType} placeholder="Usage Charge Type" />
+                          </Col>
+                        </FormGroup>
+                      </>
+                    )}
+                    {selectedDeviceType?.value == "Urinal" && (  
+                      <>
+                        <FormGroup row>
+                          <Label for="User Type" sm={4}>
+                            <b style={{ fontSize: "small" }}>User Type</b>
+                          </Label>
+                          <Col sm={8}>
+                              <Select options={userTypeList || []} value={selectedUserType} onChange={handleChangeUserType} placeholder="User Type" />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for="Usage Charge Type" sm={4}>
+                            <b style={{ fontSize: "small" }}>Usage Charge Type</b>
+                          </Label>
+                          <Col sm={8}>
+                            <Select options={userChargeType || []} value={selectedUserChargeType} onChange={handleChangeUserChargeType} placeholder="Usage Charge Type" />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for="Urinal Count" sm={4}>
+                            <b style={{ fontSize: "small" }}>Urinal Count </b>
+                          </Label>
+                          <Col sm={8}>
+                            <Input
+                              id="urinal_count"
+                              name="urinal_count"
+                              placeholder="Urinal Count"
+                              type="text"
+                              required
+                            />
+                          </Col>
+                        </FormGroup>
+                      </>
+                    )}
+                    {selectedDeviceType?.value == "BWT" && (
+                      <>
+                        <FormGroup row>
+                          <Label for="BWT Capacity" sm={4}>
+                            <b style={{ fontSize: "small" }}>BWT Capacity</b>
+                          </Label>
+                          <Col sm={8}>
+                            <Input
+                              id="bwt_capacity"
+                              name="bwt_capacity"
+                              placeholder="BWT Capacity"
+                              type="text"
+                              required
+                            />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for="BWT Level" sm={4}>
+                            <b style={{ fontSize: "small" }}>BWT Level</b>
+                          </Label>
+                          <Col sm={8}>
+                            <Input
+                              id="bwt_level"
+                              name="bwt_level"
+                              placeholder="BWT Level"
+                              type="text"
+                              required
+                            />
+                          </Col>
+                        </FormGroup>
+                      </>
+                    )}
                     </Form>
                 </CardBody>
               </Card>

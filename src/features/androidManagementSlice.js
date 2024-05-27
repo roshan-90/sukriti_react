@@ -13,7 +13,8 @@ const initialState = {
   complexName: null,
   cabinList: [],
   cabinDetails: null,
-  cabinTypeList: []
+  cabinTypeList: [],
+  userTypeList: []
 };
 
 const androidManagementSlice = createSlice({
@@ -53,6 +54,9 @@ const androidManagementSlice = createSlice({
     setCabinTypeList: (state, action) => {
       state.cabinTypeList = action.payload;
     },
+    setUserTypeList: (state, action) => {
+      state.userTypeList = action.payload;
+    },
     setResetData: (state, action) => {
         state.stateIotList = [];
         state.districtIotList = [];
@@ -63,11 +67,12 @@ const androidManagementSlice = createSlice({
         state.billingGroups = null;
         state.complexName= null
         state.cabinTypeList = [];
+        state.userTypeList = [];
     },
   },
 });
 
-export const { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail, setResetData,setClientName, setBillingGroup,setComplexName, setCabinList, setCabinDetails , setCabinTypeList} =
+export const { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail, setResetData,setClientName, setBillingGroup,setComplexName, setCabinList, setCabinDetails , setCabinTypeList,setUserTypeList } =
 androidManagementSlice.actions;
 export const androidManagementState = (state) => state.androidManagement;
 
