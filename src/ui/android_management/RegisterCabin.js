@@ -12,14 +12,15 @@ import {
   executelistDDbCityLambda,
   executeAddDdbStateLambda,
   executeAddBillingroupLambda,
-  executeClientGroupLambda
+  executeClientGroupLambda,
+  executelistIotCabinDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { setResetData } from "../../features/androidManagementSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setCabinTypeList} from "../../features/androidManagementSlice";
 import ModalSelect from '../../dialogs/ModalSelect';
 import ModalClient from './ModalClient';
 import ModalBillingGroup from './ModalBillingGroup';
@@ -51,6 +52,8 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   const [modalBillingGroup, setModalBillingGroup] = useState(null);
   const [complexVerify, setComplexVerify ] = useState(null);
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
+  const [selectedDeviceType, setSelectedDeviceType] = useState(null);
+  const cabinTypeList = useSelector((state) => state.androidManagement.cabinTypeList);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -110,14 +113,11 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   console.log('ComplexIotDetails',ComplexIotDetails);
 
 
-  // useEffect(() => {
-  //   if(ListclientName && ListbillingGroups ) {
-  //     const selectedClientOption = ListclientName.find(option => option.value === ComplexIotDetails.CLNT)
-  //     const selectetBillingOption = ListbillingGroups.find(option => option.value === ComplexIotDetails.BILL)
-  //     setSelectedClientName(selectedClientOption || null);
-  //     setSelectedbillingGroups(selectetBillingOption || null);
-  //   }
-  // },[ListclientName,ListbillingGroups])
+  useEffect(() => {
+    if(complexName) {
+      ListOfIotCabinType(complexName)
+    }
+  },[complexName])
 
   const ListOfIotState = async () => {
     try {
@@ -207,6 +207,28 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     }
   }
 
+  const ListOfIotCabinType = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-CabinType";
+      var result = await executelistIotCabinDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      console.log('result',result);
+      if(result.statusCode == 200){
+      console.log('result CabinType', result.body);
+      // Map raw data to react-select format
+      const options = result.body.map(item => ({
+        value: item,
+        label: item
+      }));
+      dispatch(setCabinTypeList(options))
+      }
+    } catch (error) {
+      handleError(error, 'Error ListOfIotCabinType')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
   const handleChangeIotCity = (selectedOption) => {
     dispatch(setComplexIotList([]));
     console.log('handleChangeIotCity',selectedOption);
@@ -273,6 +295,11 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     console.log('handleChangeSmartnessLevel',selectedOption);
     setFormData({ ...formData, SLVL: selectedOption.value });
     setSelectedSmartness(selectedOption)
+  }
+
+  const handleChangeDeviceType = (selectedOption) => {
+    console.log('handleChangeDeviceType',selectedOption);
+    setSelectedDeviceType(selectedOption)
   }
 
   const handleDateChange = (date) => {
@@ -850,6 +877,42 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                     <Form>
                     <FormGroup row>
                       <Label
+                        for="Cabin Name"
+                        sm={4}
+                      >
+                        <b style={{fontSize:"small"}}>Cabin Name</b>
+                      </Label>
+                      <Col sm={8}>
+                      <Input
+                        id="cabin_name"
+                        name="cabin_name"
+                        placeholder="cabin_name"
+                        type="text"
+                      />
+                      </Col>
+                    </FormGroup>
+                      <FormGroup row>
+                        <Label
+                            for="Device Type"
+                            sm={4}
+                          >
+                          <b style={{fontSize:"small"}}> Device Type</b>
+                          </Label>
+                          <Col sm={8}>
+                              <Select options={cabinTypeList || []} value={selectedDeviceType} onChange={handleChangeDeviceType} placeholder="Device Type" />
+                          </Col>
+                      </FormGroup>
+                    </Form>
+                </CardBody>
+              </Card>
+              <br/>
+              <Card>
+                <CardBody>
+                    <CardTitle><b>Complex Attribute</b></CardTitle>
+                    <br/>
+                    <Form>
+                    <FormGroup row>
+                      <Label
                         for="commissioning status"
                         sm={4}
                       >
@@ -990,141 +1053,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                                 id="QBWT"
                                 name="QBWT"
                                 placeholder="Number of BWTs"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                      </FormGroup>
-                      <FormGroup row>                    
-                        <Label
-                            for="Napkin Vending Machine"
-                            sm={3}
-                          >
-                          <b style={{fontSize:"small"}} > Napkin Vending Machine </b>
-                          </Label>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label for="Number Napkin Vending Machine">
-                                 Napkin Vending Machine
-                              </Label>
-                              <Input
-                                id="QSNV"
-                                name="QSNV"
-                                placeholder="Number Napkin Vending Machine"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col md={5}>
-                            <FormGroup>
-                              <Label for="Manufacturer of Napkin VM">
-                                Manufacturer of Napkin VM
-                              </Label>
-                              <Input
-                                id="MSNV"
-                                name="MSNV"
-                                placeholder="Manufacturer of Napkin VM"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                      </FormGroup>
-                      <FormGroup row>                    
-                        <Label
-                            for="Napkin incinerator"
-                            sm={3}
-                          >
-                          <b style={{fontSize:"small"}}> Napkin incinerator</b>
-                          </Label>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label for="Number Napkin incinerator">
-                                Number Napkin incinerator
-                              </Label>
-                              <Input
-                                id="QSNI"
-                                name="QSNI"
-                                placeholder="Number Napkin incinerator"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col md={5}>
-                            <FormGroup>
-                              <Label for="Manufacturer of Napkin incinerator">
-                                Manufacturer of Napkin incinerator
-                              </Label>
-                              <Input
-                                id="MSNI"
-                                name="MSNI"
-                                placeholder="Manufacturer of Napkin incinerator"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                      </FormGroup>
-                      <FormGroup row>                    
-                        <Label
-                            for="Area of KIOSK"
-                            sm={3}
-                          >
-                          <b style={{fontSize:"small"}}> Area of KIOSK</b>
-                          </Label>
-                          <Col md={9}>
-                            <FormGroup>
-                              <Input
-                                id="AR_K"
-                                name="AR_K"
-                                placeholder="Area of KIOSK"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                      </FormGroup>
-                      <FormGroup row>                    
-                        <Label
-                            for="Water Atm Capacity"
-                            sm={3}
-                          >
-                          <b style={{fontSize:"small"}}> Water Atm Capacity</b>
-                          </Label>
-                          <Col md={8}>
-                            <FormGroup>
-                              
-                              <Input
-                                id="CWTM"
-                                name="CWTM"
-                                placeholder="LPH"
-                                type="text"
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col md={1}>
-                              <Label for="LPH">
-                                <b>LPH</b>
-                              </Label>
-                          </Col>
-                      </FormGroup>
-                      <FormGroup row>                    
-                        <Label
-                            for="Supervisior Room Size"
-                            sm={3}
-                          >
-                          <b style={{fontSize:"small"}}> Supervisior Room Size</b>
-                          </Label>
-                          <Col md={9}>
-                            <FormGroup>
-                              <Input
-                                id="ARSR"
-                                name="ARSR"
-                                placeholder="ARSR"
                                 type="text"
                                 onChange={handleChange}
                               />
