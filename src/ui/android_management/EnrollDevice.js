@@ -41,6 +41,7 @@ export default function EnrollDevice() {
   const cityIotList = useSelector((state) => state.androidManagement.cityIotList);
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+  const complexName = useSelector((state) => state.androidManagement.complexName);
   const [complexChanged, setComplexChanged] = useState(false);
   const [registerComplex, setRegisterComplex] = useState(false);
   const [registerCabin, setRegisterCabin] = useState(false);
@@ -442,7 +443,7 @@ export default function EnrollDevice() {
                   </Row>
                 ))}
                 <br />
-                {(registerCabin == false) && (
+                {(registerCabin == false && complexName) && (
                     <Button
                       variant="contained"
                       onClick={OpenRegisterCabinModal}

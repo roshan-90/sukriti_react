@@ -956,22 +956,40 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                     <Form>
                     <FormGroup row>
                       <Label
-                        for="commissioning status"
+                        for="UUID"
                         sm={4}
                       >
-                        <b style={{fontSize:"small"}}>Commissioning Status</b>
+                      <b style={{fontSize:"small"}}>UUID</b>
                       </Label>
                       <Col sm={8}>
-                      <Input
-                        id="COCO"
-                        name="COCO"
-                        placeholder="COCO"
-                        type="text"
-                        disabled={true}
-                        value={"false"}
-                      />
+                        <Input
+                          id="UUID"
+                          name="UUID"
+                          placeholder="UUID"
+                          type="text"
+                          disabled={true}
+                          value={ComplexIotDetails.UUID}
+                        />                      
                       </Col>
                     </FormGroup>
+                      <FormGroup row>
+                        <Label
+                          for="commissioning status"
+                          sm={4}
+                        >
+                          <b style={{fontSize:"small"}}>Commissioning Status</b>
+                        </Label>
+                        <Col sm={8}>
+                        <Input
+                          id="COCO"
+                          name="COCO"
+                          placeholder="COCO"
+                          type="text"
+                          disabled={true}
+                          value={"false"}
+                        />
+                        </Col>
+                      </FormGroup>
                     <FormGroup row>
                       <Label
                         for="Device Type"
@@ -1106,131 +1124,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                 </CardBody>
               </Card>
               <br/>
-              <Card>
-                <CardBody>
-                    <CardTitle><b>Partners & Providers</b></CardTitle>
-                    <br/>
-                    <Form>
-                    <FormGroup row>
-                      <Label
-                        for="Manufacturer"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>Manufacturer</b>
-                      </Label>
-
-                      <Col sm={9}>
-                        <Input
-                          id="MANU"
-                          name="MANU"
-                          placeholder="manufacturer placeholder"
-                          type="text"
-                          onChange={handleChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="Tech Provider"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>Tech Provider</b>
-                      </Label>
-
-                      <Col sm={9}>
-                        <Input
-                          id="TECH"
-                          name="TECH"
-                          placeholder="Tech Provider placeholder"
-                          type="text"
-                          onChange={handleChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="Civil Partner"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>Civil Partner</b>
-                      </Label>
-
-                      <Col sm={9}>
-                        <Input
-                          id="CIVL"
-                          name="CIVL"
-                          placeholder="CivilPartner placeholder"
-                          type="text"
-                          onChange={handleChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="O&M Partner"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>O&M Partner</b>
-                      </Label>
-
-                      <Col sm={9}>
-                        <Input
-                          id="ONMP"
-                          name="ONMP"
-                          placeholder="O&M Partner placeholder"
-                          type="text"
-                          onChange={handleChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    </Form>
-                </CardBody>
-              </Card>
-              <br/>
-              <Card>
-                <CardBody>
-                    <CardTitle><b>Router Details</b></CardTitle>
-                    <br/>
-                    <Form>
-                    <FormGroup row>
-                      <Label
-                        for="Router IMEI"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>Router IMEI</b>
-                      </Label>
-
-                      <Col sm={9}>
-                        <Input
-                          id="ROUTER_IMEI"
-                          name="ROUTER_IMEI"
-                          placeholder="Router IMEI placeholder"
-                          type="text"
-                          onChange={handleChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="Router Mobile"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>Router Mobile</b>
-                      </Label>
-
-                      <Col sm={9}>
-                        <Input
-                          id="ROUTER_MOBILE"
-                          name="ROUTER_MOBILE"
-                          placeholder="Router Mobile placeholder"
-                          type="text"
-                          onChange={handleChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    </Form>
-                </CardBody>
-              </Card>
+            
             </ModalBody>
             <ModalFooter>
               <Button color="danger" onClick={setWarnings}>

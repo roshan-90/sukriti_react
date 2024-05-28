@@ -674,6 +674,14 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
               return;
           }
           setComplexVerify(true);
+      } else {
+        setDialogData({
+          title: "Not Verified",
+          message: `Please Select Valid Input.`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            },
+          });
       }
     } catch (error) {
       handleError(error, 'Error handleVerify')
