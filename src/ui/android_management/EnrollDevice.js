@@ -24,7 +24,7 @@ import Select from 'react-select'; // Importing react-select
 import UpdateComplex from './UpdateComplex'
 import RegisterComplex from './RegisterComplex';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
-import { Card, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, CardLink ,Row,Col} from 'reactstrap';
+import { Card, Input, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, CardLink ,Row,Col} from 'reactstrap';
 import { BiMaleFemale } from "react-icons/bi";
 import ReadCabinDetails from './ReadCabinDetails';
 import RegisterCabin from './RegisterCabin';
@@ -61,6 +61,11 @@ export default function EnrollDevice() {
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
+  const [selectedCabin, setSelectedCabin] = useState(null);
+
+  const handleRadioChange = (cabin) => {
+    setSelectedCabin(cabin);
+  };
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -434,6 +439,15 @@ export default function EnrollDevice() {
                  {cabinList && cabinList.map((cabin, index) => (
                   <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handleCabinDetails(cabin)}
                   >
+                     <Col xs="auto">
+                      <Input
+                        type="radio"
+                        name="selectedCabin"
+                        value={cabin}
+                        checked={selectedCabin === cabin}
+                        onChange={() => handleRadioChange(cabin)}
+                      />
+                    </Col>
                     <Col xs="auto" className="cabin-icon-col">
                       <BiMaleFemale />
                     </Col>

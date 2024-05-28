@@ -1124,7 +1124,150 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                 </CardBody>
               </Card>
               <br/>
-            
+              <Card>
+              <CardBody>
+                    <CardTitle><b>Client Details</b></CardTitle>
+                    <br/>
+                    <Form>
+                      <FormGroup row>
+                        <Label
+                          for="Address"
+                          sm={2}
+                        >
+                        <b style={{fontSize:"small"}}> Address </b> 
+                        </Label>
+                        <Col sm={10}>
+                          <Input
+                            id="ADDRESS"
+                            name="ADDRESS"
+                            type="textarea"
+                            disabled={true}
+                            value={ComplexIotDetails.ADDR}
+                          />
+                        </Col>
+                    </FormGroup>
+                      <Row>
+                      <Label
+                          for="GeoLocation"
+                          sm={2}
+                        >
+                        <b style={{fontSize:"small"}}> Geo Location </b>
+                        </Label>
+                        <Col md={5}>
+                          <FormGroup>
+                            <Label for="LATITUDE">
+                            LATITUDE
+                            </Label>
+                            <Input
+                              id="LATITUDE"
+                              name="LATITUDE"
+                              placeholder="LATITUDE"
+                              type="text"
+                              value={ComplexIotDetails.LATT}
+                              disabled={true}
+                              />
+                          </FormGroup>
+                        </Col>
+                        <Col md={5}>
+                          <FormGroup>
+                            <Label for="LONGITUDE">
+                            LONGITUDE
+                            </Label>
+                            <Input
+                              id="LONGITUDE"
+                              name="LONGITUDE"
+                              placeholder="LONGITUDE placeholder"
+                              type="text"
+                              value={ComplexIotDetails.LONG}
+                              disabled={true}
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                    <FormGroup row>
+                      <Label
+                        for="client name"
+                        sm={2}
+                      >
+                        <b style={{fontSize:"small"}}>Client Name</b>
+                      </Label>
+
+                      <Col sm={10}>
+                        <Input
+                              id="CLIENT"
+                              name="CLIENT"
+                              placeholder="CLIENT placeholder"
+                              type="text"
+                              value={ComplexIotDetails.CLNT}
+                              disabled={true}
+                            /> 
+                      </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Billing Group"
+                        sm={2}
+                      >
+                      <b style={{fontSize:"small"}}>  Billing Group</b>
+                      </Label>
+                      <Col sm={10}>
+                        <Input
+                              id="BILLING_GROUP"
+                              name="BILLING_GROUP"
+                              placeholder="BILLING_GROUP placeholder"
+                              type="text"
+                              value={ComplexIotDetails.BILL}
+                              disabled={true}
+                            />                      
+                        </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                      <Label
+                        for="Date"
+                        sm={2}
+                      >
+                      <b style={{fontSize:"small"}}> Date </b>
+                      </Label>
+                      <Col sm={10} >
+                      <DatePicker
+                        id="selectDate"
+                        value={ComplexIotDetails.DATE}
+                        disabled={true}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Select date"
+                      />
+                      </Col>
+                    </FormGroup>
+                    </Form>
+                </CardBody>
+              </Card>
+              <br/>
+              <Card>
+                <CardBody>
+                    <CardTitle><b>Camera Details</b></CardTitle>
+                    <br/>
+                    <Form>
+                    <FormGroup row>
+                      <Label
+                        for="Camera Serial Num"
+                        sm={3}
+                      >
+                        <b style={{fontSize:"small"}}>Camera Serial Num</b>
+                      </Label>
+
+                      <Col sm={9}>
+                        <Input
+                          id="CAMERA_SERIAL_NUM"
+                          name="CAMERA_SERIAL_NUM"
+                          placeholder="Camera serial number"
+                          type="text"
+                        />
+                      </Col>
+                    </FormGroup>
+                    
+                    </Form>
+                </CardBody>
+              </Card>
             </ModalBody>
             <ModalFooter>
               <Button color="danger" onClick={setWarnings}>
