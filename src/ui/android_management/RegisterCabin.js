@@ -80,45 +80,38 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
 
   const [formData, setFormData] = useState({
-    ADDR : "",
-    ARSR : "",
-    AR_K : "",
-    BILL : "",
-    CITY_CODE : "",
-    CITY_NAME : "",
-    CIVL : "",
-    CLNT : "",
-    COCO : "false",
-    CWTM : "",
+    COMPLEX : "",
+    ADDRESS : "",
+    LATITUDE : "",
+    LONGITUDE : "",
     DATE : "",
-    DEVT : "Toilet",
-    DISTRICT_CODE : "",
-    DISTRICT_NAME : "",
-    LATT : "",
-    LONG : "",
-    MANU : "", 
-    MODIFIED_BY : user.username,
-    MSNI : "",
-    MSNV : "",
-    ONMP : "",
-    QBWT : "",
-    QFWC : "",
-    QMWC : "",
-    QPWC : "",
-    QSNI : "",
-    QSNV : "",
-    QURC : "",
-    QURI : "",
-    ROUTER_IMEI : "",
-    ROUTER_MOBILE : "",
-    SLVL : "",
+    CLIENT : "sdf",
+    SMART_LEVEL : "",
+    STATE : "",
+    DISTRICT : "",
+    CITY : "",
     STATE_CODE : "",
-    STATE_NAME : "",
-    TECH : "",
-    THINGGROUPTYPE : "COMPLEX", 
-    UUID : "",
-    Name: "",
-    Parent: ""
+    DISTRICT_CODE : "",
+    CITY_CODE : "",
+    SHORT_THING_NAME : "",
+    BILLING_GROUP : "",
+    USER_TYPE : "",
+    USAGE_CHARGE : "", 
+    CABIN_NUM : user.username,
+    DEVICE_NAME : "",
+    DEVICE_MANUFACTURER : "",
+    DEVICE_MODEL : "",
+    DEVICE_PROCESSOR : "",
+    DEVICE_RAM : "",
+    DEVICE_IMEI : "",
+    DEVICE_CPU_CORES : "",
+    DEVICE_CPU_FREQUENCY : "",
+    DEVICE_SERIAL_NUM : "",
+    CAMERA_SERIAL_NUM : "",
+    ThingType: "",
+    ThingGroup : "", 
+    DefaultClientId : "",
+    Name: ""
   });
 
   console.log('ComplexIotDetails',ComplexIotDetails);
@@ -128,6 +121,22 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     if(complexName) {
       ListOfIotCabinType(complexName)
       ListOfIotUserType(complexName)
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        STATE: ComplexIotDetails.STATE_NAME,
+        DISTRICT: ComplexIotDetails.DISTRICT_NAME,
+        CITY: ComplexIotDetails.CITY_NAME,
+        STATE_CODE: ComplexIotDetails.STATE_CODE,
+        DISTRICT_CODE: ComplexIotDetails.DISTRICT_CODE,
+        CITY_CODE: ComplexIotDetails.CITY_CODE,
+        ADDRESS: ComplexIotDetails.ADDR,
+        LATITUDE: ComplexIotDetails.LATT,
+        LONGITUDE: ComplexIotDetails.LONG,
+        CLIENT: ComplexIotDetails.CLNT,
+        BILLING_GROUP: ComplexIotDetails.BILL,
+        DATE: ComplexIotDetails.DATE,
+        COMPLEX: complexName
+      }));
     }
   },[complexName])
 
@@ -176,18 +185,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     }
   }
 
-  const handleChangeIotCity = (selectedOption) => {
-    dispatch(setComplexIotList([]));
-    console.log('handleChangeIotCity',selectedOption);
-    setFormData({ ...formData, Parent: selectedOption.value });
-    setSelectedOptionIotCity(selectedOption);
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      CITY_NAME: selectedOption.label,
-      CITY_CODE: selectedOption.value,
-  }));
-  }
-
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
     let text = err.message.includes("expired");
@@ -225,19 +222,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     setModalToggle(false)
   };
 
-  const handleChangeClientName = (selectedOption) => {
-    console.log('handleChangeClientName',selectedOption)
-    setFormData({ ...formData, CLNT: selectedOption.value });
-    setSelectedClientName(selectedOption)
-
-  }
-
-  const handleChangeBillingGroup = (selectedOption) => {
-    console.log('handleChangeBillingGroup',selectedOption)
-    setFormData({ ...formData, BILL: selectedOption.value });
-    setSelectedbillingGroups(selectedOption)
-  }
-
   const handleChangeSmartnessLevel = (selectedOption) => {
     console.log('handleChangeSmartnessLevel',selectedOption);
     setFormData({ ...formData, SLVL: selectedOption.value });
@@ -247,16 +231,20 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   const handleChangeDeviceType = (selectedOption) => {
     console.log('handleChangeDeviceType',selectedOption);
     setSelectedDeviceType(selectedOption)
+    setFormData({ ...formData, ThingType: selectedOption.value });
+
   }
   
   const handleChangeUserType = (selectedOption) => {
     console.log('handleChangeUserType',selectedOption);
     setSelectedUserType(selectedOption)
+    setFormData({ ...formData, USER_TYPE: selectedOption.value });
   }
 
   const handleChangeUserChargeType = (selectedOption) => {
     console.log('handleChangeUserChargeType',selectedOption);
     setSelectedUserChargeType(selectedOption);
+    setFormData({ ...formData, USAGE_CHARGE: selectedOption.value });
   }
 
   const handleDateChange = (date) => {
@@ -295,11 +283,11 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
       //   });
       //   return
       // }
-      console.log('name, parent', {name, parent})
-      dispatch(startLoading());
-      let command = "add-iot-complex";
-      var result = await executeCreateComplexLambda(user.username, user?.credentials, command, value, name, parent);
-      console.log('result ClientName', result.body);
+      // console.log('name, parent', {name, parent})
+      // dispatch(startLoading());
+      // let command = "add-iot-complex";
+      // var result = await executeCreateComplexLambda(user.username, user?.credentials, command, value, name, parent);
+      // console.log('result ClientName', result.body);
       toggle();
     } catch (error) {
       handleError(error, 'Error createComplex')
@@ -324,7 +312,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
           }
       }
     console.log('formData',outputArray)
-    createComplex(outputArray,name,Parent);
+    // createComplex(outputArray,name,Parent);
   }
 
 
@@ -516,62 +504,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     });
   }
 
-  const handleBillingGroup = () => {
-    setModalBillingGroup({
-      title: "Add New Billing Group",
-      onClickAction: async (data) => {
-        try {
-        dispatch(startLoading());
-        // Handle the action when the user clicks OK
-        console.log('handleBillingGroup triggers', data);
-        let command = "create-billing-group";
-        var output = await executeAddBillingroupLambda(user.username, user?.credentials, command, data);
-        console.log('output', output)
-        } catch (error) {
-          handleError(error, `Error handleBillingGroup`)
-        } finally {
-          dispatch(stopLoading()); // Dispatch the stopLoading action
-        }
-      },
-    });
-  }
-
-  const ListOfIotClientName = async () => {
-    try {
-      dispatch(startLoading());
-      let command = "list-iot-clientName";
-      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
-      console.log('result ClientName', result.body);
-      const options = result.body.map(item => ({
-        value: item.Name,
-        label: item.Name
-      }));
-      dispatch(setClientName(options));
-    } catch (error) {
-      handleError(error, 'Error ListOfIotClientName')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
-  const ListOfIotBillingGroup = async () => {
-    try {
-      dispatch(startLoading());
-      let command = "list-billing-groups";
-      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
-      console.log('result ListOfIotBillingGroup', result.body);
-      const options = result.body.map(item => ({
-        value: item.Name,
-        label: item.Name
-      }));
-      dispatch(setBillingGroup(options));
-    } catch (error) {
-      handleError(error, 'Error ListOfIotBillingGroup')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
-
   const ListOfIotComplex = async (value) => {
     try {
       dispatch(startLoading());
@@ -613,59 +545,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     return UUID;
   }
 
-  const handleVerify = async () => {
-    try {
-      if(formData.Name && selectedOptionIotCity.value && selectedOptionIotDistrict.value && selectedOption.value && formData.DATE ){
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            DISTRICT_CODE: selectedOptionIotDistrict.value,
-            DISTRICT_NAME: selectedOptionIotDistrict.label,
-            STATE_CODE: selectedOption.value,
-            STATE_NAME: selectedOption.label
-        }));
-
-      if(selectedOptionIotCity.value) {
-        let complexList = await ListOfIotComplex(selectedOptionIotCity.value);
-        console.log('complexList', complexList.length);
-        let uuid = await setUUID(complexList.length);
-        console.log('uuid' , uuid);
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            UUID: uuid,
-        }));
-      }
-        dispatch(startLoading());
-        let command = "List-iot-all-complex";
-        var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
-        console.log('list of complex', result.body.complexList);
-        console.log('list of complex', result.body.complexList.length);
-  
-        // Value to check
-        const valueToCheck = formData.Name;
-  
-        // Check if the value exists
-        const valueExists = result.body.complexList.some(item => item.name == valueToCheck);
-  
-          if (valueExists) {
-            setDialogData({
-              title: "Not Verified",
-              message: `The value "${valueToCheck}" exists .`,
-              onClickAction: () => {
-                // Handle the action when the user clicks OK
-                console.log(`The value "${valueToCheck}" exists.`);
-                },
-              });
-              setComplexVerify(false);
-              return;
-          }
-          setComplexVerify(true);
-      }
-    } catch (error) {
-      handleError(error, 'Error handleVerify')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
-  }
 
   console.log('formData',formData);
   return (
@@ -767,65 +646,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                   </Form>
                 </CardBody>
               </Card>
-                    <br/>
-              <Card>
-                {/* <CardBody>
-                    <CardTitle><b>Client Details</b></CardTitle>
-                    <br/>
-                    <Form>
-                    <FormGroup row>
-                      <Label
-                        for="client name"
-                        sm={3}
-                      >
-                        <b style={{fontSize:"small"}}>Client Name</b>
-                      </Label>
-
-                      <Col sm={7}>
-                      <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
-                      </Col>
-                      <Col sm={2}>
-                        <Button color="success" onClick={handleModalClient}>
-                          New
-                        </Button>{' '}
-                    </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="Billing Group"
-                        sm={3}
-                      >
-                      <b style={{fontSize:"small"}}>  Billing Group</b>
-                      </Label>
-                      <Col sm={7}>
-                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
-                      </Col>
-                      <Col sm={2}>
-                        <Button color="success" onClick={handleBillingGroup}>
-                          New
-                        </Button>{' '}
-                    </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label
-                        for="Select Date"
-                        sm={3}
-                      >
-                      <b style={{fontSize:"small"}}> Select Date </b>
-                      </Label>
-                      <Col sm={9} >
-                      <DatePicker
-                        id="selectDate"
-                        selected={selectedDate}
-                        onChange={handleDateChange}
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText="Select date"
-                      />
-                      </Col>
-                    </FormGroup>
-                    </Form>
-                </CardBody> */}
-              </Card>
               <br/>
               <Card>
                 <CardBody>
@@ -845,6 +665,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                         name="cabin_name"
                         placeholder="cabin_name"
                         type="text"
+                        onChange={handleChange}
                       />
                       </Col>
                     </FormGroup>
@@ -908,6 +729,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                               placeholder="Urinal Count"
                               type="text"
                               required
+                              onChange={handleChange}
                             />
                           </Col>
                         </FormGroup>
@@ -926,6 +748,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                               placeholder="BWT Capacity"
                               type="text"
                               required
+                              onChange={handleChange}
                             />
                           </Col>
                         </FormGroup>
@@ -940,6 +763,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                               placeholder="BWT Level"
                               type="text"
                               required
+                              onChange={handleChange}
                             />
                           </Col>
                         </FormGroup>
@@ -1261,6 +1085,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                           name="CAMERA_SERIAL_NUM"
                           placeholder="Camera serial number"
                           type="text"
+                          onChange={handleChange}
                         />
                       </Col>
                     </FormGroup>
