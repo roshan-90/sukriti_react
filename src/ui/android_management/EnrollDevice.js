@@ -6,7 +6,9 @@ import Step from '@mui/material/Step';
 import {
   executelistIotSingleLambda,
   executelistIotDynamicLambda,
-  executelistIotCabinDynamicLambda
+  executelistIotCabinDynamicLambda,
+  executeSaveDevicesLambda,
+  executeListPolicyLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
@@ -16,7 +18,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import { selectUser } from "../../features/authenticationSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -29,7 +31,7 @@ import { BiMaleFemale } from "react-icons/bi";
 import ReadCabinDetails from './ReadCabinDetails';
 import RegisterCabin from './RegisterCabin';
 
-const steps = ['Step 1', 'Step 2', 'Step 3','step 4'];
+const steps = ['Step 1', 'Step 2', 'Step 3','step 4', 'step 5', 'step 6'];
 
 export default function EnrollDevice() {
   const navigate = useNavigate();
@@ -42,6 +44,10 @@ export default function EnrollDevice() {
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const complexName = useSelector((state) => state.androidManagement.complexName);
+  const cabinDetails = useSelector((state) => state.androidManagement.cabinDetails);
+  const selectedCabin = useSelector((state) => state.androidManagement.cabinName);
+  const listOfPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
+  const policyName = useSelector((state) => state.androidManagement.policyName);
   const [complexChanged, setComplexChanged] = useState(false);
   const [registerComplex, setRegisterComplex] = useState(false);
   const [registerCabin, setRegisterCabin] = useState(false);
@@ -61,11 +67,15 @@ export default function EnrollDevice() {
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
-  const [selectedCabin, setSelectedCabin] = useState(null);
+  const [serialNumber, setSerialNumber] = useState(null);
 
   const handleRadioChange = (cabin) => {
-    setSelectedCabin(cabin);
+    dispatch(setCabinName(cabin));
   };
+
+  const handlePolicy = (value) => {
+    dispatch(setPolicyName(value));
+  }
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -358,6 +368,42 @@ export default function EnrollDevice() {
     }
   }
 
+  const handleSaveData = async () => {
+    try {
+      dispatch(startLoading());
+      console.log('serialNumber', serialNumber);
+      console.log('selectedCabin',selectedCabin);
+      console.log('ComplexIotDetails',ComplexIotDetails);
+      console.log('cabinDetails',cabinDetails)
+      let object = {
+        command: "save-data",
+        serial_number: serialNumber,
+        cabin_name: selectedCabin,
+        cabin_details: cabinDetails,
+        complex_details: ComplexIotDetails,
+        extra_details: {
+          serial_number: serialNumber
+        }
+      }
+      console.log('object',object);
+      let result = await executeSaveDevicesLambda(user?.credentials, object);
+      console.log('result', result);
+      let enterprise_id = "enterprises/LC04ehgfv4";
+      let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
+      console.log('listPolicy', listPolicy);
+      const options = listPolicy.body.map(item => ({
+        value: item.name.split("/")[3],
+        label: item.name.split("/")[3]
+      }));
+      console.log('options',options)
+      dispatch(setListOfPolicy(options));
+    } catch (error) {
+      handleError(error, 'Error handleSaveData')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
 
   return (
     <div className="container-fluid" style={{ backgroundColor: '#fff' }}>
@@ -467,6 +513,49 @@ export default function EnrollDevice() {
                   )}
                   </div>
                 )}
+              {activeStep === 2 && (
+                <div>
+                  <h3> Device Details</h3>
+                  <Input
+                    id="serial_number"
+                    name="serial_number"
+                    placeholder="Serial Number"
+                    type="text"
+                    onChange={(e) => setSerialNumber(e.target.value)}
+                  />
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveData}
+                    >
+                      serial Number
+                    </Button>
+                </div>
+              )}
+              {activeStep === 3 && (
+                <div>
+                  <h3>Lists of Policy</h3>
+                  {listOfPolicy && listOfPolicy.map((policy, index) => (
+                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
+                  >
+                     <Col xs="auto">
+                      <Input
+                        type="radio"
+                        name="selectedPolcy"
+                        value={policy.value}
+                        checked={policyName === policy.value}
+                        onChange={() => handlePolicy(policy.value)}
+                      />
+                    </Col>
+                    <Col xs="auto" className="cabin-icon-col">
+                      <BiMaleFemale />
+                    </Col>
+                    <Col className="cabin-text">
+                      <span>{policy.value}</span>
+                    </Col>
+                  </Row>
+                ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

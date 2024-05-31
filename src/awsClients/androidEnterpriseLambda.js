@@ -503,3 +503,75 @@ export function executeCreateCabinLambda(
     });
   });
 }
+
+export function executeSaveDevicesLambda(
+  credentials,
+  object
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+ object.command,
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Enrollment_device_crud_details",
+    //   Payload: "{ " + '"serial_number": "' + object.serial_number + '",' +
+    //   '"command": "' + object.command +
+    //   '",' + '"cabin_name": "' + object.cabin_name + '",'
+    //   + '"cabin_details": "' + object.cabin_details + '",' + '"complex_details": "' + object.complex_details + '",' + '"extra_details": "' + object.extra_details + '"'  + "}",
+    Payload: JSON.stringify({
+      serial_number: object.serial_number,
+      command: object.command,
+      cabin_name: object.cabin_name,
+      complex_details: object.complex_details,
+      extra_details: object.extra_details
+    })
+    };
+    console.log('executeCreateComplexLambda pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
+
+export function executeListPolicyLambda(
+  credentials,
+  enterprise_id,
+) {
+  return new Promise(function (resolve, reject) {
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Enterprises_List_Policies_Android_Management",
+      Payload: JSON.stringify({
+        enterprises_id: enterprise_id
+      })
+    };
+    console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
