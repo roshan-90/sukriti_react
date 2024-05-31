@@ -68,6 +68,9 @@ export default function EnrollDevice() {
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
   const [serialNumber, setSerialNumber] = useState(null);
+  const [selectedOptionLanguage, setSelectedOptionLanguage] = useState(null);
+  const [upiPaymentStatus, setUpiPaymentStatus] = useState(null);
+  const [applicationTypeOption, setApplicationTypeOption] = useState(null);
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
@@ -76,6 +79,48 @@ export default function EnrollDevice() {
   const handlePolicy = (value) => {
     dispatch(setPolicyName(value));
   }
+
+  const applicationType = [
+    { label: 'Entry Management System', value: 'Entry Management System'},
+    { label: 'Toilet Monitoring System', value: 'Toilet Monitoring System'},
+    { label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System Without BWT'},
+    { label: 'Ambient Monitoring System', value: 'Ambient Monitoring System'},
+    { label: 'Black Water Treatment', value: 'Black Water Treatment'},
+    { label: 'Cabin Automation System with BWT', value: 'Cabin Automation System with BWT'}
+  ];
+
+  const upiPaymentStatusOption = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' },
+  ];
+
+  const language = [
+    { label: 'Assamese', value: 'Assamese' },
+    { label: 'Bangla', value: 'Bangla' },
+    { label: 'Tibetan', value: 'Tibetan' },
+    { label: 'Bodo', value: 'Bodo' },
+    { label: 'Dogri', value: 'Dogri' },
+    { label: 'English', value: 'English' },
+    { label: 'Gujarati', value: 'Gujarati' },
+    { label: 'Hindi', value: 'Hindi' },
+    { label: 'Kannada', value: 'Kannada' },
+    { label: 'Konkani', value: 'Konkani' },
+    { label: 'Kashmiri', value: 'Kashmiri' },
+    { label: 'Maithili', value: 'Maithili' },
+    { label: 'Malayalam', value: 'Malayalam' },
+    { label: 'Manipuri', value: 'Manipuri' },
+    { label: 'Marathi', value: 'Marathi' },
+    { label: 'Nepali', value: 'Nepali' },
+    { label: 'Odia', value: 'Odia' },
+    { label: 'Punjabi', value: 'Punjabi' },
+    { label: 'Sanskrit', value: 'Sanskrit' },
+    { label: 'Santali', value: 'Santali' },
+    { label: 'Sindhi', value: 'Sindhi' },
+    { label: 'Sindhi Devanagari', value: 'Sindhi Devanagari' },
+    { label: 'Tamil', value: 'Tamil' },
+    { label: 'Telugu', value: 'Telugu' },
+    { label: 'Urdu', value: 'Urdu' }
+  ];
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -268,6 +313,21 @@ export default function EnrollDevice() {
     ListOfIotCabin(selectedOption.value);
   }
 
+  const handleChangeLanguage = (selectedOption) => {
+    console.log('handleChangeLanguage', selectedOption);
+    setSelectedOptionLanguage(selectedOption);
+  }
+
+  const handleChangeUpiPaymentStatus = (selectedOption) => {
+    console.log('handleChangeUpiPaymentStatus',selectedOption);
+    setUpiPaymentStatus(selectedOption);
+  }
+
+  const handleChangeApplicationType = (selectedOption) => {
+    console.log('handleChangeApplicationType',selectedOption);
+    setApplicationTypeOption(selectedOption);
+  }
+
   const totalSteps = () => {
     return steps.length;
   };
@@ -369,38 +429,49 @@ export default function EnrollDevice() {
   }
 
   const handleSaveData = async () => {
+    if(serialNumber != null && selectedCabin != null && ComplexIotDetails != null && cabinDetails != null) {
     try {
       dispatch(startLoading());
       console.log('serialNumber', serialNumber);
       console.log('selectedCabin',selectedCabin);
       console.log('ComplexIotDetails',ComplexIotDetails);
       console.log('cabinDetails',cabinDetails)
-      let object = {
-        command: "save-data",
-        serial_number: serialNumber,
-        cabin_name: selectedCabin,
-        cabin_details: cabinDetails,
-        complex_details: ComplexIotDetails,
-        extra_details: {
-          serial_number: serialNumber
+        let object = {
+          command: "save-data",
+          serial_number: serialNumber,
+          cabin_name: selectedCabin,
+          cabin_details: cabinDetails,
+          complex_details: ComplexIotDetails,
+          extra_details: {
+            serial_number: serialNumber
+          }
         }
+        console.log('object',object);
+        let result = await executeSaveDevicesLambda(user?.credentials, object);
+        console.log('result', result);
+        let enterprise_id = "enterprises/LC04ehgfv4";
+        let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
+        console.log('listPolicy', listPolicy);
+        const options = listPolicy.body.map(item => ({
+          value: item.name.split("/")[3],
+          label: item.name.split("/")[3]
+        }));
+        console.log('options',options)
+        dispatch(setListOfPolicy(options));
+      } catch (error) {
+        handleError(error, 'Error handleSaveData')
+      } finally {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
       }
-      console.log('object',object);
-      let result = await executeSaveDevicesLambda(user?.credentials, object);
-      console.log('result', result);
-      let enterprise_id = "enterprises/LC04ehgfv4";
-      let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
-      console.log('listPolicy', listPolicy);
-      const options = listPolicy.body.map(item => ({
-        value: item.name.split("/")[3],
-        label: item.name.split("/")[3]
-      }));
-      console.log('options',options)
-      dispatch(setListOfPolicy(options));
-    } catch (error) {
-      handleError(error, 'Error handleSaveData')
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
+    } else {
+      setDialogData({
+        title: "Error",
+        message: 'Please Field previous state',
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleSaveData -->`);
+        },
+      });
     }
   }
 
@@ -554,6 +625,30 @@ export default function EnrollDevice() {
                     </Col>
                   </Row>
                 ))}
+                </div>
+              )}
+              {activeStep === 4 && (
+                <div>
+                  <h3> Application Details</h3>
+                  <Input
+                    id="application_details"
+                    name="application_details"
+                    placeholder="Application Details"
+                    type="text"
+                    onChange={(e) => setSerialNumber(e.target.value)}
+                  />
+                    <br />
+                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
+                    <br />
+                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
+                    <br />
+                    <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveData}
+                    >
+                      serial Number
+                    </Button>
                 </div>
               )}
             </CardContent>
