@@ -87,7 +87,8 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     ThingType: "",
     ThingGroup : "", 
     BWT_KLD: "",
-    BWT_LVL: ""
+    BWT_LVL: "",
+    CAMERA_SERIAL_NUM: ""
   });
 
   console.log('ComplexIotDetails',ComplexIotDetails);
@@ -219,10 +220,35 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     setFormData({ ...formData, USER_TYPE: selectedOption.value });
   }
 
-  const handleChangeUserChargeType = (selectedOption) => {
+  const handleChangeUserChargeType = async (selectedOption) => {
     console.log('handleChangeUserChargeType',selectedOption);
     setSelectedUserChargeType(selectedOption);
-    setFormData({ ...formData, USAGE_CHARGE: selectedOption.value });
+    if(selectedUserType.value == null) {
+      setDialogData({
+        title: "Error",
+        message: "please Select User ChargeType",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log('handleChangeUserChargeType');
+        },
+      });
+      return
+    }
+
+    let cabin_count = await formatted3DigitNumber(complexIotList.length)
+    let uuid_value = await setUUID(complexIotList.length);
+    let splitsting = uuid_value.split("_");
+    
+    setFormData( prevFormData => ({
+      ...prevFormData,
+      CABIN_NUM: cabin_count,
+      Name: uuid_value,
+      SHORT_THING_NAME: splitsting[3] + "_" + splitsting[4],
+      USAGE_CHARGE: selectedOption.value
+    }));
+
+    console.log('check uuid',uuid_value);
+    // setFormData({ ...formData, USAGE_CHARGE: selectedOption.value });
   }
 
   const handleDateChange = (date) => {
@@ -233,10 +259,37 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   };
 
   // Update form state when form values change
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
     console.log('cheking :->', { name, value });
-    setFormData({ ...formData, [name]: value });
+    if(name == "BWT_LVL") {
+      setFormData({ ...formData, [name]: value });
+      if(formData.BWT_KLD == "" ||formData.BWT_LVL == "" ) {
+        setDialogData({
+          title: "Validation Error",
+          message: `Error Please fill all input fields`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log('setWarnings complex');
+          },
+        });
+        return true;
+      }
+      let cabin_count = await formatted3DigitNumber(complexIotList.length)
+      let uuid_value = await setUUID(complexIotList.length);
+      let splitsting = uuid_value.split("_");
+      
+      setFormData( prevFormData => ({
+        ...prevFormData,
+        CABIN_NUM: cabin_count,
+        Name: uuid_value,
+        SHORT_THING_NAME: splitsting[3] + "_" + splitsting[4],
+        USAGE_CHARGE: selectedOption?.value
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
   };
 
 
@@ -250,18 +303,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
   const createCabin = async (value, object) => {
     try {
-      // if(!complexName) {
-      //   setDialogData({
-      //     title: "Error",
-      //     message: "complex is not Selected",
-      //     onClickAction: () => {
-      //       // Handle the action when the user clicks OK
-      //       console.log('complex is not select');
-      //     },
-      //   });
-      //   return
-      // }
-      // console.log('name, parent', {name, parent})
       let command = "create-iot-thing";
       var result = await executeCreateCabinLambda(user.username, user?.credentials, command, value, object);
       console.log('result createCabin', result.body);
@@ -275,12 +316,12 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
   const submitForm = (e) => {
     dispatch(startLoading());
-    setTimeout(() => {
+      console.log('formData check data', formData);
       let object = {
-        name :  formData.Name ?? "HP0501_2012_2023_MWC_006",
-        DefaultClientId :  formData.Name ?? "HP0501_2012_2023_MWC_006",
-        ThingType :  formData.ThingType ?? "Wc",
-        ThingGroup :  formData.ThingGroup ?? "TEST_AWS",
+        name :  formData.Name,
+        DefaultClientId :  formData.Name,
+        ThingType :  formData.ThingType,
+        ThingGroup :  formData.ThingGroup
       }
   
       // Deleting the keys
@@ -298,7 +339,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
       console.log('formData',outputArray)
       console.log('object',object)
       createCabin(outputArray,object);
-    }, 2000);
   }
 
 
@@ -327,19 +367,18 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
         });
         return true;
       } 
+    } else if(formData.CAMERA_SERIAL_NUM == "" || formData.ThingType == "") {
+      setDialogData({
+        title: "Validation Error",
+        message: `Error Please fill all input fields`,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log('setWarnings complex');
+        },
+      });
+      return true;
     }
 
-    let cabin_count = await formatted3DigitNumber(complexIotList.length)
-    let uuid_value = await setUUID(complexIotList.length);
-    let splitsting = uuid_value.split("_");
-    
-    setFormData( prevFormData => ({
-      ...prevFormData,
-      CABIN_NUM: cabin_count,
-      Name: uuid_value,
-      SHORT_THING_NAME: splitsting[3] + "_" + splitsting[4]
-    }));
-    console.log('check uuid',uuid_value);
     if((formData.ThingType == "Wc" || formData.ThingType == "Urinal")) {
       delete formData.BWT_KLD;
       delete formData.BWT_LVL;
@@ -358,19 +397,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
        
       },
     });
-  }
-
-  const saveDdbSDC = async (command,data) => {
-    try {
-      console.log(`saveDdbSDC ${command}`, data);
-      dispatch(startLoading());
-      var output = await executeAddDdbStateLambda(user.username, user?.credentials, command, data);
-      console.log('output', output)
-    } catch (error) {
-      handleError(error, `Error saveDdbSDC ${command}`)
-    } finally {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }
   }
 
   const formatted3DigitNumber = async (Count) => {
@@ -413,9 +439,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
     return UUID;
   }
-
-
-
 
   console.log('formData',formData);
   return (
