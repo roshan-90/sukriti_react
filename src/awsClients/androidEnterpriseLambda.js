@@ -575,3 +575,38 @@ export function executeListPolicyLambda(
     });
   });
 }
+
+
+export function executelistProvisionLambda(
+  credentials,
+  object
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+ 
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Create_QR_API",
+      Payload: "{ " + '"name": "' + object.name + '",' +
+      '"policy_name": "' + object.policy_name +
+      '",' + '"serial_number": "' + object.serial_number +
+      '"' + "}",
+    };
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}

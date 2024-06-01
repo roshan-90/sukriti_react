@@ -8,7 +8,8 @@ import {
   executelistIotDynamicLambda,
   executelistIotCabinDynamicLambda,
   executeSaveDevicesLambda,
-  executeListPolicyLambda
+  executeListPolicyLambda,
+  executelistProvisionLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
@@ -71,6 +72,16 @@ export default function EnrollDevice() {
   const [selectedOptionLanguage, setSelectedOptionLanguage] = useState(null);
   const [upiPaymentStatus, setUpiPaymentStatus] = useState(null);
   const [applicationTypeOption, setApplicationTypeOption] = useState(null);
+  const [applicationFormData, setApplicationFormData] = React.useState({
+    application_details: "",
+    application_type: "",
+    upi_payment_status: "",
+    language: "",
+    margin_left: "",
+    margin_right: "",
+    margin_top: "",
+    margin_bottom: ""
+  })
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
@@ -316,16 +327,28 @@ export default function EnrollDevice() {
   const handleChangeLanguage = (selectedOption) => {
     console.log('handleChangeLanguage', selectedOption);
     setSelectedOptionLanguage(selectedOption);
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      language: selectedOption.value,
+    }));
   }
 
   const handleChangeUpiPaymentStatus = (selectedOption) => {
     console.log('handleChangeUpiPaymentStatus',selectedOption);
     setUpiPaymentStatus(selectedOption);
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      upi_payment_status: selectedOption.value,
+    }));
   }
 
   const handleChangeApplicationType = (selectedOption) => {
     console.log('handleChangeApplicationType',selectedOption);
     setApplicationTypeOption(selectedOption);
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      application_type: selectedOption.value,
+    }));
   }
 
   const totalSteps = () => {
@@ -475,6 +498,16 @@ export default function EnrollDevice() {
     }
   }
 
+  const handleSaveDetails = async () => {
+    let object = {
+      name : "enterprises/LC04ehgfv4",
+      policy_name: policyName,
+      serial_number: serialNumber
+    }
+    let provision = await executelistProvisionLambda(user?.credentials, object);
+    console.log('listPolicy', provision);
+    console.log('handleSaveDetails formData ', applicationFormData);
+  }
 
   return (
     <div className="container-fluid" style={{ backgroundColor: '#fff' }}>
@@ -627,7 +660,6 @@ export default function EnrollDevice() {
                       </Col>
                     </Row>
                     ))}
-                    
                     </>
                   )}
                 </div>
@@ -648,12 +680,55 @@ export default function EnrollDevice() {
                     <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
                     <br />
                     <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                    <br />
+                    <Input
+                    id="margin_left"
+                    name="margin_left"
+                    placeholder="Margin Left"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <br />
+                   <Input
+                    id="margin_right"
+                    name="margin_right"
+                    placeholder="Margin Right"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <br />
+                   <Input
+                    id="margin_top"
+                    name="margin_top"
+                    placeholder="Margin Top"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <br />
+                   <Input
+                    id="margin_bottom"
+                    name="margin_bottom"
+                    placeholder="Margin Bottom"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <br />
                     <Button
                       variant="contained"
-                      onClick={handleSaveData}
+                      onClick={handleSaveDetails}
                     >
-                      serial Number
+                      Save Details
                     </Button>
+                </div>
+              )}
+              {activeStep === 5 && (
+                <div>
+                  {listOfPolicy.length > 0 && (
+                   <div className="image-container">
+                   <h3 className="image-text">image show</h3>
+                   <img src="https://picsum.photos/500/180" alt="Example Image" className="centered-image" />
+                 </div>
+                  )}
                 </div>
               )}
             </CardContent>
