@@ -19,7 +19,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import { selectUser } from "../../features/authenticationSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName, setResetData} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -398,6 +398,21 @@ export default function EnrollDevice() {
       adGroup: '',
       ad: ''
     });
+    setSelectedOption(null);
+    setSelectedOptionIotDistrict(null);
+    setSelectedOptionIotCity(null);
+    setSelectedOptionIotComplex(null);
+    dispatch(setResetData());
+    setApplicationFormData({
+      application_details: "",
+      application_type: "",
+      upi_payment_status: "",
+      language: "",
+      margin_left: "",
+      margin_right: "",
+      margin_top: "",
+      margin_bottom: ""
+    })
   };
 
   const handleChange = (e) => {
@@ -471,7 +486,7 @@ export default function EnrollDevice() {
         }
         console.log('object',object);
         let result = await executeSaveDevicesLambda(user?.credentials, object);
-        console.log('result', result);
+        console.log('executeSaveDevicesLambda result', result);
         let enterprise_id = "enterprises/LC04ehgfv4";
         let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
         console.log('listPolicy', listPolicy);
@@ -481,6 +496,16 @@ export default function EnrollDevice() {
         }));
         console.log('options',options)
         dispatch(setListOfPolicy(options));
+        if(result.statusCode == 200) {
+          setDialogData({
+            title: "Success",
+            message: result.body,
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`handleSaveData function -->`);
+            },
+          });
+        }
       } catch (error) {
         handleError(error, 'Error handleSaveData')
       } finally {
@@ -580,6 +605,8 @@ export default function EnrollDevice() {
               )}
               {activeStep === 1 && (
                  <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                    <h3> Cabin Details </h3>
+                    <br/>
                   {dialogCabinDetails &&(
                     <ReadCabinDetails dialogCabinDetails={dialogCabinDetails} setDialogCabinDetails={openCabinModal}/>
                   )}
@@ -620,19 +647,24 @@ export default function EnrollDevice() {
               {activeStep === 2 && (
                 <div>
                   <h3> Device Details</h3>
-                  <Input
-                    id="serial_number"
-                    name="serial_number"
-                    placeholder="Serial Number"
-                    type="text"
-                    onChange={(e) => setSerialNumber(e.target.value)}
-                  />
-                    <Button
-                      variant="contained"
-                      onClick={handleSaveData}
-                    >
-                      serial Number
-                    </Button>
+                 {selectedCabin && (
+                  <>
+                    <Input
+                      id="serial_number"
+                      name="serial_number"
+                      placeholder="Serial Number"
+                      type="text"
+                      onChange={(e) => setSerialNumber(e.target.value)}
+                    />
+                    <br/>
+                      <Button
+                        variant="contained"
+                        onClick={handleSaveData}
+                      >
+                        serial Number
+                      </Button>
+                  </>
+                 )}
                 </div>
               )}
               {activeStep === 3 && (
@@ -667,58 +699,62 @@ export default function EnrollDevice() {
               {activeStep === 4 && (
                 <div>
                   <h3> Application Details</h3>
-                  <Input
-                    id="application_details"
-                    name="application_details"
-                    placeholder="Application Details"
-                    type="text"
-                    onChange={(e) => setSerialNumber(e.target.value)}
-                  />
-                    <br />
-                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
-                    <br />
-                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
-                    <br />
-                    <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                  {policyName && (
+                    <>
+                      <Input
+                      id="application_details"
+                      name="application_details"
+                      placeholder="Application Details"
+                      type="text"
+                      onChange={(e) => setSerialNumber(e.target.value)}
+                    />
+                      <br />
+                      <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
+                      <br />
+                      <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
+                      <br />
+                      <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                      <br />
+                      <Input
+                      id="margin_left"
+                      name="margin_left"
+                      placeholder="Margin Left"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
                     <br />
                     <Input
-                    id="margin_left"
-                    name="margin_left"
-                    placeholder="Margin Left"
-                    type="text"
-                    onChange={(e) => handleChange(e)}
-                  />
-                  <br />
-                   <Input
-                    id="margin_right"
-                    name="margin_right"
-                    placeholder="Margin Right"
-                    type="text"
-                    onChange={(e) => handleChange(e)}
-                  />
-                  <br />
-                   <Input
-                    id="margin_top"
-                    name="margin_top"
-                    placeholder="Margin Top"
-                    type="text"
-                    onChange={(e) => handleChange(e)}
-                  />
-                  <br />
-                   <Input
-                    id="margin_bottom"
-                    name="margin_bottom"
-                    placeholder="Margin Bottom"
-                    type="text"
-                    onChange={(e) => handleChange(e)}
-                  />
-                  <br />
-                    <Button
-                      variant="contained"
-                      onClick={handleSaveDetails}
-                    >
-                      Save Details
-                    </Button>
+                      id="margin_right"
+                      name="margin_right"
+                      placeholder="Margin Right"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
+                    <Input
+                      id="margin_top"
+                      name="margin_top"
+                      placeholder="Margin Top"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
+                    <Input
+                      id="margin_bottom"
+                      name="margin_bottom"
+                      placeholder="Margin Bottom"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
+                      <Button
+                        variant="contained"
+                        onClick={handleSaveDetails}
+                      >
+                        Save Details
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
               {activeStep === 5 && (
