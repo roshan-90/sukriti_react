@@ -605,26 +605,31 @@ export default function EnrollDevice() {
               {activeStep === 3 && (
                 <div>
                   <h3>Lists of Policy</h3>
-                  {listOfPolicy && listOfPolicy.map((policy, index) => (
-                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
-                  >
-                     <Col xs="auto">
-                      <Input
-                        type="radio"
-                        name="selectedPolcy"
-                        value={policy.value}
-                        checked={policyName === policy.value}
-                        onChange={() => handlePolicy(policy.value)}
-                      />
-                    </Col>
-                    <Col xs="auto" className="cabin-icon-col">
-                      <BiMaleFemale />
-                    </Col>
-                    <Col className="cabin-text">
-                      <span>{policy.value}</span>
-                    </Col>
-                  </Row>
-                ))}
+                  {listOfPolicy.length > 0 && (
+                    <>
+                    {listOfPolicy && listOfPolicy.map((policy, index) => (
+                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
+                    >
+                       <Col xs="auto">
+                        <Input
+                          type="radio"
+                          name="selectedPolcy"
+                          value={policy.value}
+                          checked={policyName === policy.value}
+                          onChange={() => handlePolicy(policy.value)}
+                        />
+                      </Col>
+                      <Col xs="auto" className="cabin-icon-col">
+                        <BiMaleFemale />
+                      </Col>
+                      <Col className="cabin-text">
+                        <span>{policy.value}</span>
+                      </Col>
+                    </Row>
+                    ))}
+                    
+                    </>
+                  )}
                 </div>
               )}
               {activeStep === 4 && (
