@@ -9,7 +9,8 @@ import {
   executelistIotCabinDynamicLambda,
   executeSaveDevicesLambda,
   executeListPolicyLambda,
-  executelistProvisionLambda
+  executelistProvisionLambda,
+  executeUpdateDeviceLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
@@ -82,6 +83,8 @@ export default function EnrollDevice() {
     margin_top: "",
     margin_bottom: ""
   })
+  const [qrImage, setQrImage] = useState(null);
+  
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
@@ -417,7 +420,7 @@ export default function EnrollDevice() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setApplicationFormData((prevData) => ({
       ...prevData,
       [name]: value
     }));
@@ -524,14 +527,63 @@ export default function EnrollDevice() {
   }
 
   const handleSaveDetails = async () => {
+    try {
+      dispatch(startLoading());
+    let object_application_details = {
+      serial_number: serialNumber,
+      command: "update-data",
+      details_type: "application_details",
+      value : applicationFormData
+    }
+    console.log("object_application_details",object_application_details);
+    let application_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+    console.log('application_result',application_update);
+    
+    object_application_details = {
+      serial_number: serialNumber,
+      command: "update-data",
+      details_type: "policy_details",
+      value : {
+        policy_name : policyName
+      },
+    }
+    let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+    console.log('policy_update',policy_update);
+
     let object = {
       name : "enterprises/LC04ehgfv4",
       policy_name: policyName,
       serial_number: serialNumber
     }
-    let provision = await executelistProvisionLambda(user?.credentials, object);
-    console.log('listPolicy', provision);
-    console.log('handleSaveDetails formData ', applicationFormData);
+    let Qr_result = await executelistProvisionLambda(user?.credentials, object);
+    console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
+    setQrImage(JSON.parse(Qr_result.body).imageUrl)
+    object_application_details = {
+      serial_number: serialNumber,
+      command: "update-data",
+      details_type: "qr_details",
+      value : {
+        qr : JSON.parse(Qr_result.body).imageUrl
+      },
+    }
+    let qr_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+    console.log('qr_update',qr_update);
+    object_application_details = {}
+    if(application_update.statusCode == 200) {
+      setDialogData({
+        title: "Success",
+        message: application_update.body,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleSaveDetails function -->`);
+        },
+      });
+    }
+    } catch (error) {
+      handleError(error, 'Error handleSaveData')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
   }
 
   return (
@@ -706,7 +758,7 @@ export default function EnrollDevice() {
                       name="application_details"
                       placeholder="Application Details"
                       type="text"
-                      onChange={(e) => setSerialNumber(e.target.value)}
+                      onChange={(e) => handleChange(e)}
                     />
                       <br />
                       <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
@@ -762,7 +814,7 @@ export default function EnrollDevice() {
                   {listOfPolicy.length > 0 && (
                    <div className="image-container">
                    <h3 className="image-text">image show</h3>
-                   <img src="https://picsum.photos/500/180" alt="Example Image" className="centered-image" />
+                   <img src={qrImage} alt="QR Image" className="centered-image" />
                  </div>
                   )}
                 </div>

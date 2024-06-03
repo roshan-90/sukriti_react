@@ -610,3 +610,41 @@ export function executelistProvisionLambda(
     });
   });
 }
+
+export function executeUpdateDeviceLambda(
+  credentials,
+  object,
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    let details_type_value = object.details_type;
+    var pullParams = {
+      FunctionName: "Enrollment_device_crud_details",
+      Payload: JSON.stringify({
+        serial_number: object.serial_number,
+        command: object.command,
+        details_type: details_type_value,
+        [details_type_value]: object.value
+      })
+    };
+    console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
