@@ -74,7 +74,7 @@ export default function EnrollDevice() {
   const [upiPaymentStatus, setUpiPaymentStatus] = useState(null);
   const [applicationTypeOption, setApplicationTypeOption] = useState(null);
   const [applicationFormData, setApplicationFormData] = React.useState({
-    application_details: "",
+    unattended_timmer: "",
     application_type: "",
     upi_payment_status: "",
     language: "",
@@ -416,6 +416,8 @@ export default function EnrollDevice() {
       margin_top: "",
       margin_bottom: ""
     })
+    setQrImage(null);
+    setSerialNumber(null);
   };
 
   const handleChange = (e) => {
@@ -538,50 +540,99 @@ export default function EnrollDevice() {
     console.log("object_application_details",object_application_details);
     let application_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
     console.log('application_result',application_update);
-    
-    object_application_details = {
-      serial_number: serialNumber,
-      command: "update-data",
-      details_type: "policy_details",
-      value : {
-        policy_name : policyName
-      },
-    }
-    let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
-    console.log('policy_update',policy_update);
-
-    let object = {
-      name : "enterprises/LC04ehgfv4",
-      policy_name: policyName,
-      serial_number: serialNumber
-    }
-    let Qr_result = await executelistProvisionLambda(user?.credentials, object);
-    console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
-    setQrImage(JSON.parse(Qr_result.body).imageUrl)
-    object_application_details = {
-      serial_number: serialNumber,
-      command: "update-data",
-      details_type: "qr_details",
-      value : {
-        qr : JSON.parse(Qr_result.body).imageUrl
-      },
-    }
-    let qr_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
-    console.log('qr_update',qr_update);
-    object_application_details = {}
     if(application_update.statusCode == 200) {
       setDialogData({
         title: "Success",
-        message: application_update.body,
+        message: "Application Details " + application_update.body,
+        onClickAction: async () => {
+          object_application_details = {
+            serial_number: serialNumber,
+            command: "update-data",
+            details_type: "policy_details",
+            value : {
+              policy_name : policyName
+            },
+          }
+          let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+          console.log('policy_update',policy_update);
+
+          if(policy_update.statusCode == 200) {
+            setDialogData({
+              title: "Success",
+              message: "Policy Details " + policy_update.body,
+              onClickAction: async () => {
+                let object = {
+                  name : "enterprises/LC04ehgfv4",
+                  policy_name: policyName,
+                  serial_number: serialNumber
+                }
+                let Qr_result = await executelistProvisionLambda(user?.credentials, object);
+                console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
+                setQrImage(JSON.parse(Qr_result.body).imageUrl)
+                object_application_details = {
+                  serial_number: serialNumber,
+                  command: "update-data",
+                  details_type: "qr_details",
+                  value : {
+                    qr : JSON.parse(Qr_result.body).imageUrl
+                  },
+                }
+                let qr_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+                console.log('qr_update',qr_update);
+                if(qr_update.statusCode == 200) {
+                  setDialogData({
+                    title: "Success",
+                    message: qr_update.body,
+                    onClickAction: () => {
+                      // Handle the action when the user clicks OK
+                      console.log(`handleSaveDetails -->`);
+                      dispatch(stopLoading()); // Dispatch the stopLoading action
+                    },
+                  });
+                } else {
+                  setDialogData({
+                    title: "Error",
+                    message: 'QR Details not save Please try again',
+                    onClickAction: () => {
+                      // Handle the action when the user clicks OK
+                      console.log(`handleSaveDetails -->`);
+                    },
+                  });
+                  dispatch(stopLoading()); // Dispatch the stopLoading action
+                  return true;
+                }
+              },
+            });
+          } else {
+            setDialogData({
+              title: "Error",
+              message: 'Policy Details not save Please try again',
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log(`handleSaveDetails -->`);
+              },
+            });
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+            return true;
+          }
+        }
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: 'Application Details not save Please try again',
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log(`handleSaveDetails function -->`);
+          console.log(`handleSaveDetails -->`);
         },
       });
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+      return true;
     }
+    object_application_details = {}
+
     } catch (error) {
       handleError(error, 'Error handleSaveData')
-    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
@@ -754,10 +805,10 @@ export default function EnrollDevice() {
                   {policyName && (
                     <>
                       <Input
-                      id="application_details"
-                      name="application_details"
-                      placeholder="Application Details"
-                      type="text"
+                      id="unattended_timmer"
+                      name="unattended_timmer"
+                      placeholder="unattended timmer"
+                      type="number"
                       onChange={(e) => handleChange(e)}
                     />
                       <br />

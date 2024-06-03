@@ -529,7 +529,8 @@ export function executeSaveDevicesLambda(
       command: object.command,
       cabin_name: object.cabin_name,
       complex_details: object.complex_details,
-      extra_details: object.extra_details
+      extra_details: object.extra_details,
+      cabin_details: object.cabin_details
     })
     };
     console.log('executeCreateComplexLambda pullParams',pullParams);
