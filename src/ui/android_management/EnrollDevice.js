@@ -479,12 +479,39 @@ export default function EnrollDevice() {
       console.log('selectedCabin',selectedCabin);
       console.log('ComplexIotDetails',ComplexIotDetails);
       console.log('cabinDetails',cabinDetails)
+
+      const convertToAttributes = (details) => {
+        return Object.keys(details).map(key => ({
+          Name: key,
+          Value: details[key]
+        }));
+      };
+      
+      const complex_value_update = {
+        Attributes: convertToAttributes(ComplexIotDetails),
+        Description: "",
+        Name: complexName,
+        Parent: ComplexIotDetails.CITY_CODE
+      };
+      console.log('complext_ value_update',complex_value_update);
+
+      const Cabin_value_update = {
+        Attributes: convertToAttributes(cabinDetails),
+        DefaultClientId: cabinDetails.defaultClientId,
+        Id: cabinDetails.thingId,
+        Name: cabinDetails.thingName,
+        ThingType: cabinDetails.thingTypeName,
+        Arn: cabinDetails.thingArn,
+        version: cabinDetails.version,
+        BillingGroupName: cabinDetails.billingGroupName
+      };
+      console.log('Cabin_value_update',Cabin_value_update);
         let object = {
           command: "save-data",
           serial_number: serialNumber,
           cabin_name: selectedCabin,
-          cabin_details: cabinDetails,
-          complex_details: ComplexIotDetails,
+          cabin_details: Cabin_value_update,
+          complex_details: complex_value_update,
           extra_details: {
             serial_number: serialNumber
           }
