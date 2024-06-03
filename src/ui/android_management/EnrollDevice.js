@@ -891,7 +891,7 @@ export default function EnrollDevice() {
                 <div>
                   {listOfPolicy.length > 0 && (
                    <div className="image-container">
-                   <h3 className="image-text">image show</h3>
+                   <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
                  </div>
                   )}
