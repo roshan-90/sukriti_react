@@ -495,8 +495,14 @@ export default function EnrollDevice() {
       };
       console.log('complext_ value_update',complex_value_update);
 
+      const CabinconvertToAttributes = (details) => {
+        return Object.keys(details).map(key => ({
+          Name: key,
+          Value: details[key]
+        }));
+      };
       const Cabin_value_update = {
-        Attributes: convertToAttributes(cabinDetails),
+        Attributes: CabinconvertToAttributes(cabinDetails.attributes),
         DefaultClientId: cabinDetails.defaultClientId,
         Id: cabinDetails.thingId,
         Name: cabinDetails.thingName,

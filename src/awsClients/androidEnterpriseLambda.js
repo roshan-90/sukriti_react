@@ -14,7 +14,7 @@ export function executelistEnterprisesAndroidManagementLambda(credentials) {
     });
     var pullParams = {
       FunctionName: "List_Enterprises_Android_Management",
-      Payload: "{ " + '"projectId": "' + "ssf-admin-399810" + '"' + "}",
+      Payload: "{ " + '"projectId": "' + "android-management-425406" + '"' + "}",
     };
 
     lambda.invoke(pullParams, function (err, data) {
