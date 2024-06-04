@@ -343,7 +343,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
 
   const setWarnings = async () => {
-    if((formData.ThingType == "Wc" || formData.ThingType == "Urinal")) {
+    if((formData.ThingType == "WC" || formData.ThingType == "Urinal")) {
       if((formData.USAGE_CHARGE == "" || formData.USER_TYPE == "")) {
         setDialogData({
           title: "Validation Error",
@@ -379,7 +379,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
       return true;
     }
 
-    if((formData.ThingType == "Wc" || formData.ThingType == "Urinal")) {
+    if((formData.ThingType == "WC" || formData.ThingType == "Urinal")) {
       delete formData.BWT_KLD;
       delete formData.BWT_LVL;
     } else if(formData.ThingType == "BWT") {
@@ -424,7 +424,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
       } else if(selectedUserType?.value == "PD") {
         UUID += "_" + "PWC";
       } 
-    } else if (selectedDeviceType?.value == "Wc") {
+    } else if (selectedDeviceType?.value == "WC") {
       if(selectedUserType?.value == "Male") {
         UUID += "_" + "MWC";
       } else if(selectedUserType?.value == "Female") {
@@ -574,7 +574,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                               <Select options={cabinTypeList || []} value={selectedDeviceType} onChange={handleChangeDeviceType} placeholder="Device Type" />
                           </Col>
                       </FormGroup>
-                      {selectedDeviceType?.value == "Wc" && (
+                      {selectedDeviceType?.value == "WC" && (
                       <>
                         <FormGroup row>
                           <Label for="User Type" sm={4}>
@@ -747,7 +747,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                     </FormGroup>
                     <FormGroup row>                    
                         <Label
-                            for="Wc Count"
+                            for="WC Count"
                             sm={3}
                           >
                           <b style={{fontSize:"small"}}> WC Count </b>
