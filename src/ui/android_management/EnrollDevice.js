@@ -525,7 +525,7 @@ export default function EnrollDevice() {
         console.log('object',object);
         let result = await executeSaveDevicesLambda(user?.credentials, object);
         console.log('executeSaveDevicesLambda result', result);
-        let enterprise_id = "enterprises/LC01cmxvgp";
+        let enterprise_id = "enterprises/LC02x4x4qa";
         let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
         console.log('listPolicy', listPolicy);
         const options = listPolicy.body.map(item => ({
@@ -595,7 +595,7 @@ export default function EnrollDevice() {
               message: "Policy Details " + policy_update.body,
               onClickAction: async () => {
                 let object = {
-                  name : "enterprises/LC01cmxvgp",
+                  name : "enterprises/LC02x4x4qa",
                   policy_name: policyName,
                   serial_number: serialNumber
                 }
