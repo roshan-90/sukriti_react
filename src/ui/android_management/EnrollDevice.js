@@ -97,7 +97,7 @@ export default function EnrollDevice() {
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
     { label: 'Toilet Monitoring System', value: 'Toilet Monitoring System'},
-    { label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System Without BWT'},
+    { label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'},
     { label: 'Ambient Monitoring System', value: 'Ambient Monitoring System'},
     { label: 'Black Water Treatment', value: 'Black Water Treatment'},
     { label: 'Cabin Automation System with BWT', value: 'Cabin Automation System with BWT'}

@@ -343,7 +343,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
 
   const setWarnings = async () => {
-    if((formData.ThingType == "WC" || formData.ThingType == "Urinal")) {
+    if((formData.ThingType == "WC" || formData.ThingType == "URINAL")) {
       if((formData.USAGE_CHARGE == "" || formData.USER_TYPE == "")) {
         setDialogData({
           title: "Validation Error",
@@ -379,7 +379,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
       return true;
     }
 
-    if((formData.ThingType == "WC" || formData.ThingType == "Urinal")) {
+    if((formData.ThingType == "WC" || formData.ThingType == "URINAL")) {
       delete formData.BWT_KLD;
       delete formData.BWT_LVL;
     } else if(formData.ThingType == "BWT") {
@@ -416,7 +416,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     let date = formData.DATE.replace("/", "");
     UUID = formData.CITY_CODE;
     UUID += "_" + date.replace("/", "_");
-    if(selectedDeviceType?.value == "Urinal") {
+    if(selectedDeviceType?.value == "URINAL") {
       if(selectedUserType?.value == "Male") {
         UUID += "_" + "MUR";
       } else if(selectedUserType?.value == "Female") {
@@ -594,7 +594,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                         </FormGroup>
                       </>
                     )}
-                    {selectedDeviceType?.value == "Urinal" && (  
+                    {selectedDeviceType?.value == "URINAL" && (  
                       <>
                         <FormGroup row>
                           <Label for="User Type" sm={4}>
@@ -613,14 +613,14 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                           </Col>
                         </FormGroup>
                         <FormGroup row>
-                          <Label for="Urinal Count" sm={4}>
-                            <b style={{ fontSize: "small" }}>Urinal Count </b>
+                          <Label for="URINAL Count" sm={4}>
+                            <b style={{ fontSize: "small" }}>URINAL Count </b>
                           </Label>
                           <Col sm={8}>
                             <Input
                               id="urinal_count"
                               name="urinal_count"
-                              placeholder="Urinal Count"
+                              placeholder="URINAL Count"
                               type="text"
                               required
                               onChange={handleChange}
@@ -801,15 +801,15 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                       </FormGroup>
                       <FormGroup row>                    
                         <Label
-                            for="Urinal Count"
+                            for="URINAL Count"
                             sm={3}
                           >
-                          <b style={{fontSize:"small"}}> Urinal Count </b>
+                          <b style={{fontSize:"small"}}> URINAL Count </b>
                           </Label>
                           <Col md={3}>
                             <FormGroup>
-                              <Label for="Number of Urinals">
-                                Number of Urinals
+                              <Label for="Number of URINALs">
+                                Number of URINALs
                               </Label>
                               <Input
                                 id="QURI"
@@ -823,13 +823,13 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                           </Col>
                           <Col md={3}>
                             <FormGroup>
-                              <Label for="Number of Urinal Cabins">
-                                Urinal Cabins
+                              <Label for="Number of URINAL Cabins">
+                                URINAL Cabins
                               </Label>
                               <Input
                                 id="QURC"
                                 name="QURC"
-                                placeholder="Number of Urinal Cabins"
+                                placeholder="Number of URINAL Cabins"
                                 type="text"
                                 value={ComplexIotDetails.QURC}
                                 disabled={true}
