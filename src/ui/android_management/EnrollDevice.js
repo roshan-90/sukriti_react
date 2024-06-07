@@ -543,6 +543,15 @@ export default function EnrollDevice() {
               console.log(`handleSaveData function -->`);
             },
           });
+        } else {
+          setDialogData({
+            title: "Error",
+            message: 'SomethingWent wrong Please try again',
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`handleSaveData -->`);
+            },
+          });
         }
       } catch (error) {
         handleError(error, 'Error handleSaveData')
@@ -600,9 +609,23 @@ export default function EnrollDevice() {
                   serial_number: serialNumber
                 }
                 let Qr_result = await executelistProvisionLambda(user?.credentials, object);
-                console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
-                setQrImage(JSON.parse(Qr_result.body).imageUrl)
-                dispatch(stopLoading()); // Dispatch the stopLoading action
+                if(Qr_result.statusCode == 200) {
+                  console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
+                  setQrImage(JSON.parse(Qr_result.body).imageUrl)
+                  dispatch(stopLoading()); // Dispatch the stopLoading action
+                } else {
+                  setDialogData({
+                    title: "QR Token Error",
+                    message: 'Provision Token Not created Please try again',
+                    onClickAction: () => {
+                      // Handle the action when the user clicks OK
+                      console.log(`handleSaveDetails -->`);
+                    },
+                  });
+                  dispatch(stopLoading()); // Dispatch the stopLoading action
+                  return true;
+                }
+                
               },
             });
           } else {
