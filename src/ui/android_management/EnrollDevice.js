@@ -610,30 +610,7 @@ export default function EnrollDevice() {
                     qr : JSON.parse(Qr_result.body).imageUrl
                   },
                 }
-                let qr_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
-                console.log('qr_update',qr_update);
-                if(qr_update.statusCode == 200) {
-                  setDialogData({
-                    title: "Success",
-                    message: qr_update.body,
-                    onClickAction: () => {
-                      // Handle the action when the user clicks OK
-                      console.log(`handleSaveDetails -->`);
-                      dispatch(stopLoading()); // Dispatch the stopLoading action
-                    },
-                  });
-                } else {
-                  setDialogData({
-                    title: "Error",
-                    message: 'QR Details not save Please try again',
-                    onClickAction: () => {
-                      // Handle the action when the user clicks OK
-                      console.log(`handleSaveDetails -->`);
-                    },
-                  });
-                  dispatch(stopLoading()); // Dispatch the stopLoading action
-                  return true;
-                }
+                
               },
             });
           } else {
