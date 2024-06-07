@@ -602,15 +602,7 @@ export default function EnrollDevice() {
                 let Qr_result = await executelistProvisionLambda(user?.credentials, object);
                 console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
                 setQrImage(JSON.parse(Qr_result.body).imageUrl)
-                object_application_details = {
-                  serial_number: serialNumber,
-                  command: "update-data",
-                  details_type: "qr_details",
-                  value : {
-                    qr : JSON.parse(Qr_result.body).imageUrl
-                  },
-                }
-                
+                dispatch(stopLoading()); // Dispatch the stopLoading action
               },
             });
           } else {

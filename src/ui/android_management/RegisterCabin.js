@@ -559,6 +559,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                         name="Name"
                         placeholder="Name"
                         type="text"
+                        disabled={true}
                         onChange={handleChange}
                       />
                       </Col>
