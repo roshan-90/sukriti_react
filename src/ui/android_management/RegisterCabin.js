@@ -12,7 +12,7 @@ import {
   executelistDDbCityLambda,
   executeAddDdbStateLambda,
   executeAddBillingroupLambda,
-  executeClientGroupLambda,
+  executelistListUserTypeLambda,
   executelistIotCabinDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -97,7 +97,6 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   useEffect(() => {
     if(complexName) {
       ListOfIotCabinType(complexName)
-      ListOfIotUserType(complexName)
       setFormData((prevFormData )=> ({
         ...prevFormData,
         STATE: ComplexIotDetails.STATE_NAME,
@@ -142,11 +141,12 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     }
   }
 
-  const ListOfIotUserType = async (value) => {
+  const ListOfIotUserType = async (value, cabinType) => {
     try {
+      console.log('CabinTypeList', cabinType)
       dispatch(startLoading());
       let command = "list-iot-UserType";
-      var result = await executelistIotCabinDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      var result = await executelistListUserTypeLambda('test_rk_mandi', user?.credentials, value, command, cabinType);
       console.log('result',result);
       if(result.statusCode == 200){
       console.log('result UserType', result.body);
@@ -211,6 +211,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     console.log('handleChangeDeviceType',selectedOption);
     setSelectedDeviceType(selectedOption)
     setFormData({ ...formData, ThingType: selectedOption.value });
+    ListOfIotUserType(complexName,selectedOption.value)
 
   }
   
