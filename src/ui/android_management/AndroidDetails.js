@@ -649,7 +649,7 @@ function AndroidDetails() {
                     }}
                     outline
                     color="primary"
-                    className="edit-button"
+                    className="add-button"
                   >
                     <AddIcon />
                   </Button>
