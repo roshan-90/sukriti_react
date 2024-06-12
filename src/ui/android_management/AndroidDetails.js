@@ -42,6 +42,9 @@ import {
   Button  
 } from "reactstrap";
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select'; // Importing react-select
 
@@ -648,7 +651,7 @@ function AndroidDetails() {
                     color="primary"
                     className="edit-button"
                   >
-                    + New
+                    <AddIcon />
                   </Button>
                   <Button
                     onClick={() => {
@@ -659,7 +662,7 @@ function AndroidDetails() {
                     color="primary"
                     className="edit-button"
                   >
-                    Edit
+                    <EditIcon />
                   </Button>
                   <Button
                     onClick={() => {
@@ -670,7 +673,7 @@ function AndroidDetails() {
                     color="primary"
                     className="delete-button"
                   >
-                    Delete Enterprise
+                    <DeleteIcon  color="error"/>
                   </Button>
                 </div>
             )}
