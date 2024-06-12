@@ -43,6 +43,7 @@ import {
 } from "reactstrap";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router-dom";
+import Select from 'react-select'; // Importing react-select
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -105,6 +106,13 @@ function AndroidDetails() {
   const [modal, setModal] = useState(false); 
   const toggle = () => setModal(!modal);
   const navigate = useNavigate();
+  const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
+
+
+  const handleChangeIotEnterprise = async (selectionOption) => {
+    console.log('selectionOption',selectionOption);
+    setSelectedOptionEnterprise(selectionOption)
+  }
 
   const handleDeleteEnterprises = async () => {
     try {
@@ -172,7 +180,11 @@ function AndroidDetails() {
         user?.credentials
       );
       console.log("fetchListEnterprisesData", result);
-      setListEnterprise(result.body.enterprises);
+      const options = result.body.enterprises.map(item => ({
+        value: item.name,
+        label: item.enterpriseDisplayName
+      }));
+      setListEnterprise(options);
     } catch (err) {
       handleError(err, "fetchListEnterprisesData");
     } finally {
@@ -617,20 +629,50 @@ function AndroidDetails() {
               </Button>
             )}
             {selectedEnterprises.length == 0 && (
-              <Button
-                onClick={() => {
-                  console.log('showEnterpriseCheck',showEnterpriseCheck);
-                  setShowEnterpriseCheck(!showEnterpriseCheck)
-                }}
-                outline
-                color="primary"
-                className="px-4"
-                style={{
-                  float: "right",
-                }}
-              >
-                Delete enterprise
-              </Button>
+                  <div className="container-item">
+                  <div className="select-container">
+                    <Select
+                      options={listEnterprise || []}
+                      value={selectedOptionEnterprise}
+                      onChange={handleChangeIotEnterprise}
+                      placeholder="Select Enterprise"
+                      className="select-dropdown"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      console.log('showEnterpriseCheck', showEnterpriseCheck);
+                      setShowEnterpriseCheck(!showEnterpriseCheck);
+                    }}
+                    outline
+                    color="primary"
+                    className="edit-button"
+                  >
+                    + New
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      console.log('showEnterpriseCheck', showEnterpriseCheck);
+                      setShowEnterpriseCheck(!showEnterpriseCheck);
+                    }}
+                    outline
+                    color="primary"
+                    className="edit-button"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      console.log('showEnterpriseCheck', showEnterpriseCheck);
+                      setShowEnterpriseCheck(!showEnterpriseCheck);
+                    }}
+                    outline
+                    color="primary"
+                    className="delete-button"
+                  >
+                    Delete Enterprise
+                  </Button>
+                </div>
             )}
             
             <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>

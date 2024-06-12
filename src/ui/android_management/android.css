@@ -11,3 +11,30 @@
 .Qr_image img {
   max-width: 100%; /* Ensure image doesn't exceed container width */
 }
+
+.container-item {
+  display: flex;
+  justify-content: center; /* Center the items horizontally */
+  align-items: center; /* Center the items vertically */
+  padding: 10px; /* Add some padding if needed */
+  width: 100%; /* Ensure the container takes up the full width */
+  box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+  flex-direction: row;
+}
+
+.select-container {
+  margin-left: 60%;/* Allow the select container to grow and take up available space */
+}
+
+.select-dropdown {
+  width: 100%; /* Ensure the select takes up the full width of its container */
+}
+
+.delete-button {
+  margin-left: auto; /* Push the button to the right */
+}
+
+.edit-button {
+  margin-left: auto;
+}
+
