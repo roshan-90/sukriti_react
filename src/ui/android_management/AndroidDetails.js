@@ -23,7 +23,7 @@ import {
   executelistDevicesAndroidManagementLambda,
   executeCreateEnterpriseAndroidManagementLambda,
   executeDeleteEnterpriseAndroidManagementLambda,
-  executelistIotSingleLambda,
+  executeUpdateEnterpriseLambda,
   executelistIotDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -122,19 +122,14 @@ function AndroidDetails() {
     setSelectedOptionEnterprise(selectionOption)
   }
 
-  const handleDeleteEnterprises = async () => {
+  const handleEnterprises = async (enterprise) => {
     try {
-      dispatch(startLoading()); // Dispatch the startLoading action
-      console.log('create android enterprise');
-      selectedEnterprises.forEach(async (enterprise) => {
-        var result = await executeDeleteEnterpriseAndroidManagementLambda(user?.credentials,enterprise);
+        dispatch(startLoading()); // Dispatch the startLoading action
+        console.log('handleDeleteEnterprises');
+        var result = await executeDeleteEnterpriseAndroidManagementLambda(user?.credentials, enterprise);
         console.log('enterprise:-->', enterprise);
         console.log('result',result);
-      });
-      setSelectedEnterprises([]);
-      setTimeout(() => {
-        dispatch(stopLoading()); // Dispatch the stopLoading action
-      }, 3000);
+        setSelectedEnterprises([]);
     } catch( err) {
       handleError(err, 'Error create android enterprise')
       dispatch(stopLoading()); // Dispatch the stopLoading action
@@ -157,36 +152,78 @@ function AndroidDetails() {
       setDialogEditEnterprise({
         title: "Edit Enterprise",
         message: selectedOptionEnterprise.label,
-        onClickAction: (data) => {
-          // Handle the action when the user clicks OK
-          console.log("edit is click",data);
-
+        onClickAction: async (data) => {
+          try{
+            dispatch(startLoading()); // Dispatch the startLoading action
+            // Handle the action when the user clicks OK
+            console.log("edit is click",data);
+            let object = {
+              object_key: "enterpriseDisplayName",
+              enterpriseId: selectedOptionEnterprise?.value,
+              command: "patch_enterprise",
+              value: data
+            }
+            let result_data =  await executeUpdateEnterpriseLambda(user?.credentials, object);
+            console.log('result_data',result_data);
+            if(result_data.statusCode == 200) {
+              setDialogData({
+                title: "Success",
+                message: "Enterprise update is successfully",
+                onClickAction: async () => {
+                  setSelectedOptionEnterprise(null)
+                  // Handle the action when the user clicks OK
+                  console.log("handleEditEnterprise");
+                  await fetchListEnterprisesData()
+                },
+              })
+            } else {
+              setDialogData({
+                title: "Error",
+                message: "Something went wrong",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error handleEditEnterprise");
+                },
+              })
+            }
+          } catch( err) {
+            handleError(err, 'Error handleEditEnterprise')
+          } finally {
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          }
         },
       })
     }
   }
 
   const handleDeleteEnterprise = async () => {
+    try{
     console.log('clicked',selectedOptionEnterprise?.value);
-    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
-     { 
-        setDialogData({
-        title: "Validation Error",
-        message: "Please Select Enterprise",
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log("handleEditEnterprise");
-        },
-      })
-    } else {
-      setDialogDeleteData({
-        title: `${selectedOptionEnterprise.label} Delete Enterprise`,
-        message: "Are You Sure Delete this EnterPrise",
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log( `clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
-        },
-      });
+      if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+      { 
+          setDialogData({
+          title: "Validation Error",
+          message: "Please Select Enterprise",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("handleEditEnterprise");
+          },
+        })
+      } else {
+        setDialogDeleteData({
+          title: `${selectedOptionEnterprise.label} Delete Enterprise`,
+          message: "Are You Sure Delete this Enterprise",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log( `clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
+            // handleEnterprises(selectedOptionEnterprise.value)
+          },
+        });
+      }
+    } catch( err) {
+      handleError(err, 'Error handleDeleteEnterprise')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
 
@@ -672,22 +709,7 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
-            {selectedEnterprises.length > 0 && (
-              <Button
-                onClick={() => {
-                  handleDeleteEnterprises()
-                }}
-                outline
-                color="primary"
-                className="px-2"
-                style={{
-                  float: "right",
-                  marginLeft: "3px"
-                }}
-              >
-                <DeleteIcon  color="error"/>
-              </Button>
-            )}
+            
                   <div className="container-item">
                   <div className="select-container">
                     <Select
