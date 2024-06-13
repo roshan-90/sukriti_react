@@ -44,9 +44,10 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select'; // Importing react-select
+import ModalEditEnterprise from './ModalEditEnterprise';
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -110,7 +111,7 @@ function AndroidDetails() {
   const toggle = () => setModal(!modal);
   const navigate = useNavigate();
   const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
-
+  const [dialogEditEnterprise , setDialogEditEnterprise] = useState(null);
 
   const handleChangeIotEnterprise = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
@@ -135,6 +136,31 @@ function AndroidDetails() {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
+
+  const handleEditEnterprise = async () => {
+    console.log('clicked',selectedOptionEnterprise?.value);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+     { 
+        setDialogData({
+        title: "Validation Error",
+        message: "Please Select Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleEditEnterprise");
+        },
+      })
+    } else {
+      setDialogEditEnterprise({
+        title: "Edit Enterprise",
+        message: selectedOptionEnterprise.label,
+        onClickAction: (data) => {
+          // Handle the action when the user clicks OK
+          console.log("edit is click",data);
+          
+        },
+      })
+    }
+  }
 
 
   const handleError = (err, Custommessage, onclick = null) => {
@@ -608,6 +634,8 @@ function AndroidDetails() {
             />
           </div>
         )}
+        <MessageDialog data={dialogData} />
+        <ModalEditEnterprise data={dialogEditEnterprise} />
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
@@ -654,8 +682,7 @@ function AndroidDetails() {
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log('showEnterpriseCheck', showEnterpriseCheck);
-                      setShowEnterpriseCheck(!showEnterpriseCheck);
+                      handleEditEnterprise();
                     }}
                     outline
                     color="primary"
