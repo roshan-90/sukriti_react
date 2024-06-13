@@ -48,6 +48,8 @@ import { useNavigate } from "react-router-dom";
 import Select from 'react-select'; // Importing react-select
 import ModalEditEnterprise from './ModalEditEnterprise';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import ModalConfirmDialog from "../../dialogs/ModalConfirmDialog";
+
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -112,6 +114,8 @@ function AndroidDetails() {
   const navigate = useNavigate();
   const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
   const [dialogEditEnterprise , setDialogEditEnterprise] = useState(null);
+  const [dialogDeleteData, setDialogDeleteData] = useState(null);
+
 
   const handleChangeIotEnterprise = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
@@ -156,9 +160,33 @@ function AndroidDetails() {
         onClickAction: (data) => {
           // Handle the action when the user clicks OK
           console.log("edit is click",data);
-          
+
         },
       })
+    }
+  }
+
+  const handleDeleteEnterprise = async () => {
+    console.log('clicked',selectedOptionEnterprise?.value);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+     { 
+        setDialogData({
+        title: "Validation Error",
+        message: "Please Select Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleEditEnterprise");
+        },
+      })
+    } else {
+      setDialogDeleteData({
+        title: `${selectedOptionEnterprise.label} Delete Enterprise`,
+        message: "Are You Sure Delete this EnterPrise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log( `clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
+        },
+      });
     }
   }
 
@@ -635,6 +663,7 @@ function AndroidDetails() {
           </div>
         )}
         <MessageDialog data={dialogData} />
+        <ModalConfirmDialog data={dialogDeleteData} />
         <ModalEditEnterprise data={dialogEditEnterprise} />
         <div className="row">
           <div className="col-md-2" style={{}}>
@@ -659,7 +688,6 @@ function AndroidDetails() {
                 <DeleteIcon  color="error"/>
               </Button>
             )}
-            {selectedEnterprises.length == 0 && (
                   <div className="container-item">
                   <div className="select-container">
                     <Select
@@ -692,8 +720,7 @@ function AndroidDetails() {
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log('showEnterpriseCheck', showEnterpriseCheck);
-                      setShowEnterpriseCheck(!showEnterpriseCheck);
+                      handleDeleteEnterprise();
                     }}
                     outline
                     color="primary"
@@ -702,8 +729,6 @@ function AndroidDetails() {
                     <DeleteIcon  color="error"/>
                   </Button>
                 </div>
-            )}
-            
             <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
           </div>
         </div>
