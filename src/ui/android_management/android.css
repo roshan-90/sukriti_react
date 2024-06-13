@@ -43,3 +43,10 @@
 
 }
 
+.big-checkbox {
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  margin-left: 10px; /* Push the button to the right */
+  margin-top: 6px; /* Push the button to the right */
+}

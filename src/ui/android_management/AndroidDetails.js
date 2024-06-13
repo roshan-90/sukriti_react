@@ -115,7 +115,11 @@ function AndroidDetails() {
   const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
   const [dialogEditEnterprise , setDialogEditEnterprise] = useState(null);
   const [dialogDeleteData, setDialogDeleteData] = useState(null);
+  const [isChecked, setIsChecked] = useState(false);
 
+  const handleCheckboxChange = (event) => {
+      setIsChecked(event.target.checked);
+  };
 
   const handleChangeIotEnterprise = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
@@ -256,9 +260,21 @@ function AndroidDetails() {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
       console.log('create android enterprise');
-      var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials);
+      var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, isChecked);
       console.log('executeCreateEnterpriseAndroidManagementLambda',result);
-      window.open(`${result?.body?.signupUrl}`,"_blank");
+      if(result.statusCode == 200) {
+        window.open(`${result?.body?.signupUrl}`,"_blank");
+      } else {
+        setDialogData({
+          title: "Error",
+          message: result?.body,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("error createEnterprise");
+          },
+        });
+        return;
+      }
     } catch( err) {
       handleError(err, 'Error create android enterprise')
     } finally {
@@ -470,15 +486,15 @@ function AndroidDetails() {
   const ListEnterpriseComponent = () => {
     console.log("listEnterprise", listEnterprise);
 
-  const handleCheckboxChange = (name) => {
-    setSelectedEnterprises((prevSelected) => {
-      if (prevSelected.includes(name)) {
-        return prevSelected.filter((enterprise) => enterprise !== name);
-      } else {
-        return [...prevSelected, name];
-      }
-    });
-  };
+  // const handleCheckboxChange = (name) => {
+  //   setSelectedEnterprises((prevSelected) => {
+  //     if (prevSelected.includes(name)) {
+  //       return prevSelected.filter((enterprise) => enterprise !== name);
+  //     } else {
+  //       return [...prevSelected, name];
+  //     }
+  //   });
+  // };
 
   
 
@@ -710,8 +726,8 @@ function AndroidDetails() {
           </div>
           <div className="col-md-10" style={{}}>
             
-                  <div className="container-item">
-                  <div className="select-container">
+                  <div className="container-item">   
+                  <div className="select-container">               
                     <Select
                       options={listEnterprise || []}
                       value={selectedOptionEnterprise}
@@ -720,6 +736,14 @@ function AndroidDetails() {
                       className="select-dropdown"
                     />
                   </div>
+                    <div>
+                      <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={handleCheckboxChange}
+                          className="big-checkbox"
+                      />
+                </div>
                   <Button
                     onClick={() => {
                       createEnterprise();

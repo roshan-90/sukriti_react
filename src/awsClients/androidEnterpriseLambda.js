@@ -62,7 +62,7 @@ export function executelistDevicesAndroidManagementLambda(
   });
 }
 
-export function executeCreateEnterpriseAndroidManagementLambda(credentials) {
+export function executeCreateEnterpriseAndroidManagementLambda(credentials, isChecked) {
   return new Promise(function (resolve, reject) {
     console.log(
       "credentials-executelistDevicesAndroidManagementLambda",
@@ -75,6 +75,8 @@ export function executeCreateEnterpriseAndroidManagementLambda(credentials) {
     });
     var pullParams = {
       FunctionName: "Create_Enterprises_API",
+      Payload: "{ " + '"isChecked": "' + isChecked + '"' + "}",
+
     };
 
     lambda.invoke(pullParams, function (err, data) {
