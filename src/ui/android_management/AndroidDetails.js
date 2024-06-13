@@ -644,8 +644,7 @@ function AndroidDetails() {
                   </div>
                   <Button
                     onClick={() => {
-                      console.log('showEnterpriseCheck', showEnterpriseCheck);
-                      setShowEnterpriseCheck(!showEnterpriseCheck);
+                      createEnterprise();
                     }}
                     outline
                     color="primary"
