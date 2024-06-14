@@ -49,6 +49,7 @@ import Select from 'react-select'; // Importing react-select
 import ModalEditEnterprise from './ModalEditEnterprise';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import ModalConfirmDialog from "../../dialogs/ModalConfirmDialog";
+import ComplexNavigationCompact from "./ComplexNavigationCompact";
 
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
@@ -496,14 +497,28 @@ function AndroidDetails() {
   //   });
   // };
 
-  
+  const TreeComponent = () => {
+    console.log("hellog");
+    return (
+      <>
+        <ComplexNavigationCompact />
+      </>
+    );
+  };
+
+  const memoizedTreeComponent = useMemo(() => {
+    return <TreeComponent />;
+  }, []);
 
   return (
-    <div className="row" style={{ background: "white", padding: "5px" }}>
+    <>
+    
+    <div className="row" style={{  padding: "5px" , width: "135%"}}>
       {/* Header Component */}
-      <Header />
+    {memoizedTreeComponent}
+      {/* <Header /> */}
 
-      {listEnterprise && (
+      {/* {listEnterprise && (
         <div style={{ width: "100%", maxHeight: "300px", overflowY: "auto" }}>
             {listEnterprise.map((data, index) => (
               <div className="row" style={rowStyle} key={index}>
@@ -527,8 +542,9 @@ function AndroidDetails() {
             ))}
           </div>
 
-      )}
+      )} */}
     </div>
+    </>
   );
   };
 
