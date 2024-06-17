@@ -729,3 +729,39 @@ export function executeUpdateEnterpriseLambda(
     });
   });
 }
+
+export function executeListDeviceLambda(
+  credentials,
+  object,
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Android_Management_Device",
+      Payload: JSON.stringify({
+        enterpriseId: object.enterpriseId,
+        command: object.command,
+        complex: object.complex
+      })
+    };
+    console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}

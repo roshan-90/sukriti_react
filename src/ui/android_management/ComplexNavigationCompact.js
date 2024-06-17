@@ -79,8 +79,8 @@ const ComplexNavigationCompact = (props) => {
 
   const handleComplexSelection = (treeEdge) => {
     console.log('treeEdge',treeEdge);
-    return;
-    dispatch(startLoading()); // Dispatch the startLoading action
+ 
+    // dispatch(startLoading()); // Dispatch the startLoading action
     console.log("complexNavigationcompact treeEdge --> ", treeEdge);
     const stateIndex = treeEdge.stateIndex;
     const districtIndex = treeEdge.districtIndex;
@@ -93,6 +93,7 @@ const ComplexNavigationCompact = (props) => {
     console.log("complexNavigationcompact complex --> 22 ", complex);
     const hierarchy = getComplexHierarchy(authStated?.accessTree, treeEdge);
     console.log("complexNavigationcompact hierarchy --> 22 ", hierarchy);
+    return;
     dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
   };
 
@@ -102,11 +103,13 @@ const ComplexNavigationCompact = (props) => {
       return <NoDataComponent />;
     } else {
       return (
+        <>
         <StateList
           ref={stateList}
           listData={authStated?.accessTree}
           handleComplexSelection={handleComplexSelection}
         />
+        </>
       );
     }
   };

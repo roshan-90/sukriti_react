@@ -29,6 +29,7 @@ import {
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
+import { setListEnterprise , setSelectedOptionEnterprise } from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -103,8 +104,10 @@ function AndroidDetails() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const listEnterprise = useSelector((state) => state.androidManagement.listEnterprise)
+  const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
   const [dialogData, setDialogData] = useState(null);
-  const [listEnterprise, setListEnterprise] = useState(undefined);
+  // const [listEnterprise, setListEnterprise] = useState(undefined);
   const [listDevices, setListDevices] = useState(undefined);
   const [showDeviceData, setShowDeviceData] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
@@ -113,7 +116,7 @@ function AndroidDetails() {
   const [modal, setModal] = useState(false); 
   const toggle = () => setModal(!modal);
   const navigate = useNavigate();
-  const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
+  // const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
   const [dialogEditEnterprise , setDialogEditEnterprise] = useState(null);
   const [dialogDeleteData, setDialogDeleteData] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
@@ -124,7 +127,7 @@ function AndroidDetails() {
 
   const handleChangeIotEnterprise = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
-    setSelectedOptionEnterprise(selectionOption)
+    dispatch(setSelectedOptionEnterprise(selectionOption))
   }
 
   const handleEnterprises = async (enterprise) => {
@@ -175,7 +178,7 @@ function AndroidDetails() {
                 title: "Success",
                 message: "Enterprise update is successfully",
                 onClickAction: async () => {
-                  setSelectedOptionEnterprise(null)
+                  dispatch(setSelectedOptionEnterprise(null))
                   // Handle the action when the user clicks OK
                   console.log("handleEditEnterprise");
                   await fetchListEnterprisesData()
@@ -295,7 +298,7 @@ function AndroidDetails() {
         value: item.name,
         label: item.enterpriseDisplayName
       }));
-      setListEnterprise(options);
+      dispatch(setListEnterprise(options));
     } catch (err) {
       handleError(err, "fetchListEnterprisesData");
     } finally {
