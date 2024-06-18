@@ -29,7 +29,7 @@ import {
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise } from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice} from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -107,6 +107,7 @@ function AndroidDetails() {
   const listEnterprise = useSelector((state) => state.androidManagement.listEnterprise)
   const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
   const listDeviceFetch = useSelector((state) => state.androidManagement.listDevice);
+  const selectedDeviceFetch = useSelector((state) => state.androidManagement.selectedDevice);
   const [dialogData, setDialogData] = useState(null);
   // const [listEnterprise, setListEnterprise] = useState(undefined);
   const [listDevices, setListDevices] = useState(undefined);
@@ -482,9 +483,9 @@ function AndroidDetails() {
   };
 
   const handleClickDevice = (data) => {
-    setShowDeviceData(null);
+    // dispatch(setSelectedDevice(null));
     console.log("data", data);
-    setShowDeviceData(data);
+    dispatch(setSelectedDevice(data));
   };
 
   // Rename the function to start with an uppercase letter
@@ -623,13 +624,13 @@ function AndroidDetails() {
   }, [listDeviceFetch]);
 
   const DeviceInfoComponent = () => {
-    console.log("showDeviceData", showDeviceData);
+    console.log("selectedDeviceFetch", selectedDeviceFetch);
     return (
       <>
-        {showDeviceData && (
+        {selectedDeviceFetch && (
           <div className="container">
             <div className="Qr_image">
-              <img src="assets/img/QRCopyimage.png" alt="QR Code Image" />
+              <img src={selectedDeviceFetch.qr_details.qr} alt="QR Code Image" />
             </div>
             <div
               style={{
@@ -653,11 +654,11 @@ function AndroidDetails() {
                         <b>Hardware Info</b>
                       </CardTitle>
                       <CardText>
-                        <p>Brand: {showDeviceData.hardwareInfo.brand}</p>
-                        <p>Model: {showDeviceData.hardwareInfo.model}</p>
+                        <p>Brand: {selectedDeviceFetch?.android_data?.hardwareInfo.brand}</p>
+                        <p>Model: {selectedDeviceFetch?.android_data?.hardwareInfo.model}</p>
                         <p>
                           Serial Number:{" "}
-                          {showDeviceData.hardwareInfo.serialNumber}
+                          {selectedDeviceFetch.android_data?.hardwareInfo?.serialNumber}
                         </p>
                         {/* Add more hardware info fields as needed */}
                       </CardText>
@@ -677,11 +678,11 @@ function AndroidDetails() {
                       <CardText>
                         <p>
                           Android Version:{" "}
-                          {showDeviceData?.softwareInfo?.androidVersion}
+                          {selectedDeviceFetch?.android_data?.softwareInfo?.androidVersion}
                         </p>
                         <p>
                           Build Number:{" "}
-                          {showDeviceData?.softwareInfo?.androidBuildNumber}
+                          {selectedDeviceFetch?.android_data?.softwareInfo?.androidBuildNumber}
                         </p>
                         {/* Add more software info fields as needed */}
                       </CardText>
@@ -701,10 +702,10 @@ function AndroidDetails() {
                         <b>Memory Info</b>
                       </CardTitle>
                       <CardText>
-                        <p>Total RAM: {showDeviceData.memoryInfo.totalRam}</p>
+                        <p>Total RAM: {selectedDeviceFetch?.android_data?.memoryInfo.totalRam}</p>
                         <p>
                           Total Internal Storage:{" "}
-                          {showDeviceData.memoryInfo.totalInternalStorage}
+                          {selectedDeviceFetch?.android_data?.memoryInfo.totalInternalStorage}
                         </p>
                         {/* Add more memory info fields as needed */}
                       </CardText>
