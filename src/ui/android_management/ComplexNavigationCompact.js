@@ -23,6 +23,8 @@ import { updateSelectedComplex } from "../../features/complesStoreSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import { setListDevice } from "../../features/androidManagementSlice";
+import { executeListDeviceLambda } from "../../awsClients/androidEnterpriseLambda";
 
 const ComplexNavigationCompact = (props) => {
   const selectionSummary = useRef();
@@ -32,7 +34,6 @@ const ComplexNavigationCompact = (props) => {
   const authStated = useSelector(authState);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
-
   const initFetchCompletedUserAccessTreeAction = async () => {
     // dispatch(startLoading()); // Dispatch the startLoading action
     try {
@@ -77,9 +78,9 @@ const ComplexNavigationCompact = (props) => {
     // }
   }, []);
 
-  const handleComplexSelection = (treeEdge) => {
+  const handleComplexSelection = async (treeEdge,selectedEnterprise) => {
+    dispatch(startLoading()); // Dispatch the startLoading action
     console.log('treeEdge',treeEdge);
- 
     // dispatch(startLoading()); // Dispatch the startLoading action
     console.log("complexNavigationcompact treeEdge --> ", treeEdge);
     const stateIndex = treeEdge.stateIndex;
@@ -93,12 +94,47 @@ const ComplexNavigationCompact = (props) => {
     console.log("complexNavigationcompact complex --> 22 ", complex);
     const hierarchy = getComplexHierarchy(authStated?.accessTree, treeEdge);
     console.log("complexNavigationcompact hierarchy --> 22 ", hierarchy);
+      if(selectedEnterprise?.value == undefined || selectedEnterprise == null) {
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Enterprise",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("handleCheckEnterprise");
+          },
+        })
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+        return true
+      } else {
+        let object = {
+          complex : complex.name,
+          enterpriseId : selectedEnterprise?.value,
+          command : "get_web_device"
+        }
+        console.log('object check',object);
+        let result_listdevice = await executeListDeviceLambda(user?.credentials, object);
+        console.log('listdevice',result_listdevice);
+        if(result_listdevice.statusCode == 200) {
+          dispatch(setListDevice(result_listdevice.body))
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        } else {
+          setDialogData({
+            title: "Server Error",
+            message: result_listdevice.body,
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("handleCheckEnterprise");
+            },
+          })
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+          return true
+        }
+      }
     return;
     dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
   };
 
   const ComponentSelector = () => {
-    console.log("new hello");
     if (authStated?.accessTree == undefined) {
       return <NoDataComponent />;
     } else {
@@ -122,7 +158,7 @@ const ComplexNavigationCompact = (props) => {
           display: "flex",
           alignItems: "center",
           background: colorTheme.primary,
-          padding: "10px",
+          padding: "3px",
         }}
       >
         <div
@@ -130,8 +166,8 @@ const ComplexNavigationCompact = (props) => {
             ...whiteSurfaceCircularBorder,
             float: "left",
             padding: "10px",
-            width: "50px",
-            height: "50px",
+            width: "35px",
+            height: "35px",
           }}
         >
           <img

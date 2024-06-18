@@ -106,6 +106,7 @@ function AndroidDetails() {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const listEnterprise = useSelector((state) => state.androidManagement.listEnterprise)
   const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
+  const listDeviceFetch = useSelector((state) => state.androidManagement.listDevice);
   const [dialogData, setDialogData] = useState(null);
   // const [listEnterprise, setListEnterprise] = useState(undefined);
   const [listDevices, setListDevices] = useState(undefined);
@@ -561,7 +562,7 @@ function AndroidDetails() {
   };
 
   const ListsDeviceComponent = () => {
-    console.log("listDevices", listDevices);
+    console.log("listDeviceFetch", listDeviceFetch);
     return (
       <div
         className="row"
@@ -569,7 +570,7 @@ function AndroidDetails() {
       >
           <>
             <ListDeviceHeader />
-        {listDevices && (
+        {listDeviceFetch && (
             <div
               style={{
                 ...whiteSurface,
@@ -579,9 +580,9 @@ function AndroidDetails() {
                 maxHeight: "200px",
               }}
             >
-              {listDevices.map((data, index) => {
+              {listDeviceFetch.map((data, index) => {
                 const circleColor =
-                  data.state == "PROVISIONING" ? "red" : "green";
+                  data.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == "TRUE" ? "green" : "red";
 
                 let circleActive = {
                   boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 8px 0px",
@@ -604,7 +605,7 @@ function AndroidDetails() {
                         style={textStyle}
                         onClick={() => handleClickDevice(data)}
                       >
-                        {deviceName(data.name)} {/* Call the function here */}
+                        {data.serial_number} {/* Call the function here */}
                       </div>
                     </div>
                   </>
@@ -619,7 +620,7 @@ function AndroidDetails() {
 
   const memoizedListsDeviceComponent = useMemo(() => {
     return <ListsDeviceComponent />;
-  }, [listDevices]);
+  }, [listDeviceFetch]);
 
   const DeviceInfoComponent = () => {
     console.log("showDeviceData", showDeviceData);

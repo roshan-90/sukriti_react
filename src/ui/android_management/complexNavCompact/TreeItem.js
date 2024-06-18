@@ -10,16 +10,18 @@ import {
   ComplexRow,
 } from "./TreeRows";
 import { TreeItemType } from "../../../nomenclature/nomenclature";
+import { useSelector } from "react-redux";
 
 const TreeItemRoot = (props) => {
   const [expanded, setExpanded] = useState(props.expanded);
+  const selectedEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise)
 
   const handleToggle = () => {
     setExpanded(!expanded);
   };
 
   const handleComplexSelection = () => {
-    props.handleComplexSelection(props.treeEdge);
+    props.handleComplexSelection(props.treeEdge,selectedEnterprise);
   };
 
   const DisplayRow = () => {
