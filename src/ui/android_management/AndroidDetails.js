@@ -518,7 +518,7 @@ function AndroidDetails() {
   return (
     <>
     
-    <div className="row" style={{  padding: "5px" , width: "135%"}}>
+    <div className="row" style={{  padding: "5px" , width: "150%"}}>
       {/* Header Component */}
     {memoizedTreeComponent}
       {/* <Header /> */}
@@ -567,7 +567,7 @@ function AndroidDetails() {
     return (
       <div
         className="row"
-        style={{ marginTop: "10px", background: "white", padding: "5px" }}
+        style={{ marginTop: "10px", background: "white", padding: "5px", width: "140%" }}
       >
           <>
             <ListDeviceHeader />
@@ -722,7 +722,7 @@ function AndroidDetails() {
 
   const memoizedDeviceInfoComponent = useMemo(() => {
     return <DeviceInfoComponent />;
-  }, [showDeviceData]);
+  }, [selectedDeviceFetch]);
 
   console.log('selectedEnterprises.length',selectedEnterprises.length);
   return (

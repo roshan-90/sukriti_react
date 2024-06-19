@@ -130,8 +130,7 @@ const ComplexNavigationCompact = (props) => {
           return true
         }
       }
-    return;
-    dispatch(updateSelectedComplex({ complex: complex, hierarchy: hierarchy }));
+      dispatch(stopLoading());
   };
 
   const ComponentSelector = () => {
