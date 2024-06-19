@@ -132,6 +132,17 @@ function AndroidDetails() {
     dispatch(setSelectedOptionEnterprise(selectionOption))
   }
 
+  let size = function (bytes) {
+    if (bytes === 0) {
+      return "0.00 B";
+    }
+    
+    let e = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, e)).toFixed(2) +
+      ' ' + ' KMGTP'.charAt(e) + 'B';
+  }
+  
+
   const handleEnterprises = async (enterprise) => {
     try {
         dispatch(startLoading()); // Dispatch the startLoading action
@@ -502,6 +513,8 @@ function AndroidDetails() {
   //   });
   // };
 
+
+
   const TreeComponent = () => {
     console.log("hellog");
     return (
@@ -702,12 +715,83 @@ function AndroidDetails() {
                         <b>Memory Info</b>
                       </CardTitle>
                       <CardText>
-                        <p>Total RAM: {selectedDeviceFetch?.android_data?.memoryInfo.totalRam}</p>
+                        <p>Total RAM: {size(selectedDeviceFetch?.android_data?.memoryInfo.totalRam)}</p>
                         <p>
                           Total Internal Storage:{" "}
-                          {selectedDeviceFetch?.android_data?.memoryInfo.totalInternalStorage}
+                          {size(selectedDeviceFetch?.android_data?.memoryInfo.totalInternalStorage)}
                         </p>
-                        {/* Add more memory info fields as needed */}
+                      </CardText>
+                    </CardBody>
+                  </Card>
+                  <Card
+                    style={{
+                      ...whiteSurface,
+                      background: "white",
+                      margin: "10px",
+                    }}
+                  >
+                    <CardBody>
+                      <CardTitle>
+                        <b> General Details</b>
+                      </CardTitle>
+                      <CardText>
+                        <p> <b>Name: </b>{selectedDeviceFetch?.android_data?.name}</p>
+                        <p>
+                           <b>Management Mode: </b>{" "}
+                          {selectedDeviceFetch?.android_data?.managementMode}
+                        </p>
+                        <p>
+                          <b>Applied State:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.appliedState}
+                        </p>
+                        <p>
+                          <b>Policy:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.policyName}
+                        </p>
+                        <p>
+                          <b>Enrollment Time:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.enrollmentTime}
+                        </p>
+                        <p>
+                          <b>API Level:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.apiLevel}
+                        </p>
+                        <p>
+                          <b>Last Policy Sync Time:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.lastPolicySyncTime}
+                        </p>
+                        <p>
+                          <b>Enrollment Token Name:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.enrollmentTokenName}
+                        </p>
+                        <p>
+                          <b>Enrollment Token Data:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.enrollmentTokenData}
+                        </p>
+                        <p>
+                          <b>Username:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.userName}
+                        </p>
+                        <p>
+                          <b>Ownership:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.ownership}
+                        </p>
+                        <p>
+                          <b>Applied Policy Name:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.appliedPolicyName}
+                        </p>
+                        <p>
+                          <b>Last Status Report Time:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.lastStatusReportTime}
+                        </p>
+                        <p>
+                          <b>Applied Policy Version:</b>{" "}
+                          {selectedDeviceFetch?.android_data?.appliedPolicyVersion}
+                        </p>
+                        <p>
+                          <b>Policy Compliant: </b>{" "}
+                          {selectedDeviceFetch?.android_data?.policyCompliant}
+                        </p>
                       </CardText>
                     </CardBody>
                   </Card>
