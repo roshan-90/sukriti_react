@@ -560,11 +560,7 @@ export function executeSaveDevicesLambda(
     });
     var pullParams = {
       FunctionName: "Enrollment_device_crud_details",
-    //   Payload: "{ " + '"serial_number": "' + object.serial_number + '",' +
-    //   '"command": "' + object.command +
-    //   '",' + '"cabin_name": "' + object.cabin_name + '",'
-    //   + '"cabin_details": "' + object.cabin_details + '",' + '"complex_details": "' + object.complex_details + '",' + '"extra_details": "' + object.extra_details + '"'  + "}",
-    Payload: JSON.stringify({
+      Payload: JSON.stringify({
       serial_number: object.serial_number,
       command: object.command,
       cabin_name: object.cabin_name,
@@ -750,6 +746,42 @@ export function executeListDeviceLambda(
         enterpriseId: object.enterpriseId,
         command: object.command,
         complex: object.complex
+      })
+    };
+    console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
+
+export function executeDeleteDeviceLambda(
+  credentials,
+  object,
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Android_Management_Device",
+      Payload: JSON.stringify({
+        enterpriseId: object.enterpriseId,
+        command: object.command,
+        deviceId: object.deviceId
       })
     };
     console.log('pullParams',pullParams);

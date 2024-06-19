@@ -1,15 +1,10 @@
 import React, {
   useState,
-  useRef,
   useEffect,
-  Suspense,
-  lazy,
-  useCallback,
-  useMemo,
+  useMemo
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ErrorBoundary from "../../components/ErrorBoundary";
-import NoDataComponent from "../../components/NoDataComponent";
 import {
   colorTheme,
   whiteSurfaceCircularBorder,
@@ -24,12 +19,12 @@ import {
   executeCreateEnterpriseAndroidManagementLambda,
   executeDeleteEnterpriseAndroidManagementLambda,
   executeUpdateEnterpriseLambda,
-  executelistIotDynamicLambda
+  executeListPolicyLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice} from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy} from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -51,7 +46,7 @@ import ModalEditEnterprise from './ModalEditEnterprise';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import ModalConfirmDialog from "../../dialogs/ModalConfirmDialog";
 import ComplexNavigationCompact from "./ComplexNavigationCompact";
-
+import ModalEditDevices from './ModalEditDevices';
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -109,7 +104,6 @@ function AndroidDetails() {
   const listDeviceFetch = useSelector((state) => state.androidManagement.listDevice);
   const selectedDeviceFetch = useSelector((state) => state.androidManagement.selectedDevice);
   const [dialogData, setDialogData] = useState(null);
-  // const [listEnterprise, setListEnterprise] = useState(undefined);
   const [listDevices, setListDevices] = useState(undefined);
   const [showDeviceData, setShowDeviceData] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
@@ -118,10 +112,10 @@ function AndroidDetails() {
   const [modal, setModal] = useState(false); 
   const toggle = () => setModal(!modal);
   const navigate = useNavigate();
-  // const [selectedOptionEnterprise, setSelectedOptionEnterprise] = useState(null);
   const [dialogEditEnterprise , setDialogEditEnterprise] = useState(null);
   const [dialogDeleteData, setDialogDeleteData] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
+  const [dialogEditDevice , setDialogEditDevice] = useState(null);
 
   const handleCheckboxChange = (event) => {
       setIsChecked(event.target.checked);
@@ -130,6 +124,32 @@ function AndroidDetails() {
   const handleChangeIotEnterprise = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
     dispatch(setSelectedOptionEnterprise(selectionOption))
+    ListofPolicyFunction(selectionOption.value)
+  }
+
+  async function ListofPolicyFunction(value) {
+    console.log('list of policy value',value);
+    let listPolicy = await executeListPolicyLambda(user?.credentials, value);
+    console.log('listPolicy', listPolicy);
+    if(listPolicy.statusCode == 200) {
+      if(listPolicy.body.length > 0) {
+        const options = listPolicy.body.map(item => ({
+          value: item.name.split("/")[3],
+          label: item.name.split("/")[3]
+        }));
+        console.log('options',options)
+        dispatch(setListOfPolicy(options));
+      }
+    } else {
+      setDialogData({
+        title: "Error",
+        message: 'SomethingWent wrong Please try again',
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleSaveData -->`);
+        },
+      });
+    }
   }
 
   let size = function (bytes) {
@@ -219,7 +239,6 @@ function AndroidDetails() {
 
   const handleDeleteEnterprise = async () => {
     try{
-    console.log('clicked',selectedOptionEnterprise?.value);
       if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
       { 
           setDialogData({
@@ -227,7 +246,7 @@ function AndroidDetails() {
           message: "Please Select Enterprise",
           onClickAction: () => {
             // Handle the action when the user clicks OK
-            console.log("handleEditEnterprise");
+            console.log("handleDeleteEnterprise");
           },
         })
       } else {
@@ -236,8 +255,8 @@ function AndroidDetails() {
           message: "Are You Sure Delete this Enterprise",
           onClickAction: () => {
             // Handle the action when the user clicks OK
-            console.log( `clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
-            // handleEnterprises(selectedOptionEnterprise.value)
+            console.log(`clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
+            handleEnterprises(selectedOptionEnterprise.value)
           },
         });
       }
@@ -335,6 +354,110 @@ function AndroidDetails() {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
+
+  const handleDeleteDevice = async (deviceId) => {
+    console.log('handleDeleteDevice device id :->', deviceId);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+      { 
+         setDialogData({
+         title: "Validation Error",
+         message: "Please Select Enterprise",
+         onClickAction: () => {
+           // Handle the action when the user clicks OK
+           console.log("handleEditEnterprise");
+         },
+       })
+     } else {
+       let object = {
+         enterpriseId : selectedOptionEnterprise?.value,
+         deviceId : deviceId,
+         command : "delete_device"
+       }
+       console.log('check object', object);
+      //  let result_data = await executeDeleteDeviceLambda(user?.credentials, object);
+      //  console.log("result_data", result_data);
+      //  if(result_data.statusCode == 200) {
+      //     setDialogData({
+      //       title: "Success",
+      //       message: result_data.body,
+      //       onClickAction: async () => {
+      //         console.log("Response handleDeleteDevice");
+      //       },
+      //     })
+      //   } else {
+      //     setDialogData({
+      //       title: "Error",
+      //       message: "Something went wrong",
+      //       onClickAction: () => {
+      //         // Handle the action when the user clicks OK
+      //         console.log("error handleDeleteDevice");
+      //       },
+      //     })
+      //   }
+     }
+
+  };
+
+  const handleEditDevice = async (deviceId) => {
+    console.log('handleEditDevice device id :->', deviceId);
+    console.log('clicked',selectedOptionEnterprise?.value);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+     { 
+        setDialogData({
+        title: "Validation Error",
+        message: "Please Select Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleEditEnterprise");
+        },
+      })
+    } else {
+      setDialogEditDevice({
+        title: "Edit Device",
+        message: selectedOptionEnterprise.label,
+        onClickAction: async (data) => {
+          console.log("edit is click",data);
+          // try{
+          //   dispatch(startLoading()); // Dispatch the startLoading action
+          //   // Handle the action when the user clicks OK
+          //   let object = {
+          //     object_key: "enterpriseDisplayName",
+          //     enterpriseId: selectedOptionEnterprise?.value,
+          //     command: "patch_enterprise",
+          //     value: data
+          //   }
+          //   let result_data =  await executeUpdateEnterpriseLambda(user?.credentials, object);
+          //   console.log('result_data',result_data);
+          //   if(result_data.statusCode == 200) {
+          //     setDialogData({
+          //       title: "Success",
+          //       message: "Enterprise update is successfully",
+          //       onClickAction: async () => {
+          //         dispatch(setSelectedOptionEnterprise(null))
+          //         // Handle the action when the user clicks OK
+          //         console.log("handleEditEnterprise");
+          //         await fetchListEnterprisesData()
+          //       },
+          //     })
+          //   } else {
+          //     setDialogData({
+          //       title: "Error",
+          //       message: "Something went wrong",
+          //       onClickAction: () => {
+          //         // Handle the action when the user clicks OK
+          //         console.log("error handleEditEnterprise");
+          //       },
+          //     })
+          //   }
+          // } catch( err) {
+          //   handleError(err, 'Error handleEditEnterprise')
+          // } finally {
+          //   dispatch(stopLoading()); // Dispatch the stopLoading action
+          // }
+        },
+      })
+    }
+  }
 
   useEffect(() => {
     fetchListEnterprisesData();
@@ -441,13 +564,13 @@ function AndroidDetails() {
               className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
               style={{
                 ...whiteSurfaceCircularBorder,
-                width: "90px",
+                width: "50px",
                 height: "30px",
                 // borderRadius: "8%",
                 fontSize: "14px", // Adjust font size here
               }}
             >
-         <span style={{ marginRight: '2px', color: "black"}}>+ New</span>
+         <span style={{ marginRight: '2px', color: "blue"}}><AddIcon/></span>
             </Button>
       </div>
     );
@@ -494,27 +617,11 @@ function AndroidDetails() {
   };
 
   const handleClickDevice = (data) => {
-    // dispatch(setSelectedDevice(null));
-    console.log("data", data);
     dispatch(setSelectedDevice(data));
   };
 
   // Rename the function to start with an uppercase letter
   const ListEnterpriseComponent = () => {
-    console.log("listEnterprise", listEnterprise);
-
-  // const handleCheckboxChange = (name) => {
-  //   setSelectedEnterprises((prevSelected) => {
-  //     if (prevSelected.includes(name)) {
-  //       return prevSelected.filter((enterprise) => enterprise !== name);
-  //     } else {
-  //       return [...prevSelected, name];
-  //     }
-  //   });
-  // };
-
-
-
   const TreeComponent = () => {
     console.log("hellog");
     return (
@@ -533,7 +640,7 @@ function AndroidDetails() {
     
     <div className="row" style={{  padding: "5px" , width: "150%"}}>
       {/* Header Component */}
-    {memoizedTreeComponent}
+      {memoizedTreeComponent}
       {/* <Header /> */}
 
       {/* {listEnterprise && (
@@ -584,50 +691,50 @@ function AndroidDetails() {
       >
           <>
             <ListDeviceHeader />
-        {listDeviceFetch && (
-            <div
-              style={{
-                ...whiteSurface,
-                background: "white",
-                width: "100%",
-                overflow: "auto",
-                maxHeight: "200px",
-              }}
-            >
-              {listDeviceFetch.map((data, index) => {
-                const circleColor =
-                  data.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == "TRUE" ? "green" : "red";
+              {listDeviceFetch && (
+                  <div
+                    style={{
+                      ...whiteSurface,
+                      background: "white",
+                      width: "100%",
+                      overflow: "auto",
+                      maxHeight: "200px",
+                    }}
+                  >
+                    {listDeviceFetch.map((data, index) => {
+                      const circleColor =
+                        data.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == "TRUE" ? "green" : "red";
 
-                let circleActive = {
-                  boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 8px 0px",
-                  backgroundColor: circleColor,
-                  borderRadius: "50%",
-                  width: "10px",
-                  height: "10px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                };
-                return (
-                  <>
-                    <div className="row" style={rowStyle} key={index}>
-                      <div className="col-md-2" style={colStyle}>
-                        <div style={circleActive}></div>
-                      </div>
-                      <div
-                        className="col-md-8"
-                        style={textStyle}
-                        onClick={() => handleClickDevice(data)}
-                      >
-                        {data.serial_number} {/* Call the function here */}
-                      </div>
-                    </div>
-                  </>
-                );
-              })}
-            </div>
-        )}
-        </>
+                      let circleActive = {
+                        boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 8px 0px",
+                        backgroundColor: circleColor,
+                        borderRadius: "50%",
+                        width: "10px",
+                        height: "10px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      };
+                      return (
+                        <>
+                          <div className="row" style={rowStyle} key={index}>
+                            <div className="col-md-2" style={colStyle}>
+                              <div style={circleActive}></div>
+                            </div>
+                            <div
+                              className="col-md-8"
+                              style={textStyle}
+                              onClick={() => handleClickDevice(data)}
+                            >
+                              {data.serial_number} {/* Call the function here */}
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })}
+                  </div>
+              )}
+          </>
       </div>
     );
   };
@@ -644,6 +751,38 @@ function AndroidDetails() {
           <div className="container">
             <div className="Qr_image">
               <img src={selectedDeviceFetch.qr_details.qr} alt="QR Code Image" />
+            </div>
+            <div className="container">
+            <Row>
+              <Button
+                onClick={() => handleEditDevice(selectedDeviceFetch?.android_data?.name)}
+                color="primary"
+                className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+                style={{
+                  ...whiteSurfaceCircularBorder,
+                  width: "30px",
+                  height: "30px",
+                  fontSize: "14px", // Adjust font size here
+                }}
+              >
+                <span style={{ marginRight: '2px', color: "blue"}}><EditIcon/></span>
+              </Button>
+              <Button
+                  onClick={() => handleDeleteDevice(selectedDeviceFetch?.android_data?.name)}
+                  color="primary"
+                  className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+                  style={{
+                    ...whiteSurfaceCircularBorder,
+                    width: "30px",
+                    height: "30px",
+                    fontSize: "14px", // Adjust font size here
+                  }}
+                >
+                <span style={{ marginRight: '2px', color: "red"}}>
+                  <DeleteIcon/>
+                  </span>
+              </Button>
+              </Row>
             </div>
             <div
               style={{
@@ -823,6 +962,7 @@ function AndroidDetails() {
         <MessageDialog data={dialogData} />
         <ModalConfirmDialog data={dialogDeleteData} />
         <ModalEditEnterprise data={dialogEditEnterprise} />
+        <ModalEditDevices data={dialogEditDevice} />
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
