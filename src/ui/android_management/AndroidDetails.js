@@ -19,7 +19,8 @@ import {
   executeCreateEnterpriseAndroidManagementLambda,
   executeDeleteEnterpriseAndroidManagementLambda,
   executeUpdateEnterpriseLambda,
-  executeListPolicyLambda
+  executeListPolicyLambda,
+  executePatchDeviceLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -408,7 +409,7 @@ function AndroidDetails() {
         message: "Please Select Enterprise",
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log("handleEditEnterprise");
+          console.log("handleEditDevice");
         },
       })
     } else {
@@ -416,44 +417,43 @@ function AndroidDetails() {
         title: "Edit Device",
         message: selectedOptionEnterprise.label,
         onClickAction: async (data) => {
-          console.log("edit is click",data);
-          // try{
-          //   dispatch(startLoading()); // Dispatch the startLoading action
-          //   // Handle the action when the user clicks OK
-          //   let object = {
-          //     object_key: "enterpriseDisplayName",
-          //     enterpriseId: selectedOptionEnterprise?.value,
-          //     command: "patch_enterprise",
-          //     value: data
-          //   }
-          //   let result_data =  await executeUpdateEnterpriseLambda(user?.credentials, object);
-          //   console.log('result_data',result_data);
-          //   if(result_data.statusCode == 200) {
-          //     setDialogData({
-          //       title: "Success",
-          //       message: "Enterprise update is successfully",
-          //       onClickAction: async () => {
-          //         dispatch(setSelectedOptionEnterprise(null))
-          //         // Handle the action when the user clicks OK
-          //         console.log("handleEditEnterprise");
-          //         await fetchListEnterprisesData()
-          //       },
-          //     })
-          //   } else {
-          //     setDialogData({
-          //       title: "Error",
-          //       message: "Something went wrong",
-          //       onClickAction: () => {
-          //         // Handle the action when the user clicks OK
-          //         console.log("error handleEditEnterprise");
-          //       },
-          //     })
-          //   }
-          // } catch( err) {
-          //   handleError(err, 'Error handleEditEnterprise')
-          // } finally {
-          //   dispatch(stopLoading()); // Dispatch the stopLoading action
-          // }
+          console.log('data',data);
+            let object = {
+              command : "patch_device",
+              deviceId : deviceId,
+              enterpriseId: selectedOptionEnterprise?.value,
+              requestBody: data
+            }
+          console.log("edit is click check :->",object);
+          try{
+            dispatch(startLoading()); // Dispatch the startLoading action
+            
+            let result_data =  await executePatchDeviceLambda(user?.credentials, object);
+            console.log('result_data',result_data);
+            if(result_data.statusCode == 200) {
+              setDialogData({
+                title: "Success",
+                message: "Device update is successfully",
+                onClickAction: async () => {
+                  
+                  console.log("handleEditDevice");
+                },
+              })
+            } else {
+              setDialogData({
+                title: "Error",
+                message: "Something went wrong",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error handleEditDevice");
+                },
+              })
+            }
+          } catch( err) {
+            handleError(err, 'Error handleEditDevice')
+          } finally {
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          }
         },
       })
     }

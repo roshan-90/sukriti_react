@@ -56,6 +56,7 @@ export default function EnrollDevice() {
   const cabinList = useSelector((state) => state.androidManagement.cabinList);
   const [dialogData, setDialogData] = useState(null);
   const [dialogCabinDetails, setDialogCabinDetails] = useState(false);
+  const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
@@ -472,6 +473,18 @@ export default function EnrollDevice() {
   }
 
   const handleSaveData = async () => {
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+      { 
+         setDialogData({
+         title: "Validation Error",
+         message: "Please Select Enterprise",
+         onClickAction: () => {
+           // Handle the action when the user clicks OK
+           console.log("handleEditEnterprise");
+         },
+       })
+       return;
+      }
     if(serialNumber != null && selectedCabin != null && ComplexIotDetails != null && cabinDetails != null) {
     try {
       dispatch(startLoading());
@@ -525,7 +538,7 @@ export default function EnrollDevice() {
         console.log('object',object);
         let result = await executeSaveDevicesLambda(user?.credentials, object);
         console.log('executeSaveDevicesLambda result', result);
-        let enterprise_id = "enterprises/LC02x4x4qa";
+        let enterprise_id = selectedOptionEnterprise.value;
         let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
         console.log('listPolicy', listPolicy);
         const options = listPolicy.body.map(item => ({
@@ -572,6 +585,18 @@ export default function EnrollDevice() {
 
   const handleSaveDetails = async () => {
     try {
+      if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+        { 
+           setDialogData({
+           title: "Validation Error",
+           message: "Please Select Enterprise",
+           onClickAction: () => {
+             // Handle the action when the user clicks OK
+             console.log("handleEditEnterprise");
+           },
+         })
+         return;
+        }
       dispatch(startLoading());
     let object_application_details = {
       serial_number: serialNumber,
@@ -604,7 +629,7 @@ export default function EnrollDevice() {
               message: "Policy Details " + policy_update.body,
               onClickAction: async () => {
                 let object = {
-                  name : "enterprises/LC02x4x4qa",
+                  name : selectedOptionEnterprise.value,
                   policy_name: policyName,
                   serial_number: serialNumber
                 }

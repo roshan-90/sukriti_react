@@ -21,6 +21,7 @@ const ModalEditDevices = ({ data }) => {
   const [displayName, setDisplayName] = useState(null); // State for react-select
   const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const policyName = useSelector((state) => state.androidManagement.policyName);
+  const [selectedDeviceState, setSelectedDeviceState] = useState(null);
 
   const device_state = [
     { label: 'DEVICE_STATE_UNSPECIFIED', value: 'DEVICE_STATE_UNSPECIFIED' },
@@ -52,7 +53,12 @@ const ModalEditDevices = ({ data }) => {
   const handleButtonClick = () => {
     handleClose();
     if (onClickAction !== undefined) {
-      onClickAction(displayName);
+      let requestBody = {
+        state : selectedDeviceState.value,
+        policyName: policyName.value,
+        name: displayName
+      }
+      onClickAction(requestBody);
       setOpen(false);
       setDisplayName(null);
     }
@@ -62,6 +68,10 @@ const ModalEditDevices = ({ data }) => {
     console.log('selectionOption',selectionOption);
     dispatch(setPolicyName(selectionOption))
   }
+
+  const handleChangeDeviceState = async (selectionOption) => {
+    setSelectedDeviceState(selectionOption);
+  }
   
   if(data) {
     console.log('data.options',data.options);
@@ -69,7 +79,7 @@ const ModalEditDevices = ({ data }) => {
       <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="sm" fullWidth
       PaperProps={{
         style: {
-          height: '55%', // Adjust the maximum height as needed
+          height: '85%', // Adjust the maximum height as needed
         },
       }}>
         <DialogTitle>{title}</DialogTitle>
@@ -91,9 +101,9 @@ const ModalEditDevices = ({ data }) => {
               />
             <br/>
             <Input
-                id="displayName"
-                name="displayName"
-                placeholder="Please Enter displayName"
+                id="disabledReason"
+                name="disabledReason"
+                placeholder="Please Enter disabledReason"
                 type="text"
                 onChange= {(e) => setDisplayName(e.target.value)}
               />
@@ -105,6 +115,15 @@ const ModalEditDevices = ({ data }) => {
               placeholder="Select Policy"
               className="select-dropdown"
             />
+            <br/>
+            <Select
+              options={device_state || []}
+              value={selectedDeviceState}
+              onChange={handleChangeDeviceState}
+              placeholder="Select Device State"
+              className="select-dropdown"
+            />
+            <br/>
           </div>
         </DialogContent>
         <DialogActions>
