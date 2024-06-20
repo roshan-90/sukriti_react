@@ -757,12 +757,13 @@ function AndroidDetails() {
               <Button
                 onClick={() => handleEditDevice(selectedDeviceFetch?.android_data?.name)}
                 color="primary"
-                className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+                className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
                 style={{
                   ...whiteSurfaceCircularBorder,
-                  width: "30px",
-                  height: "30px",
+                  width: "50px",
+                  height: "35px",
                   fontSize: "14px", // Adjust font size here
+                  marginRight: "18px"
                 }}
               >
                 <span style={{ marginRight: '2px', color: "blue"}}><EditIcon/></span>
@@ -770,11 +771,11 @@ function AndroidDetails() {
               <Button
                   onClick={() => handleDeleteDevice(selectedDeviceFetch?.android_data?.name)}
                   color="primary"
-                  className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+                  className="px-2 d-flex align-items-center delete_button_device" // Adjust padding and add flex properties
                   style={{
                     ...whiteSurfaceCircularBorder,
-                    width: "30px",
-                    height: "30px",
+                    width: "50px",
+                    height: "35px",
                     fontSize: "14px", // Adjust font size here
                   }}
                 >
