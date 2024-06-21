@@ -905,10 +905,6 @@ function AndroidDetails() {
                           {selectedDeviceFetch?.android_data?.enrollmentTokenName}
                         </p>
                         <p>
-                          <b>Enrollment Token Data:</b>{" "}
-                          {selectedDeviceFetch?.android_data?.enrollmentTokenData}
-                        </p>
-                        <p>
                           <b>Username:</b>{" "}
                           {selectedDeviceFetch?.android_data?.userName}
                         </p>
