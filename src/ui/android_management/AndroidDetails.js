@@ -48,6 +48,7 @@ import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path base
 import ModalConfirmDialog from "../../dialogs/ModalConfirmDialog";
 import ComplexNavigationCompact from "./ComplexNavigationCompact";
 import ModalEditDevices from './ModalEditDevices';
+import ModalCreatePolicy from './ModalCreatePolicy';
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -105,7 +106,7 @@ function AndroidDetails() {
   const listDeviceFetch = useSelector((state) => state.androidManagement.listDevice);
   const selectedDeviceFetch = useSelector((state) => state.androidManagement.selectedDevice);
   const [dialogData, setDialogData] = useState(null);
-  const [listDevices, setListDevices] = useState(undefined);
+  const [dialogCreatePolicy, setDialogCreatePolicy] = useState(false);
   const [showDeviceData, setShowDeviceData] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
   const [showEnterpriseCheck, setShowEnterpriseCheck] = useState(false)
@@ -119,7 +120,7 @@ function AndroidDetails() {
   const [dialogEditDevice , setDialogEditDevice] = useState(null);
   const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const policyName = useSelector((state) => state.androidManagement.policyName);
-
+  const [listDevices, setListDevices] = useState(undefined);
 
   const handleChangePolicy = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
@@ -537,7 +538,62 @@ function AndroidDetails() {
   }
 
   const createPolicy =  async() => {
-
+    console.log('createPolicy clicked',selectedOptionEnterprise?.value);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+     { 
+        setDialogData({
+        title: "Validation Error",
+        message: "Please Select Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleEditDevice");
+        },
+      })
+    } else {
+      setDialogCreatePolicy({
+        title: "Create Policy",
+        message: selectedOptionEnterprise.label,
+        onClickAction: async (data) => {
+          console.log('data',data);
+          //   let object = {
+          //     command : "patch_device",
+          //     deviceId : deviceId,
+          //     enterpriseId: selectedOptionEnterprise?.value,
+          //     requestBody: data
+          //   }
+          // console.log("edit is click check :->",object);
+          // try{
+          //   dispatch(startLoading()); // Dispatch the startLoading action
+            
+          //   let result_data =  await executePatchDeviceLambda(user?.credentials, object);
+          //   console.log('result_data',result_data);
+          //   if(result_data.statusCode == 200) {
+          //     setDialogData({
+          //       title: "Success",
+          //       message: "Device update is successfully",
+          //       onClickAction: async () => {
+                  
+          //         console.log("handleEditDevice");
+          //       },
+          //     })
+          //   } else {
+          //     setDialogData({
+          //       title: "Error",
+          //       message: "Something went wrong",
+          //       onClickAction: () => {
+          //         // Handle the action when the user clicks OK
+          //         console.log("error handleEditDevice");
+          //       },
+          //     })
+          //   }
+          // } catch( err) {
+          //   handleError(err, 'Error handleEditDevice')
+          // } finally {
+          //   dispatch(stopLoading()); // Dispatch the stopLoading action
+          // }
+        },
+      })
+    }
   }
 
   const ListDeviceHeader = () => {
@@ -980,6 +1036,7 @@ function AndroidDetails() {
         <ModalConfirmDialog data={dialogDeleteData} />
         <ModalEditEnterprise data={dialogEditEnterprise} />
         <ModalEditDevices data={dialogEditDevice} />
+        <ModalCreatePolicy data={dialogCreatePolicy} />
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
