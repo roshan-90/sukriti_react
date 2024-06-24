@@ -268,6 +268,28 @@ const ModalCreatePolicy = ({ data }) => {
                 }}
               />
               </FormGroup>
+              <>
+                {applicationState && (
+                  <>
+                    <Select
+                      options={listofPolicy || []}
+                      value={policyName}
+                      onChange={handleChangePolicy}
+                      placeholder="Select Policy"
+                      className="select-dropdown"
+                    />
+                    <br />
+                    <Select
+                      options={device_state || []}
+                      value={selectedDeviceState}
+                      onChange={handleChangeDeviceState}
+                      placeholder="Select Device State"
+                      className="select-dropdown"
+                    />
+                    <br />
+                  </>
+                )}
+              </>
               <FormGroup switch>
                <Label> kioskCustomization </Label>
               <Input
@@ -280,7 +302,7 @@ const ModalCreatePolicy = ({ data }) => {
               </FormGroup>
             </Form>
             <br/>
-            {/* <Select
+            <Select
               options={listofPolicy || []}
               value={policyName}
               onChange={handleChangePolicy}
@@ -294,7 +316,7 @@ const ModalCreatePolicy = ({ data }) => {
               onChange={handleChangeDeviceState}
               placeholder="Select Device State"
               className="select-dropdown"
-            /> */}
+            />
             <br/>
           </div>
         </DialogContent>
