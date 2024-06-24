@@ -22,10 +22,6 @@
   flex-direction: row;
 }
 
-.select-container {
-  margin-left: 60%;/* Allow the select container to grow and take up available space */
-}
-
 .select-dropdown {
   width: 100%; /* Ensure the select takes up the full width of its container */
 }
@@ -49,4 +45,8 @@
   cursor: pointer;
   margin-left: 10px; /* Push the button to the right */
   margin-top: 6px; /* Push the button to the right */
+}
+
+.select-container {
+  width: 40%; /* Ensure the select takes up the full width of its container */
 }

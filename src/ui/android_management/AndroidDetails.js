@@ -25,7 +25,7 @@ import {
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy} from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName } from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -117,6 +117,14 @@ function AndroidDetails() {
   const [dialogDeleteData, setDialogDeleteData] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const [dialogEditDevice , setDialogEditDevice] = useState(null);
+  const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
+  const policyName = useSelector((state) => state.androidManagement.policyName);
+
+
+  const handleChangePolicy = async (selectionOption) => {
+    console.log('selectionOption',selectionOption);
+    dispatch(setPolicyName(selectionOption))
+  }
 
   const handleCheckboxChange = (event) => {
       setIsChecked(event.target.checked);
@@ -520,6 +528,18 @@ function AndroidDetails() {
     );
   };
 
+  const handleDeletePolicy = async () => {
+
+  }
+
+  const handleEditPolicy = async() => {
+
+  }
+
+  const createPolicy =  async() => {
+
+  }
+  
   const ListDeviceHeader = () => {
     return (
       <div
@@ -967,8 +987,9 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
-            
-                  <div className="container-item">   
+            <div className="row">
+              <div className="col-6"> 
+                <div className="container-item ">   
                   <div className="select-container">               
                     <Select
                       options={listEnterprise || []}
@@ -1017,6 +1038,59 @@ function AndroidDetails() {
                     <DeleteIcon  color="error"/>
                   </Button>
                 </div>
+                </div>
+                <div className="col-6"> 
+                <div className="container-item policy-container">   
+                  <div className="select-container">               
+                    <Select
+                      options={listofPolicy || []}
+                      value={policyName}
+                      onChange={handleChangePolicy}
+                      placeholder="Select Policy"
+                      className="select-dropdown"
+                    />
+                  </div>
+                    <div>
+                      <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={handleCheckboxChange}
+                          className="big-checkbox"
+                      />
+                </div>
+                  <Button
+                    onClick={() => {
+                      createPolicy();
+                    }}
+                    outline
+                    color="primary"
+                    className="add-button"
+                  >
+                    <AddIcon />
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleEditPolicy();
+                    }}
+                    outline
+                    color="primary"
+                    className="edit-button"
+                  >
+                    <EditIcon />
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleDeletePolicy();
+                    }}
+                    outline
+                    color="primary"
+                    className="delete-button"
+                  >
+                    <DeleteIcon  color="error"/>
+                  </Button>
+                </div>
+                </div>
+            </div>
             <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
           </div>
         </div>

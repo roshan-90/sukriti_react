@@ -16,7 +16,7 @@ const initialState = {
   cabinTypeList: [],
   userTypeList: [],
   cabinName: null,
-  listOfPolicy: {},
+  listOfPolicy: null,
   policyName: null,
   listEnterprise: null,
   selectedOptionEnterprise: null,
