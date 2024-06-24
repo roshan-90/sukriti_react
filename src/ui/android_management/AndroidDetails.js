@@ -539,7 +539,7 @@ function AndroidDetails() {
   const createPolicy =  async() => {
 
   }
-  
+
   const ListDeviceHeader = () => {
     return (
       <div
@@ -1050,14 +1050,6 @@ function AndroidDetails() {
                       className="select-dropdown"
                     />
                   </div>
-                    <div>
-                      <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={handleCheckboxChange}
-                          className="big-checkbox"
-                      />
-                </div>
                   <Button
                     onClick={() => {
                       createPolicy();
