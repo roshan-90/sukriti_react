@@ -21,11 +21,16 @@ const ModalCreatePolicy = ({ data }) => {
   const [displayName, setDisplayName] = useState(null); // State for react-select
   const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const [selectedDeviceState, setSelectedDeviceState] = useState(null);
-  const [applicationName, setApplicationName] = useState(null);
+  const [packageName, setPackageName] = useState(null);
   const [installType, setInstallType] = useState(null);
   const [defaultPermissionPolicy, setDefaultPermissionPolicy] = useState(null);
   const [autoUpdateMode, setAutoUpdateMode] = useState(null);
   const [userControlSettings, setUserControlSettings] = useState(null);
+  const [powerButtonActions, setPowerButtonActions] = useState(null);
+  const [systemErrorWarnings , setSystemErrorWarnings] = useState(null);
+  const [systemNavigation , setSystemNavigation] = useState(null);
+  const [statusBar, setStatusBar] = useState(null);
+  const [deviceSettings, setDeviceSettings] = useState(null);
   const [formData, setFormData] = useState({
     "cameraDisabled": true,
     "addUserDisabled": true,
@@ -79,12 +84,12 @@ const ModalCreatePolicy = ({ data }) => {
     { label: 'POWER_BUTTON_BLOCKED', value: 'POWER_BUTTON_BLOCKED' },
   ];
 
-  const systemErrorWarnings = [
+  const SystemErrorWarnings = [
     { label: 'SYSTEM_ERROR_WARNINGS_UNSPECIFIED', value: 'SYSTEM_ERROR_WARNINGS_UNSPECIFIED' },
     { label: 'ERROR_AND_WARNINGS_ENABLED', value: 'ERROR_AND_WARNINGS_ENABLED' },
     { label: 'ERROR_AND_WARNINGS_MUTED', value: 'ERROR_AND_WARNINGS_MUTED' }
   ];
-  const systemNavigation = [
+  const SystemNavigation = [
     { label: 'SYSTEM_NAVIGATION_UNSPECIFIED', value: 'SYSTEM_NAVIGATION_UNSPECIFIED' },
     { label: 'NAVIGATION_ENABLED', value: 'NAVIGATION_ENABLED' },
     { label: 'NAVIGATION_DISABLED', value: 'NAVIGATION_DISABLED' },
@@ -129,11 +134,6 @@ const ModalCreatePolicy = ({ data }) => {
     }
   };
 
-  const handleChangePolicy = async (selectionOption) => {
-    console.log('selectionOption',selectionOption);
-    dispatch(setPolicyName(selectionOption))
-  }
-
   const handleChangeInstallType = async (selectionOption) => {
     setInstallType(selectionOption);
   }
@@ -149,7 +149,23 @@ const ModalCreatePolicy = ({ data }) => {
   const handleChangeUserControlSettings = async (selectionOption) => {
     setUserControlSettings(selectionOption)
   }
-  
+
+  const handleChangePowerButtonActions = (selectionOption) => {
+    setPowerButtonActions(selectionOption)
+  }
+  const handleChangeSystemErrorWarnings = (selectionOption) => {
+    setSystemErrorWarnings(selectionOption)
+  }
+  const handleChangeSystemNavigation = (selectionOption) => {
+    setSystemNavigation(selectionOption)
+  }
+  const handleChangeStatusBar = (selectionOption) => {
+    setStatusBar(selectionOption)
+  }
+  const handleChangeDeviceSettings = (selectionOption) => {
+    setDeviceSettings(selectionOption)
+  }
+
   if(data) {
     console.log('data.options',data.options);
     return (
@@ -186,7 +202,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 id="policy_name"
                 name="policy_name"
-                placeholder="enter policy_name"
+                placeholder="Enter Policy Name"
                 type="text"
                 onChange= {(e) => setPolicyName(e.target.value)}
               />
@@ -341,6 +357,52 @@ const ModalCreatePolicy = ({ data }) => {
                   setkioskCustomization(!kioskCustomization);
                 }}
               />
+              <>
+                {kioskCustomization && (
+                  <>
+                    <Select
+                      options={PowerButtonActions || []}
+                      value={powerButtonActions}
+                      onChange={handleChangePowerButtonActions}
+                      placeholder="Select Power Button Actions"
+                      className="select-dropdown"
+                    />
+                    <br/>
+                    <Select
+                      options={SystemErrorWarnings || []}
+                      value={systemErrorWarnings}
+                      onChange={handleChangeSystemErrorWarnings}
+                      placeholder="Select System Error Warnings"
+                      className="select-dropdown"
+                    />
+                    <br />
+                    <Select
+                      options={SystemNavigation || []}
+                      value={systemNavigation}
+                      onChange={handleChangeSystemNavigation}
+                      placeholder="Select System Navigation"
+                      className="select-dropdown"
+                    />
+                    <br />
+                    <Select
+                      options={StatusBar || []}
+                      value={statusBar}
+                      onChange={handleChangeStatusBar}
+                      placeholder="Select Status Bar"
+                      className="select-dropdown"
+                    />
+                    <br />
+                    <Select
+                      options={DeviceSettings || []}
+                      value={deviceSettings}
+                      onChange={handleChangeDeviceSettings}
+                      placeholder="Select Device Settings"
+                      className="select-dropdown"
+                    />
+                    <br />
+                  </>
+                )}
+              </>
               </FormGroup>
               <FormGroup switch>
                <Label> Applications </Label>
@@ -357,16 +419,16 @@ const ModalCreatePolicy = ({ data }) => {
                   <>
                         <Label
                           check
-                          for="Application Name"
+                          for="Package Name"
                         >
-                          Application Name
+                          Package Name
                       </Label>
                     <Input
-                      id="application_name"
-                      name="application_name"
-                      placeholder="enter application name"
+                      id="package_name"
+                      name="package_name"
+                      placeholder="Enter Package name"
                       type="text"
-                      onChange= {(e) => setApplicationName(e.target.value)}
+                      onChange= {(e) => setPackageName(e.target.value)}
                     />
                   <br/>
                     <Select
