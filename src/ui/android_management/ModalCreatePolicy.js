@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
+ 
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Typography,
 } from "@mui/material";
-import { Form, FormGroup, Label, Input } from 'reactstrap';
+import {  Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useDispatch, useSelector } from "react-redux";
 import Select from 'react-select'; // Importing react-select
 
@@ -49,6 +49,7 @@ const ModalCreatePolicy = ({ data }) => {
   })
   const [applicationState, setApplicationState] = useState(false);
   const [kioskCustomization , setkioskCustomization] = useState(false)
+  const [applications, setApplications] = useState([]);
 
   const InstallType = [
     { label: 'INSTALL_TYPE_UNSPECIFIED', value: 'INSTALL_TYPE_UNSPECIFIED' },
@@ -165,6 +166,14 @@ const ModalCreatePolicy = ({ data }) => {
   const handleChangeDeviceSettings = (selectionOption) => {
     setDeviceSettings(selectionOption)
   }
+  const handleAddApplication = () => {
+    setApplications([...applications, { id: applications.length }]);
+  };
+
+  const handleRemoveApplication = (id) => {
+    setApplications(applications.filter((app) => app.id !== id));
+  };
+
 
   if(data) {
     console.log('data.options',data.options);
@@ -404,68 +413,76 @@ const ModalCreatePolicy = ({ data }) => {
                 )}
               </>
               </FormGroup>
-              <FormGroup switch>
-               <Label> Applications </Label>
+              <div>
+      <FormGroup switch>
+        <Button
+          onClick={handleAddApplication}
+          outline
+          color="primary"
+          className="add-button"
+        >
+          Add Application
+        </Button>
+        <Label>Applications</Label>
+        <Input
+          type="switch"
+          checked={applicationState}
+          onClick={() => {
+            setApplicationState(!applicationState);
+          }}
+        />
+      </FormGroup>
+
+      {applications.map((application) => (
+        <div key={application.id}>
+          {applicationState && (
+            <>
+              <Label check for="Package Name">
+                Package Name
+              </Label>
               <Input
-                type="switch"
-                checked={applicationState}
-                onClick={() => {
-                  setApplicationState(!applicationState);
-                }}
+                id={`package_name_${application.id}`}
+                name="package_name"
+                placeholder="Enter Package name"
+                type="text"
+                onChange={(e) => console.log(e.target.value)}
               />
-              </FormGroup>
-              <>
-                {applicationState && (
-                  <>
-                        <Label
-                          check
-                          for="Package Name"
-                        >
-                          Package Name
-                      </Label>
-                    <Input
-                      id="package_name"
-                      name="package_name"
-                      placeholder="Enter Package name"
-                      type="text"
-                      onChange= {(e) => setPackageName(e.target.value)}
-                    />
-                  <br/>
-                    <Select
-                      options={InstallType || []}
-                      value={installType}
-                      onChange={handleChangeInstallType}
-                      placeholder="Select Install Type"
-                      className="select-dropdown"
-                    />
-                    <br/>
-                    <Select
-                      options={DefaultPermissionPolicy || []}
-                      value={defaultPermissionPolicy}
-                      onChange={handleChangeDefaultPermissionPolicy}
-                      placeholder="Select Default Permission Policy"
-                      className="select-dropdown"
-                    />
-                    <br />
-                    <Select
-                      options={AutoUpdateMode || []}
-                      value={autoUpdateMode}
-                      onChange={handleChangeAutoUpdateMode}
-                      placeholder="Select Auto Update Mode"
-                      className="select-dropdown"
-                    />
-                    <br />
-                    <Select
-                      options={UserControlSettings || []}
-                      value={userControlSettings}
-                      onChange={handleChangeUserControlSettings}
-                      placeholder="Select Auto Update Mode"
-                      className="select-dropdown"
-                    />
-                    <br />
-                  </>
-                )}
-              </>
+              <br />
+              <Select
+                options={InstallType || []}
+                placeholder="Select Install Type"
+                className="select-dropdown"
+              />
+              <br />
+              <Select
+                options={DefaultPermissionPolicy || []}
+                placeholder="Select Default Permission Policy"
+                className="select-dropdown"
+              />
+              <br />
+              <Select
+                options={AutoUpdateMode || []}
+                placeholder="Select Auto Update Mode"
+                className="select-dropdown"
+              />
+              <br />
+              <Select
+                options={UserControlSettings || []}
+                placeholder="Select Auto Update Mode"
+                className="select-dropdown"
+              />
+              <br />
+              <Button
+                onClick={() => handleRemoveApplication(application.id)}
+                color="danger"
+              >
+                Delete Application
+              </Button>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
             </Form>
             <br/>
             
