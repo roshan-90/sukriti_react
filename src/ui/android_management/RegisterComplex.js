@@ -122,7 +122,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     try {
       dispatch(startLoading());
       let command = "list-iot-state";
-      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
+      var result = await executelistIotSingleLambda(user.username,user?.credentials, command);
       console.log('result',result);
       // Map raw data to react-select format
       const options = result.body.map(item => ({
@@ -165,7 +165,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     try {
       dispatch(startLoading());
       let command = "list-iot-district";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value,command);
       console.log('result',result);
       console.log('result.body',result.body);
       if(result.statusCode !== 404){
@@ -187,7 +187,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     try {
       dispatch(startLoading());
       let command = "list-iot-city";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value, command);
       console.log('result',result);
       if(result.statusCode !== 404){
         // Map raw data to react-select format
@@ -370,7 +370,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       }
       dispatch(startLoading());
       let command = "list-ddb-district";
-      var result = await executelistIotDynamicLambda('test_rk_mandi',user?.credentials, selectedOption.value, command);
+      var result = await executelistIotDynamicLambda(user.username,user?.credentials, selectedOption.value, command);
       console.log('result New District',result);
       const options = result.body.map(item => ({
         value: item.Code,
@@ -418,7 +418,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       }
       dispatch(startLoading());
       let command = "list-ddb-city";
-      var result = await executelistDDbCityLambda('test_rk_mandi',user?.credentials, selectedOption.value, selectedOptionIotDistrict.value, command);
+      var result = await executelistDDbCityLambda(user.username,user?.credentials, selectedOption.value, selectedOptionIotDistrict.value, command);
       console.log('result New City',result);
       const options = result.body.map(item => ({
         value: item.Code,
@@ -453,7 +453,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     try {
       dispatch(startLoading());
       let command = "list-ddb-state";
-      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
       console.log('result',result);
       const options = result.body.map(item => ({
         value: item.Code,
@@ -591,15 +591,20 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     try {
       dispatch(startLoading());
       let command = "list-iot-complex";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value, command);
       console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.Name,
-        label: item.Name
-      }));
-      dispatch(setComplexIotList(options));
-      return options;
+      if(result.statusCode == 200) {
+        // Map raw data to react-select format
+        const options = result.body.map(item => ({
+          value: item.Name,
+          label: item.Name
+        }));
+        dispatch(setComplexIotList(options));
+        return options;
+      } else {
+        console.log('result.body',result.body)
+        return [];
+      }
     } catch (error) {
       handleError(error, 'Error ListOfIotComplex')
     } finally {
@@ -641,8 +646,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
 
       if(selectedOptionIotCity.value) {
         let complexList = await ListOfIotComplex(selectedOptionIotCity.value);
-        console.log('complexList', complexList.length);
-        let uuid = await setUUID(complexList.length);
+        let uuid = await setUUID(complexList.length ? complexList.length : 0);
         console.log('uuid' , uuid);
         setFormData(prevFormData => ({
             ...prevFormData,

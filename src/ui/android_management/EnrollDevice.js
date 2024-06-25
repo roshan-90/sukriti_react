@@ -165,7 +165,7 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-iot-state";
-      var result = await executelistIotSingleLambda('test_rk_mandi',user?.credentials, command);
+      var result = await executelistIotSingleLambda(user.username,user?.credentials, command);
       console.log('result',result);
       // Map raw data to react-select format
       const options = result.body.map(item => ({
@@ -184,7 +184,7 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-iot-district";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value,command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value,command);
       console.log('result',result);
       // Map raw data to react-select format
       const options = result.body.map(item => ({
@@ -203,7 +203,7 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-iot-city";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value, command);
       console.log('result',result);
       // Map raw data to react-select format
       const options = result.body.map(item => ({
@@ -222,14 +222,18 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-iot-complex";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value, command);
       console.log('result',result);
-      // Map raw data to react-select format
-      const options = result.body.map(item => ({
-        value: item.Name,
-        label: item.Name
-      }));
-      dispatch(setComplexIotList(options));
+      if(result.statusCode == 200) {
+        // Map raw data to react-select format
+        const options = result.body.map(item => ({
+          value: item.Name,
+          label: item.Name
+        }));
+        dispatch(setComplexIotList(options));
+      } else {
+        console.log('result.body',result.body)
+      }
     } catch (error) {
       handleError(error, 'Error ListOfIotComplex')
     } finally {
@@ -241,7 +245,7 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-iot-complexDetail";
-      var result = await executelistIotDynamicLambda('test_rk_mandi', user?.credentials, value, command);
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value, command);
       console.log('result complexDetail',result.body);
       dispatch(setComplexIotDetail(result.body));
     } catch (error) {
@@ -255,7 +259,7 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-iot-clientName";
-      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
       console.log('result ClientName', result.body);
       const options = result.body.map(item => ({
         value: item.Name,
@@ -273,7 +277,7 @@ export default function EnrollDevice() {
     try {
       dispatch(startLoading());
       let command = "list-billing-groups";
-      var result = await executelistIotSingleLambda('test_rk_mandi', user?.credentials, command);
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
       console.log('result ListOfIotBillingGroup', result.body);
       const options = result.body.map(item => ({
         value: item.Name,
