@@ -117,8 +117,23 @@ const ModalCreatePolicy = ({ data }) => {
   const handleButtonClick = () => {
     console.log('applicationState',applicationState);
     console.log('kioskCustomization',kioskCustomization);
-
-    let data = {};
+    console.log('formData',formData);
+    let data = {
+      cameraDisabled: formData.cameraDisabled,
+      addUserDisabled: formData.addUserDisabled,
+      removeUserDisabled: formData.removeUserDisabled,
+      factoryResetDisabled: formData.factoryResetDisabled,
+      mountPhysicalMediaDisabled: formData.mountPhysicalMediaDisabled,
+      safeBootDisabled: formData.safeBootDisabled,
+      uninstallAppsDisabled: formData.uninstallAppsDisabled,
+      bluetoothConfigDisabled: formData.bluetoothConfigDisabled,
+      vpnConfigDisabled: formData.vpnConfigDisabled,
+      networkResetDisabled: formData.networkResetDisabled,
+      smsDisabled: formData.smsDisabled,
+      modifyAccountsDisabled: formData.modifyAccountsDisabled,
+      outgoingCallsDisabled: formData.outgoingCallsDisabled,
+      kioskCustomLauncherEnabled: formData.kioskCustomLauncherEnabled,
+    };
     if(kioskCustomization == true) {
       if(powerButtonActions?.value && systemErrorWarnings?.value && systemNavigation?.value && statusBar?.value && deviceSettings?.value){
         let kioskCustomization = {
@@ -147,9 +162,9 @@ const ModalCreatePolicy = ({ data }) => {
     if (onClickAction !== undefined) {
       let requestBody = {
         policy_name: policyName,
-        field_to_patch : formData
+        field_to_patch : data
       }
-      onClickAction({requestBody,data});
+      onClickAction(requestBody);
       setOpen(false);
     }
   };
@@ -204,7 +219,13 @@ const ModalCreatePolicy = ({ data }) => {
     );
   };
 
-  
+  const handleToggle = (field) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [field]: !prevFormData[field],
+    }));
+  };
+
   if(data) {
     console.log('data.options',data.options);
     return (
@@ -252,9 +273,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.cameraDisabled}
-                onClick={() => {
-                  setFormData(!formData.cameraDisabled);
-                }}
+                onClick={() => handleToggle('cameraDisabled')}
               />
             </FormGroup>
             <FormGroup switch>
@@ -262,9 +281,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.addUserDisabled}
-                onClick={() => {
-                  setFormData(!formData.addUserDisabled);
-                }}
+                onClick={() => handleToggle('addUserDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -272,9 +289,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.removeUserDisabled}
-                onClick={() => {
-                  setFormData(!formData.removeUserDisabled);
-                }}
+                onClick={() => handleToggle('removeUserDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -282,9 +297,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.factoryResetDisabled}
-                onClick={() => {
-                  setFormData(!formData.factoryResetDisabled);
-                }}
+                onClick={() => handleToggle('factoryResetDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -292,9 +305,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.mountPhysicalMediaDisabled}
-                onClick={() => {
-                  setFormData(!formData.mountPhysicalMediaDisabled);
-                }}
+                onClick={() => handleToggle('mountPhysicalMediaDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -302,9 +313,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.safeBootDisabled}
-                onClick={() => {
-                  setFormData(!formData.safeBootDisabled);
-                }}
+                onClick={() => handleToggle('safeBootDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -312,9 +321,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.uninstallAppsDisabled}
-                onClick={() => {
-                  setFormData(!formData.uninstallAppsDisabled);
-                }}
+                onClick={() => handleToggle('uninstallAppsDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -322,9 +329,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.bluetoothConfigDisabled}
-                onClick={() => {
-                  setFormData(!formData.bluetoothConfigDisabled);
-                }}
+                onClick={() => handleToggle('bluetoothConfigDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -332,9 +337,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.vpnConfigDisabled}
-                onClick={() => {
-                  setFormData(!formData.vpnConfigDisabled);
-                }}
+                onClick={() => handleToggle('vpnConfigDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -342,9 +345,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.networkResetDisabled}
-                onClick={() => {
-                  setFormData(!formData.networkResetDisabled);
-                }}
+                onClick={() => handleToggle('networkResetDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -352,9 +353,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.smsDisabled}
-                onClick={() => {
-                  setFormData(!formData.smsDisabled);
-                }}
+                onClick={() => handleToggle('smsDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -362,9 +361,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.modifyAccountsDisabled}
-                onClick={() => {
-                  setFormData(!formData.modifyAccountsDisabled);
-                }}
+                onClick={() => handleToggle('modifyAccountsDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -372,9 +369,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.outgoingCallsDisabled}
-                onClick={() => {
-                  setFormData(!formData.outgoingCallsDisabled);
-                }}
+                onClick={() => handleToggle('outgoingCallsDisabled')}
               />
               </FormGroup>
               <FormGroup switch>
@@ -382,9 +377,7 @@ const ModalCreatePolicy = ({ data }) => {
               <Input
                 type="switch"
                 checked={formData.kioskCustomLauncherEnabled}
-                onClick={() => {
-                  setFormData(!formData.kioskCustomLauncherEnabled);
-                }}
+                onClick={() => handleToggle('kioskCustomLauncherEnabled')}
               />
               </FormGroup>
               <FormGroup switch>

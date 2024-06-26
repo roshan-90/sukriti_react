@@ -20,7 +20,8 @@ import {
   executeDeleteEnterpriseAndroidManagementLambda,
   executeUpdateEnterpriseLambda,
   executeListPolicyLambda,
-  executePatchDeviceLambda
+  executePatchDeviceLambda,
+  executeCreatePolicyLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -554,43 +555,37 @@ function AndroidDetails() {
         title: "Create Policy",
         message: selectedOptionEnterprise.label,
         onClickAction: async (data) => {
+          data.enterprises_id = selectedOptionEnterprise.value;
           console.log('data',data);
-          //   let object = {
-          //     command : "patch_device",
-          //     deviceId : deviceId,
-          //     enterpriseId: selectedOptionEnterprise?.value,
-          //     requestBody: data
-          //   }
-          // console.log("edit is click check :->",object);
-          // try{
-          //   dispatch(startLoading()); // Dispatch the startLoading action
+          try{
+            dispatch(startLoading()); // Dispatch the startLoading action
             
-          //   let result_data =  await executePatchDeviceLambda(user?.credentials, object);
-          //   console.log('result_data',result_data);
-          //   if(result_data.statusCode == 200) {
-          //     setDialogData({
-          //       title: "Success",
-          //       message: "Device update is successfully",
-          //       onClickAction: async () => {
+            let result_data =  await executeCreatePolicyLambda(user?.credentials, data);
+            console.log('result_data',result_data);
+            if(result_data.statusCode == 200) {
+              setDialogData({
+                title: "Success",
+                message: "Policy Created is successfully",
+                onClickAction: async () => {
                   
-          //         console.log("handleEditDevice");
-          //       },
-          //     })
-          //   } else {
-          //     setDialogData({
-          //       title: "Error",
-          //       message: "Something went wrong",
-          //       onClickAction: () => {
-          //         // Handle the action when the user clicks OK
-          //         console.log("error handleEditDevice");
-          //       },
-          //     })
-          //   }
-          // } catch( err) {
-          //   handleError(err, 'Error handleEditDevice')
-          // } finally {
-          //   dispatch(stopLoading()); // Dispatch the stopLoading action
-          // }
+                  console.log("createPolicy function");
+                },
+              })
+            } else {
+              setDialogData({
+                title: "Error",
+                message: "Something went wrong",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error createPolicy");
+                },
+              })
+            }
+          } catch( err) {
+            handleError(err, 'Error createPolicy')
+          } finally {
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          }
         },
       })
     }
