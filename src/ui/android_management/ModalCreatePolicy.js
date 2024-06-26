@@ -167,14 +167,41 @@ const ModalCreatePolicy = ({ data }) => {
     setDeviceSettings(selectionOption)
   }
   const handleAddApplication = () => {
-    setApplications([...applications, { id: applications.length }]);
+    setApplications([
+      ...applications,
+      {
+        packageName: '',
+        installType: null,
+        defaultPermissionPolicy: null,
+        autoUpdateMode: null,
+        userControlSettings: null,
+      },
+    ]);
   };
 
-  const handleRemoveApplication = (id) => {
-    setApplications(applications.filter((app) => app.id !== id));
+  const handleRemoveApplication = (index) => {
+    const updatedApplications = applications.filter((_, i) => i !== index);
+    setApplications(updatedApplications);
   };
 
+  const handleChange = (index, field, value) => {
+    const updatedApplications = applications.map((app, i) =>
+      i === index ? { ...app, [field]: value } : app
+    );
+    setApplications(updatedApplications);
+  };
 
+  const validateForm = (application) => {
+    return (
+      application.packageName &&
+      application.installType &&
+      application.defaultPermissionPolicy &&
+      application.autoUpdateMode &&
+      application.userControlSettings
+    );
+  };
+  
+  
   if(data) {
     console.log('data.options',data.options);
     return (
@@ -414,7 +441,7 @@ const ModalCreatePolicy = ({ data }) => {
               </>
               </FormGroup>
               <div>
-      <FormGroup switch>
+              <FormGroup switch>
         <Button
           onClick={handleAddApplication}
           outline
@@ -433,55 +460,105 @@ const ModalCreatePolicy = ({ data }) => {
         />
       </FormGroup>
 
-      {applications.map((application) => (
-        <div key={application.id}>
+      {applications.map((application, index) => (
+        <div key={index}>
           {applicationState && (
             <>
-              <Label check for="Package Name">
+              <Label check for={`package_name_${index}`}>
                 Package Name
               </Label>
               <Input
-                id={`package_name_${application.id}`}
+                id={`package_name_${index}`}
                 name="package_name"
                 placeholder="Enter Package name"
                 type="text"
-                onChange={(e) => console.log(e.target.value)}
+                value={application.packageName}
+                onChange={(e) =>
+                  handleChange(index, 'packageName', e.target.value)
+                }
               />
               <br />
               <Select
-                options={InstallType || []}
+                options={InstallType}
+                value={InstallType.find(
+                  (option) => option.value === application.installType
+                )}
+                onChange={(selectedOption) =>
+                  handleChange(index, 'installType', selectedOption.value)
+                }
                 placeholder="Select Install Type"
                 className="select-dropdown"
               />
               <br />
               <Select
-                options={DefaultPermissionPolicy || []}
+                options={DefaultPermissionPolicy}
+                value={DefaultPermissionPolicy.find(
+                  (option) =>
+                    option.value === application.defaultPermissionPolicy
+                )}
+                onChange={(selectedOption) =>
+                  handleChange(
+                    index,
+                    'defaultPermissionPolicy',
+                    selectedOption.value
+                  )
+                }
                 placeholder="Select Default Permission Policy"
                 className="select-dropdown"
               />
               <br />
               <Select
-                options={AutoUpdateMode || []}
+                options={AutoUpdateMode}
+                value={AutoUpdateMode.find(
+                  (option) => option.value === application.autoUpdateMode
+                )}
+                onChange={(selectedOption) =>
+                  handleChange(index, 'autoUpdateMode', selectedOption.value)
+                }
                 placeholder="Select Auto Update Mode"
                 className="select-dropdown"
               />
               <br />
               <Select
-                options={UserControlSettings || []}
-                placeholder="Select Auto Update Mode"
+                options={UserControlSettings}
+                value={UserControlSettings.find(
+                  (option) => option.value === application.userControlSettings
+                )}
+                onChange={(selectedOption) =>
+                  handleChange(
+                    index,
+                    'userControlSettings',
+                    selectedOption.value
+                  )
+                }
+                placeholder="Select User Control Settings"
                 className="select-dropdown"
               />
               <br />
               <Button
-                onClick={() => handleRemoveApplication(application.id)}
+                onClick={() => handleRemoveApplication(index)}
                 color="danger"
               >
                 Delete Application
               </Button>
             </>
           )}
-        </div>
+           </div>
       ))}
+
+      <Button
+        onClick={() => {
+          const isValid = applications.every(validateForm);
+          if (isValid) {
+            console.log('Applications:', applications);
+          } else {
+            alert('Please fill out all fields.');
+          }
+        }}
+        color="primary"
+      >
+        Submit
+      </Button>
     </div>
             </Form>
             <br/>
