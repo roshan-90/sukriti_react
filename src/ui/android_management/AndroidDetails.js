@@ -50,6 +50,8 @@ import ModalConfirmDialog from "../../dialogs/ModalConfirmDialog";
 import ComplexNavigationCompact from "./ComplexNavigationCompact";
 import ModalEditDevices from './ModalEditDevices';
 import ModalCreatePolicy from './ModalCreatePolicy';
+import ModalUpdatePolicy from './ModalUpdatePolicy';
+
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -122,6 +124,7 @@ function AndroidDetails() {
   const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const policyName = useSelector((state) => state.androidManagement.policyName);
   const [listDevices, setListDevices] = useState(undefined);
+  const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
 
   const handleChangePolicy = async (selectionOption) => {
     console.log('selectionOption',selectionOption);
@@ -591,6 +594,30 @@ function AndroidDetails() {
     }
   }
 
+  const updatePolicy = async() => {
+    console.log('updatePolicy clicked',selectedOptionEnterprise?.value);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+     { 
+        setDialogData({
+        title: "Validation Error",
+        message: "Please Select Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("updatePolicy");
+        },
+      })
+    } else {
+      setDialogUpdatePolicy({
+        title: "Update Policy",
+        message: selectedOptionEnterprise.label,
+        onClickAction: async (data) => {
+          console.log('data',data);
+          
+        },
+      })
+    }
+  }
+
   const ListDeviceHeader = () => {
     return (
       <div
@@ -1032,6 +1059,7 @@ function AndroidDetails() {
         <ModalEditEnterprise data={dialogEditEnterprise} />
         <ModalEditDevices data={dialogEditDevice} />
         <ModalCreatePolicy data={dialogCreatePolicy} />
+        <ModalUpdatePolicy data={dialogUpdatePolicy} />
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
@@ -1114,7 +1142,7 @@ function AndroidDetails() {
                   </Button>
                   <Button
                     onClick={() => {
-                      handleEditPolicy();
+                      updatePolicy();
                     }}
                     outline
                     color="primary"
