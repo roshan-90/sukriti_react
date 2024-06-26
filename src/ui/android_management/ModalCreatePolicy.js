@@ -118,55 +118,60 @@ const ModalCreatePolicy = ({ data }) => {
     console.log('applicationState',applicationState);
     console.log('kioskCustomization',kioskCustomization);
     console.log('formData',formData);
-    let data = {
-      cameraDisabled: formData.cameraDisabled,
-      addUserDisabled: formData.addUserDisabled,
-      removeUserDisabled: formData.removeUserDisabled,
-      factoryResetDisabled: formData.factoryResetDisabled,
-      mountPhysicalMediaDisabled: formData.mountPhysicalMediaDisabled,
-      safeBootDisabled: formData.safeBootDisabled,
-      uninstallAppsDisabled: formData.uninstallAppsDisabled,
-      bluetoothConfigDisabled: formData.bluetoothConfigDisabled,
-      vpnConfigDisabled: formData.vpnConfigDisabled,
-      networkResetDisabled: formData.networkResetDisabled,
-      smsDisabled: formData.smsDisabled,
-      modifyAccountsDisabled: formData.modifyAccountsDisabled,
-      outgoingCallsDisabled: formData.outgoingCallsDisabled,
-      kioskCustomLauncherEnabled: formData.kioskCustomLauncherEnabled,
-    };
-    if(kioskCustomization == true) {
-      if(powerButtonActions?.value && systemErrorWarnings?.value && systemNavigation?.value && statusBar?.value && deviceSettings?.value){
-        let kioskCustomization = {
-          powerButtonActions: powerButtonActions?.value,
-          systemErrorWarnings: systemErrorWarnings?.value,
-          systemNavigation: systemNavigation?.value,
-          statusBar: statusBar?.value,
-          deviceSettings: deviceSettings?.value
-        };
-        data.kioskCustomization = kioskCustomization;
-      } else {
-        alert('Please fill kiosk Customization');
+    if(policyName) {
+      let data = {
+        cameraDisabled: formData.cameraDisabled,
+        addUserDisabled: formData.addUserDisabled,
+        removeUserDisabled: formData.removeUserDisabled,
+        factoryResetDisabled: formData.factoryResetDisabled,
+        mountPhysicalMediaDisabled: formData.mountPhysicalMediaDisabled,
+        safeBootDisabled: formData.safeBootDisabled,
+        uninstallAppsDisabled: formData.uninstallAppsDisabled,
+        bluetoothConfigDisabled: formData.bluetoothConfigDisabled,
+        vpnConfigDisabled: formData.vpnConfigDisabled,
+        networkResetDisabled: formData.networkResetDisabled,
+        smsDisabled: formData.smsDisabled,
+        modifyAccountsDisabled: formData.modifyAccountsDisabled,
+        outgoingCallsDisabled: formData.outgoingCallsDisabled,
+        kioskCustomLauncherEnabled: formData.kioskCustomLauncherEnabled,
+      };
+      if(kioskCustomization == true) {
+        if(powerButtonActions?.value && systemErrorWarnings?.value && systemNavigation?.value && statusBar?.value && deviceSettings?.value){
+          let kioskCustomization = {
+            powerButtonActions: powerButtonActions?.value,
+            systemErrorWarnings: systemErrorWarnings?.value,
+            systemNavigation: systemNavigation?.value,
+            statusBar: statusBar?.value,
+            deviceSettings: deviceSettings?.value
+          };
+          data.kioskCustomization = kioskCustomization;
+        } else {
+          alert('Please fill kiosk Customization');
+        }
+      } 
+  
+      if(applicationState == true) {
+        const isValid = applications.every(validateForm);
+        console.log('Applications:', applications);
+        if (isValid) {
+          data.applications = applications;
+        } else {
+          alert('Please fill out all fields.');
+        }
+      } 
+      handleClose();
+      if (onClickAction !== undefined) {
+        let requestBody = {
+          policy_name: policyName,
+          field_to_patch : data
+        }
+        onClickAction(requestBody);
+        setOpen(false);
       }
-    } 
-
-    if(applicationState == true) {
-      const isValid = applications.every(validateForm);
-      console.log('Applications:', applications);
-      if (isValid) {
-        data.applications = applications;
-      } else {
-        alert('Please fill out all fields.');
-      }
-    } 
-    handleClose();
-    if (onClickAction !== undefined) {
-      let requestBody = {
-        policy_name: policyName,
-        field_to_patch : data
-      }
-      onClickAction(requestBody);
-      setOpen(false);
+    } else {
+      alert('Please fill policy name');
     }
+  
   };
 
   const handleChangePowerButtonActions = (selectionOption) => {
