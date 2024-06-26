@@ -18,14 +18,7 @@ const ModalCreatePolicy = ({ data }) => {
   const [message, setMessage] = useState("");
   const [policyName, setPolicyName] = useState('');
   const [onClickAction, setOnClickAction] = useState(undefined);
-  const [displayName, setDisplayName] = useState(null); // State for react-select
-  const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const [selectedDeviceState, setSelectedDeviceState] = useState(null);
-  const [packageName, setPackageName] = useState(null);
-  const [installType, setInstallType] = useState(null);
-  const [defaultPermissionPolicy, setDefaultPermissionPolicy] = useState(null);
-  const [autoUpdateMode, setAutoUpdateMode] = useState(null);
-  const [userControlSettings, setUserControlSettings] = useState(null);
   const [powerButtonActions, setPowerButtonActions] = useState(null);
   const [systemErrorWarnings , setSystemErrorWarnings] = useState(null);
   const [systemNavigation , setSystemNavigation] = useState(null);
@@ -119,37 +112,47 @@ const ModalCreatePolicy = ({ data }) => {
 
   const handleClose = () => {
     setOpen(false);
-    setDisplayName(null);
   };
 
   const handleButtonClick = () => {
+    console.log('applicationState',applicationState);
+    console.log('kioskCustomization',kioskCustomization);
+
+    let data = {};
+    if(kioskCustomization == true) {
+      if(powerButtonActions?.value && systemErrorWarnings?.value && systemNavigation?.value && statusBar?.value && deviceSettings?.value){
+        let kioskCustomization = {
+          powerButtonActions: powerButtonActions?.value,
+          systemErrorWarnings: systemErrorWarnings?.value,
+          systemNavigation: systemNavigation?.value,
+          statusBar: statusBar?.value,
+          deviceSettings: deviceSettings?.value
+        };
+        data.kioskCustomization = kioskCustomization;
+      } else {
+        alert('Please fill kiosk Customization');
+      }
+    } 
+
+    if(applicationState == true) {
+      const isValid = applications.every(validateForm);
+      console.log('Applications:', applications);
+      if (isValid) {
+        data.applications = applications;
+      } else {
+        alert('Please fill out all fields.');
+      }
+    } 
     handleClose();
     if (onClickAction !== undefined) {
       let requestBody = {
-        state : selectedDeviceState.value,
-        name: displayName
+        policy_name: policyName,
+        field_to_patch : formData
       }
-      onClickAction(requestBody);
+      onClickAction({requestBody,data});
       setOpen(false);
-      setDisplayName(null);
     }
   };
-
-  const handleChangeInstallType = async (selectionOption) => {
-    setInstallType(selectionOption);
-  }
-
-  const handleChangeDefaultPermissionPolicy = async (selectionOption) => {
-    setDefaultPermissionPolicy(selectionOption)
-  }
-
-  const handleChangeAutoUpdateMode = async (selectionOption) => {
-    setAutoUpdateMode(selectionOption)
-  }
-
-  const handleChangeUserControlSettings = async (selectionOption) => {
-    setUserControlSettings(selectionOption)
-  }
 
   const handleChangePowerButtonActions = (selectionOption) => {
     setPowerButtonActions(selectionOption)
@@ -200,7 +203,7 @@ const ModalCreatePolicy = ({ data }) => {
       application.userControlSettings
     );
   };
-  
+
   
   if(data) {
     console.log('data.options',data.options);
