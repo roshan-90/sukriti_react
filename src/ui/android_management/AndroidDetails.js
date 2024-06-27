@@ -1,7 +1,8 @@
 import React, {
   useState,
   useEffect,
-  useMemo
+  useMemo,
+  useRef
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ErrorBoundary from "../../components/ErrorBoundary";
@@ -52,6 +53,7 @@ import ComplexNavigationCompact from "./ComplexNavigationCompact";
 import ModalEditDevices from './ModalEditDevices';
 import ModalCreatePolicy from './ModalCreatePolicy';
 import ModalUpdatePolicy from './ModalUpdatePolicy';
+import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
@@ -127,6 +129,7 @@ function AndroidDetails() {
   const policyDetails = useSelector((state) => state.androidManagement.policyDetails);
   const [listDevices, setListDevices] = useState(undefined);
   const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
+  const confirmationDialog = useRef();
 
   const handleChangePolicy = async (selectionOption) => {
     try {
@@ -561,11 +564,16 @@ function AndroidDetails() {
   };
 
   const handleDeletePolicy = async () => {
-
+    confirmationDialog.current.showDialog(
+      "Confirm Action",
+      "To delete the Vendor Details permanently, type 'DELETE' below",
+      "DELETE",
+      handleEditPolicy
+    );
   }
 
   const handleEditPolicy = async() => {
-
+    console.log('confirm button is clicked');
   }
 
   const createPolicy =  async() => {
@@ -1119,6 +1127,7 @@ function AndroidDetails() {
         <ModalEditDevices data={dialogEditDevice} />
         <ModalCreatePolicy data={dialogCreatePolicy} />
         <ModalUpdatePolicy data={dialogUpdatePolicy} />
+        <ConfirmationDialog ref={confirmationDialog} />
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
