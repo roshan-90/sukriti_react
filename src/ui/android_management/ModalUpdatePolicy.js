@@ -27,31 +27,24 @@ const ModalUpdatePolicy = ({ data }) => {
   const [statusBar, setStatusBar] = useState(null);
   const [deviceSettings, setDeviceSettings] = useState(null);
   const [formData, setFormData] = useState({
-    "cameraDisabled": true,
-    "addUserDisabled": true,
+    "cameraDisabled": false,
+    "addUserDisabled": false,
     "removeUserDisabled": false,
-    "factoryResetDisabled": true,
-    "mountPhysicalMediaDisabled": true,
-    "safeBootDisabled": true,
+    "factoryResetDisabled": false,
+    "mountPhysicalMediaDisabled": false,
+    "safeBootDisabled": false,
     "uninstallAppsDisabled": false,
-    "bluetoothConfigDisabled": true,
+    "bluetoothConfigDisabled": false,
     "vpnConfigDisabled": false,
     "networkResetDisabled": false,
     "smsDisabled": false,
-    "modifyAccountsDisabled": true,
-    "outgoingCallsDisabled": true,
-    "kioskCustomLauncherEnabled": true,
+    "modifyAccountsDisabled": false,
+    "outgoingCallsDisabled": false,
+    "kioskCustomLauncherEnabled": false,
   })
   const [applicationState, setApplicationState] = useState(false);
   const [kioskCustomization , setkioskCustomization] = useState(false)
   const [applications, setApplications] = useState([]);
-
-  if(listofPolicy !== null) {
-    let getPolicyDetail =  listofPolicy.fillter((item)=> 
-                       item.value == Selectedpolicy.value 
-                     );
-       console.log('getPolicyDetail',getPolicyDetail);
-  }
 
   const InstallType = [
     { label: 'INSTALL_TYPE_UNSPECIFIED', value: 'INSTALL_TYPE_UNSPECIFIED' },
@@ -114,6 +107,37 @@ const ModalUpdatePolicy = ({ data }) => {
     if (data) {
       setTitle(data.title);
       setMessage(data.message);
+      setPolicyName(data.policyDetails.name.split('/')[3])
+      setFormData({
+        "cameraDisabled": data.policyDetails.cameraDisabled,
+        "addUserDisabled": data.policyDetails.addUserDisabled,
+        "removeUserDisabled": data.policyDetails.removeUserDisabled,
+        "factoryResetDisabled": data.policyDetails.factoryResetDisabled,
+        "mountPhysicalMediaDisabled": data.policyDetails.mountPhysicalMediaDisabled,
+        "safeBootDisabled": data.policyDetails.safeBootDisabled,
+        "uninstallAppsDisabled": data.policyDetails.uninstallAppsDisabled,
+        "bluetoothConfigDisabled": data.policyDetails.bluetoothConfigDisabled,
+        "vpnConfigDisabled": data.policyDetails.vpnConfigDisabled,
+        "networkResetDisabled": data.policyDetails.networkResetDisabled,
+        "smsDisabled": data.policyDetails.smsDisabled,
+        "modifyAccountsDisabled": data.policyDetails.modifyAccountsDisabled,
+        "outgoingCallsDisabled": data.policyDetails.outgoingCallsDisabled,
+        "kioskCustomLauncherEnabled": data.policyDetails.kioskCustomLauncherEnabled,
+      })
+      if(data.policyDetails.applications.length > 0) {
+        setApplicationState(true);
+        setApplications(data.policyDetails.applications)
+      }
+      if(data.policyDetails.kioskCustomization) {
+        if(Object.keys(data.policyDetails.kioskCustomization).length > 0) {
+          setPowerButtonActions({ label: data.policyDetails.kioskCustomization.powerButtonActions, value: data.policyDetails.kioskCustomization.powerButtonActions });
+          setSystemErrorWarnings({ label: data.policyDetails.kioskCustomization.systemErrorWarnings, value: data.policyDetails.kioskCustomization.systemErrorWarnings });
+          setSystemNavigation({ label: data.policyDetails.kioskCustomization.systemNavigation, value: data.policyDetails.kioskCustomization.systemNavigation });
+          setStatusBar({ label: data.policyDetails.kioskCustomization.statusBar, value: data.policyDetails.kioskCustomization.statusBar });
+          setDeviceSettings({ label: data.policyDetails.kioskCustomization.deviceSettings, value: data.policyDetails.kioskCustomization.deviceSettings });
+          setkioskCustomization(true);
+        }
+      }
       setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
     }
@@ -278,7 +302,7 @@ const ModalUpdatePolicy = ({ data }) => {
                 name="policy_name"
                 placeholder="Enter Policy Name"
                 type="text"
-                onChange= {(e) => setPolicyName(e.target.value)}
+                disabled={true}
               />
             <br/>
             <Form>

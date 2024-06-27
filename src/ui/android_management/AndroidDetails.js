@@ -21,12 +21,13 @@ import {
   executeUpdateEnterpriseLambda,
   executeListPolicyLambda,
   executePatchDeviceLambda,
-  executeCreatePolicyLambda
+  executeCreatePolicyLambda,
+  executePolicyDetailsLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName } from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails} from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -123,12 +124,38 @@ function AndroidDetails() {
   const [dialogEditDevice , setDialogEditDevice] = useState(null);
   const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const policyName = useSelector((state) => state.androidManagement.policyName);
+  const policyDetails = useSelector((state) => state.androidManagement.policyDetails);
   const [listDevices, setListDevices] = useState(undefined);
   const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
 
   const handleChangePolicy = async (selectionOption) => {
-    console.log('selectionOption',selectionOption);
-    dispatch(setPolicyName(selectionOption))
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      let object = {
+        enterprises_id: selectedOptionEnterprise?.value,
+        policy_name: selectionOption.value
+      }
+      console.log('selectionOption',selectionOption);
+      let policyDetail = await executePolicyDetailsLambda(user?.credentials, object)
+      console.log('policyDetail',policyDetail);
+      if(policyDetail.statusCode == 200) {
+          dispatch(setPolicyName(selectionOption))
+          dispatch(setPolicyDetails(policyDetail.body));
+      } else {
+        setDialogData({
+          title: "Error",
+          message: 'SomethingWent wrong Please try again',
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleChangePolicy -->`);
+          },
+        });
+      }
+    } catch (err) {
+      handleError(err, "fetchListDevicesData");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
   }
 
   const handleCheckboxChange = (event) => {
@@ -596,7 +623,8 @@ function AndroidDetails() {
 
   const updatePolicy = async() => {
     console.log('updatePolicy clicked',selectedOptionEnterprise?.value);
-    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+    console.log('policyName', policyDetails);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined || policyDetails == null) 
      { 
         setDialogData({
         title: "Validation Error",
@@ -610,6 +638,7 @@ function AndroidDetails() {
       setDialogUpdatePolicy({
         title: "Update Policy",
         message: selectedOptionEnterprise.label,
+        policyDetails: policyDetails,
         onClickAction: async (data) => {
           console.log('data',data);
           
