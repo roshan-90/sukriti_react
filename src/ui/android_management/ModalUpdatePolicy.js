@@ -109,20 +109,20 @@ const ModalUpdatePolicy = ({ data }) => {
       setMessage(data.message);
       setPolicyName(data.policyDetails.name.split('/')[3])
       setFormData({
-        "cameraDisabled": data.policyDetails.cameraDisabled,
-        "addUserDisabled": data.policyDetails.addUserDisabled,
-        "removeUserDisabled": data.policyDetails.removeUserDisabled,
-        "factoryResetDisabled": data.policyDetails.factoryResetDisabled,
-        "mountPhysicalMediaDisabled": data.policyDetails.mountPhysicalMediaDisabled,
-        "safeBootDisabled": data.policyDetails.safeBootDisabled,
-        "uninstallAppsDisabled": data.policyDetails.uninstallAppsDisabled,
-        "bluetoothConfigDisabled": data.policyDetails.bluetoothConfigDisabled,
-        "vpnConfigDisabled": data.policyDetails.vpnConfigDisabled,
-        "networkResetDisabled": data.policyDetails.networkResetDisabled,
-        "smsDisabled": data.policyDetails.smsDisabled,
-        "modifyAccountsDisabled": data.policyDetails.modifyAccountsDisabled,
-        "outgoingCallsDisabled": data.policyDetails.outgoingCallsDisabled,
-        "kioskCustomLauncherEnabled": data.policyDetails.kioskCustomLauncherEnabled,
+        "cameraDisabled": data.policyDetails.cameraDisabled ?? false,
+        "addUserDisabled": data.policyDetails.addUserDisabled ?? false,
+        "removeUserDisabled": data.policyDetails.removeUserDisabled ?? false,
+        "factoryResetDisabled": data.policyDetails.factoryResetDisabled ?? false,
+        "mountPhysicalMediaDisabled": data.policyDetails.mountPhysicalMediaDisabled ?? false,
+        "safeBootDisabled": data.policyDetails.safeBootDisabled ?? false,
+        "uninstallAppsDisabled": data.policyDetails.uninstallAppsDisabled ?? false,
+        "bluetoothConfigDisabled": data.policyDetails.bluetoothConfigDisabled ?? false,
+        "vpnConfigDisabled": data.policyDetails.vpnConfigDisabled ?? false,
+        "networkResetDisabled": data.policyDetails.networkResetDisabled ?? false,
+        "smsDisabled": data.policyDetails.smsDisabled ?? false,
+        "modifyAccountsDisabled": data.policyDetails.modifyAccountsDisabled ?? false,
+        "outgoingCallsDisabled": data.policyDetails.outgoingCallsDisabled ?? false,
+        "kioskCustomLauncherEnabled": data.policyDetails.kioskCustomLauncherEnabled ?? false,
       })
       if(data.policyDetails.applications.length > 0) {
         setApplicationState(true);
@@ -180,6 +180,7 @@ const ModalUpdatePolicy = ({ data }) => {
           data.kioskCustomization = kioskCustomization;
         } else {
           alert('Please fill kiosk Customization');
+          return;
         }
       } 
   
@@ -190,8 +191,10 @@ const ModalUpdatePolicy = ({ data }) => {
           data.applications = applications;
         } else {
           alert('Please fill out all fields.');
+          return;
         }
       } 
+
       handleClose();
       if (onClickAction !== undefined) {
         let requestBody = {
@@ -203,6 +206,7 @@ const ModalUpdatePolicy = ({ data }) => {
       }
     } else {
       alert('Please fill policy name');
+      return
     }
   
   };
@@ -303,6 +307,7 @@ const ModalUpdatePolicy = ({ data }) => {
                 placeholder="Enter Policy Name"
                 type="text"
                 disabled={true}
+                value={policyName}
               />
             <br/>
             <Form>

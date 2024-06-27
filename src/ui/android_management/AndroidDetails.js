@@ -641,7 +641,37 @@ function AndroidDetails() {
         policyDetails: policyDetails,
         onClickAction: async (data) => {
           console.log('data',data);
-          
+          data.enterprises_id = selectedOptionEnterprise.value;
+          console.log('data',data);
+          try{
+            dispatch(startLoading()); // Dispatch the startLoading action
+            
+            let result_data =  await executeCreatePolicyLambda(user?.credentials, data);
+            console.log('result_data',result_data);
+            if(result_data.statusCode == 200) {
+              setDialogData({
+                title: "Success",
+                message: "Policy Updated is successfully",
+                onClickAction: async () => {
+                  
+                  console.log("updatePolicy function");
+                },
+              })
+            } else {
+              setDialogData({
+                title: "Error",
+                message: "Something went wrong",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error updatePolicy");
+                },
+              })
+            }
+          } catch( err) {
+            handleError(err, 'Error updatePolicy')
+          } finally {
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          }
         },
       })
     }

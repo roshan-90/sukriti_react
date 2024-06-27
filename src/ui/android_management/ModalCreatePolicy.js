@@ -147,6 +147,7 @@ const ModalCreatePolicy = ({ data }) => {
           data.kioskCustomization = kioskCustomization;
         } else {
           alert('Please fill kiosk Customization');
+          return;
         }
       } 
   
@@ -157,6 +158,7 @@ const ModalCreatePolicy = ({ data }) => {
           data.applications = applications;
         } else {
           alert('Please fill out all fields.');
+          return;
         }
       } 
       handleClose();
@@ -170,6 +172,7 @@ const ModalCreatePolicy = ({ data }) => {
       }
     } else {
       alert('Please fill policy name');
+      return
     }
   
   };
