@@ -446,15 +446,15 @@ const ModalCreatePolicy = ({ data }) => {
               </FormGroup>
               <div>
               <FormGroup switch>
-        <Button
-          onClick={handleAddApplication}
-          outline
-          color="primary"
-          className="add-button"
-        >
-          Add Application
-        </Button>
-        <Label>Applications</Label>
+                <Label>Applications</Label>
+                  <Button
+                    onClick={handleAddApplication}
+                    outline
+                    color="primary"
+                    className="add-button"
+                  >
+                  <span style={{ marginRight: '2px', color: "blue"}}>Add Applications</span>
+                </Button>
         <Input
           type="switch"
           checked={applicationState}

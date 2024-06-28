@@ -172,27 +172,43 @@ function AndroidDetails() {
   }
 
   async function ListofPolicyFunction(value) {
-    console.log('list of policy value',value);
-    let listPolicy = await executeListPolicyLambda(user?.credentials, value);
-    console.log('listPolicy', listPolicy);
-    if(listPolicy.statusCode == 200) {
-      if(listPolicy.body.length > 0) {
-        const options = listPolicy.body.map(item => ({
-          value: item.name.split("/")[3],
-          label: item.name.split("/")[3]
-        }));
-        console.log('options',options)
-        dispatch(setListOfPolicy(options));
+    try {
+      console.log('list of policy value',value);
+      dispatch(startLoading()); // Dispatch the startLoading action
+      let listPolicy = await executeListPolicyLambda(user?.credentials, value);
+      console.log('listPolicy', listPolicy);
+      if(listPolicy.statusCode == 200) {
+        if(listPolicy.body.length > 0) {
+          const options = listPolicy.body.map(item => ({
+            value: item.name.split("/")[3],
+            label: item.name.split("/")[3]
+          }));
+          console.log('options',options)
+          dispatch(setListOfPolicy(options));
+        }
+      } else if(listPolicy.statusCode == 400)  {
+        setDialogData({
+          title: "Empty",
+          message: 'Data Not found',
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`ListofPolicyFunction -->`);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: 'SomethingWent wrong Please try again later',
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`ListofPolicyFunction -->`);
+          },
+        });
       }
-    } else {
-      setDialogData({
-        title: "Error",
-        message: 'SomethingWent wrong Please try again',
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log(`handleSaveData -->`);
-        },
-      });
+    } catch (err) {
+      handleError(err, "ListofPolicyFunction");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
 
@@ -636,7 +652,7 @@ function AndroidDetails() {
      { 
         setDialogData({
         title: "Validation Error",
-        message: "Please Select Enterprise",
+        message: "Please Select Enterprise and policies",
         onClickAction: () => {
           // Handle the action when the user clicks OK
           console.log("updatePolicy");
