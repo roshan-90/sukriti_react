@@ -23,12 +23,13 @@ import {
   executeListPolicyLambda,
   executePatchDeviceLambda,
   executeCreatePolicyLambda,
-  executePolicyDetailsLambda
+  executePolicyDetailsLambda,
+  executePolicyDeleteLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails} from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails,setResetData} from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -54,7 +55,7 @@ import ModalEditDevices from './ModalEditDevices';
 import ModalCreatePolicy from './ModalCreatePolicy';
 import ModalUpdatePolicy from './ModalUpdatePolicy';
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
-
+import ModalDeletePolicy from './ModalDeletePolicy';
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -112,6 +113,7 @@ function AndroidDetails() {
   const listDeviceFetch = useSelector((state) => state.androidManagement.listDevice);
   const selectedDeviceFetch = useSelector((state) => state.androidManagement.selectedDevice);
   const [dialogData, setDialogData] = useState(null);
+  const [dialogDeletePolicy , setDialogDeletePolicy] = useState(null);
   const [dialogCreatePolicy, setDialogCreatePolicy] = useState(false);
   const [showDeviceData, setShowDeviceData] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
@@ -589,16 +591,57 @@ function AndroidDetails() {
   };
 
   const handleDeletePolicy = async () => {
-    confirmationDialog.current.showDialog(
-      "Confirm Action",
-      "To delete the Vendor Details permanently, type 'DELETE' below",
-      "DELETE",
-      handleEditPolicy
-    );
+    if(policyDetails.DynamoDB.length > 0) {
+      setDialogDeletePolicy({
+        title: "Can't Delete Policy",
+        message: "Data found",
+        data: policyDetails.DynamoDB,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleDeletePolicy");
+        },
+      })
+    } else {
+      confirmationDialog.current.showDialog(
+        "Confirm Action",
+        "To delete the Vendor Details permanently, type 'DELETE' below",
+        "DELETE",
+        handleConfirmDeletePolicy
+      );
+    }
   }
 
-  const handleEditPolicy = async() => {
+  const handleConfirmDeletePolicy = async() => {
     console.log('confirm button is clicked');
+    try{
+      dispatch(startLoading()); 
+      let result_data =  await executePolicyDeleteLambda(user?.credentials, selectedOptionEnterprise.value, policyName.value);
+      console.log('result_data',result_data);
+      dispatch(setResetData())
+      if(result_data.statusCode == 200) {
+        setDialogData({
+          title: "Success",
+          message: "Policy Deleted is successfully",
+          onClickAction: async () => {
+            
+            console.log("handleConfirmDeletePolicy function");
+          },
+        })
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "Something went wrong",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("error handleConfirmDeletePolicy");
+          },
+        })
+      }
+    } catch( err) {
+      handleError(err, 'Error handleConfirmDeletePolicy')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
   }
 
   const createPolicy =  async() => {
@@ -1153,6 +1196,7 @@ function AndroidDetails() {
         <ModalCreatePolicy data={dialogCreatePolicy} />
         <ModalUpdatePolicy data={dialogUpdatePolicy} />
         <ConfirmationDialog ref={confirmationDialog} />
+        <ModalDeletePolicy data={dialogDeletePolicy} />
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}

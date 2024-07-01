@@ -914,3 +914,38 @@ export function executePolicyDetailsLambda(
     });
   });
 }
+
+export function executePolicyDeleteLambda(
+  credentials,
+  enterprises_id,
+  policy_name
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Enterprises_Delete_Policies_Android_Management",
+      Payload: JSON.stringify({
+        policyName: `${enterprises_id}/policies/${policy_name}`,
+      })
+    };
+    console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}

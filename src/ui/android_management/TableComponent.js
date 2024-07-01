@@ -50,6 +50,7 @@ const TableComponent = ({ staticData }) => {
             <table>
                 <thead>
                     <tr>
+                        <th>Sr.No.</th>
                         <th>Short Name</th>
                         <th>Serial Name</th>
                         <th>State</th>
@@ -62,6 +63,7 @@ const TableComponent = ({ staticData }) => {
                     {records.length > 0 ? (
                         records.map((record, index) => (
                             <tr key={index}>
+                                <td>{index}</td>
                                 <td>{record.cabin_name.split('_')[3] + '_' + record.cabin_name.split('_')[4]}</td>
                                 <td>{record.serial_number}</td>
                                 <td>{AttributeFilter(record.complex_details,1)}</td>

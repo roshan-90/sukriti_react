@@ -105,6 +105,11 @@ const androidManagementSlice = createSlice({
         state.cabinName = null
         state.listOfPolicy = {};
         state.policyName = null;
+        state.policyDetails = null;
+        state.listEnterprise= null;
+        state.selectedOptionEnterprise= null;
+        state.listDevice= null;
+        state.selectedDevice= null;
     },
   },
 });
