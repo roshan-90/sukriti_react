@@ -10,6 +10,7 @@ import {
 import {  Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useDispatch, useSelector } from "react-redux";
 import Select from 'react-select'; // Importing react-select
+import TableComponent from './TableComponent';
 
 const ModalUpdatePolicy = ({ data }) => {
   const dispatch = useDispatch();
@@ -124,10 +125,13 @@ const ModalUpdatePolicy = ({ data }) => {
         "outgoingCallsDisabled": data.policyDetails.outgoingCallsDisabled ?? false,
         "kioskCustomLauncherEnabled": data.policyDetails.kioskCustomLauncherEnabled ?? false,
       })
-      if(data.policyDetails.applications.length > 0) {
+      if(data.policyDetails?.applications?.length > 0) {
         setApplicationState(true);
         setApplications(data.policyDetails.applications)
+      } else {
+
       }
+
       if(data.policyDetails.kioskCustomization) {
         if(Object.keys(data.policyDetails.kioskCustomization).length > 0) {
           setPowerButtonActions({ label: data.policyDetails.kioskCustomization.powerButtonActions, value: data.policyDetails.kioskCustomization.powerButtonActions });
@@ -279,6 +283,8 @@ const ModalUpdatePolicy = ({ data }) => {
       }}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
+          <TableComponent staticData={data.policyDetails.DynamoDB} />
+            <br />
           <div style={{ margin: "auto", width: "90%" }}>
               <Label
                     check

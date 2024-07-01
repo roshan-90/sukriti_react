@@ -144,6 +144,15 @@ function AndroidDetails() {
       if(policyDetail.statusCode == 200) {
           dispatch(setPolicyName(selectionOption))
           dispatch(setPolicyDetails(policyDetail.body));
+      } else if(policyDetail.statusCode == 400) {
+        setDialogData({
+          title: "Not Found",
+          message: policyDetail.body,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleChangePolicy -->`);
+          },
+        });
       } else {
         setDialogData({
           title: "Error",
@@ -1181,7 +1190,10 @@ function AndroidDetails() {
                   >
                     <AddIcon />
                   </Button>
-                  <Button
+                  {(selectedOptionEnterprise?.value !== "" && selectedOptionEnterprise !== null && selectedOptionEnterprise?.value !== undefined) 
+                  && (
+                    <>
+                     <Button
                     onClick={() => {
                       handleEditEnterprise();
                     }}
@@ -1201,6 +1213,8 @@ function AndroidDetails() {
                   >
                     <DeleteIcon  color="error"/>
                   </Button>
+                    </>
+                  )}
                 </div>
                 </div>
                 <div className="col-6"> 
@@ -1224,6 +1238,10 @@ function AndroidDetails() {
                   >
                     <AddIcon />
                   </Button>
+                  {
+                   (selectedOptionEnterprise?.value !== "" && selectedOptionEnterprise !== null && selectedOptionEnterprise?.value !== undefined && policyDetails !== null) 
+                   &&  (
+                    <>
                   <Button
                     onClick={() => {
                       updatePolicy();
@@ -1244,6 +1262,9 @@ function AndroidDetails() {
                   >
                     <DeleteIcon  color="error"/>
                   </Button>
+                    </>
+                   )
+                  }
                 </div>
                 </div>
             </div>
