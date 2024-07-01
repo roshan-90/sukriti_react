@@ -42,6 +42,8 @@ const TableComponent = ({ staticData }) => {
             const cityNameAttribute = complexDetails.Attributes.find(attribute => attribute.Name === 'CITY_NAME');
             const cityName = cityNameAttribute ? cityNameAttribute.Value : 'Not Found';
             return cityName;
+        } else {
+            
         }
     }
 

@@ -36,10 +36,11 @@ const ModalDeletePolicy = ({ data }) => {
   if(data) {
     console.log('data.options',data.options);
     return (
-      <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="sm" fullWidth
+      <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="lg" fullWidth
       PaperProps={{
         style: {
           height: '85%', // Adjust the maximum height as needed
+          width: '80%'
         },
       }}>
         <DialogTitle>{title}</DialogTitle>

@@ -623,7 +623,6 @@ function AndroidDetails() {
           title: "Success",
           message: "Policy Deleted is successfully",
           onClickAction: async () => {
-            
             console.log("handleConfirmDeletePolicy function");
           },
         })
@@ -752,6 +751,64 @@ function AndroidDetails() {
       })
     }
   }
+
+  const  AttributeFilter = (data,value) => {
+    if (value == 1) {
+        const stateNameAttribute = data.Attributes.find(attribute => attribute.Name === 'STATE_NAME');
+        const stateName = stateNameAttribute ? stateNameAttribute.Value : 'Not Found';
+        return stateName;
+    } else if (value == 2) {
+        const districtNameAttribute = data.Attributes.find(attribute => attribute.Name === 'DISTRICT_NAME');
+        const districtName = districtNameAttribute ? districtNameAttribute.Value : 'Not Found';
+        return districtName;
+    } else if (value == 3) {
+        const cityNameAttribute = data.Attributes.find(attribute => attribute.Name === 'CITY_NAME');
+        const cityName = cityNameAttribute ? cityNameAttribute.Value : 'Not Found';
+        return cityName;
+    } else if (value == 4) {
+      const BILL = data.Attributes.find(attribute => attribute.Name === 'BILL');
+      const BILL_result = BILL ? BILL.Value : 'Not Found';
+      return BILL_result;
+    } else if (value == 5) {
+      const CLNT = data.Attributes.find(attribute => attribute.Name === 'CLNT');
+      const CLNT_result = CLNT ? CLNT.Value : 'Not Found';
+        return CLNT_result;
+    } else if (value == 6) {
+      const COCO = data.Attributes.find(attribute => attribute.Name === 'COCO');
+      const COCO_result = COCO ? COCO.Value : 'Not Found';
+      return COCO_result;
+    } else if (value == 7) {
+      const Complex_DATE = data.Attributes.find(attribute => attribute.Name === 'DATE');
+      const Complex_DATE_result = Complex_DATE ? Complex_DATE.Value : 'Not Found';
+      return Complex_DATE_result;
+    } else if (value == 11) {
+      const BILLING_GROUP = data.Attributes.find(attribute => attribute.Name === 'BILLING_GROUP');
+      const BILLING_GROUP_filter = BILLING_GROUP ? BILLING_GROUP.Value : 'Not Found';
+      return BILLING_GROUP_filter;
+    } else if(value == 12) {
+      const CLIENT = data.Attributes.find(attribute => attribute.Name === 'CLIENT');
+      const CLIENT_filter = CLIENT ? CLIENT.Value : 'Not Found';
+      return CLIENT_filter;
+    } else if(value == 13) {
+      const DATE = data.Attributes.find(attribute => attribute.Name === 'DATE');
+      const DATE_filter = DATE ? DATE.Value : 'Not Found';
+      return DATE_filter;
+    } else if(value == 14) {
+      const SMART_LEVEL = data.Attributes.find(attribute => attribute.Name === 'SMART_LEVEL');
+      const SMART_LEVEL_filter = SMART_LEVEL ? SMART_LEVEL.Value : 'Not Found';
+      return SMART_LEVEL_filter;
+    } else if(value == 15) {
+      const USAGE_CHARGE = data.Attributes.find(attribute => attribute.Name === 'USAGE_CHARGE');
+      const USAGE_CHARGE_filter = USAGE_CHARGE ? USAGE_CHARGE.Value : 'Not Found';
+      return USAGE_CHARGE_filter;
+    } else if(value == 16) {
+      const USER_TYPE = data.Attributes.find(attribute => attribute.Name === 'USER_TYPE');
+      const USER_TYPE_filter = USER_TYPE ? USER_TYPE.Value : 'Not Found';
+      return USER_TYPE_filter;
+    } else {
+        
+    }
+}
 
   const ListDeviceHeader = () => {
     return (
@@ -959,7 +1016,7 @@ function AndroidDetails() {
                               style={textStyle}
                               onClick={() => handleClickDevice(data)}
                             >
-                              {data.serial_number} {/* Call the function here */}
+                              {data.cabin_name.split('_')[3] + '_' + data.cabin_name.split('_')[4]}
                             </div>
                           </div>
                         </>
@@ -983,7 +1040,7 @@ function AndroidDetails() {
         {selectedDeviceFetch && (
           <div className="container">
             <div className="Qr_image">
-              <img src={selectedDeviceFetch.qr_details.qr} alt="QR Code Image" />
+              <img src={selectedDeviceFetch?.qr_details?.qr} alt="QR Code Image" />
             </div>
             <div className="container">
             <Row>
@@ -1028,6 +1085,32 @@ function AndroidDetails() {
             >
               <Row>
                 <Col md="6">
+                <Card
+                    style={{
+                      ...whiteSurface,
+                      background: "white",
+                      margin: "10px",
+                    }}
+                  >
+                    <CardBody>
+                      <CardTitle>
+                        <b>Complex Details</b>
+                      </CardTitle>
+                      <CardText>
+                        <p>Complex: {selectedDeviceFetch.complex_details.Name}</p>
+                        <p>State: { AttributeFilter(selectedDeviceFetch.complex_details,1)}</p>
+                        <p>District: {AttributeFilter(selectedDeviceFetch.complex_details,2)}</p>
+                        <p>
+                          City:{" "}
+                          {AttributeFilter(selectedDeviceFetch.complex_details,3)}
+                        </p>
+                        <p>BILL: {AttributeFilter(selectedDeviceFetch.complex_details,4)}</p>
+                        <p>CLNT: {AttributeFilter(selectedDeviceFetch.complex_details,5)}</p>
+                        <p>COCO: {AttributeFilter(selectedDeviceFetch.complex_details,6)}</p>
+                        <p>DATE: {AttributeFilter(selectedDeviceFetch.complex_details,7)}</p>
+                      </CardText>
+                    </CardBody>
+                  </Card>
                   <Card
                     style={{
                       ...whiteSurface,
@@ -1076,6 +1159,29 @@ function AndroidDetails() {
                   </Card>
                 </Col>
                 <Col md="6">
+                <Card
+                    style={{
+                      ...whiteSurface,
+                      background: "white",
+                      margin: "10px",
+                    }}
+                  >
+                    <CardBody>
+                      <CardTitle>
+                        <b>Cabin Details</b>
+                      </CardTitle>
+                      <CardText>
+                        <p>Name: {selectedDeviceFetch.cabin_details.Name}</p>
+                        <p>ThingType: {selectedDeviceFetch.cabin_details.ThingType}</p>
+                        <p>BILLING_GROUP: {AttributeFilter(selectedDeviceFetch.cabin_details,11)}</p>
+                        <p>CLIENT: {AttributeFilter(selectedDeviceFetch.cabin_details,12)}</p>
+                        <p>DATE: {AttributeFilter(selectedDeviceFetch.cabin_details,13)}</p>
+                        <p>SMART_LEVEL: {AttributeFilter(selectedDeviceFetch.cabin_details,14)}</p>
+                        <p>USAGE_CHARGE: {AttributeFilter(selectedDeviceFetch.cabin_details,15)}</p>
+                        <p>USER_TYPE: {AttributeFilter(selectedDeviceFetch.cabin_details,16)}</p>
+                      </CardText>
+                    </CardBody>
+                  </Card>
                   <Card
                     style={{
                       ...whiteSurface,
