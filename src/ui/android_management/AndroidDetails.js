@@ -630,7 +630,7 @@ function AndroidDetails() {
       } else {
         setDialogData({
           title: "Error",
-          message: "Something went wrong",
+          message: result_data.body,
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log("error handleConfirmDeletePolicy");
