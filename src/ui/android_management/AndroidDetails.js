@@ -56,7 +56,7 @@ import ModalCreatePolicy from './ModalCreatePolicy';
 import ModalUpdatePolicy from './ModalUpdatePolicy';
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import ModalDeletePolicy from './ModalDeletePolicy';
-
+import RegisterComplex from './RegisterComplex';
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
     // Define form fields and initial values here
@@ -134,12 +134,17 @@ function AndroidDetails() {
   const confirmationDialog = useRef();
   const [complexDetailShow, setComplexDetailShow] = useState(0);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+  const [registerComplex, setRegisterComplex] = useState(false);
 
 
   const handleClickFunction = async (data) => {
     console.log('data',data);
     if(Object.keys(ComplexIotDetails).length === 0)
     setComplexDetailShow(1);
+  }
+
+  const OpenRegisterModal = () => {
+    setRegisterComplex(!registerComplex);
   }
 
   const handleChangePolicy = async (selectionOption) => {
@@ -1313,6 +1318,9 @@ function AndroidDetails() {
         <ModalUpdatePolicy data={dialogUpdatePolicy} />
         <ConfirmationDialog ref={confirmationDialog} />
         <ModalDeletePolicy data={dialogDeletePolicy} />
+        {(registerComplex) && (
+          <RegisterComplex openModal={registerComplex} selected={registerComplex} setModalToggle={OpenRegisterModal} /> // Pass complexChanged as a prop
+        )}
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
@@ -1431,7 +1439,24 @@ function AndroidDetails() {
             {complexDetailShow == 1 ? 
                <ErrorBoundary>{
                 <div className="container">
-                <b>Complex Details</b>
+                  <Row>
+                    <Col md="12">
+                      <b>Complex Details</b> 
+                      <Button
+                          onClick={() => {
+                            OpenRegisterModal();
+                          }}
+                          outline
+                          color="primary"
+                          className="add-button"
+                        >
+                          <AddIcon />
+                        </Button>
+                    </Col>
+                    <Col md="3">
+                          
+                    </Col>
+                  </Row>
                 <Row style={{width: "95%"}}>
                   <Col md="6">
                     <Card
