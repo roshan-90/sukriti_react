@@ -1467,27 +1467,25 @@ function AndroidDetails() {
                         }}
                       >
                         <CardBody>
-                          <CardText>
+                        <CardText>
                             <pre>
-                            <p><b>State: </b>              {ComplexIotDetails.STATE_NAME}</p>
-                            <p><b>District: </b>           {ComplexIotDetails.DISTRICT_NAME}</p>
-                            <p><b>
-                              City: </b>               {ComplexIotDetails.CITY_NAME}
-                            </p>
-                            <p><b>STATE_CODE:  </b>         {ComplexIotDetails.STATE_CODE}</p>
-                            <p><b>DISTRICT_CODE:  </b>      {ComplexIotDetails.DISTRICT_CODE}</p>
-                            <p><b>CITY_CODE:  </b>          {ComplexIotDetails.CITY_CODE}</p>
-                            <p><b>BILL:  </b>               {ComplexIotDetails.BILL}</p>
-                            <p><b>CLNT:  </b>               {ComplexIotDetails.CLNT}</p>
-                            <p><b>COCO:  </b>               {ComplexIotDetails.COCO}</p>
-                            <p><b>DATE:  </b>               {ComplexIotDetails.DATE}</p>
-                            <p><b>Address: </b>             {ComplexIotDetails.ADDR}</p>
-                            <p><b>CIVL: </b>                {ComplexIotDetails.CIVL}</p>
-                            <p><b>DEVT: </b>                {ComplexIotDetails.DEVT}</p>
-                            <p><b>LATT:  </b>               {ComplexIotDetails.LATT}</p>
-                            <p><b>LONG:  </b>               {ComplexIotDetails.LONG}</p>
-                            <p><b>MANU:  </b>               {ComplexIotDetails.MANU}</p>
-                            <p><b>MODIFIED_BY:  </b>        {ComplexIotDetails.MODIFIED_BY}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>State: </b> {ComplexIotDetails.STATE_NAME}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>District: </b> {ComplexIotDetails.DISTRICT_NAME}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>City: </b> {ComplexIotDetails.CITY_NAME}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>STATE_CODE: </b> {ComplexIotDetails.STATE_CODE}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>DISTRICT_CODE: </b> {ComplexIotDetails.DISTRICT_CODE}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>CITY_CODE: </b> {ComplexIotDetails.CITY_CODE}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>BILL: </b> {ComplexIotDetails.BILL}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>CLNT: </b> {ComplexIotDetails.CLNT}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>COCO: </b> {ComplexIotDetails.COCO}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>DATE: </b> {ComplexIotDetails.DATE}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Address: </b> {ComplexIotDetails.ADDR}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>CIVL: </b> {ComplexIotDetails.CIVL}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>DEVT: </b> {ComplexIotDetails.DEVT}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>LATT: </b> {ComplexIotDetails.LATT}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>LONG: </b> {ComplexIotDetails.LONG}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>MANU: </b> {ComplexIotDetails.MANU}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>MODIFIED_BY: </b> {ComplexIotDetails.MODIFIED_BY}</p>
                             </pre>
                           </CardText>
                         </CardBody>
@@ -1504,25 +1502,23 @@ function AndroidDetails() {
                         <CardBody>
                           <CardText>
                             <pre>
-                            <p><b>UUID:  </b>              {ComplexIotDetails.UUID}</p>
-                            <p><b>THINGGROUPTYPE:  </b>    {ComplexIotDetails.THINGGROUPTYPE}</p>
-                            <p><b>TECH:  </b>              {ComplexIotDetails.TECH}</p>
-                            <p><b>SLVL:  </b>              {ComplexIotDetails.SLVL}</p>
-                            <p><b>ROUTER_IMEI:  </b>       {ComplexIotDetails.ROUTER_IMEI}</p>
-                            <p><b>ROUTER_MOBILE:  </b>     {ComplexIotDetails.ROUTER_MOBILE}</p>
-
-                            <p><b>MSNI:  </b>              {ComplexIotDetails.MSNI}</p>
-                            <p><b>MSNV:  </b>              {ComplexIotDetails.MSNV}</p>
-                            <p><b>ONMP:  </b>              {ComplexIotDetails.ONMP}</p>
-                            <p><b>QBWT:  </b>              {ComplexIotDetails.QBWT}</p>
-                            <p><b>QFWC:  </b>              {ComplexIotDetails.QFWC}</p>
-                            <p><b>QMWC:  </b>              {ComplexIotDetails.QMWC}</p>
-                            <p><b>QPWC:  </b>              {ComplexIotDetails.QPWC}</p>
-                            <p><b>QSNI:  </b>              {ComplexIotDetails.QSNI}</p>
-                            <p><b>QSNV:  </b>              {ComplexIotDetails.QSNV}</p>
-                            <p><b>QURC:  </b>              {ComplexIotDetails.QURC}</p>
-                            <p><b>QURI:  </b>              {ComplexIotDetails.QURI}</p>
-
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>UUID:  </b>              {ComplexIotDetails.UUID}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>THINGGROUPTYPE:  </b>    {ComplexIotDetails.THINGGROUPTYPE}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>TECH:  </b>              {ComplexIotDetails.TECH}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>SLVL:  </b>              {ComplexIotDetails.SLVL}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>ROUTER_IMEI:  </b>       {ComplexIotDetails.ROUTER_IMEI}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>ROUTER_MOBILE:  </b>     {ComplexIotDetails.ROUTER_MOBILE}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>MSNI:  </b>              {ComplexIotDetails.MSNI}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>MSNV:  </b>              {ComplexIotDetails.MSNV}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>ONMP:  </b>              {ComplexIotDetails.ONMP}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QBWT:  </b>              {ComplexIotDetails.QBWT}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QFWC:  </b>              {ComplexIotDetails.QFWC}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QMWC:  </b>              {ComplexIotDetails.QMWC}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QPWC:  </b>              {ComplexIotDetails.QPWC}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QSNI:  </b>              {ComplexIotDetails.QSNI}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QSNV:  </b>              {ComplexIotDetails.QSNV}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QURC:  </b>              {ComplexIotDetails.QURC}</p>
+                            <p style={{border: '1px solid black', padding: '10px'}}><b>QURI:  </b>              {ComplexIotDetails.QURI}</p>
                             </pre>
                           </CardText>
                         </CardBody>
