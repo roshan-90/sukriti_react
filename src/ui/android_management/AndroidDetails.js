@@ -132,6 +132,15 @@ function AndroidDetails() {
   const [listDevices, setListDevices] = useState(undefined);
   const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
   const confirmationDialog = useRef();
+  const [complexDetailShow, setComplexDetailShow] = useState(0);
+  const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
+
+
+  const handleClickFunction = async (data) => {
+    console.log('data',data);
+    if(Object.keys(ComplexIotDetails).length === 0)
+    setComplexDetailShow(1);
+  }
 
   const handleChangePolicy = async (selectionOption) => {
     try {
@@ -908,6 +917,7 @@ function AndroidDetails() {
 
   const handleClickDevice = (data) => {
     dispatch(setSelectedDevice(data));
+    setComplexDetailShow(2);
   };
 
   // Rename the function to start with an uppercase letter
@@ -916,7 +926,7 @@ function AndroidDetails() {
     console.log("hellog");
     return (
       <>
-        <ComplexNavigationCompact />
+        <ComplexNavigationCompact clicked={handleClickFunction}/>
       </>
     );
   };
@@ -1418,7 +1428,91 @@ function AndroidDetails() {
                 </div>
                 </div>
             </div>
-            <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
+            {complexDetailShow == 1 ? 
+               <ErrorBoundary>{
+                <div className="container">
+                <b>Complex Details</b>
+                <Row style={{width: "95%"}}>
+                  <Col md="6">
+                    <Card
+                        style={{
+                          ...whiteSurface,
+                          background: "white",
+                          margin: "10px",
+                        }}
+                      >
+                        <CardBody>
+                          <CardText>
+                            <pre>
+                            <p><b>State: </b>              {ComplexIotDetails.STATE_NAME}</p>
+                            <p><b>District: </b>           {ComplexIotDetails.DISTRICT_NAME}</p>
+                            <p><b>
+                              City: </b>               {ComplexIotDetails.CITY_NAME}
+                            </p>
+                            <p><b>STATE_CODE:  </b>         {ComplexIotDetails.STATE_CODE}</p>
+                            <p><b>DISTRICT_CODE:  </b>      {ComplexIotDetails.DISTRICT_CODE}</p>
+                            <p><b>CITY_CODE:  </b>          {ComplexIotDetails.CITY_CODE}</p>
+                            <p><b>BILL:  </b>               {ComplexIotDetails.BILL}</p>
+                            <p><b>CLNT:  </b>               {ComplexIotDetails.CLNT}</p>
+                            <p><b>COCO:  </b>               {ComplexIotDetails.COCO}</p>
+                            <p><b>DATE:  </b>               {ComplexIotDetails.DATE}</p>
+                            <p><b>Address: </b>             {ComplexIotDetails.ADDR}</p>
+                            <p><b>CIVL: </b>                {ComplexIotDetails.CIVL}</p>
+                            <p><b>DEVT: </b>                {ComplexIotDetails.DEVT}</p>
+                            <p><b>LATT:  </b>               {ComplexIotDetails.LATT}</p>
+                            <p><b>LONG:  </b>               {ComplexIotDetails.LONG}</p>
+                            <p><b>MANU:  </b>               {ComplexIotDetails.MANU}</p>
+                            <p><b>MODIFIED_BY:  </b>        {ComplexIotDetails.MODIFIED_BY}</p>
+                            </pre>
+                          </CardText>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                    <Col md="6">
+                      <Card
+                        style={{
+                          ...whiteSurface,
+                          background: "white",
+                          margin: "10px",
+                        }}
+                      >
+                        <CardBody>
+                          <CardText>
+                            <pre>
+                            <p><b>UUID:  </b>              {ComplexIotDetails.UUID}</p>
+                            <p><b>THINGGROUPTYPE:  </b>    {ComplexIotDetails.THINGGROUPTYPE}</p>
+                            <p><b>TECH:  </b>              {ComplexIotDetails.TECH}</p>
+                            <p><b>SLVL:  </b>              {ComplexIotDetails.SLVL}</p>
+                            <p><b>ROUTER_IMEI:  </b>       {ComplexIotDetails.ROUTER_IMEI}</p>
+                            <p><b>ROUTER_MOBILE:  </b>     {ComplexIotDetails.ROUTER_MOBILE}</p>
+
+                            <p><b>MSNI:  </b>              {ComplexIotDetails.MSNI}</p>
+                            <p><b>MSNV:  </b>              {ComplexIotDetails.MSNV}</p>
+                            <p><b>ONMP:  </b>              {ComplexIotDetails.ONMP}</p>
+                            <p><b>QBWT:  </b>              {ComplexIotDetails.QBWT}</p>
+                            <p><b>QFWC:  </b>              {ComplexIotDetails.QFWC}</p>
+                            <p><b>QMWC:  </b>              {ComplexIotDetails.QMWC}</p>
+                            <p><b>QPWC:  </b>              {ComplexIotDetails.QPWC}</p>
+                            <p><b>QSNI:  </b>              {ComplexIotDetails.QSNI}</p>
+                            <p><b>QSNV:  </b>              {ComplexIotDetails.QSNV}</p>
+                            <p><b>QURC:  </b>              {ComplexIotDetails.QURC}</p>
+                            <p><b>QURI:  </b>              {ComplexIotDetails.QURI}</p>
+
+                            </pre>
+                          </CardText>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                  </Row>
+                </div>
+                }
+                </ErrorBoundary>
+              :
+              <>
+              {complexDetailShow == 2 ? 
+              <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
+              : <></>}</>
+            }
           </div>
         </div>
       </div>

@@ -23,8 +23,8 @@ import { updateSelectedComplex } from "../../features/complesStoreSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
-import { setListDevice } from "../../features/androidManagementSlice";
-import { executeListDeviceLambda } from "../../awsClients/androidEnterpriseLambda";
+import { setListDevice , setComplexIotDetail} from "../../features/androidManagementSlice";
+import { executeListDeviceLambda , executelistIotDynamicLambda } from "../../awsClients/androidEnterpriseLambda";
 
 const ComplexNavigationCompact = (props) => {
   const selectionSummary = useRef();
@@ -78,6 +78,30 @@ const ComplexNavigationCompact = (props) => {
     // }
   }, []);
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+  
   const handleComplexSelection = async (treeEdge,selectedEnterprise) => {
     dispatch(startLoading()); // Dispatch the startLoading action
     console.log('treeEdge',treeEdge);
@@ -116,6 +140,10 @@ const ComplexNavigationCompact = (props) => {
         console.log('listdevice',result_listdevice);
         if(result_listdevice.statusCode == 200) {
           dispatch(setListDevice(result_listdevice.body))
+          if(result_listdevice.body.length > 0) {
+            props.clicked(result_listdevice.body[0])
+            ListOfIotComplexDetails(complex.name)
+          } 
           dispatch(stopLoading()); // Dispatch the stopLoading action
         } else {
           setDialogData({
@@ -132,6 +160,21 @@ const ComplexNavigationCompact = (props) => {
       }
       dispatch(stopLoading());
   };
+
+  const ListOfIotComplexDetails = async (value) => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-complexDetail";
+      var result = await executelistIotDynamicLambda(user.username, user?.credentials, value, command);
+      console.log('result complexDetail',result.body);
+      dispatch(setComplexIotDetail(result.body));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotComplex')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
 
   const ComponentSelector = () => {
     if (authStated?.accessTree == undefined) {
