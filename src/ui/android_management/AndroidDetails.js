@@ -24,12 +24,14 @@ import {
   executePatchDeviceLambda,
   executeCreatePolicyLambda,
   executePolicyDetailsLambda,
-  executePolicyDeleteLambda
+  executePolicyDeleteLambda,
+  executelistIotSingleLambda,
+
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails,setResetData} from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails,setResetData , setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -57,6 +59,8 @@ import ModalUpdatePolicy from './ModalUpdatePolicy';
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import ModalDeletePolicy from './ModalDeletePolicy';
 import RegisterComplex from './RegisterComplex';
+import UpdateComplex from './UpdateComplex'
+
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
     // Define form fields and initial values here
@@ -135,10 +139,16 @@ function AndroidDetails() {
   const [complexDetailShow, setComplexDetailShow] = useState(0);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const [registerComplex, setRegisterComplex] = useState(false);
+  const [complexChanged, setComplexChanged] = useState(false);
+  const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
 
 
   const handleClickFunction = async (data) => {
     console.log('data',data);
+    ListOfIotClientName();
+    ListOfIotBillingGroup();
+    dispatch(setComplexName(data.complex_details.Name))
+    setSelectedOptionIotComplex({label: data.complex_details.Name , value: data.complex_details.Name})
     if(Object.keys(ComplexIotDetails).length === 0)
     setComplexDetailShow(1);
   }
@@ -146,6 +156,47 @@ function AndroidDetails() {
   const OpenRegisterModal = () => {
     setRegisterComplex(!registerComplex);
   }
+
+  const OpenUpdateComplexModal = () => {
+    setComplexChanged(true)
+  }
+
+  const ListOfIotClientName = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-iot-clientName";
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
+      console.log('result ClientName', result.body);
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setClientName(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotClientName')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const ListOfIotBillingGroup = async () => {
+    try {
+      dispatch(startLoading());
+      let command = "list-billing-groups";
+      var result = await executelistIotSingleLambda(user.username, user?.credentials, command);
+      console.log('result ListOfIotBillingGroup', result.body);
+      const options = result.body.map(item => ({
+        value: item.Name,
+        label: item.Name
+      }));
+      dispatch(setBillingGroup(options));
+    } catch (error) {
+      handleError(error, 'Error ListOfIotBillingGroup')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
 
   const handleChangePolicy = async (selectionOption) => {
     try {
@@ -1321,6 +1372,9 @@ function AndroidDetails() {
         {(registerComplex) && (
           <RegisterComplex openModal={registerComplex} selected={registerComplex} setModalToggle={OpenRegisterModal} /> // Pass complexChanged as a prop
         )}
+        {(ComplexIotDetails['key'] !== null && complexChanged) && (
+          <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} /> // Pass complexChanged as a prop
+        )}
         <div className="row">
           <div className="col-md-2" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
@@ -1452,6 +1506,16 @@ function AndroidDetails() {
                         >
                           <AddIcon />
                         </Button>
+                        <Button
+                        onClick={() => {
+                          OpenUpdateComplexModal();
+                        }}
+                        outline
+                        color="primary"
+                        className="edit-button"
+                      >
+                        <EditIcon />
+                      </Button>
                     </Col>
                     <Col md="3">
                           

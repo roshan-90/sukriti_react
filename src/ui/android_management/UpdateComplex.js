@@ -256,6 +256,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
       handleError(error, 'Error ListOfIotClientName')
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
+      toggle()
     }
   }
 
