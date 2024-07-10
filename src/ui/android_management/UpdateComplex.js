@@ -275,6 +275,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
 
   const deleteComplex = async() => {
     try{
+      dispatch(startLoading());
       console.log('deleted complex');
       let command = "delete-iot-complex";
       var result = await executeDeleteComplexLambda(user.username, user?.credentials, command, complexName, selectedOptionEnterprise.value );
