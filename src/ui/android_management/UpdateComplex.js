@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for react-datepicker
 import {
   executeUpdateComplexLambda,
-  executelistIotDynamicLambda
+  executeDeleteComplexLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
@@ -29,6 +29,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   const user = useSelector(selectUser);
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -276,7 +277,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
     try{
       console.log('deleted complex');
       let command = "delete-iot-complex";
-      var result = await executelistIotDynamicLambda('dev_000000', user?.credentials, complexName, command );
+      var result = await executeDeleteComplexLambda(user.username, user?.credentials, command, complexName, selectedOptionEnterprise.value );
       console.log('result deleteComplex', result.body);
       setDialogData({
         title: "Deleted",

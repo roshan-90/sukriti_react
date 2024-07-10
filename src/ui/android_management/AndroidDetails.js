@@ -26,7 +26,7 @@ import {
   executePolicyDetailsLambda,
   executePolicyDeleteLambda,
   executelistIotSingleLambda,
-
+  executeDeleteDeviceLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -491,45 +491,63 @@ function AndroidDetails() {
     }
   };
 
-  const handleDeleteDevice = async (deviceId) => {
+  const handleDeleteDevice = async (deviceId, serialNumber) => {
     console.log('handleDeleteDevice device id :->', deviceId);
-    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined || serialNumber == null || serialNumber == undefined) 
       { 
          setDialogData({
          title: "Validation Error",
-         message: "Please Select Enterprise",
+         message: "Please Select Enterprise and valid Device",
          onClickAction: () => {
            // Handle the action when the user clicks OK
-           console.log("handleEditEnterprise");
+           console.log("handleDeleteDevice");
          },
        })
      } else {
-       let object = {
-         enterpriseId : selectedOptionEnterprise?.value,
-         deviceId : deviceId,
-         command : "delete_device"
-       }
-       console.log('check object', object);
-      //  let result_data = await executeDeleteDeviceLambda(user?.credentials, object);
-      //  console.log("result_data", result_data);
-      //  if(result_data.statusCode == 200) {
-      //     setDialogData({
-      //       title: "Success",
-      //       message: result_data.body,
-      //       onClickAction: async () => {
-      //         console.log("Response handleDeleteDevice");
-      //       },
-      //     })
-      //   } else {
-      //     setDialogData({
-      //       title: "Error",
-      //       message: "Something went wrong",
-      //       onClickAction: () => {
-      //         // Handle the action when the user clicks OK
-      //         console.log("error handleDeleteDevice");
-      //       },
-      //     })
-      //   }
+      setDialogData({
+        title: " Delete Device",
+        message: "Are you want to sure Delete Device",
+        onClickAction: async () => {
+          try{
+            dispatch(startLoading()); // Dispatch the startLoading action
+          // Handle the action when the user clicks OK
+          console.log("handleDeleteDevice else");
+          let object = {
+            enterpriseId : selectedOptionEnterprise?.value,
+            deviceId : deviceId,
+            command : "delete_device",
+            serialNumber: serialNumber
+          }
+          console.log('check object', object);
+          let result_data = await executeDeleteDeviceLambda(user?.credentials, object);
+          console.log("result_data", result_data);
+          if(result_data.statusCode == 200) {
+             setDialogData({
+               title: "Success",
+               message: "Device with ID deleted successfully",
+               onClickAction: async () => {
+                 console.log("Response handleDeleteDevice");
+               },
+             })
+           } else {
+             setDialogData({
+               title: "Error",
+               message: "Something went wrong",
+               onClickAction: () => {
+                 // Handle the action when the user clicks OK
+                 console.log("error handleDeleteDevice");
+               },
+             })
+           }
+        } catch( err) {
+          handleError(err, 'Error handleDeleteDevice')
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
+      },
+
+      })
+      
      }
 
   };
@@ -1125,7 +1143,7 @@ function AndroidDetails() {
                 <span style={{ marginRight: '2px', color: "blue"}}><EditIcon/></span>
               </Button>
               <Button
-                  onClick={() => handleDeleteDevice(selectedDeviceFetch?.android_data?.name)}
+                  onClick={() => handleDeleteDevice(selectedDeviceFetch?.android_data?.name, selectedDeviceFetch?.android_data?.hardwareInfo.serialNumber)}
                   color="primary"
                   className="px-2 d-flex align-items-center delete_button_device" // Adjust padding and add flex properties
                   style={{

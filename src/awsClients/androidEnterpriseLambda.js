@@ -781,10 +781,11 @@ export function executeDeleteDeviceLambda(
       Payload: JSON.stringify({
         enterpriseId: object.enterpriseId,
         command: object.command,
-        deviceId: object.deviceId
+        value: {
+          [object.serialNumber]: object.deviceId
+        }
       })
     };
-    console.log('pullParams',pullParams);
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);
@@ -937,6 +938,46 @@ export function executePolicyDeleteLambda(
       })
     };
     console.log('pullParams',pullParams);
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
+
+export function executeDeleteComplexLambda(
+  userName,
+  credentials,
+  command,
+  complex,
+  enterpriseId
+) {
+  return new Promise(function (resolve, reject) {
+    console.log(
+      "credentials "+ command,
+      credentials
+    );
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Enterprise_Crud_Iot_ComplexTree",
+      Payload: JSON.stringify({
+        userName: userName,
+        command: command,
+        complex: complex,
+        enterpriseId: enterpriseId
+      })
+    };
+    
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);
