@@ -265,7 +265,7 @@ function AndroidDetails() {
       } else if(listPolicy.statusCode == 400)  {
         setDialogData({
           title: "Empty",
-          message: 'Data Not found',
+          message: 'List of Policy Not found',
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log(`ListofPolicyFunction -->`);
@@ -431,18 +431,33 @@ function AndroidDetails() {
   const createEnterprise = async () => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
-      console.log('create android enterprise');
+      console.log('create android enterprise',isChecked);
       var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, isChecked);
       console.log('executeCreateEnterpriseAndroidManagementLambda',result);
       if(result.statusCode == 200) {
         window.open(`${result?.body?.signupUrl}`,"_blank");
       } else {
         setDialogData({
-          title: "Error",
-          message: result?.body,
-          onClickAction: () => {
+          title: "Previous Enterprise already exists",
+          message: "can you overwrite previous enterprise click Yes otherwise Cancel",
+          onClickAction: async () => {
             // Handle the action when the user clicks OK
-            console.log("error createEnterprise");
+            var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, true);
+            console.log('executeCreateEnterpriseAndroidManagementLambda',result);
+            if(result.statusCode == 200) {
+              window.open(`${result?.body?.signupUrl}`,"_blank");
+            } else {
+              setDialogData({
+                title: "Previous Enterprise already exists",
+                message: "can you overwrite previous enterprise click Yes otherwise Cancel",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error createEnterprise");
+                  
+                },
+              });
+              return;
+            }
           },
         });
         return;
@@ -1412,14 +1427,14 @@ function AndroidDetails() {
                       className="select-dropdown"
                     />
                   </div>
-                    <div>
+                    {/* <div>
                       <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={handleCheckboxChange}
                           className="big-checkbox"
                       />
-                </div>
+                    </div> */}
                   <Button
                     onClick={() => {
                       createEnterprise();

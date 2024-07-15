@@ -43,6 +43,9 @@ const MessageDialog = ({ data }) => {
         </div>
       </DialogContent>
       <DialogActions>
+        <Button variant="contained" color="primary" onClick={handleClose}>
+          Cancel
+        </Button>
         <Button variant="contained" color="success" onClick={handleButtonClick}>
           OK
         </Button>

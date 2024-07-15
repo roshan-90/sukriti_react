@@ -147,8 +147,8 @@ const ComplexNavigationCompact = (props) => {
           dispatch(stopLoading()); // Dispatch the stopLoading action
         } else {
           setDialogData({
-            title: "Server Error",
-            message: result_listdevice.body,
+            title: "Error",
+            message: "This complex not belong to this enterprise and complex not created in this enterprise",
             onClickAction: () => {
               // Handle the action when the user clicks OK
               console.log("handleCheckEnterprise");
