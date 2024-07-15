@@ -10,7 +10,7 @@ const TableComponent = ({ staticData }) => {
     useEffect(() => {
         if (staticData.length > 0) {
             if(staticData.length > 4) {
-                setRecords(staticData.slice(0, 4));
+                setRecords(staticData.slice(0, 5));
             } else {
                 setRecords(staticData.slice(0, staticData.length));
             }
@@ -18,9 +18,10 @@ const TableComponent = ({ staticData }) => {
     }, [staticData]);
 
     const fetchMoreRecords = () => {
+        console.log('page',page);
         const newPage = page + 1;
         const newRecords = staticData.slice(page * 5, newPage * 5);
-
+        console.log('newRecords',newRecords)
         if (newRecords.length === 0) {
             alert("No more records");
         } else {
@@ -65,7 +66,7 @@ const TableComponent = ({ staticData }) => {
                     {records.length > 0 ? (
                         records.map((record, index) => (
                             <tr key={index}>
-                                <td>{index}</td>
+                                <td>{index+1}</td>
                                 <td>{record.cabin_name.split('_')[3] + '_' + record.cabin_name.split('_')[4]}</td>
                                 <td>{record.serial_number}</td>
                                 <td>{AttributeFilter(record.complex_details,1)}</td>

@@ -13,6 +13,7 @@ const MessageDialog = ({ data }) => {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [onClickAction, setOnClickAction] = useState(undefined);
+  const [checkbtn, setcheckbtn] = useState(false)
 
   useEffect(() => {
     if (data) {
@@ -20,6 +21,9 @@ const MessageDialog = ({ data }) => {
       setMessage(data.message);
       setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
+      if(data.checkbtn == true) {
+        setcheckbtn(true)
+      }
     }
   }, [data]);
 
@@ -43,9 +47,11 @@ const MessageDialog = ({ data }) => {
         </div>
       </DialogContent>
       <DialogActions>
+        {checkbtn && (
         <Button variant="contained" color="primary" onClick={handleClose}>
           Cancel
         </Button>
+        )}
         <Button variant="contained" color="success" onClick={handleButtonClick}>
           OK
         </Button>

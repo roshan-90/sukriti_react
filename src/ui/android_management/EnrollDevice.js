@@ -584,6 +584,7 @@ export default function EnrollDevice() {
           console.log(`handleSaveData -->`);
         },
       });
+      dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
 
@@ -599,9 +600,9 @@ export default function EnrollDevice() {
              console.log("handleEditEnterprise");
            },
          })
+         dispatch(startLoading());
          return;
         }
-      dispatch(startLoading());
     let object_application_details = {
       serial_number: serialNumber,
       command: "update-data",

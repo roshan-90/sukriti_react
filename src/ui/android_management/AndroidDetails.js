@@ -441,11 +441,13 @@ function AndroidDetails() {
           title: "Previous Enterprise already exists",
           message: "can you overwrite previous enterprise click Yes otherwise Cancel",
           onClickAction: async () => {
+            dispatch(startLoading()); // Dispatch the startLoading action
             // Handle the action when the user clicks OK
             var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, true);
             console.log('executeCreateEnterpriseAndroidManagementLambda',result);
             if(result.statusCode == 200) {
               window.open(`${result?.body?.signupUrl}`,"_blank");
+              dispatch(stopLoading()); // Dispatch the stopLoading action
             } else {
               setDialogData({
                 title: "Previous Enterprise already exists",
@@ -456,10 +458,13 @@ function AndroidDetails() {
                   
                 },
               });
+              dispatch(stopLoading()); // Dispatch the stopLoading action
               return;
             }
           },
+          checkbtn: true
         });
+        dispatch(stopLoading()); // Dispatch the stopLoading action
         return;
       }
     } catch( err) {
