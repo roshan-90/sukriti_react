@@ -10,6 +10,8 @@ import {
 import {  Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useDispatch, useSelector } from "react-redux";
 import Select from 'react-select'; // Importing react-select
+import ModalAddApplication from "./ModalAddApplication";
+
 
 const ModalCreatePolicy = ({ data }) => {
   const dispatch = useDispatch();
@@ -43,6 +45,7 @@ const ModalCreatePolicy = ({ data }) => {
   const [applicationState, setApplicationState] = useState(false);
   const [kioskCustomization , setkioskCustomization] = useState(false)
   const [applications, setApplications] = useState([]);
+  const [modalAddApplication, setModalAddApplication] = useState(null);
 
   const InstallType = [
     { label: 'INSTALL_TYPE_UNSPECIFIED', value: 'INSTALL_TYPE_UNSPECIFIED' },
@@ -234,18 +237,33 @@ const ModalCreatePolicy = ({ data }) => {
     }));
   };
 
+  const handleAddfunction = () => {
+    setApplicationState(!applicationState)
+    setModalAddApplication({
+      title: "Add New Application",
+      onClickAction: async (data) => {
+        console.log('click')
+      },
+    });
+  }
+
+
   if(data) {
     console.log('data.options',data.options);
     return (
-      <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="sm" fullWidth
+      <Dialog className="dialog-selects" open={open} onClose={handleClose}  fullWidth
       PaperProps={{
         style: {
           height: '85%', // Adjust the maximum height as needed
+          minWidth: '68%'
         },
       }}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <div style={{ margin: "auto", width: "90%" }}>
+          {applicationState && (
+            <ModalAddApplication data={modalAddApplication}/>
+          )}
               <Label
                     check
                     for="Enterprise Name"
@@ -458,13 +476,11 @@ const ModalCreatePolicy = ({ data }) => {
         <Input
           type="switch"
           checked={applicationState}
-          onClick={() => {
-            setApplicationState(!applicationState);
-          }}
+          onClick={handleAddfunction}
         />
       </FormGroup>
-
-      {applications.map((application, index) => (
+      
+      {/* {applications.map((application, index) => (
         <div key={index}>
           {applicationState && (
             <>
@@ -548,7 +564,7 @@ const ModalCreatePolicy = ({ data }) => {
             </>
           )}
            </div>
-      ))}
+      ))} */}
 
       <Button
         onClick={() => {
