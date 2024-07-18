@@ -50,3 +50,8 @@
 .select-container {
   width: 40%; /* Ensure the select takes up the full width of its container */
 }
+
+.border-css {
+  border-style: groove;
+  border: #0dcaf0;
+}
