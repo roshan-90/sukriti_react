@@ -8,8 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import Select from 'react-select'; // Importing react-select
-import {Col, Form, FormGroup, Label, Input } from 'reactstrap';
+import {Col, Row, FormGroup, Label, Input } from 'reactstrap';
 import { FaCheck } from "react-icons/fa";
+import { executeVerifyPackageNameLambda } from "../../awsClients/androidEnterpriseLambda";
 
 const ModalAddApplication = ({ data }) => {
   const [open, setOpen] = useState(false);
@@ -112,6 +113,7 @@ const ModalAddApplication = ({ data }) => {
               <Label check for={`package_name`}>
                 Package Name
               </Label>
+              <Row>
               <Col sm={9}>
               <Input
                 id={`package_name`}
@@ -124,7 +126,7 @@ const ModalAddApplication = ({ data }) => {
               />
               </Col>
               <Col sm={1}>
-              {/* {packageNameVerify == true ? <>
+              {packageNameVerify == true ? <>
                   <Button color="success"  disabled>
                     <FaCheck />
                   </Button>{' '}
@@ -133,8 +135,9 @@ const ModalAddApplication = ({ data }) => {
                   <Button color="info" onClick={handleVerify}>
                     check
                   </Button>{' '}
-                </>} */}
+                </>}
               </Col>
+              </Row>
               <br />
               <Select
                 options={InstallType}

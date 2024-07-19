@@ -1016,10 +1016,6 @@ export function executeVerifyPackageNameLambda(
   enterpriseId
 ) {
   return new Promise(function (resolve, reject) {
-    console.log(
-      "credentials "+ command,
-      credentials
-    );
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
