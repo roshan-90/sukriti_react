@@ -295,6 +295,19 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
   }
 
   const setWarnings = () => {
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+      { 
+         setDialogData({
+         title: "Validation Error",
+         message: "Please Select Enterprise",
+         onClickAction: () => {
+           // Handle the action when the user clicks OK
+           console.log("handleEditEnterprise");
+         },
+       })
+       return true;
+     } 
+
     setDialogData({
       title: "Confirms",
       message: `Are you Sure Delete ${complexName} Complex`,

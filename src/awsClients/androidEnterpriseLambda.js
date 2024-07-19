@@ -776,16 +776,34 @@ export function executeDeleteDeviceLambda(
       apiVersion: "2015-03-31",
       credentials: credentials, // Pass the credentials from the Redux store
     });
-    var pullParams = {
-      FunctionName: "Android_Management_Device",
-      Payload: JSON.stringify({
-        enterpriseId: object.enterpriseId,
-        command: object.command,
-        value: {
-          [object.serialNumber]: object.deviceId
-        }
-      })
-    };
+
+    console.log('object',object);
+
+    if(object.abandonDevice == false) {
+      var pullParams = {
+        FunctionName: "Android_Management_Device",
+        Payload: JSON.stringify({
+          enterpriseId: object.enterpriseId,
+          command: object.command,
+          abandonDevice: object.abandonDevice,
+          value: {
+            [object.serialNumber]: object.deviceId
+          }
+        })
+      };
+    } else {
+      var pullParams = {
+        FunctionName: "Android_Management_Device",
+        Payload: JSON.stringify({
+          enterpriseId: object.enterpriseId,
+          command: object.command,
+          abandonDevice: object.abandonDevice,
+          serial_number: object.serialNumber
+        })
+      };
+    }
+
+    console.log('pullPrams',pullParams);
     lambda.invoke(pullParams, function (err, data) {
       if (err) {
         console.log("_lambda", err);
