@@ -242,7 +242,7 @@ const ModalCreatePolicy = ({ data }) => {
     setModalAddApplication({
       title: "Add New Application",
       onClickAction: async (data) => {
-        console.log('click')
+        console.log('click', data);
       },
     });
   }

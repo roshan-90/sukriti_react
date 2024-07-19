@@ -17,7 +17,13 @@ const ModalAddApplication = ({ data }) => {
   const [onClickAction, setOnClickAction] = useState(undefined);
   const [packageNameVerify, setPackageNameVerify ] = useState(null);
   const [applications, setApplications] = useState([]);
-
+  const [formData, setFormData] = useState({
+    packageName: '',
+    installType: '',
+    defaultPermissionPolicy: '',
+    autoUpdateMode: '',
+    userControlSettings: ''
+  });
   const UserControlSettings = [
     { label: 'USER_CONTROL_SETTINGS_UNSPECIFIED', value: 'USER_CONTROL_SETTINGS_UNSPECIFIED' },
     { label: 'USER_CONTROL_ALLOWED', value: 'USER_CONTROL_ALLOWED' },
@@ -60,21 +66,27 @@ const ModalAddApplication = ({ data }) => {
   };
 
   const handleButtonClick = () => {
-    // console.log('formData',formData);
-    // if(formData.description == '' || formData.name == ''){
-    //   return true;
-    // }
-    // handleClose();
-    // if (onClickAction !== undefined) {
-    //   onClickAction(formData);
-    //   setOpen(false);
-    //   setSelectedOption(null);
-    // }
+    console.log('formData',formData);
+    if(formData.packageName == '' || formData.installType == '' || formData.defaultPermissionPolicy == '' || formData.autoUpdateMode == '' || formData.userControlSettings == ''){
+      return true;
+    }
+    handleClose();
+    if (onClickAction !== undefined) {
+      onClickAction(formData);
+      setOpen(false);
+      setFormData({
+        packageName: '',
+        installType: '',
+        defaultPermissionPolicy: '',
+        autoUpdateMode: '',
+        userControlSettings: ''
+      })
+    }
   };
 
   const handleChange = (field, value) => {
     console.log('data',{field,value})
-    // setApplications(updatedApplications);
+    setFormData({ ...formData, [field]: value });  
   };
 
   const handleVerify = () => {
