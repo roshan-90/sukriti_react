@@ -104,14 +104,39 @@ const ModalReinitiate = ({ data }) => {
     { label: 'Urdu', value: 'Urdu' }
   ];
 
+  
   useEffect(() => {
+    console.log('data',data);
     if (data) {
       setTitle(data.title);
       setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
       handleListPolicy();
+      if(data.data.DEVICE_POLICY_STATE == "TRUE") {
+        dispatch(setPolicyName(data.data.policy_name))
+      }
+      console.log('data.data.application_details',data.data.application_details);
+
+      if(data.data.DEVICE_APPLICATION_STATE == "TRUE") {
+        setApplicationFormData({
+          unattended_timmer: data.data.application_details.unattended_timmer ?? '',
+          margin_left: data.data.application_details.margin_left ?? '',
+          margin_right:data.data.application_details.margin_right ?? '',
+          margin_top: data.data.application_details.margin_top ?? '',
+          margin_bottom: data.data.application_details.margin_bottom ?? ''
+        })
+        setApplicationTypeOption({ label: data.data.application_details.application_type, value: data.data.application_details.application_type})
+        setUpiPaymentStatus({ label: data.data.application_details.upi_payment_status, value: data.data.application_details.upi_payment_status})
+        setSelectedOptionLanguage({ label: data.data.application_details.language, value: data.data.application_details.language})
+      }
+
+      if(data.data.QR_CREATED_STATE == "TRUE") {
+        setQrImage(data.data.qr_details.qr)
+      }
     }
-  }, [data]);
+  }, [data,]);
+
+  
 
   const handleClose = () => {
     setOpen(false);
@@ -201,6 +226,8 @@ const ModalReinitiate = ({ data }) => {
   
 
   const handlePolicy = (value) => {
+    console.log('value',value);
+    console.log('data', data);
     dispatch(setPolicyName(value));
   }
 
@@ -440,18 +467,26 @@ const ModalReinitiate = ({ data }) => {
                         <BiMaleFemale />
                       </Col>
                       <Col className="cabin-text">
-                        <span>{policy.value}</span>
+                        <span>{policy.value.split('_')[0]}</span>
                       </Col>
                     </Row>
                     ))}
                     </>
                   )}
+                  {data.data.DEVICE_POLICY_STATE == "TRUE" ? <> </> : (
+                  <Button
+                    variant="contained"
+                    onClick={handleComplete}
+                  >
+                    Save Policy
+                  </Button>
+                  ) }
                 </div>
               )}
               {activeStep === 1 && (
                 <div>
                   <h3> Application Details</h3>
-                  {/* {policyName && ( */}
+                  {policyName && (
                     <>
                       <Input
                       id="unattended_timmer"
@@ -459,6 +494,7 @@ const ModalReinitiate = ({ data }) => {
                       placeholder="unattended timmer"
                       type="number"
                       onChange={(e) => handleChange(e)}
+                      value={applicationFormData.unattended_timmer}
                     />
                       <br />
                       <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
@@ -473,6 +509,7 @@ const ModalReinitiate = ({ data }) => {
                       placeholder="Margin Left"
                       type="text"
                       onChange={(e) => handleChange(e)}
+                      value={applicationFormData.margin_left}
                     />
                     <br />
                     <Input
@@ -481,6 +518,7 @@ const ModalReinitiate = ({ data }) => {
                       placeholder="Margin Right"
                       type="text"
                       onChange={(e) => handleChange(e)}
+                      value={applicationFormData.margin_right}
                     />
                     <br />
                     <Input
@@ -489,6 +527,7 @@ const ModalReinitiate = ({ data }) => {
                       placeholder="Margin Top"
                       type="text"
                       onChange={(e) => handleChange(e)}
+                      value={applicationFormData.margin_top}
                     />
                     <br />
                     <Input
@@ -497,16 +536,19 @@ const ModalReinitiate = ({ data }) => {
                       placeholder="Margin Bottom"
                       type="text"
                       onChange={(e) => handleChange(e)}
+                      value={applicationFormData.margin_bottom}
                     />
                     <br />
+                    {data.data.DEVICE_APPLICATION_STATE == "TRUE" ? <></> : (
                       <Button
                         variant="contained"
                         onClick={handleSaveDetails}
                       >
                         Save Details
                       </Button>
+                    )}
                     </>
-                  {/* )} */}
+                  )}
                 </div>
               )}
               {activeStep === 2 && (
@@ -515,7 +557,16 @@ const ModalReinitiate = ({ data }) => {
                    <div className="image-container">
                    <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
+                   {data.data.QR_CREATED_STATE == "TRUE" ? <> </> : (
+                    <Button
+                          variant="contained"
+                          onClick={handleSaveDetails}
+                        >
+                          QR Generate
+                        </Button>
+                   )}
                  </div>
+                 
                   )}
                 </div>
               )}
@@ -538,9 +589,9 @@ const ModalReinitiate = ({ data }) => {
     </Box>
     </div>
         <DialogActions>
-          <Button variant="contained" color="success" onClick={handleButtonClick}>
+          {/* <Button variant="contained" color="success" onClick={handleButtonClick}>
             Submit
-          </Button>
+          </Button> */}
           <Button variant="contained" color="primary" onClick={handleClose}>
             Cancel
           </Button>
