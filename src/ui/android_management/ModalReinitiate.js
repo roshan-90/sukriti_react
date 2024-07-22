@@ -23,7 +23,8 @@ import { BiMaleFemale } from "react-icons/bi";
 import { selectUser } from "../../features/authenticationSlice";
 import {
   executelistProvisionLambda,
-  executeUpdateDeviceLambda
+  executeUpdateDeviceLambda,
+  executeListPolicyLambda
 } from "../../awsClients/androidEnterpriseLambda";
 
 const steps = ['Policy Section', 'Application Section', 'Enrollment Token'];
@@ -108,6 +109,7 @@ const ModalReinitiate = ({ data }) => {
       setTitle(data.title);
       setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
+      handleListPolicy();
     }
   }, [data]);
 
@@ -142,6 +144,35 @@ const ModalReinitiate = ({ data }) => {
   }
   const handleVerify = () => {
     
+  }
+
+  const handleListPolicy = async() => {
+    try{
+    let enterprise_id = selectedOptionEnterprise.value;
+    let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
+    console.log('listPolicy', listPolicy);
+    const options = listPolicy.body.map(item => ({
+      value: item.name.split("/")[3],
+      label: item.name.split("/")[3]
+    }));
+    console.log('options',options)
+    dispatch(setListOfPolicy(options));
+    if(listPolicy.statusCode == 200) {
+    } else {
+      setDialogData({
+        title: "Error",
+        message: 'SomethingWent wrong Please try again',
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleSaveData -->`);
+        },
+      });
+    }
+  } catch (error) {
+    handleError(error, 'Error handleSaveData')
+  } finally {
+    dispatch(stopLoading()); // Dispatch the stopLoading action
+  }
   }
 
   const handleError = (err, Custommessage, onclick = null) => {
@@ -388,7 +419,7 @@ const ModalReinitiate = ({ data }) => {
               <Typography variant="h6" gutterBottom>
                 {steps[activeStep]}
               </Typography>
-              {activeStep === 3 && (
+              {activeStep === 0 && (
                 <div>
                   <h3>Lists of Policy</h3>
                   {listOfPolicy.length > 0 && (
@@ -417,10 +448,10 @@ const ModalReinitiate = ({ data }) => {
                   )}
                 </div>
               )}
-              {activeStep === 4 && (
+              {activeStep === 1 && (
                 <div>
                   <h3> Application Details</h3>
-                  {policyName && (
+                  {/* {policyName && ( */}
                     <>
                       <Input
                       id="unattended_timmer"
@@ -475,10 +506,10 @@ const ModalReinitiate = ({ data }) => {
                         Save Details
                       </Button>
                     </>
-                  )}
+                  {/* )} */}
                 </div>
               )}
-              {activeStep === 5 && (
+              {activeStep === 2 && (
                 <div>
                   {listOfPolicy.length > 0 && (
                    <div className="image-container">
