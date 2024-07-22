@@ -402,8 +402,8 @@ const ModalReinitiate = ({ data }) => {
       <Dialog className="dialog-selects" open={open} onClose={handleClose} maxWidth="sm" fullWidth
       PaperProps={{
         style: {
-          height: '85%', // Adjust the maximum height as needed
-          minWidth: '85%'
+          height: '95%', // Adjust the maximum height as needed
+          minWidth: '95%'
         },
       }}>
         <DialogTitle>{title}</DialogTitle>
