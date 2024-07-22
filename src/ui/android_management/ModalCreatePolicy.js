@@ -242,7 +242,7 @@ const ModalCreatePolicy = ({ data }) => {
     setModalAddApplication({
       title: "Add New Application",
       onClickAction: async (data) => {
-        console.log('click', data);
+        console.log('clicked ', data);
       },
     });
   }
@@ -262,7 +262,7 @@ const ModalCreatePolicy = ({ data }) => {
         <DialogContent>
           <div style={{ margin: "auto", width: "90%" }}>
           {applicationState && (
-            <ModalAddApplication data={modalAddApplication}/>
+            <ModalAddApplication data={modalAddApplication} setApplicationState={setApplicationState}/>
           )}
               <Label
                     check
@@ -398,25 +398,7 @@ const ModalCreatePolicy = ({ data }) => {
                 onClick={() => handleToggle('outgoingCallsDisabled')}
               />
               </FormGroup>
-              <FormGroup switch>
-               <Label> Kiosk CustomLauncher Enabled </Label>
-              <Input
-                type="switch"
-                checked={formData.kioskCustomLauncherEnabled}
-                onClick={() => handleToggle('kioskCustomLauncherEnabled')}
-              />
-              </FormGroup>
-              <FormGroup switch>
-               <Label> kioskCustomization </Label>
-              <Input
-                type="switch"
-                checked={kioskCustomization}
-                onClick={() => {
-                  setkioskCustomization(!kioskCustomization);
-                }}
-              />
-              <>
-                {kioskCustomization && (
+               <Label> <b>kioskCustomization </b></Label>
                   <>
                     <Select
                       options={PowerButtonActions || []}
@@ -459,27 +441,20 @@ const ModalCreatePolicy = ({ data }) => {
                     />
                     <br />
                   </>
-                )}
-              </>
-              </FormGroup>
               <div>
-              <FormGroup switch>
-                <Label>Applications</Label>
+                <Label> <b> Applications </b></Label>
+                <br/>
                   <Button
-                    onClick={handleAddApplication}
+                    onClick={handleAddfunction}
                     outline
                     color="primary"
                     className="add-button"
                   >
-                  <span style={{ marginRight: '2px', color: "blue"}}>Add Applications</span>
+                    ADD Application
                 </Button>
-        <Input
-          type="switch"
-          checked={applicationState}
-          onClick={handleAddfunction}
-        />
-      </FormGroup>
-      
+                <br/>
+                <br/>
+
       {/* {applications.map((application, index) => (
         <div key={index}>
           {applicationState && (

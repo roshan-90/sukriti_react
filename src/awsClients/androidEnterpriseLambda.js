@@ -1026,7 +1026,7 @@ export function executeVerifyPackageNameLambda(
       Payload: JSON.stringify({
         userName: userName,
         packageName: packageName,
-        enterpriseId: enterpriseId
+        EnterpriseId: enterpriseId
       })
     };
     

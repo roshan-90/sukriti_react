@@ -11,13 +11,24 @@ import Select from 'react-select'; // Importing react-select
 import {Col, Row, FormGroup, Label, Input } from 'reactstrap';
 import { FaCheck } from "react-icons/fa";
 import { executeVerifyPackageNameLambda } from "../../awsClients/androidEnterpriseLambda";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../features/authenticationSlice";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
-const ModalAddApplication = ({ data }) => {
+
+const ModalAddApplication = ({ data , setApplicationState}) => {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const user = useSelector(selectUser);
+  const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
   const [title, setTitle] = useState("");
   const [onClickAction, setOnClickAction] = useState(undefined);
   const [packageNameVerify, setPackageNameVerify ] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
   const [formData, setFormData] = useState({
     packageName: '',
     installType: '',
@@ -37,7 +48,6 @@ const ModalAddApplication = ({ data }) => {
     { label: 'BLOCKED', value: 'BLOCKED' },
     { label: 'AVAILABLE', value: 'AVAILABLE' },
     { label: 'REQUIRED_FOR_SETUP', value: 'REQUIRED_FOR_SETUP' },
-    { label: 'KIOSK', value: 'KIOSK' }
   ];
 
   const DefaultPermissionPolicy = [
@@ -64,7 +74,33 @@ const ModalAddApplication = ({ data }) => {
 
   const handleClose = () => {
     setOpen(false);
+    setApplicationState(false);
   };
+
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+  
 
   const handleButtonClick = () => {
     console.log('formData',formData);
@@ -90,9 +126,36 @@ const ModalAddApplication = ({ data }) => {
     setFormData({ ...formData, [field]: value });  
   };
 
-  const handleVerify = () => {
-    console.log('handle verify function is running');
+  const handleVerify = async () => {
+    console.log('handle verify function is running',formData.packageName);
     console.log("applications",applications)
+    if(formData.packageName == '' || selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) {
+      setDialogData({
+        title: "Validation Error",
+        message: "Please Select Package name and Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleVerify package name ");
+        },
+      })
+      return;
+    } else {
+      try {
+        dispatch(startLoading());
+        var result = await executeVerifyPackageNameLambda(user.username, user?.credentials, formData.packageName, selectedOptionEnterprise.value);
+        console.log('result',result);
+        if(result.statusCode == 200) {
+          setPackageNameVerify(true);
+        } else {
+
+        }
+      } catch (error) {
+        handleError(error, 'Error handleVerify package')
+      } finally {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }
+
+    }
   }
 
   if(data) {
@@ -107,6 +170,15 @@ const ModalAddApplication = ({ data }) => {
       }}>
         <DialogTitle>{title}</DialogTitle>
         <br/>
+        {isLoading && (
+          <div className="loader-container">
+            <CircularProgress
+              className="loader"
+              style={{ color: "rgb(93 192 166)" }}
+            />
+          </div>
+        )}
+        <MessageDialog data={dialogData} />
         <DialogContent>
           <div style={{ margin: "auto", width: "90%" }}>
           <>
