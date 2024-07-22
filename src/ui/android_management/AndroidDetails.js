@@ -60,6 +60,7 @@ import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
 import ModalDeletePolicy from './ModalDeletePolicy';
 import RegisterComplex from './RegisterComplex';
 import UpdateComplex from './UpdateComplex'
+import ModalReinitiate from './ModalReinitiate';
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -141,7 +142,7 @@ function AndroidDetails() {
   const [registerComplex, setRegisterComplex] = useState(false);
   const [complexChanged, setComplexChanged] = useState(false);
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
-
+  const [reinitiate, setReinitiate] = useState(null)
 
   const handleClickFunction = async (data) => {
     console.log('data',data);
@@ -546,6 +547,18 @@ function AndroidDetails() {
         dispatch(stopLoading()); // Dispatch the stopLoading action
       }
     },
+    })
+  }
+
+  const handleReinitateDevice = async (device) => {
+    setReinitiate({
+      title: "Reinitiate Device",
+      message: "reinitate",
+      data: device,
+      onClickAction: () => {
+        // Handle the action when the user clicks OK
+        console.log("handleDeleteDevice");
+      },
     })
   }
 
@@ -1254,21 +1267,40 @@ function AndroidDetails() {
               >
                 <span style={{ marginRight: '2px', color: "blue"}}><EditIcon/></span>
               </Button>
+              {(selectedDeviceFetch.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == "FAIL" || selectedDeviceFetch.DEVICE_PROV_GET_INFO_PUBLISH == "FAIL") && (
+                <>
               <Button
-                  onClick={() => handleDeleteDevice(selectedDeviceFetch)}
-                  color="primary"
-                  className="px-2 d-flex align-items-center delete_button_device" // Adjust padding and add flex properties
-                  style={{
-                    ...whiteSurfaceCircularBorder,
-                    width: "50px",
-                    height: "35px",
-                    fontSize: "14px", // Adjust font size here
-                  }}
-                >
-                <span style={{ marginRight: '2px', color: "red"}}>
-                  <DeleteIcon/>
-                  </span>
+                onClick={() => handleReinitateDevice(selectedDeviceFetch)}
+                color="primary"
+                className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
+                style={{
+                  ...whiteSurfaceCircularBorder,
+                  width: "70px",
+                  height: "35px",
+                  fontSize: "14px", // Adjust font size here
+                  marginRight: "18px"
+                }}
+              >
+                <span style={{ marginRight: '2px', color: "blue"}}>Reinitiate</span>
               </Button>
+              </>
+              )}
+                    <Button
+                      onClick={() => handleDeleteDevice(selectedDeviceFetch)}
+                      color="primary"
+                      className="px-2 d-flex align-items-center delete_button_device" // Adjust padding and add flex properties
+                      style={{
+                        ...whiteSurfaceCircularBorder,
+                        width: "50px",
+                        height: "35px",
+                        fontSize: "14px", // Adjust font size here
+                      }}
+                    >
+                      <span style={{ marginRight: '2px', color: "red"}}>
+                        <DeleteIcon/>
+                        </span>
+                    </Button>
+              
               </Row>
             </div>
             <div
@@ -1499,6 +1531,7 @@ function AndroidDetails() {
         <ModalUpdatePolicy data={dialogUpdatePolicy} />
         <ConfirmationDialog ref={confirmationDialog} />
         <ModalDeletePolicy data={dialogDeletePolicy} />
+        <ModalReinitiate data={reinitiate} />
         {(registerComplex) && (
           <RegisterComplex openModal={registerComplex} selected={registerComplex} setModalToggle={OpenRegisterModal} /> // Pass complexChanged as a prop
         )}
