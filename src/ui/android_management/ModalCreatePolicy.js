@@ -44,7 +44,6 @@ const ModalCreatePolicy = ({ data }) => {
     "smsDisabled": false,
     "modifyAccountsDisabled": true,
     "outgoingCallsDisabled": true,
-    "kioskCustomLauncherEnabled": true,
   })
   const [applicationState, setApplicationState] = useState(false);
   const [kioskCustomization , setkioskCustomization] = useState(false)
@@ -179,7 +178,30 @@ const ModalCreatePolicy = ({ data }) => {
         }
         onClickAction(requestBody);
         setOpen(false);
+        setFormData({
+          "cameraDisabled": true,
+          "addUserDisabled": true,
+          "removeUserDisabled": false,
+          "factoryResetDisabled": true,
+          "mountPhysicalMediaDisabled": true,
+          "safeBootDisabled": true,
+          "uninstallAppsDisabled": false,
+          "bluetoothConfigDisabled": true,
+          "vpnConfigDisabled": false,
+          "networkResetDisabled": false,
+          "smsDisabled": false,
+          "modifyAccountsDisabled": true,
+          "outgoingCallsDisabled": true,
+        })
       }
+      setPowerButtonActions(null);
+      setSystemErrorWarnings(null);
+      setSystemNavigation(null);
+      setStatusBar(null);
+      setDeviceSettings(null);
+      setPolicyName('');
+      setSelectedKiosk(null);
+      setApplications([]);
     } else {
       alert('Please fill policy name');
       return
