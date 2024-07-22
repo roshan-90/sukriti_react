@@ -102,11 +102,34 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
   };
   
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     console.log('formData',formData);
+    let check = await handleVerify();
+    
     if(formData.packageName == '' || formData.installType == '' || formData.defaultPermissionPolicy == '' || formData.autoUpdateMode == '' || formData.userControlSettings == ''){
-      return true;
+      setDialogData({
+        title: "Validation Error",
+        message: "Please Enter and Select all valid field",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+         console.log('handleVerify :->')
+        },
+      });
+      return
     }
+    console.log('packageNameVerify',check);
+    if(check == false) {
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter valid application package",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+         console.log('handleVerify :->')
+        },
+      });
+      return
+    }
+
     handleClose();
     if (onClickAction !== undefined) {
       onClickAction(formData);
@@ -138,7 +161,7 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
           console.log("handleVerify package name ");
         },
       })
-      return;
+      return false;
     } else {
       try {
         dispatch(startLoading());
@@ -146,8 +169,18 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
         console.log('result',result);
         if(result.statusCode == 200) {
           setPackageNameVerify(true);
+          return true;
         } else {
-
+          setDialogData({
+            title: "Validation Error",
+            message: "Please enter valid application package",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+             console.log('handleVerify :->')
+            },
+          });
+          return false 
+          // setPackageNameVerify(false);
         }
       } catch (error) {
         handleError(error, 'Error handleVerify package')

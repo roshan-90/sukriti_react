@@ -128,6 +128,7 @@ const ModalCreatePolicy = ({ data }) => {
     console.log('applicationState',applicationState);
     console.log('kioskCustomization',kioskCustomization);
     console.log('formData',formData);
+    
     if(policyName) {
       let data = {
         cameraDisabled: formData.cameraDisabled,
@@ -143,9 +144,7 @@ const ModalCreatePolicy = ({ data }) => {
         smsDisabled: formData.smsDisabled,
         modifyAccountsDisabled: formData.modifyAccountsDisabled,
         outgoingCallsDisabled: formData.outgoingCallsDisabled,
-        kioskCustomLauncherEnabled: formData.kioskCustomLauncherEnabled,
       };
-      if(kioskCustomization == true) {
         if(powerButtonActions?.value && systemErrorWarnings?.value && systemNavigation?.value && statusBar?.value && deviceSettings?.value){
           let kioskCustomization = {
             powerButtonActions: powerButtonActions?.value,
@@ -158,19 +157,20 @@ const ModalCreatePolicy = ({ data }) => {
         } else {
           alert('Please fill kiosk Customization');
           return;
+        } 
+        if(applications.length  == 0) {
+          alert('Please add application Details');
+          return
+        } else if (selectedKiosk.packageName == '', selectedKiosk.packageName == null) {
+          alert('Please select Kiosk application');
+          return
         }
-      } 
-  
-      if(applicationState == true) {
-        const isValid = applications.every(validateForm);
-        console.log('Applications:', applications);
-        if (isValid) {
-          data.applications = applications;
-        } else {
-          alert('Please fill out all fields.');
-          return;
-        }
-      } 
+        console.log('applications',applications);
+        data.applications = applications;
+        console.log('applications.length',applications.length);
+        data.kioskPackage = selectedKiosk.packageName
+        console.log('data check',data);
+        console.log('selectedKiosk',selectedKiosk);
       handleClose();
       if (onClickAction !== undefined) {
         let requestBody = {
@@ -693,7 +693,7 @@ console.log('applications',applications);
            </div>
       ))} */}
 
-      <Button
+      {/* <Button
         onClick={() => {
           const isValid = applications.every(validateForm);
           if (isValid) {
@@ -705,7 +705,7 @@ console.log('applications',applications);
         color="primary"
       >
         Submit
-      </Button>
+      </Button> */}
     </div>
             </Form>
             <br/>
