@@ -52,7 +52,8 @@ const ModalCreatePolicy = ({ data }) => {
   const [modalAddApplication, setModalAddApplication] = useState(null);
   const [editApplication, setEditApplication] = useState(false)
   const [modalupdateApplication, setModalUpdateApplication] = useState(null);
-
+  const [chooseKiosk , setChooseKiosk] = useState(false);
+  const [selectedKiosk, setSelectedKiosk] = useState(null);
   const InstallType = [
     { label: 'INSTALL_TYPE_UNSPECIFIED', value: 'INSTALL_TYPE_UNSPECIFIED' },
     { label: 'PREINSTALLED', value: 'PREINSTALLED' },
@@ -254,6 +255,10 @@ const ModalCreatePolicy = ({ data }) => {
     });
   }
 
+  const handleChooseKiosk = () => {
+    setChooseKiosk(!chooseKiosk);
+  }
+
   const handleUpdateapplication = (data, index) => {
     setEditApplication(!editApplication)
     setModalUpdateApplication({
@@ -274,6 +279,11 @@ const ModalCreatePolicy = ({ data }) => {
     setApplications((prevApplications) => 
       prevApplications.filter((_, i) => i !== index)
     );
+  }
+
+  const handleRadioChange = async (item) => {
+    setSelectedKiosk(item);
+    handleChooseKiosk();
   }
 
 console.log('applications',applications);
@@ -484,11 +494,63 @@ console.log('applications',applications);
                   >
                     ADD Application
                 </Button>
+                {applications.length > 0 && (
+                <Button
+                    onClick={handleChooseKiosk}
+                    outline
+                    color="primary"
+                    className="add-button"
+                  >
+                    Choose Kiosk
+                </Button>
+                )}
                 <br/>
                 <br/>
                 {applications.length > 0 && (
         <>
           {applications.map((item, index) => (
+            <> 
+            {chooseKiosk == true ? (
+              <> 
+              <Row
+              key={index}
+              style={{
+                marginBottom: '10px',
+                alignItems: 'center',
+                backgroundColor: 'ghostwhite',
+                width: '70%',
+              }}
+              className="cabin-row clickable-row"
+            >
+              <Col xs="auto">
+                  <Input
+                    type="radio"
+                    name="selectedkiosk"
+                    value={item}
+                    checked={selectedKiosk === item}
+                    onChange={() => handleRadioChange(item)}
+                  />
+              </Col>
+              <Col xs="auto" className="cabin-icon-col">
+                <BiMaleFemale />
+              </Col>
+              <Col className="application-text"  
+                style={{
+                  fontSize: "small"
+                }}>
+                  <span>{item.packageName}</span>
+                  <br />
+                  <span> &nbsp;&nbsp;&nbsp;&nbsp;{item.installType}</span>
+                  <br />
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.defaultPermissionPolicy}</span>
+                  <br />
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.autoUpdateMode}</span>
+                  <br />
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.userControlSettings}</span>
+                </Col>
+            </Row>
+              </>
+            ) : (
             <Row
               key={index}
               style={{
@@ -540,6 +602,8 @@ console.log('applications',applications);
                       </Button>
               </Col>
             </Row>
+            )}
+            </>
           ))}
         </>
       )}
