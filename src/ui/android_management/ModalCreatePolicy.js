@@ -11,7 +11,11 @@ import {  Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useDispatch, useSelector } from "react-redux";
 import Select from 'react-select'; // Importing react-select
 import ModalAddApplication from "./ModalAddApplication";
-
+import { Row,Col} from 'reactstrap';
+import { BiMaleFemale } from "react-icons/bi";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import ModalUpdateApplication from './ModalUpdateApplication';
 
 const ModalCreatePolicy = ({ data }) => {
   const dispatch = useDispatch();
@@ -46,6 +50,8 @@ const ModalCreatePolicy = ({ data }) => {
   const [kioskCustomization , setkioskCustomization] = useState(false)
   const [applications, setApplications] = useState([]);
   const [modalAddApplication, setModalAddApplication] = useState(null);
+  const [editApplication, setEditApplication] = useState(false)
+  const [modalupdateApplication, setModalUpdateApplication] = useState(null);
 
   const InstallType = [
     { label: 'INSTALL_TYPE_UNSPECIFIED', value: 'INSTALL_TYPE_UNSPECIFIED' },
@@ -243,11 +249,34 @@ const ModalCreatePolicy = ({ data }) => {
       title: "Add New Application",
       onClickAction: async (data) => {
         console.log('clicked ', data);
+        setApplications((prevApplications) => [...prevApplications, data]);
       },
     });
   }
 
+  const handleUpdateapplication = (data, index) => {
+    setEditApplication(!editApplication)
+    setModalUpdateApplication({
+      title: "Update Application",
+      data: data,
+      onClickAction: async (data) => {
+        console.log('update clicked ', data);
+        setApplications((prevApplications) =>
+          prevApplications.map((app, i) => (i === index ? data : app))
+        );
+      },
+      data: { ...applications[index] },
+    });
+  }
 
+  const handleDeleteapplication = async(index) => {
+    console.log('index',index);
+    setApplications((prevApplications) => 
+      prevApplications.filter((_, i) => i !== index)
+    );
+  }
+
+console.log('applications',applications);
   if(data) {
     console.log('data.options',data.options);
     return (
@@ -263,6 +292,9 @@ const ModalCreatePolicy = ({ data }) => {
           <div style={{ margin: "auto", width: "90%" }}>
           {applicationState && (
             <ModalAddApplication data={modalAddApplication} setApplicationState={setApplicationState}/>
+          )}
+          {editApplication && (
+              <ModalUpdateApplication data={modalupdateApplication} setApplicationState={setEditApplication}/>
           )}
               <Label
                     check
@@ -454,7 +486,63 @@ const ModalCreatePolicy = ({ data }) => {
                 </Button>
                 <br/>
                 <br/>
-
+                {applications.length > 0 && (
+        <>
+          {applications.map((item, index) => (
+            <Row
+              key={index}
+              style={{
+                marginBottom: '10px',
+                alignItems: 'center',
+                backgroundColor: 'ghostwhite',
+                width: '70%',
+              }}
+              className="cabin-row clickable-row"
+            >
+              {/* <Col xs="auto"></Col> */}
+              <Col xs="auto" className="cabin-icon-col">
+                <BiMaleFemale />
+              </Col>
+              <Col className="application-text"  
+              style={{
+                fontSize: "small"
+              }}>
+                <span>{item.packageName}</span>
+                <br />
+                <span> &nbsp;&nbsp;&nbsp;&nbsp;{item.installType}</span>
+                <br />
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.defaultPermissionPolicy}</span>
+                <br />
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.autoUpdateMode}</span>
+                <br />
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.userControlSettings}</span>
+              </Col>
+              <Col className="cabin-text">
+                  <Button
+                      onClick={() => {
+                        handleDeleteapplication(index);
+                      }}
+                      outline
+                      color="primary"
+                      className="delete-button"
+                    >
+                      <DeleteIcon  color="error"/>
+                  </Button>
+                  <Button
+                        onClick={() => {
+                          handleUpdateapplication(item,index);
+                        }}
+                        outline
+                        color="primary"
+                        className="edit-button"
+                      >
+                        <EditIcon />
+                      </Button>
+              </Col>
+            </Row>
+          ))}
+        </>
+      )}
       {/* {applications.map((application, index) => (
         <div key={index}>
           {applicationState && (
