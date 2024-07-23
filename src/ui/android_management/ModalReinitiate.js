@@ -141,6 +141,28 @@ const ModalReinitiate = ({ data }) => {
   const handleClose = () => {
     setOpen(false);
     setSelectedOption(null);
+    setApplicationFormData({
+      unattended_timmer: "",
+      application_type: "",
+      upi_payment_status: "",
+      language: "",
+      margin_left: "",
+      margin_right: "",
+      margin_top: "",
+      margin_bottom: ""
+    })
+    setFormData({
+       name: '',
+      description: ''
+    })
+    dispatch(setPolicyName(null))
+    setActiveStep(0)
+    setApplicationTypeOption(null)
+    setQrImage(null)
+    setSelectedOptionLanguage(null)
+    setUpiPaymentStatus(null)
+    setCompleted({})
+    window.location.reload(); 
   };
 
   const handleButtonClick = () => {
@@ -154,6 +176,7 @@ const ModalReinitiate = ({ data }) => {
       setOpen(false);
       setSelectedOption(null);
     }
+    window.location.reload(); 
   };
   const handleChangeApplicationType = (selectedOption) => {
     console.log('handleChangeApplicationType',selectedOption);
@@ -165,7 +188,7 @@ const ModalReinitiate = ({ data }) => {
   }
   const handleChange = (e) => {
     const { name , value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setApplicationFormData({ ...applicationFormData, [name]: value });
   }
   const handleVerify = () => {
     
@@ -178,7 +201,7 @@ const ModalReinitiate = ({ data }) => {
     console.log('listPolicy', listPolicy);
     const options = listPolicy.body.map(item => ({
       value: item.name.split("/")[3],
-      label: item.name.split("/")[3]
+      label: item.name.split("/")[3].split('_')[0]
     }));
     console.log('options',options)
     dispatch(setListOfPolicy(options));
@@ -275,74 +298,39 @@ const ModalReinitiate = ({ data }) => {
     setCompleted({});
   };
 
-  const handleSaveDetails = async () => {
+  const handleSavePolicy = async () => {
     try {
-      if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
-        { 
-           setDialogData({
-           title: "Validation Error",
-           message: "Please Select Enterprise",
-           onClickAction: () => {
-             // Handle the action when the user clicks OK
-             console.log("handleEditEnterprise");
-           },
-         })
-         dispatch(startLoading());
-         return;
-        }
-    let object_application_details = {
-      serial_number: serialNumber,
-      command: "update-data",
-      details_type: "application_details",
-      value : applicationFormData
-    }
-    console.log("object_application_details",object_application_details);
-    let application_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
-    console.log('application_result',application_update);
-    if(application_update.statusCode == 200) {
+    dispatch(startLoading());
+    console.log('data',data);
+    console.log('policyName',policyName)
+    
+    if(data.data.serial_number == undefined ||  data.data.serial_number == '' || policyName == null) {
       setDialogData({
-        title: "Success",
-        message: "Application Details " + application_update.body,
-        onClickAction: async () => {
-          object_application_details = {
-            serial_number: serialNumber,
-            command: "update-data",
-            details_type: "policy_details",
-            value : {
-              policy_name : policyName
-            },
-          }
-          let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
-          console.log('policy_update',policy_update);
-
+        title: "Validation Error",
+        message: "Serial Number Not found or Policy Name not select",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleSavePolicy");
+        },
+      })
+      return;
+    } else {
+        let object_application_details = {
+          serial_number: data.data.serial_number,
+          command: "update-data",
+          details_type: "policy_details",
+          value : {
+            policy_name : policyName
+          },
+        }
+        let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+        console.log('policy_update',policy_update);
           if(policy_update.statusCode == 200) {
             setDialogData({
               title: "Success",
               message: "Policy Details " + policy_update.body,
               onClickAction: async () => {
-                let object = {
-                  name : selectedOptionEnterprise.value,
-                  policy_name: policyName,
-                  serial_number: serialNumber
-                }
-                let Qr_result = await executelistProvisionLambda(user?.credentials, object);
-                if(Qr_result.statusCode == 200) {
-                  console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
-                  setQrImage(JSON.parse(Qr_result.body).imageUrl)
-                  dispatch(stopLoading()); // Dispatch the stopLoading action
-                } else {
-                  setDialogData({
-                    title: "QR Token Error",
-                    message: 'Provision Token Not created Please try again',
-                    onClickAction: () => {
-                      // Handle the action when the user clicks OK
-                      console.log(`handleSaveDetails -->`);
-                    },
-                  });
-                  dispatch(stopLoading()); // Dispatch the stopLoading action
-                  return true;
-                }
-                
+                console.log('successs policy details')
               },
             });
           } else {
@@ -357,21 +345,136 @@ const ModalReinitiate = ({ data }) => {
             dispatch(stopLoading()); // Dispatch the stopLoading action
             return true;
           }
-        }
-      });
-    } else {
-      setDialogData({
-        title: "Error",
-        message: 'Application Details not save Please try again',
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log(`handleSaveDetails -->`);
-        },
-      });
+        
+      }
+    } catch( err) {
+      handleError(err, 'Error handleSavePolicy')
+    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
-      return true;
     }
-    object_application_details = {}
+  }
+
+  const handleGenerateQR = async () => {
+    try {
+      if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+        { 
+           setDialogData({
+           title: "Validation Error",
+           message: "Please Select Enterprise",
+           onClickAction: () => {
+             // Handle the action when the user clicks OK
+             console.log("handleGenerateQR");
+           },
+         })
+         
+         return;
+        }
+
+      dispatch(startLoading());
+      console.log('data',data);
+      console.log('policyName',policyName)
+      
+        if(data.data.serial_number == undefined ||  data.data.serial_number == '' || policyName == null) {
+          setDialogData({
+            title: "Validation Error",
+            message: "Serial Number Not found or Policy Name not select",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("handleSavePolicy");
+            },
+          })
+          return;
+        } else {
+            let object = {
+              name : selectedOptionEnterprise.value,
+              policy_name: policyName,
+              serial_number: data.data.serial_number
+            }
+            let Qr_result = await executelistProvisionLambda(user?.credentials, object);
+            if(Qr_result.statusCode == 200) {
+              console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
+              setQrImage(JSON.parse(Qr_result.body).imageUrl)
+              dispatch(stopLoading()); // Dispatch the stopLoading action
+            } else {
+              setDialogData({
+                title: "QR Token Error",
+                message: 'Provision Token Not created Please try again',
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log(`handleGenerateQR -->`);
+                },
+              });
+              dispatch(stopLoading()); // Dispatch the stopLoading action
+              return true;
+            }
+            
+          }
+      } catch( err) {
+        handleError(err, 'Error handleGenerateQR')
+      } finally {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }
+  }
+
+
+  const handleSaveDetails = async () => {
+    try {
+      if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+        { 
+           setDialogData({
+           title: "Validation Error",
+           message: "Please Select Enterprise",
+           onClickAction: () => {
+             // Handle the action when the user clicks OK
+             console.log("handleEditEnterprise");
+           },
+         })
+         
+         return;
+        }
+
+        if(data.data.serial_number == undefined ||  data.data.serial_number == '' || policyName == null) {
+          setDialogData({
+            title: "Validation Error",
+            message: "Serial Number Not found ",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("handleSavePolicy");
+            },
+          })
+          return;
+        } 
+
+        let object_application_details = {
+          serial_number: data.data.serial_number,
+          command: "update-data",
+          details_type: "application_details",
+          value : applicationFormData
+        }
+        console.log("object_application_details",object_application_details);
+        let application_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
+        console.log('application_result',application_update);
+        if(application_update.statusCode == 200) {
+          setDialogData({
+            title: "Success",
+            message: "Application Details " + application_update.body,
+            onClickAction: async () => {
+              console.log('application details success');
+            }
+          });
+        } else {
+          setDialogData({
+            title: "Error",
+            message: 'Application Details not save Please try again',
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`handleSaveDetails -->`);
+            },
+          });
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+          return true;
+        }
+        object_application_details = {}
 
     } catch (error) {
       handleError(error, 'Error handleSaveData')
@@ -452,22 +555,22 @@ const ModalReinitiate = ({ data }) => {
                   {listOfPolicy.length > 0 && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
-                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
+                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.label)}
                     >
                        <Col xs="auto">
                         <Input
                           type="radio"
                           name="selectedPolcy"
-                          value={policy.value}
-                          checked={policyName === policy.value}
-                          onChange={() => handlePolicy(policy.value)}
+                          value={policy.label}
+                          checked={policyName === policy.label}
+                          onChange={() => handlePolicy(policy.label)}
                         />
                       </Col>
                       <Col xs="auto" className="cabin-icon-col">
                         <BiMaleFemale />
                       </Col>
                       <Col className="cabin-text">
-                        <span>{policy.value.split('_')[0]}</span>
+                        <span>{policy.label}</span>
                       </Col>
                     </Row>
                     ))}
@@ -476,7 +579,7 @@ const ModalReinitiate = ({ data }) => {
                   {data.data.DEVICE_POLICY_STATE == "TRUE" ? <> </> : (
                   <Button
                     variant="contained"
-                    onClick={handleComplete}
+                    onClick={handleSavePolicy}
                   >
                     Save Policy
                   </Button>
@@ -488,6 +591,7 @@ const ModalReinitiate = ({ data }) => {
                   <h3> Application Details</h3>
                   {policyName && (
                     <>
+                    {data.data.DEVICE_APPLICATION_STATE == "TRUE" ? <>
                       <Input
                       id="unattended_timmer"
                       name="unattended_timmer"
@@ -508,7 +612,7 @@ const ModalReinitiate = ({ data }) => {
                       name="margin_left"
                       placeholder="Margin Left"
                       type="text"
-                      onChange={(e) => handleChange(e)}
+                      onChange={handleChange}
                       value={applicationFormData.margin_left}
                     />
                     <br />
@@ -539,13 +643,61 @@ const ModalReinitiate = ({ data }) => {
                       value={applicationFormData.margin_bottom}
                     />
                     <br />
-                    {data.data.DEVICE_APPLICATION_STATE == "TRUE" ? <></> : (
+                    </> : (
+                      <>
+                      <Input
+                      id="unattended_timmer"
+                      name="unattended_timmer"
+                      placeholder="unattended timmer"
+                      type="number"
+                      onChange={(e) => handleChange(e)}
+                    />
+                      <br />
+                      <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
+                      <br />
+                      <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
+                      <br />
+                      <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                      <br />
+                      <Input
+                      id="margin_left"
+                      name="margin_left"
+                      placeholder="Margin Left"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
+                    <Input
+                      id="margin_right"
+                      name="margin_right"
+                      placeholder="Margin Right"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
+                    <Input
+                      id="margin_top"
+                      name="margin_top"
+                      placeholder="Margin Top"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
+                    <Input
+                      id="margin_bottom"
+                      name="margin_bottom"
+                      placeholder="Margin Bottom"
+                      type="text"
+                      onChange={(e) => handleChange(e)}
+                    />
+                    <br />
                       <Button
                         variant="contained"
                         onClick={handleSaveDetails}
                       >
                         Save Details
                       </Button>
+                      </>
                     )}
                     </>
                   )}
@@ -560,7 +712,7 @@ const ModalReinitiate = ({ data }) => {
                    {data.data.QR_CREATED_STATE == "TRUE" ? <> </> : (
                     <Button
                           variant="contained"
-                          onClick={handleSaveDetails}
+                          onClick={handleGenerateQR}
                         >
                           QR Generate
                         </Button>
