@@ -10,7 +10,8 @@ import {
   executeSaveDevicesLambda,
   executeListPolicyLambda,
   executelistProvisionLambda,
-  executeUpdateDeviceLambda
+  executeUpdateDeviceLambda,
+  executeCreatePolicyLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
@@ -32,6 +33,8 @@ import { Card, Input, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, C
 import { BiMaleFemale } from "react-icons/bi";
 import ReadCabinDetails from './ReadCabinDetails';
 import RegisterCabin from './RegisterCabin';
+import ModalCreatePolicy from './ModalCreatePolicy';
+import AddIcon from '@mui/icons-material/Add';
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4', 'step 5', 'step 6'];
 
@@ -65,7 +68,7 @@ export default function EnrollDevice() {
     adGroup: '',
     ad: ''
   });
-
+  const [dialogCreatePolicy, setDialogCreatePolicy] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null); // State for react-select
   const [selectedOptionIotDistrict, setSelectedOptionIotDistrict] = useState(null); // State for react-select
   const [selectedOptionIotCity, setSelectedOptionIotCity] = useState(null); // State for react-select
@@ -692,6 +695,61 @@ export default function EnrollDevice() {
     }
   }
 
+  const createPolicy =  async() => {
+    console.log('createPolicy clicked',selectedOptionEnterprise?.value);
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+     { 
+        setDialogData({
+        title: "Validation Error",
+        message: "Please Select Enterprise",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleEditDevice");
+        },
+      })
+    } else {
+      setDialogCreatePolicy({
+        title: "Create Policy",
+        message: selectedOptionEnterprise.label,
+        onClickAction: async (data) => {
+          data.enterprises_id = selectedOptionEnterprise.value;
+          console.log('data',data);
+          try{
+            dispatch(startLoading()); // Dispatch the startLoading action
+            
+            let result_data =  await executeCreatePolicyLambda(user?.credentials, data);
+            console.log('result_data',result_data);
+            if(result_data.statusCode == 200) {
+              setDialogData({
+                title: "Success",
+                message: "Policy Created is successfully",
+                onClickAction: async () => {
+                  window.location.reload();
+                  console.log("createPolicy function");
+                },
+              })
+            } else {
+              setDialogData({
+                title: "Error",
+                message: "Something went wrong",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error createPolicy");
+                  window.location.reload();
+                },
+              })
+            }
+          } catch( err) {
+            handleError(err, 'Error createPolicy')
+          } finally {
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          }
+        },
+      })
+    }
+  }
+
+
   return (
     <div className="container-fluid" style={{ backgroundColor: '#fff' }}>
     <Box sx={{ width: '62%', backgroundColor: '#fff', padding: '20px', marginLeft: '20%'}}>
@@ -827,8 +885,19 @@ export default function EnrollDevice() {
               )}
               {activeStep === 3 && (
                 <div>
+                    <ModalCreatePolicy data={dialogCreatePolicy} />
                   <h3>Lists of Policy</h3>
-                  {listOfPolicy.length > 0 && (
+                  <Button
+                    onClick={() => {
+                      createPolicy();
+                    }}
+                    outline
+                    color="primary"
+                    className="add-button"
+                  >
+                    Create Policy <AddIcon />
+                  </Button>
+                  {listOfPolicy?.length > 0 && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
                     <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
