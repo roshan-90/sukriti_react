@@ -832,6 +832,7 @@ function AndroidDetails() {
           message: "Policy Deleted is successfully",
           onClickAction: async () => {
             console.log("handleConfirmDeletePolicy function");
+            window.location.reload();
           },
         })
       } else {
@@ -841,6 +842,7 @@ function AndroidDetails() {
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log("error handleConfirmDeletePolicy");
+            window.location.reload();
           },
         })
       }
@@ -880,7 +882,7 @@ function AndroidDetails() {
                 title: "Success",
                 message: "Policy Created is successfully",
                 onClickAction: async () => {
-                  
+                  window.location.reload();
                   console.log("createPolicy function");
                 },
               })
@@ -891,6 +893,7 @@ function AndroidDetails() {
                 onClickAction: () => {
                   // Handle the action when the user clicks OK
                   console.log("error createPolicy");
+                  window.location.reload();
                 },
               })
             }
@@ -936,7 +939,7 @@ function AndroidDetails() {
                 title: "Success",
                 message: "Policy Updated is successfully",
                 onClickAction: async () => {
-                  
+                  window.location.reload();
                   console.log("updatePolicy function");
                 },
               })
@@ -947,6 +950,7 @@ function AndroidDetails() {
                 onClickAction: () => {
                   // Handle the action when the user clicks OK
                   console.log("error updatePolicy");
+                  window.location.reload();
                 },
               })
             }
