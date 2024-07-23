@@ -17,6 +17,7 @@ import { Row,Col} from 'reactstrap';
 import { BiMaleFemale } from "react-icons/bi";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { GoPackage } from "react-icons/go";
 
 
 const ModalUpdatePolicy = ({ data }) => {
@@ -601,7 +602,7 @@ const ModalUpdatePolicy = ({ data }) => {
                   />
               </Col>
               <Col xs="auto" className="cabin-icon-col">
-                <BiMaleFemale />
+                <GoPackage />
               </Col>
               <Col className="application-text"  
                 style={{
@@ -632,7 +633,7 @@ const ModalUpdatePolicy = ({ data }) => {
             >
               {/* <Col xs="auto"></Col> */}
               <Col xs="auto" className="cabin-icon-col">
-                <BiMaleFemale />
+                <GoPackage />
               </Col>
               <Col className="application-text"  
               style={{

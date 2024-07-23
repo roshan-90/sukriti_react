@@ -16,6 +16,7 @@ import { BiMaleFemale } from "react-icons/bi";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ModalUpdateApplication from './ModalUpdateApplication';
+import { GoPackage } from "react-icons/go";
 
 const ModalCreatePolicy = ({ data }) => {
   const dispatch = useDispatch();
@@ -554,7 +555,7 @@ console.log('applications',applications);
                   />
               </Col>
               <Col xs="auto" className="cabin-icon-col">
-                <BiMaleFemale />
+                <GoPackage  />
               </Col>
               <Col className="application-text"  
                 style={{
@@ -585,7 +586,7 @@ console.log('applications',applications);
             >
               {/* <Col xs="auto"></Col> */}
               <Col xs="auto" className="cabin-icon-col">
-                <BiMaleFemale />
+                <GoPackage />
               </Col>
               <Col className="application-text"  
               style={{

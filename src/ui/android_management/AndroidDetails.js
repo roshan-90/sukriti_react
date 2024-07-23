@@ -1055,7 +1055,7 @@ function AndroidDetails() {
 
         <div style={{ float: "left", marginLeft: "10px" }}>
           <div style={{ ...complexCompositionStyle.complexTitleClient }}>
-            {"Android Device List"}
+            {"Android Device List"} &nbsp;
           </div>
         </div>
         <Button
