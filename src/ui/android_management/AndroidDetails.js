@@ -258,7 +258,7 @@ function AndroidDetails() {
         if(listPolicy.body.length > 0) {
           const options = listPolicy.body.map(item => ({
             value: item.name.split("/")[3],
-            label: item.name.split("/")[3]
+            label: item.name.split("/")[3].split('_')[0]
           }));
           console.log('options',options)
           dispatch(setListOfPolicy(options));

@@ -118,10 +118,13 @@ const ModalUpdatePolicy = ({ data }) => {
   ];
 
   useEffect(() => {
+    console.log('data check',data);
     if (data) {
       setTitle(data.title);
       setMessage(data.message);
-      setPolicyName(data.policyDetails.name.split('/')[3])
+      if(Selectedpolicy.label) {
+        setPolicyName(Selectedpolicy?.label)
+      }
       setFormData({
         "cameraDisabled": data.policyDetails.cameraDisabled ?? false,
         "addUserDisabled": data.policyDetails.addUserDisabled ?? false,
@@ -220,9 +223,7 @@ const ModalUpdatePolicy = ({ data }) => {
         smsDisabled: formData.smsDisabled,
         modifyAccountsDisabled: formData.modifyAccountsDisabled,
         outgoingCallsDisabled: formData.outgoingCallsDisabled,
-        kioskCustomLauncherEnabled: formData.kioskCustomLauncherEnabled,
       };
-      if(kioskCustomization == true) {
         if(powerButtonActions?.value && systemErrorWarnings?.value && systemNavigation?.value && statusBar?.value && deviceSettings?.value){
           let kioskCustomization = {
             powerButtonActions: powerButtonActions?.value,
@@ -235,20 +236,20 @@ const ModalUpdatePolicy = ({ data }) => {
         } else {
           alert('Please fill kiosk Customization');
           return;
+        } 
+        if(applications.length  == 0) {
+          alert('Please add application Details');
+          return
+        } else if (selectedKiosk.packageName == '', selectedKiosk.packageName == null) {
+          alert('Please select Kiosk application');
+          return
         }
-      } 
-  
-      if(applicationState == true) {
-        const isValid = applications.every(validateForm);
-        console.log('Applications:', applications);
-        if (isValid) {
-          data.applications = applications;
-        } else {
-          alert('Please fill out all fields.');
-          return;
-        }
-      } 
-
+        console.log('applications',applications);
+        data.applications = applications;
+        console.log('applications.length',applications.length);
+        data.kioskPackage = selectedKiosk.packageName
+        console.log('data check',data);
+        console.log('selectedKiosk',selectedKiosk);
       handleClose();
       if (onClickAction !== undefined) {
         let requestBody = {
@@ -257,7 +258,30 @@ const ModalUpdatePolicy = ({ data }) => {
         }
         onClickAction(requestBody);
         setOpen(false);
+        setFormData({
+          "cameraDisabled": true,
+          "addUserDisabled": true,
+          "removeUserDisabled": false,
+          "factoryResetDisabled": true,
+          "mountPhysicalMediaDisabled": true,
+          "safeBootDisabled": true,
+          "uninstallAppsDisabled": false,
+          "bluetoothConfigDisabled": true,
+          "vpnConfigDisabled": false,
+          "networkResetDisabled": false,
+          "smsDisabled": false,
+          "modifyAccountsDisabled": true,
+          "outgoingCallsDisabled": true,
+        })
       }
+      setPowerButtonActions(null);
+      setSystemErrorWarnings(null);
+      setSystemNavigation(null);
+      setStatusBar(null);
+      setDeviceSettings(null);
+      setPolicyName('');
+      setSelectedKiosk(null);
+      setApplications([]);
     } else {
       alert('Please fill policy name');
       return
@@ -377,6 +401,7 @@ const ModalUpdatePolicy = ({ data }) => {
                 placeholder="Enter Policy Name"
                 type="text"
                 onChange= {(e) => setPolicyName(e.target.value)}
+                value={policyName}
               />
             <br/>
             <Form>
