@@ -248,6 +248,8 @@ function AndroidDetails() {
     ListofPolicyFunction(selectionOption.value)
   }
 
+  
+
   async function ListofPolicyFunction(value) {
     try {
       console.log('list of policy value',value);
@@ -313,6 +315,23 @@ function AndroidDetails() {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
+
+  const handleEnrollDevice = () => {  
+    if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+      { 
+         setDialogData({
+         title: "Validation Error",
+         message: "Please Select Enterprise",
+         onClickAction: () => {
+           // Handle the action when the user clicks OK
+           console.log("handleDeleteDevice");
+         },
+       })
+       return
+     } else {
+            navigate("/android_management/enroll_device")
+     }
+  }
 
   const handleEditEnterprise = async () => {
     console.log('clicked',selectedOptionEnterprise?.value);
@@ -428,6 +447,8 @@ function AndroidDetails() {
       });
     }
   };
+
+ 
 
   const createEnterprise = async () => {
     try {
@@ -1059,9 +1080,7 @@ function AndroidDetails() {
           </div>
         </div>
         <Button
-              onClick={() => {
-                navigate("/android_management/enroll_device")
-              }}
+              onClick={() => handleEnrollDevice()}
               color="primary"
               className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
               style={{
@@ -1244,7 +1263,7 @@ function AndroidDetails() {
 
   const memoizedListsDeviceComponent = useMemo(() => {
     return <ListsDeviceComponent />;
-  }, [listDeviceFetch]);
+  }, [listDeviceFetch,selectedOptionEnterprise]);
 
   const DeviceInfoComponent = () => {
     console.log("selectedDeviceFetch", selectedDeviceFetch);
@@ -1317,6 +1336,32 @@ function AndroidDetails() {
             >
               <Row>
                 <Col md="6">
+                <Card
+                    style={{
+                      ...whiteSurface,
+                      background: "white",
+                      margin: "10px",
+                    }}
+                  >
+                    <CardBody>
+                      <CardTitle>
+                        <b>Device State</b>
+                      </CardTitle>
+                      <CardText>
+                        <p>Complex: {selectedDeviceFetch.complex_details.Name}</p>
+                        <p>State: { AttributeFilter(selectedDeviceFetch.complex_details,1)}</p>
+                        <p>District: {AttributeFilter(selectedDeviceFetch.complex_details,2)}</p>
+                        <p>
+                          City:{" "}
+                          {AttributeFilter(selectedDeviceFetch.complex_details,3)}
+                        </p>
+                        <p>BILL: {AttributeFilter(selectedDeviceFetch.complex_details,4)}</p>
+                        <p>CLNT: {AttributeFilter(selectedDeviceFetch.complex_details,5)}</p>
+                        <p>COCO: {AttributeFilter(selectedDeviceFetch.complex_details,6)}</p>
+                        <p>DATE: {AttributeFilter(selectedDeviceFetch.complex_details,7)}</p>
+                      </CardText>
+                    </CardBody>
+                  </Card>
                 <Card
                     style={{
                       ...whiteSurface,
@@ -1502,6 +1547,7 @@ function AndroidDetails() {
                       </CardText>
                     </CardBody>
                   </Card>
+                  
                 </Col>
               </Row>
             </div>

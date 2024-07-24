@@ -89,6 +89,21 @@ export default function EnrollDevice() {
   })
   const [qrImage, setQrImage] = useState(null);
   
+  useEffect(() => {
+    setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
+    setUpiPaymentStatus({ label: 'No', value: 'No' })
+    setSelectedOptionLanguage({ label: 'Hindi', value: 'Hindi' })
+    setApplicationFormData({
+      unattended_timmer: 20,
+      application_type: 'Cabin Automation System without BWT',
+      upi_payment_status: 'No',
+      language: 'Hindi',
+      margin_left: 0,
+      margin_right: 0,
+      margin_top: 0,
+      margin_bottom: 0
+    })
+  },[]);
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
@@ -603,9 +618,9 @@ export default function EnrollDevice() {
              console.log("handleEditEnterprise");
            },
          })
-         dispatch(startLoading());
          return;
         }
+    dispatch(startLoading());
     let object_application_details = {
       serial_number: serialNumber,
       command: "update-data",
@@ -780,7 +795,7 @@ export default function EnrollDevice() {
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
               <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={handleReset}>Reset</Button>
+              <Button variant="contained" onClick={handleReset}>Reset</Button>
             </Box>
           </React.Fragment>
         ) : (
@@ -934,6 +949,7 @@ export default function EnrollDevice() {
                       placeholder="unattended timmer"
                       type="number"
                       onChange={(e) => handleChange(e)}
+                      value = {applicationFormData.unattended_timmer}
                     />
                       <br />
                       <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
@@ -946,32 +962,36 @@ export default function EnrollDevice() {
                       id="margin_left"
                       name="margin_left"
                       placeholder="Margin Left"
-                      type="text"
+                      type="number"
                       onChange={(e) => handleChange(e)}
+                      value = {applicationFormData.margin_left}
                     />
                     <br />
                     <Input
                       id="margin_right"
                       name="margin_right"
                       placeholder="Margin Right"
-                      type="text"
+                      type="number"
                       onChange={(e) => handleChange(e)}
+                      value = {applicationFormData.margin_right}
                     />
                     <br />
                     <Input
                       id="margin_top"
                       name="margin_top"
                       placeholder="Margin Top"
-                      type="text"
+                      type="number"
                       onChange={(e) => handleChange(e)}
+                      value = {applicationFormData.margin_top}
                     />
                     <br />
                     <Input
                       id="margin_bottom"
                       name="margin_bottom"
                       placeholder="Margin Bottom"
-                      type="text"
+                      type="number"
                       onChange={(e) => handleChange(e)}
+                      value = {applicationFormData.margin_bottom}
                     />
                     <br />
                       <Button
@@ -997,6 +1017,7 @@ export default function EnrollDevice() {
             </CardContent>
           </Card>
         )}
+
         <br />
         <div sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
           <Button disabled={activeStep === 0} onClick={handleBack}>

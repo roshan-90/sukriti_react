@@ -105,9 +105,7 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
   const handleButtonClick = async () => {
     console.log('formData',formData);
     let check;
-    if(packageNameVerify == null || packageNameVerify == false) {
-      check = await handleVerify();
-    }
+    check = await handleVerify();
     
     if(formData.packageName == '' || formData.installType == '' || formData.defaultPermissionPolicy == '' || formData.autoUpdateMode == '' || formData.userControlSettings == ''){
       setDialogData({
