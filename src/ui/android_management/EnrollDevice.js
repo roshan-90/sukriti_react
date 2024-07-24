@@ -378,10 +378,12 @@ export default function EnrollDevice() {
   }
 
   const totalSteps = () => {
+    console.log('totalSteps', steps.length);
     return steps.length;
   };
 
   const completedSteps = () => {
+    console.log('Object.keys(completed).length',Object.keys(completed).length);
     return Object.keys(completed).length;
   };
 
@@ -907,10 +909,11 @@ export default function EnrollDevice() {
                       createPolicy();
                     }}
                     outline
+                    variant="contained"
                     color="primary"
                     className="add-button"
                   >
-                    Create Policy <AddIcon />
+                    <AddIcon /> Create Policy 
                   </Button>
                   {listOfPolicy?.length > 0 && (
                     <>
@@ -1020,15 +1023,18 @@ export default function EnrollDevice() {
 
         <br />
         <div sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button disabled={activeStep === 0} onClick={handleBack}>
+          <Button variant="contained" disabled={activeStep === 0} onClick={handleBack}>
             Back
           </Button>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          {activeStep === steps.length ? <> </> : (
           <Button
             variant="contained"
             onClick={handleComplete}
           >
             {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'}
           </Button>
+          )}
         </div>
       </div>
     </Box>
