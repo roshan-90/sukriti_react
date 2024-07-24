@@ -1290,7 +1290,7 @@ function AndroidDetails() {
               >
                 <span style={{ marginRight: '2px', color: "blue"}}><EditIcon/></span>
               </Button>
-              {(selectedDeviceFetch.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == "FAIL" || selectedDeviceFetch.DEVICE_PROV_GET_INFO_PUBLISH == "FAIL") && (
+              {(selectedDeviceFetch.DEVICE_POLICY_STATE == "FAIL" || selectedDeviceFetch.DEVICE_APPLICATION_STATE == "FAIL" || selectedDeviceFetch.QR_CREATED_STATE == "FAIL") && (
                 <>
               <Button
                 onClick={() => handleReinitateDevice(selectedDeviceFetch)}
@@ -1348,17 +1348,15 @@ function AndroidDetails() {
                         <b>Device State</b>
                       </CardTitle>
                       <CardText>
-                        <p>Complex: {selectedDeviceFetch.complex_details.Name}</p>
-                        <p>State: { AttributeFilter(selectedDeviceFetch.complex_details,1)}</p>
-                        <p>District: {AttributeFilter(selectedDeviceFetch.complex_details,2)}</p>
-                        <p>
-                          City:{" "}
-                          {AttributeFilter(selectedDeviceFetch.complex_details,3)}
-                        </p>
-                        <p>BILL: {AttributeFilter(selectedDeviceFetch.complex_details,4)}</p>
-                        <p>CLNT: {AttributeFilter(selectedDeviceFetch.complex_details,5)}</p>
-                        <p>COCO: {AttributeFilter(selectedDeviceFetch.complex_details,6)}</p>
-                        <p>DATE: {AttributeFilter(selectedDeviceFetch.complex_details,7)}</p>
+                        <p>CREATED_STATE: <b>{selectedDeviceFetch.CREATED_STATE}</b></p>
+                        <p>PROVISIONING_THING_CREATED_STATE: <b>{selectedDeviceFetch.PROVISIONING_THING_CREATED_STATE}</b></p>
+                        <p>CERT_ATTACH_STATE: <b>{selectedDeviceFetch.CERT_ATTACH_STATE}</b></p>
+                        <p>DEVICE_POLICY_STATE: <b>{selectedDeviceFetch.DEVICE_POLICY_STATE}</b></p>
+                        <p>DEVICE_APPLICATION_STATE: <b>{selectedDeviceFetch.DEVICE_APPLICATION_STATE}</b></p>
+                        <p>QR_CREATED_STATE: <b>{selectedDeviceFetch.QR_CREATED_STATE}</b></p>
+                        <p>DEVICE_PROV_GET_INFO_PUBLISH: <b>{selectedDeviceFetch.DEVICE_PROV_GET_INFO_PUBLISH}</b></p>
+                        <p>DEVICE_PROV_GET_INFO_RESP_INIT: <b>{selectedDeviceFetch.DEVICE_PROV_GET_INFO_RESP_INIT}</b></p>
+                        <p>DEVICE_PROV_COMPLETED_INFO_RESP_INIT: <b>{selectedDeviceFetch.DEVICE_PROV_COMPLETED_INFO_RESP_INIT}</b></p>
                       </CardText>
                     </CardBody>
                   </Card>

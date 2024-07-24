@@ -128,6 +128,20 @@ const ModalReinitiate = ({ data }) => {
         setApplicationTypeOption({ label: data.data.application_details.application_type, value: data.data.application_details.application_type})
         setUpiPaymentStatus({ label: data.data.application_details.upi_payment_status, value: data.data.application_details.upi_payment_status})
         setSelectedOptionLanguage({ label: data.data.application_details.language, value: data.data.application_details.language})
+      } else {
+        setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
+        setUpiPaymentStatus({ label: 'No', value: 'No' })
+        setSelectedOptionLanguage({ label: 'Hindi', value: 'Hindi' })
+        setApplicationFormData({
+          unattended_timmer: 20,
+          application_type: 'Cabin Automation System without BWT',
+          upi_payment_status: 'No',
+          language: 'Hindi',
+          margin_left: 0,
+          margin_right: 0,
+          margin_top: 0,
+          margin_bottom: 0
+        })
       }
 
       if(data.data.QR_CREATED_STATE == "TRUE") {
@@ -300,7 +314,6 @@ const ModalReinitiate = ({ data }) => {
 
   const handleSavePolicy = async () => {
     try {
-    dispatch(startLoading());
     console.log('data',data);
     console.log('policyName',policyName)
     
@@ -315,6 +328,7 @@ const ModalReinitiate = ({ data }) => {
       })
       return;
     } else {
+      dispatch(startLoading());
         let object_application_details = {
           serial_number: data.data.serial_number,
           command: "update-data",
@@ -387,7 +401,7 @@ const ModalReinitiate = ({ data }) => {
         } else {
             let object = {
               name : selectedOptionEnterprise.value,
-              policy_name: policyName,
+              policy_name: data.data.serial_number,
               serial_number: data.data.serial_number
             }
             let Qr_result = await executelistProvisionLambda(user?.credentials, object);
@@ -444,7 +458,7 @@ const ModalReinitiate = ({ data }) => {
           })
           return;
         } 
-
+        dispatch(startLoading());
         let object_application_details = {
           serial_number: data.data.serial_number,
           command: "update-data",
@@ -591,7 +605,6 @@ const ModalReinitiate = ({ data }) => {
                   <h3> Application Details</h3>
                   {policyName && (
                     <>
-                    {data.data.DEVICE_APPLICATION_STATE == "TRUE" ? <>
                       <Input
                       id="unattended_timmer"
                       name="unattended_timmer"
@@ -643,62 +656,15 @@ const ModalReinitiate = ({ data }) => {
                       value={applicationFormData.margin_bottom}
                     />
                     <br />
-                    </> : (
-                      <>
-                      <Input
-                      id="unattended_timmer"
-                      name="unattended_timmer"
-                      placeholder="unattended timmer"
-                      type="number"
-                      onChange={(e) => handleChange(e)}
-                    />
-                      <br />
-                      <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
-                      <br />
-                      <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
-                      <br />
-                      <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
-                      <br />
-                      <Input
-                      id="margin_left"
-                      name="margin_left"
-                      placeholder="Margin Left"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                    />
-                    <br />
-                    <Input
-                      id="margin_right"
-                      name="margin_right"
-                      placeholder="Margin Right"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                    />
-                    <br />
-                    <Input
-                      id="margin_top"
-                      name="margin_top"
-                      placeholder="Margin Top"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                    />
-                    <br />
-                    <Input
-                      id="margin_bottom"
-                      name="margin_bottom"
-                      placeholder="Margin Bottom"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                    />
-                    <br />
+                    {data.data.DEVICE_APPLICATION_STATE == "FAIL" && (
                       <Button
                         variant="contained"
                         onClick={handleSaveDetails}
                       >
                         Save Details
                       </Button>
-                      </>
                     )}
+                    
                     </>
                   )}
                 </div>
