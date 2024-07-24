@@ -408,7 +408,7 @@ function AndroidDetails() {
       } else {
         setDialogDeleteData({
           title: `${selectedOptionEnterprise.label} Delete Enterprise`,
-          message: "Are You Sure Delete this Enterprise",
+          message: "Are You Sure you want to Delete this Enterprise",
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log(`clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
@@ -448,21 +448,8 @@ function AndroidDetails() {
     }
   };
 
- 
-
-  const createEnterprise = async () => {
+  const EnterpriseCreate = async() => {
     try {
-      dispatch(startLoading()); // Dispatch the startLoading action
-      console.log('create android enterprise',isChecked);
-      var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, isChecked);
-      console.log('executeCreateEnterpriseAndroidManagementLambda',result);
-      if(result.statusCode == 200) {
-        window.open(`${result?.body?.signupUrl}`,"_blank");
-      } else {
-        setDialogData({
-          title: "Previous Enterprise already exists",
-          message: "can you overwrite previous enterprise click Yes otherwise Cancel",
-          onClickAction: async () => {
             dispatch(startLoading()); // Dispatch the startLoading action
             // Handle the action when the user clicks OK
             var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, true);
@@ -476,18 +463,66 @@ function AndroidDetails() {
                 message: "can you overwrite previous enterprise click Yes otherwise Cancel",
                 onClickAction: () => {
                   // Handle the action when the user clicks OK
-                  console.log("error createEnterprise");
+                  console.log("error EnterpriseCreate");
                   
                 },
               });
               dispatch(stopLoading()); // Dispatch the stopLoading action
               return;
             }
-          },
-          checkbtn: true
-        });
-        dispatch(stopLoading()); // Dispatch the stopLoading action
-        return;
+        } catch( err) {
+          handleError(err, 'Error EnterpriseCreate')
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
+  }
+ 
+
+  const createEnterprise = async () => {
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      console.log('create android enterprise',isChecked);
+      var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, isChecked);
+      console.log('executeCreateEnterpriseAndroidManagementLambda',result);
+      if(result.statusCode == 200) {
+        window.open(`${result?.body?.signupUrl}`,"_blank");
+      } else {
+        confirmationDialog.current.showDialog(
+          "Enterprise creation already inprogress",
+          "To cancel the previous enterprise creation request, Please type 'PROCEED' below Or ( Please try again after 20min )",
+          "PROCEED",
+          EnterpriseCreate
+        );
+
+        // setDialogData({
+        //   title: "Previous Enterprise already exists",
+        //   message: "can you overwrite previous enterprise click Yes otherwise Cancel",
+        //   onClickAction: async () => {
+        //     dispatch(startLoading()); // Dispatch the startLoading action
+        //     // Handle the action when the user clicks OK
+        //     var result = await executeCreateEnterpriseAndroidManagementLambda(user?.credentials, true);
+        //     console.log('executeCreateEnterpriseAndroidManagementLambda',result);
+        //     if(result.statusCode == 200) {
+        //       window.open(`${result?.body?.signupUrl}`,"_blank");
+        //       dispatch(stopLoading()); // Dispatch the stopLoading action
+        //     } else {
+        //       setDialogData({
+        //         title: "Previous Enterprise already exists",
+        //         message: "can you overwrite previous enterprise click Yes otherwise Cancel",
+        //         onClickAction: () => {
+        //           // Handle the action when the user clicks OK
+        //           console.log("error createEnterprise");
+                  
+        //         },
+        //       });
+        //       dispatch(stopLoading()); // Dispatch the stopLoading action
+        //       return;
+        //     }
+        //   },
+        //   checkbtn: true
+        // });
+        // dispatch(stopLoading()); // Dispatch the stopLoading action
+        // return;
       }
     } catch( err) {
       handleError(err, 'Error create android enterprise')
@@ -833,7 +868,7 @@ function AndroidDetails() {
     } else {
       confirmationDialog.current.showDialog(
         "Confirm Action",
-        "To delete the Vendor Details permanently, type 'DELETE' below",
+        "To delete the policy permanently, type 'DELETE' below",
         "DELETE",
         handleConfirmDeletePolicy
       );
