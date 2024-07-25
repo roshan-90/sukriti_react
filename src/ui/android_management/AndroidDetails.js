@@ -1629,8 +1629,8 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
-            <div className="row" style={{...borderCssStyle , width:"96%", marginLeft: "5%"}}>
-              <div className="col-6"> 
+            <div className="row" style={{ width:"96%", marginLeft: "5%"}}>
+              <div className="col-6" style={{...borderCssStyle, }} > 
                 <div className="container-item">   
                 <b><span> &nbsp;Enterprise : &nbsp; </span></b>
                   <div className="select-container">               
@@ -1687,7 +1687,7 @@ function AndroidDetails() {
                   )}
                 </div>
                 </div>
-                <div className="col-6" style={{...borderCssStyle }}> 
+                <div className="col-6" style={{...borderCssStyle}}> 
                 <div className="container-item policy-container"> 
                 <b><span> &nbsp; Policy :  &nbsp; </span> </b>  
                   <div className="select-container">               
