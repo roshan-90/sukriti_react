@@ -11,6 +11,7 @@ import {
   whiteSurfaceCircularBorder,
   complexCompositionStyle,
   whiteSurface,
+  borderCssStyle
 } from "../../jsStyles/Style";
 import icToilet from "../../assets/img/icons/ic_toilet.png";
 import "./android.css";
@@ -259,8 +260,8 @@ function AndroidDetails() {
       if(listPolicy.statusCode == 200) {
         if(listPolicy.body.length > 0) {
           const options = listPolicy.body.map(item => ({
-            value: item.name.split("/")[3],
-            label: item.name.split("/")[3].split('_')[0]
+            value: item.name,
+            label: item.name
           }));
           console.log('options',options)
           dispatch(setListOfPolicy(options));
@@ -1628,8 +1629,8 @@ function AndroidDetails() {
             <ErrorBoundary>{memoizedListsDeviceComponent}</ErrorBoundary>
           </div>
           <div className="col-md-10" style={{}}>
-            <div className="row border-css" style={{width:"96%", marginLeft: "5%"}}>
-              <div className="col-6 border-css"> 
+            <div className="row" style={{...borderCssStyle , width:"96%", marginLeft: "5%"}}>
+              <div className="col-6"> 
                 <div className="container-item">   
                 <b><span> &nbsp;Enterprise : &nbsp; </span></b>
                   <div className="select-container">               
@@ -1686,7 +1687,7 @@ function AndroidDetails() {
                   )}
                 </div>
                 </div>
-                <div className="col-6 border-css"> 
+                <div className="col-6" style={{...borderCssStyle }}> 
                 <div className="container-item policy-container"> 
                 <b><span> &nbsp; Policy :  &nbsp; </span> </b>  
                   <div className="select-container">               

@@ -426,3 +426,9 @@ export const dashboardStyle = {
     fontWeight: "500",
   },
 };
+
+export const borderCssStyle = {
+  boxShadow: "0 4px 8px 0 rgba(0,0,0,0.2)",
+  backgroundColor: "White",
+  borderRadius: "5px",
+}

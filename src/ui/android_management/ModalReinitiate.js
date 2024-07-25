@@ -214,8 +214,8 @@ const ModalReinitiate = ({ data }) => {
     let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
     console.log('listPolicy', listPolicy);
     const options = listPolicy.body.map(item => ({
-      value: item.name.split("/")[3],
-      label: item.name.split("/")[3].split('_')[0]
+      value: item.name,
+      label: item.name
     }));
     console.log('options',options)
     dispatch(setListOfPolicy(options));
