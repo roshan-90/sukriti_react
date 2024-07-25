@@ -66,6 +66,10 @@ const ModalReinitiate = ({ data }) => {
   const [serialNumber, setSerialNumber] = useState(null);
   const [selectedOptionLanguage, setSelectedOptionLanguage] = useState(null);
   const [upiPaymentStatus, setUpiPaymentStatus] = useState(null);
+  const [policyDisable, setPolicyDisable] = useState(false);
+  const [ApplicationDisable, setApplicationDisable] = useState(false);
+  const [qrDisable, setQrDisable] = useState(false);
+
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
     { label: 'Toilet Monitoring System', value: 'Toilet Monitoring System'},
@@ -176,7 +180,6 @@ const ModalReinitiate = ({ data }) => {
     setSelectedOptionLanguage(null)
     setUpiPaymentStatus(null)
     setCompleted({})
-    window.location.reload(); 
   };
 
   const handleButtonClick = () => {
@@ -190,7 +193,6 @@ const ModalReinitiate = ({ data }) => {
       setOpen(false);
       setSelectedOption(null);
     }
-    window.location.reload(); 
   };
   const handleChangeApplicationType = (selectedOption) => {
     console.log('handleChangeApplicationType',selectedOption);
@@ -340,6 +342,7 @@ const ModalReinitiate = ({ data }) => {
         let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
         console.log('policy_update',policy_update);
           if(policy_update.statusCode == 200) {
+            setPolicyDisable(true);
             setDialogData({
               title: "Success",
               message: "Policy Details " + policy_update.body,
@@ -384,10 +387,8 @@ const ModalReinitiate = ({ data }) => {
          return;
         }
 
-      dispatch(startLoading());
       console.log('data',data);
       console.log('policyName',policyName)
-      
         if(data.data.serial_number == undefined ||  data.data.serial_number == '' || policyName == null) {
           setDialogData({
             title: "Validation Error",
@@ -399,16 +400,17 @@ const ModalReinitiate = ({ data }) => {
           })
           return;
         } else {
+            dispatch(startLoading());
             let object = {
               name : selectedOptionEnterprise.value,
-              policy_name: data.data.serial_number,
+              policy_name: policyName,
               serial_number: data.data.serial_number
             }
             let Qr_result = await executelistProvisionLambda(user?.credentials, object);
             if(Qr_result.statusCode == 200) {
               console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
               setQrImage(JSON.parse(Qr_result.body).imageUrl)
-              dispatch(stopLoading()); // Dispatch the stopLoading action
+              setQrDisable(true);
             } else {
               setDialogData({
                 title: "QR Token Error",
@@ -469,6 +471,7 @@ const ModalReinitiate = ({ data }) => {
         let application_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
         console.log('application_result',application_update);
         if(application_update.statusCode == 200) {
+          setApplicationDisable(true);
           setDialogData({
             title: "Success",
             message: "Application Details " + application_update.body,
@@ -492,6 +495,8 @@ const ModalReinitiate = ({ data }) => {
 
     } catch (error) {
       handleError(error, 'Error handleSaveData')
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
@@ -569,16 +574,27 @@ const ModalReinitiate = ({ data }) => {
                   {listOfPolicy.length > 0 && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
-                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.label)}
+                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" // Prevent click action if policy is already selected
+
                     >
                        <Col xs="auto">
-                        <Input
+                       {(data.data.DEVICE_POLICY_STATE == "TRUE" || policyDisable == true) ? <> <Input
                           type="radio"
                           name="selectedPolcy"
                           value={policy.label}
                           checked={policyName === policy.label}
                           onChange={() => handlePolicy(policy.label)}
+                          disabled={!!policyName} // Disable the input when check is true
+                          style={policyName === policy.label ? { pointerEvents: 'none' } : {}}
+
+                        /> </> : (
+                          <Input
+                          type="radio"
+                          name="selectedPolcy"
+                          onChange={() => handlePolicy(policy.label)}
                         />
+                       )}
+                       
                       </Col>
                       <Col xs="auto" className="cabin-icon-col">
                         <BiMaleFemale />
@@ -590,7 +606,7 @@ const ModalReinitiate = ({ data }) => {
                     ))}
                     </>
                   )}
-                  {data.data.DEVICE_POLICY_STATE == "TRUE" ? <> </> : (
+                  {(data.data.DEVICE_POLICY_STATE == "TRUE"  || policyDisable == true) ? <> </> : (
                   <Button
                     variant="contained"
                     onClick={handleSavePolicy}
@@ -603,8 +619,70 @@ const ModalReinitiate = ({ data }) => {
               {activeStep === 1 && (
                 <div>
                   <h3> Application Details</h3>
-                  {policyName && (
+
+                  {(data.data.DEVICE_APPLICATION_STATE == "TRUE" || ApplicationDisable == true) ? 
+                   <>
+                   <Input
+                   id="unattended_timmer"
+                   name="unattended_timmer"
+                   placeholder="unattended timmer"
+                   type="number"
+                   onChange={(e) => handleChange(e)}
+                   value={applicationFormData.unattended_timmer}
+                   disabled
+                 />
+                   <br />
+                   <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" isDisabled/>
+                   <br />
+                   <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" isDisabled/>
+                   <br />
+                   <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" isDisabled />
+                   <br />
+                   <Input
+                   id="margin_left"
+                   name="margin_left"
+                   placeholder="Margin Left"
+                   type="text"
+                   onChange={handleChange}
+                   value={applicationFormData.margin_left}
+                   disabled
+                 />
+                 <br />
+                 <Input
+                   id="margin_right"
+                   name="margin_right"
+                   placeholder="Margin Right"
+                   type="text"
+                   onChange={(e) => handleChange(e)}
+                   value={applicationFormData.margin_right}
+                   disabled
+                 />
+                 <br />
+                 <Input
+                   id="margin_top"
+                   name="margin_top"
+                   placeholder="Margin Top"
+                   type="text"
+                   onChange={(e) => handleChange(e)}
+                   value={applicationFormData.margin_top}
+                   disabled
+                 />
+                 <br />
+                 <Input
+                   id="margin_bottom"
+                   name="margin_bottom"
+                   placeholder="Margin Bottom"
+                   type="text"
+                   onChange={(e) => handleChange(e)}
+                   value={applicationFormData.margin_bottom}
+                   disabled
+                 />
+                 <br />
+                 </>
+                  : (
                     <>
+                    {policyName && (
+                      <>
                       <Input
                       id="unattended_timmer"
                       name="unattended_timmer"
@@ -613,56 +691,56 @@ const ModalReinitiate = ({ data }) => {
                       onChange={(e) => handleChange(e)}
                       value={applicationFormData.unattended_timmer}
                     />
-                      <br />
-                      <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
-                      <br />
-                      <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
-                      <br />
-                      <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
-                      <br />
-                      <Input
-                      id="margin_left"
-                      name="margin_left"
-                      placeholder="Margin Left"
-                      type="text"
-                      onChange={handleChange}
-                      value={applicationFormData.margin_left}
-                    />
+                    <br />
+                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
+                    <br />
+                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
+                    <br />
+                    <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
                     <br />
                     <Input
-                      id="margin_right"
-                      name="margin_right"
-                      placeholder="Margin Right"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                      value={applicationFormData.margin_right}
-                    />
-                    <br />
-                    <Input
-                      id="margin_top"
-                      name="margin_top"
-                      placeholder="Margin Top"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                      value={applicationFormData.margin_top}
-                    />
-                    <br />
-                    <Input
-                      id="margin_bottom"
-                      name="margin_bottom"
-                      placeholder="Margin Bottom"
-                      type="text"
-                      onChange={(e) => handleChange(e)}
-                      value={applicationFormData.margin_bottom}
-                    />
-                    <br />
-                    {data.data.DEVICE_APPLICATION_STATE == "FAIL" && (
-                      <Button
-                        variant="contained"
-                        onClick={handleSaveDetails}
-                      >
-                        Save Details
-                      </Button>
+                    id="margin_left"
+                    name="margin_left"
+                    placeholder="Margin Left"
+                    type="text"
+                    onChange={handleChange}
+                    value={applicationFormData.margin_left}
+                  />
+                  <br />
+                  <Input
+                    id="margin_right"
+                    name="margin_right"
+                    placeholder="Margin Right"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                    value={applicationFormData.margin_right}
+                  />
+                  <br />
+                  <Input
+                    id="margin_top"
+                    name="margin_top"
+                    placeholder="Margin Top"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                    value={applicationFormData.margin_top}
+                  />
+                  <br />
+                  <Input
+                    id="margin_bottom"
+                    name="margin_bottom"
+                    placeholder="Margin Bottom"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                    value={applicationFormData.margin_bottom}
+                  />
+                  <br />
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveDetails}
+                    >
+                      Save Details
+                    </Button>
+                  </>
                     )}
                     
                     </>
@@ -675,7 +753,7 @@ const ModalReinitiate = ({ data }) => {
                    <div className="image-container">
                    <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
-                   {data.data.QR_CREATED_STATE == "TRUE" ? <> </> : (
+                   {(data.data.QR_CREATED_STATE == "TRUE" || qrDisable == true)? <> </> : (
                     <Button
                           variant="contained"
                           onClick={handleGenerateQR}
