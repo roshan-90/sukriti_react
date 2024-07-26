@@ -344,15 +344,27 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
 
 
   const setWarnings = () => {
-    setDialogData({
-      title: "Confirms",
-      message: `Are you Sure submitForm ${formData.Name} Complex`,
-      onClickAction: () => {
-        // Handle the action when the user clicks OK
-        console.log('submitForm complex');
-        submitForm();
-      },
-    });
+    if(complexVerify == true) {
+      setDialogData({
+        title: "Confirms",
+        message: `Are you Sure submitForm ${formData.Name} Complex`,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log('submitForm complex');
+          submitForm();
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: "Please Verify Complex Name",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log('Please Verify Complex Name');
+        },
+      });
+      return
+    }
   }
   const handleNewDistrict = async (value) => {
     try {
