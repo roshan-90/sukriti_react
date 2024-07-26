@@ -557,7 +557,8 @@ export default function EnrollDevice() {
           complex_details: complex_value_update,
           extra_details: {
             serial_number: serialNumber
-          }
+          },
+          enterpriseId: selectedOptionEnterprise.value
         }
         console.log('object',object);
         let result = await executeSaveDevicesLambda(user?.credentials, object);
