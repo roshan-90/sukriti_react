@@ -27,7 +27,8 @@ import {
   executePolicyDetailsLambda,
   executePolicyDeleteLambda,
   executelistIotSingleLambda,
-  executeDeleteDeviceLambda
+  executeDeleteDeviceLambda,
+  executeShareQrLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -62,6 +63,9 @@ import ModalDeletePolicy from './ModalDeletePolicy';
 import RegisterComplex from './RegisterComplex';
 import UpdateComplex from './UpdateComplex'
 import ModalReinitiate from './ModalReinitiate';
+import ShareIcon from '@mui/icons-material/Share';
+import ModalShareQR from "./ModalShareQR";
+
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -144,6 +148,7 @@ function AndroidDetails() {
   const [complexChanged, setComplexChanged] = useState(false);
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
   const [reinitiate, setReinitiate] = useState(null)
+  const [qrShare , setQrShare] = useState(null);
 
   const handleClickFunction = async (data) => {
     console.log('data',data);
@@ -732,7 +737,48 @@ function AndroidDetails() {
 
   };
 
-
+  const handleQr = async (qr) => {
+    console.log('qr',qr);
+    setQrShare({
+      title: "Share QR",
+      message: "Share Qr",
+      onClickAction: async (data) => {
+        try{
+          console.log('check qr', qr);
+          console.log('data',data);
+          dispatch(startLoading()); // Dispatch the startLoading action
+          // Handle the action when the user clicks OK
+          let result_data =  await executeShareQrLambda(user?.credentials, data, qr);
+          console.log('result_data',result_data);
+          if(result_data.statusCode == 200) {
+            setDialogData({
+              title: "Success",
+              message: " Qr is sent to your email successfully",
+              onClickAction: async () => {
+                dispatch(setSelectedOptionEnterprise(null))
+                // Handle the action when the user clicks OK
+                console.log("handleQr");
+                await fetchListEnterprisesData()
+              },
+            })
+          } else {
+            setDialogData({
+              title: "Error",
+              message: "Something went wrong please try again later",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("error handleQr");
+              },
+            })
+          }
+        } catch( err) {
+          handleError(err, 'Error handleQr')
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
+      },
+    })
+  }
 
   const handleEditDevice = async (deviceId) => {
     console.log('handleEditDevice device id :->', deviceId);
@@ -1359,7 +1405,24 @@ function AndroidDetails() {
                         <DeleteIcon/>
                         </span>
                     </Button>
-              
+                  {selectedDeviceFetch?.qr_details?.qr && (
+                    <Button
+                      onClick={() => handleQr(selectedDeviceFetch?.qr_details?.qr)}
+                      color="primary"
+                      className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
+                      style={{
+                        ...whiteSurfaceCircularBorder,
+                        width: "50px",
+                        height: "35px",
+                        fontSize: "14px", // Adjust font size here
+                        marginLeft: "15px"
+                      }}
+                        // Add the inert attribute conditionally
+                        inert={true}
+                    >
+                      <span style={{ marginRight: '2px', color: "blue"}}><ShareIcon/></span>
+                    </Button>
+                  )}
               </Row>
             </div>
             <div
@@ -1610,6 +1673,7 @@ function AndroidDetails() {
         <MessageDialog data={dialogData} />
         <ModalConfirmDialog data={dialogDeleteData} />
         <ModalEditEnterprise data={dialogEditEnterprise} />
+        <ModalShareQR data={qrShare} />
         <ModalEditDevices data={dialogEditDevice} />
         <ModalCreatePolicy data={dialogCreatePolicy} />
         <ModalUpdatePolicy data={dialogUpdatePolicy} />

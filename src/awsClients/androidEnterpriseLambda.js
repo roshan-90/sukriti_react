@@ -561,14 +561,14 @@ export function executeSaveDevicesLambda(
     var pullParams = {
       FunctionName: "Enrollment_device_crud_details",
       Payload: JSON.stringify({
-      serial_number: object.serial_number,
-      command: object.command,
-      cabin_name: object.cabin_name,
-      complex_details: object.complex_details,
-      extra_details: object.extra_details,
-      cabin_details: object.cabin_details,
-      enterpriseId: object.enterpriseId
-    })
+        serial_number: object.serial_number,
+        command: object.command,
+        cabin_name: object.cabin_name,
+        complex_details: object.complex_details,
+        extra_details: object.extra_details,
+        cabin_details: object.cabin_details,
+        enterpriseId: object.enterpriseId
+      })
     };
     console.log('executeCreateComplexLambda pullParams',pullParams);
     lambda.invoke(pullParams, function (err, data) {
@@ -1028,6 +1028,38 @@ export function executeVerifyPackageNameLambda(
         userName: userName,
         packageName: packageName,
         EnterpriseId: enterpriseId
+      })
+    };
+    
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
+
+export function executeShareQrLambda(
+  credentials,
+  email,
+  qr
+) {
+  return new Promise(function (resolve, reject) {
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "shareQR",
+      Payload: JSON.stringify({
+        email: email,
+        qr: qr
       })
     };
     
