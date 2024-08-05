@@ -471,6 +471,7 @@ export default function EnrollDevice() {
     setActiveStep(step);
   };
 
+  console.log('activeStep', activeStep);
   const handleComplete = () => {
     const newCompleted = completed;
     newCompleted[activeStep] = true;
@@ -1088,9 +1089,9 @@ export default function EnrollDevice() {
               )}
               {activeStep === 5 && (
                 <div>
+                  <h3 className="image-text">QR Show</h3>
                   {listOfPolicy?.length > 0 && (
                    <div className="image-container">
-                   <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
                    <Button
                       onClick={() => handleQr(qrImage)}
@@ -1127,7 +1128,8 @@ export default function EnrollDevice() {
             variant="contained"
             onClick={handleComplete}
           >
-            {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'}
+            {/* {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'} */}
+            {'Next'}
           </Button>
           )}
         </div>
