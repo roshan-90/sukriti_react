@@ -247,10 +247,10 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   console.log('selected', selected);
 
   const toggle = () => {
-    dispatch(setStateIotList([]));
-    dispatch(setDistrictIotList([]));
-    dispatch(setCityIotList([]));
-    dispatch(setComplexIotList([]));
+    // dispatch(setStateIotList([]));
+    // dispatch(setDistrictIotList([]));
+    // dispatch(setCityIotList([]));
+    // dispatch(setComplexIotList([]));
     setModal(!modal)
     setModalToggle(false)
   };

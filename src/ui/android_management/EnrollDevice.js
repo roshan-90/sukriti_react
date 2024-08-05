@@ -11,7 +11,8 @@ import {
   executeListPolicyLambda,
   executelistProvisionLambda,
   executeUpdateDeviceLambda,
-  executeCreatePolicyLambda
+  executeCreatePolicyLambda,
+  executeShareQrLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
@@ -29,12 +30,17 @@ import Select from 'react-select'; // Importing react-select
 import UpdateComplex from './UpdateComplex'
 import RegisterComplex from './RegisterComplex';
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import {
+  whiteSurfaceCircularBorder
+} from "../../jsStyles/Style";
 import { Card, Input, CardBody, CardTitle, CardText, ListGroup, ListGroupItem, CardLink ,Row,Col} from 'reactstrap';
 import { BiMaleFemale } from "react-icons/bi";
 import ReadCabinDetails from './ReadCabinDetails';
 import RegisterCabin from './RegisterCabin';
 import ModalCreatePolicy from './ModalCreatePolicy';
 import AddIcon from '@mui/icons-material/Add';
+import ShareIcon from '@mui/icons-material/Share';
+import ModalShareQR from "./ModalShareQR";
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4', 'step 5', 'step 6'];
 
@@ -88,7 +94,10 @@ export default function EnrollDevice() {
     margin_bottom: ""
   })
   const [qrImage, setQrImage] = useState(null);
-  
+  const [serialNumberEnable, setSerialNumberEnable] = useState(false);
+  const [applicationDetails, setApplicationDetails] = useState(false);
+  const [qrShare , setQrShare] = useState(null);
+
   useEffect(() => {
     setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
     setUpiPaymentStatus({ label: 'No', value: 'No' })
@@ -102,7 +111,17 @@ export default function EnrollDevice() {
       margin_right: 0,
       margin_top: 0,
       margin_bottom: 0
-    })
+    });
+    setSelectedOption(null);
+    setSelectedOptionIotDistrict(null)
+    setSelectedOptionIotCity(null);
+    setSelectedOptionIotComplex(null);
+    dispatch(setListOfPolicy(null))
+    dispatch(setCabinList([]));
+    dispatch(setPolicyName(null));
+    dispatch(setCabinName(null));
+    setSerialNumberEnable(false);
+    setApplicationDetails(false);
   },[]);
 
   const handleRadioChange = (cabin) => {
@@ -309,6 +328,47 @@ export default function EnrollDevice() {
     }
   }
 
+  const handleQr = async (qr) => {
+    console.log('qr',qr);
+    setQrShare({
+      title: "Share QR",
+      message: "Share Qr",
+      onClickAction: async (data) => {
+        try{
+          console.log('check qr', qr);
+          console.log('data',data);
+          dispatch(startLoading()); // Dispatch the startLoading action
+          // Handle the action when the user clicks OK
+          let result_data =  await executeShareQrLambda(user?.credentials, data, qr);
+          console.log('result_data',result_data);
+          if(result_data.statusCode == 200) {
+            setDialogData({
+              title: "Success",
+              message: " Qr is sent to your email successfully",
+              onClickAction: async () => {
+                // Handle the action when the user clicks OK
+                console.log("handleQr");
+              },
+            })
+          } else {
+            setDialogData({
+              title: "Error",
+              message: "Something went wrong please try again later",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("error handleQr");
+              },
+            })
+          }
+        } catch( err) {
+          handleError(err, 'Error handleQr')
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
+      },
+    })
+  }
+
   // Handle change in react-select 
   const handleChangeIotState = (selectedOption) => {
     console.log('check', selectedOption.value);
@@ -443,6 +503,12 @@ export default function EnrollDevice() {
     })
     setQrImage(null);
     setSerialNumber(null);
+    dispatch(setListOfPolicy(null))
+    dispatch(setCabinList([]));
+    dispatch(setPolicyName(null));
+    dispatch(setCabinName(null));
+    setSerialNumberEnable(false);
+    setApplicationDetails(false);
   };
 
   const handleChange = (e) => {
@@ -459,6 +525,10 @@ export default function EnrollDevice() {
 
   const OpenRegisterCabinModal = () => {
     setRegisterCabin(!registerCabin);
+    console.log('registerCabin',registerCabin);
+    if(registerCabin == true) {
+      ListOfIotCabin(complexName);
+    }
   }
 
   const openCabinModal = () => {
@@ -573,6 +643,7 @@ export default function EnrollDevice() {
         console.log('options',options)
         dispatch(setListOfPolicy(options));
         if(result.statusCode == 200) {
+          setSerialNumberEnable(true);
           setDialogData({
             title: "Success",
             message: result.body,
@@ -650,6 +721,7 @@ export default function EnrollDevice() {
           console.log('policy_update',policy_update);
 
           if(policy_update.statusCode == 200) {
+            setApplicationDetails(true);
             setDialogData({
               title: "Success",
               message: "Policy Details " + policy_update.body,
@@ -780,6 +852,7 @@ export default function EnrollDevice() {
           </div>
         )}
         <MessageDialog data={dialogData} />
+        <ModalShareQR data={qrShare} />
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={label} completed={completed[index]}>
@@ -886,17 +959,20 @@ export default function EnrollDevice() {
                     <Input
                       id="serial_number"
                       name="serial_number"
-                      placeholder="Serial Number"
+                      placeholder="Please Enter Serial Number"
                       type="text"
                       onChange={(e) => setSerialNumber(e.target.value)}
+                      disabled = {serialNumberEnable == true ? true: false}
                     />
                     <br/>
+                    {serialNumberEnable == true ? <></>: (
                       <Button
                         variant="contained"
                         onClick={handleSaveData}
                       >
-                        serial Number
+                        Submit
                       </Button>
+                    )}
                   </>
                  )}
                 </div>
@@ -998,22 +1074,40 @@ export default function EnrollDevice() {
                       value = {applicationFormData.margin_bottom}
                     />
                     <br />
+                    {applicationDetails == true ? <></>: (
                       <Button
                         variant="contained"
                         onClick={handleSaveDetails}
                       >
                         Save Details
                       </Button>
+                    )}
                     </>
                   )}
                 </div>
               )}
               {activeStep === 5 && (
                 <div>
-                  {listOfPolicy.length > 0 && (
+                  {listOfPolicy?.length > 0 && (
                    <div className="image-container">
                    <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
+                   <Button
+                      onClick={() => handleQr(qrImage)}
+                      color="primary"
+                      className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
+                      style={{
+                        ...whiteSurfaceCircularBorder,
+                        width: "50px",
+                        height: "35px",
+                        fontSize: "14px", // Adjust font size here
+                        marginLeft: "15px"
+                      }}
+                        // Add the inert attribute conditionally
+                        inert={true}
+                    >
+                      <span style={{ marginRight: '2px', color: "blue"}}><ShareIcon/></span>
+                    </Button>
                  </div>
                   )}
                 </div>

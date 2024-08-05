@@ -755,10 +755,9 @@ function AndroidDetails() {
               title: "Success",
               message: " Qr is sent to your email successfully",
               onClickAction: async () => {
-                dispatch(setSelectedOptionEnterprise(null))
                 // Handle the action when the user clicks OK
                 console.log("handleQr");
-                await fetchListEnterprisesData()
+                
               },
             })
           } else {
