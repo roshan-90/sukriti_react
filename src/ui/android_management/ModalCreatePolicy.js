@@ -122,6 +122,7 @@ const ModalCreatePolicy = ({ data }) => {
 
   const handleClose = () => {
     setOpen(false);
+    data.onClose();
   };
 
   const handleButtonClick = () => {

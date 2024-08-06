@@ -252,12 +252,31 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
       let command = "update-iot-complex";
       var result = await executeUpdateComplexLambda('test_rk_mandi', user?.credentials, command, value, complexName);
       console.log('result ClientName', result.body);
+      if(result.statusCode == 200) {
+        setDialogData({
+          title: "Success",
+          message: "Complex update is successfully",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            toggle();   
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: "Something went wrong please try again later",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            toggle();   
+          },
+        });
+      }
       
     } catch (error) {
       handleError(error, 'Error ListOfIotClientName')
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
-      toggle()
+      // toggle()
     }
   }
 

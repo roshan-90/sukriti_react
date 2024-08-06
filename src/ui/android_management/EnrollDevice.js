@@ -802,6 +802,9 @@ export default function EnrollDevice() {
       setDialogCreatePolicy({
         title: "Create Policy",
         message: selectedOptionEnterprise.label,
+        onClose: async()=>{
+          setDialogCreatePolicy(false)
+        },
         onClickAction: async (data) => {
           data.enterprises_id = selectedOptionEnterprise.value;
           console.log('data',data);
@@ -957,7 +960,19 @@ export default function EnrollDevice() {
                   <h3> Device Details</h3>
                  {selectedCabin && (
                   <>
-                    <Input
+                    
+                    {serialNumberEnable == true ? <>
+                        <Input
+                        id="serial_number"
+                        name="serial_number"
+                        placeholder="Please Enter Serial Number"
+                        type="text"
+                        value={serialNumber}
+                        disabled = {serialNumberEnable == true ? true: false}
+                        />
+                    </>: (
+                      <>
+                      <Input
                       id="serial_number"
                       name="serial_number"
                       placeholder="Please Enter Serial Number"
@@ -965,14 +980,14 @@ export default function EnrollDevice() {
                       onChange={(e) => setSerialNumber(e.target.value)}
                       disabled = {serialNumberEnable == true ? true: false}
                     />
-                    <br/>
-                    {serialNumberEnable == true ? <></>: (
+                        <br/>
                       <Button
                         variant="contained"
                         onClick={handleSaveData}
                       >
                         Submit
                       </Button>
+                      </>
                     )}
                   </>
                  )}
@@ -993,7 +1008,7 @@ export default function EnrollDevice() {
                   >
                     <AddIcon /> Create Policy 
                   </Button>
-                  {listOfPolicy?.length > 0 && (
+                  {(listOfPolicy?.length > 0 && serialNumberEnable == true) && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
                     <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
@@ -1090,7 +1105,7 @@ export default function EnrollDevice() {
               {activeStep === 5 && (
                 <div>
                   <h3 className="image-text">QR Show</h3>
-                  {listOfPolicy?.length > 0 && (
+                  {(listOfPolicy?.length > 0 && applicationDetails == true ) &&(
                    <div className="image-container">
                    <img src={qrImage} alt="QR Image" className="centered-image" />
                    <Button

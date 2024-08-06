@@ -57,12 +57,20 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
   const userTypeList = useSelector((state) => state.androidManagement.userTypeList);
   const [selectedUserType, setSelectedUserType] = useState(null);
   const [selectedUserChargeType, setSelectedUserChargeType] = useState(null);
-
+  const [selectedBwtLevel, setSelectedBwtLevel] = useState(null);
+  
   const userChargeType = [
     { label: 'None', value: 'None' },
     { label: 'COIN', value: 'COIN' },
     { label: 'COIN_RF', value: 'COIN_RF' },
     { label: 'RF', value: 'RF' }
+  ];
+
+  const bwtLevel = [
+    { label: 'BWT_G0', value: 'BWT_G0' },
+    { label: 'BWT_G1', value: 'BWT_G1' },
+    { label: 'BWT_G2', value: 'BWT_G2' },
+    { label: 'BWT_G3', value: 'BWT_G3' }
   ];
 
   const [formData, setFormData] = useState({
@@ -250,6 +258,11 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
 
     console.log('check uuid',uuid_value);
     // setFormData({ ...formData, USAGE_CHARGE: selectedOption.value });
+  }
+
+  const handleChangeBwtLevel = (selectedOption) => {
+    setSelectedBwtLevel(selectedOption);
+    setFormData({ ...formData, BWT_LVL: selectedOption.value });
   }
 
   const handleDateChange = (date) => {
@@ -653,14 +666,15 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
                             <b style={{ fontSize: "small" }}>BWT Level</b>
                           </Label>
                           <Col sm={8}>
-                            <Input
+                            {/* <Input
                               id="BWT_LVL"
                               name="BWT_LVL"
                               placeholder="BWT Level"
                               type="text"
                               required
                               onChange={handleChange}
-                            />
+                            /> */}
+                            <Select options={bwtLevel || []} value={selectedBwtLevel} onChange={handleChangeBwtLevel} placeholder="BWT Level" />
                           </Col>
                         </FormGroup>
                       </>

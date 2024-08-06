@@ -643,6 +643,7 @@ function AndroidDetails() {
              message: "Device with ID deleted successfully",
              onClickAction: async () => {
                console.log("Response handleDeleteDevice");
+               window.location.reload();
              },
            })
          } else {
