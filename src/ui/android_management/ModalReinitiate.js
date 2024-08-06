@@ -24,8 +24,15 @@ import { selectUser } from "../../features/authenticationSlice";
 import {
   executelistProvisionLambda,
   executeUpdateDeviceLambda,
-  executeListPolicyLambda
+  executeListPolicyLambda,
+  executeShareQrLambda
 } from "../../awsClients/androidEnterpriseLambda";
+import ShareIcon from '@mui/icons-material/Share';
+import ModalShareQR from "./ModalShareQR";
+import {
+  whiteSurfaceCircularBorder
+} from "../../jsStyles/Style";
+
 
 const steps = ['Policy Section', 'Application Section', 'Enrollment Token'];
 
@@ -69,6 +76,7 @@ const ModalReinitiate = ({ data }) => {
   const [policyDisable, setPolicyDisable] = useState(false);
   const [ApplicationDisable, setApplicationDisable] = useState(false);
   const [qrDisable, setQrDisable] = useState(false);
+  const [qrShare , setQrShare] = useState(null);
 
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
@@ -314,6 +322,47 @@ const ModalReinitiate = ({ data }) => {
     setCompleted({});
   };
 
+  const handleQr = async (qr) => {
+    console.log('qr',qr);
+    setQrShare({
+      title: "Share QR",
+      message: "Share Qr",
+      onClickAction: async (data) => {
+        try{
+          console.log('check qr', qr);
+          console.log('data',data);
+          dispatch(startLoading()); // Dispatch the startLoading action
+          // Handle the action when the user clicks OK
+          let result_data =  await executeShareQrLambda(user?.credentials, data, qr);
+          console.log('result_data',result_data);
+          if(result_data.statusCode == 200) {
+            setDialogData({
+              title: "Success",
+              message: " Qr is sent to your email successfully",
+              onClickAction: async () => {
+                // Handle the action when the user clicks OK
+                console.log("handleQr");
+              },
+            })
+          } else {
+            setDialogData({
+              title: "Error",
+              message: "Something went wrong please try again later",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("error handleQr");
+              },
+            })
+          }
+        } catch( err) {
+          handleError(err, 'Error handleQr')
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
+      },
+    })
+  }
+
   const handleSavePolicy = async () => {
     try {
     console.log('data',data);
@@ -541,6 +590,7 @@ const ModalReinitiate = ({ data }) => {
           </div>
         )}
         <MessageDialog data={dialogData} />
+        <ModalShareQR data={qrShare} />
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={label} completed={completed[index]}>
@@ -753,13 +803,31 @@ const ModalReinitiate = ({ data }) => {
                    <div className="image-container">
                    <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
-                   {(data.data.QR_CREATED_STATE == "TRUE" || qrDisable == true)? <> </> : (
+                   {(data.data.QR_CREATED_STATE == "TRUE" || qrDisable == true)? <><Button
+                      onClick={() => handleQr(qrImage)}
+                      color="primary"
+                      className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
+                      style={{
+                        ...whiteSurfaceCircularBorder,
+                        width: "50px",
+                        height: "35px",
+                        fontSize: "14px", // Adjust font size here
+                        marginLeft: "15px"
+                      }}
+                        // Add the inert attribute conditionally
+                        inert={true}
+                    >
+                      <span style={{ marginRight: '2px', color: "blue"}}><ShareIcon/></span>
+                    </Button> </> : (
+                    <>
                     <Button
                           variant="contained"
                           onClick={handleGenerateQR}
                         >
                           QR Generate
                         </Button>
+                      
+                    </>
                    )}
                  </div>
                  

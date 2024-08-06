@@ -666,15 +666,44 @@ function AndroidDetails() {
   }
 
   const handleReinitateDevice = async (device) => {
-    setReinitiate({
-      title: "Reinitiate Device",
-      message: "reinitate",
-      data: device,
-      onClickAction: () => {
-        // Handle the action when the user clicks OK
-        console.log("handleDeleteDevice");
-      },
-    })
+
+    console.log('device',device);
+    if(device.DEVICE_POLICY_STATE == 'FAIL' || device.DEVICE_APPLICATION_STATE == 'FAIL'|| device.QR_CREATED_STATE == 'FAIL')
+    {
+      setReinitiate({
+        title: "Reinitiate Device",
+        message: "reinitate",
+        data: device,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("handleDeleteDevice");
+        },
+      })
+    } else {
+      if(device.DEVICE_PROV_GET_INFO_PUBLISH == 'FAIL') {
+        setDialogData({
+          title: "Do One of the following things",
+          message: "1. Scan QR and enroll device \n\n\n\n" +
+          "2. Launch Sukriti Iot Admin app and enter serial number (if asked) and sign in into the control panel",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("error handleReinitateDevice");
+          },
+        })
+      } else if (device.DEVICE_POLICY_STATE == 'FAIL' ) {
+
+      } else if (device.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == 'FAIL' ) {
+        setDialogData({
+          title: "Do One of the following things",
+          message: "Please Login to the Sukriti IoT Admin application's control panel and tap the reinitiate button",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log("error handleReinitateDevice");
+          },
+        })
+      }
+      
+    }
   }
 
   const handleDeleteDevice = async (device) => {
@@ -1441,7 +1470,7 @@ function AndroidDetails() {
               >
                 <span style={{ marginRight: '2px', color: "blue"}}><EditIcon/></span>
               </Button>
-              {(selectedDeviceFetch.DEVICE_POLICY_STATE == "FAIL" || selectedDeviceFetch.DEVICE_APPLICATION_STATE == "FAIL" || selectedDeviceFetch.QR_CREATED_STATE == "FAIL") && (
+              {(selectedDeviceFetch.DEVICE_POLICY_STATE == "FAIL" || selectedDeviceFetch.DEVICE_APPLICATION_STATE == "FAIL" || selectedDeviceFetch.QR_CREATED_STATE == "FAIL" || selectedDeviceFetch.DEVICE_PROV_GET_INFO_PUBLISH == "FAIL" || selectedDeviceFetch.DEVICE_PROV_GET_INFO_RESP_INIT == "FAIL" ||selectedDeviceFetch.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == "FAIL") && (
                 <>
               <Button
                 onClick={() => handleReinitateDevice(selectedDeviceFetch)}
