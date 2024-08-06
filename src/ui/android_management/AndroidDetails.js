@@ -1386,18 +1386,20 @@ function AndroidDetails() {
                             >
                               {data.cabin_name.split('_')[3] + '_' + data.cabin_name.split('_')[4]}
                             </div>
+                            {data.deviceId && (
                             <div
                             className="col-md-2">
-                            <Form>
-                            <FormGroup switch>
-                            <Input
-                              type="switch"
-                              checked={data.isKioskEnabled}
-                              onClick={(e) => handlekiosk(e,data)}
-                            />
-                            </FormGroup>
-                            </Form>
+                              <Form>
+                                <FormGroup switch>
+                                <Input
+                                  type="switch"
+                                  checked={data.isKioskEnabled}
+                                  onClick={(e) => handlekiosk(e,data)}
+                                />
+                                </FormGroup>
+                              </Form>
                             </div>
+                            )}
                           </div>
                         </>
                       );
