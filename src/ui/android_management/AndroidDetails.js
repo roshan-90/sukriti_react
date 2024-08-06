@@ -28,7 +28,8 @@ import {
   executePolicyDeleteLambda,
   executelistIotSingleLambda,
   executeDeleteDeviceLambda,
-  executeShareQrLambda
+  executeShareQrLambda,
+  executeKioskDeviceLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -149,7 +150,10 @@ function AndroidDetails() {
   const [selectedOptionIotComplex, setSelectedOptionIotComplex] = useState(null); // State for react-select
   const [reinitiate, setReinitiate] = useState(null)
   const [qrShare , setQrShare] = useState(null);
+  const [kioskState, setkioskState] = useState(false);
 
+
+  
   const handleClickFunction = async (data) => {
     console.log('data',data);
     ListOfIotClientName();
@@ -307,7 +311,55 @@ function AndroidDetails() {
       ' ' + ' KMGTP'.charAt(e) + 'B';
   }
   
-
+  const handlekiosk = async (e,data) => {
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      console.log('data',data);
+      let check; 
+      let message = '';
+      if(data.isKioskEnabled == true) {
+        check = false;
+        message = "Device successfully switched to maintenance mode"
+      } else {
+        check = true;
+        message = "Device successfully switched to handover mode"
+      }
+      let object = {
+        command : "kiosk_device",
+        serial_number: data?.serial_number,
+        kiosk_device: check
+      }
+      console.log('object', object);
+        let result_data =  await executeKioskDeviceLambda(user?.credentials, object);
+          console.log('result_data',result_data);
+          if(result_data.statusCode == 200) {
+            setListDevices(null)
+            setDialogData({
+              title: "Success",
+              message: message,
+              onClickAction: async () => {
+                console.log('handle kiosk success');
+                window.location.reload();
+                
+              },
+            })
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          } else {
+            setDialogData({
+              title: "Error",
+              message: "Something went wrong",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("error handlekiosk");
+              },
+            })
+            dispatch(stopLoading()); // Dispatch the stopLoading action
+          }
+      } catch( err) {
+        handleError(err, 'Error handlekiosk')
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }
+  }
   const handleEnterprises = async (enterprise) => {
     try {
         dispatch(startLoading()); // Dispatch the startLoading action
@@ -779,7 +831,9 @@ function AndroidDetails() {
     })
   }
 
-  const handleEditDevice = async (deviceId) => {
+  const handleEditDevice = async (data) => {
+    let deviceId = data?.android_data?.name;
+    let serial_number = data?.serial_number
     console.log('handleEditDevice device id :->', deviceId);
     console.log('clicked',selectedOptionEnterprise?.value);
     if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
@@ -802,7 +856,8 @@ function AndroidDetails() {
               command : "patch_device",
               deviceId : deviceId,
               enterpriseId: selectedOptionEnterprise?.value,
-              requestBody: data
+              requestBody: data,
+              serial_number: serial_number
             }
           console.log("edit is click check :->",object);
           try{
@@ -1325,11 +1380,23 @@ function AndroidDetails() {
                               <div style={circleActive}></div>
                             </div>
                             <div
-                              className="col-md-8"
+                              className="col-md-6"
                               style={textStyle}
                               onClick={() => handleClickDevice(data)}
                             >
                               {data.cabin_name.split('_')[3] + '_' + data.cabin_name.split('_')[4]}
+                            </div>
+                            <div
+                            className="col-md-2">
+                            <Form>
+                            <FormGroup switch>
+                            <Input
+                              type="switch"
+                              checked={data.isKioskEnabled}
+                              onClick={(e) => handlekiosk(e,data)}
+                            />
+                            </FormGroup>
+                            </Form>
                             </div>
                           </div>
                         </>
@@ -1344,7 +1411,7 @@ function AndroidDetails() {
 
   const memoizedListsDeviceComponent = useMemo(() => {
     return <ListsDeviceComponent />;
-  }, [listDeviceFetch,selectedOptionEnterprise]);
+  }, [listDeviceFetch,selectedOptionEnterprise,kioskState]);
 
   const DeviceInfoComponent = () => {
     console.log("selectedDeviceFetch", selectedDeviceFetch);
@@ -1358,7 +1425,7 @@ function AndroidDetails() {
             <div className="container">
             <Row>
               <Button
-                onClick={() => handleEditDevice(selectedDeviceFetch?.android_data?.name)}
+                onClick={() => handleEditDevice(selectedDeviceFetch)}
                 color="primary"
                 className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
                 style={{

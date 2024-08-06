@@ -836,6 +836,7 @@ export function executePatchDeviceLambda(
       FunctionName: "Android_Management_Device",
       Payload: JSON.stringify({
         command : object.command,
+        serial_number: object.serial_number,
         deviceId : object.deviceId,
         enterpriseId: object.enterpriseId,
         requestBody: {
@@ -1060,6 +1061,38 @@ export function executeShareQrLambda(
       Payload: JSON.stringify({
         email: email,
         qr: qr
+      })
+    };
+    
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
+
+export function executeKioskDeviceLambda(
+  credentials,
+  object
+) {
+  return new Promise(function (resolve, reject) {
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Android_Management_Device",
+      Payload: JSON.stringify({
+        command: object.command,
+        serial_number: object.serial_number,
+        kiosk_device: object.kiosk_device
       })
     };
     

@@ -42,6 +42,8 @@ const ModalEditDevices = ({ data }) => {
       setMessage(data.message);
       setOnClickAction(() => data.onClickAction || undefined);
       setOpen(true);
+      setDisplayName(null)
+      setSelectedDeviceState(null);
     }
   }, [data]);
 
