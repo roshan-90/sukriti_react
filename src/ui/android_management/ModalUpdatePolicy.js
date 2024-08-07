@@ -241,7 +241,7 @@ const ModalUpdatePolicy = ({ data }) => {
         if(applications.length  == 0) {
           alert('Please add application Details');
           return
-        } else if (selectedKiosk.packageName == '', selectedKiosk.packageName == null) {
+        } else if (selectedKiosk?.packageName == '', selectedKiosk?.packageName == null) {
           alert('Please select Kiosk application');
           return
         }

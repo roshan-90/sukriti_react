@@ -129,7 +129,6 @@ const ModalCreatePolicy = ({ data }) => {
     console.log('applicationState',applicationState);
     console.log('kioskCustomization',kioskCustomization);
     console.log('formData',formData);
-    
     if(policyName) {
       let data = {
         cameraDisabled: formData.cameraDisabled,
@@ -162,7 +161,7 @@ const ModalCreatePolicy = ({ data }) => {
         if(applications.length  == 0) {
           alert('Please add application Details');
           return
-        } else if (selectedKiosk.packageName == '', selectedKiosk.packageName == null) {
+        } else if (selectedKiosk?.packageName == '', selectedKiosk?.packageName == null) {
           alert('Please select Kiosk application');
           return
         }
