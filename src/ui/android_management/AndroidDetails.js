@@ -2068,15 +2068,15 @@ function AndroidDetails() {
                         <CardBody>
                         <CardText>
                             <pre>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>name: </b> {enterpriseDetail.name ?? ''}</p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Enterprise Display Name: </b> {enterpriseDetail.enterpriseDisplayName ?? ''} </p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Contact Email: </b> {enterpriseDetail.contactInfo?.contactEmail ?? ''} </p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Name: </b> {enterpriseDetail.contactInfo?.dataProtectionOfficerName ?? ''} </p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Email: </b> {enterpriseDetail.contactInfo?.dataProtectionOfficerEmail ?? ''} </p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Phone: </b> {enterpriseDetail.contactInfo?.dataProtectionOfficerPhone ?? ''} </p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Name: </b> {enterpriseDetail.contactInfo?.euRepresentativeName ?? ''}</p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Email: </b> {enterpriseDetail.contactInfo?.euRepresentativeEmail ?? ''} </p>
-                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Phone: </b> {enterpriseDetail.contactInfo?.euRepresentativePhone ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>name: </b> {enterpriseDetail?.name ?? ''}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Enterprise Display Name: </b> {enterpriseDetail?.enterpriseDisplayName ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Contact Email: </b> {enterpriseDetail?.contactInfo?.contactEmail ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Name: </b> {enterpriseDetail?.contactInfo?.dataProtectionOfficerName ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Email: </b> {enterpriseDetail?.contactInfo?.dataProtectionOfficerEmail ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Phone: </b> {enterpriseDetail?.contactInfo?.dataProtectionOfficerPhone ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Name: </b> {enterpriseDetail?.contactInfo?.euRepresentativeName ?? ''}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Email: </b> {enterpriseDetail?.contactInfo?.euRepresentativeEmail ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Phone: </b> {enterpriseDetail?.contactInfo?.euRepresentativePhone ?? ''} </p>
                             </pre>
                           </CardText>
                         </CardBody>
