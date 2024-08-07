@@ -145,7 +145,7 @@ function AndroidDetails() {
   const [listDevices, setListDevices] = useState(undefined);
   const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
   const confirmationDialog = useRef();
-  const [complexDetailShow, setComplexDetailShow] = useState(0);
+  const [complexDetailShow, setComplexDetailShow] = useState(3);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const [registerComplex, setRegisterComplex] = useState(false);
   const [complexChanged, setComplexChanged] = useState(false);
@@ -683,7 +683,7 @@ function AndroidDetails() {
         if(result_data.statusCode == 200) {
            setDialogData({
              title: "Success",
-             message: "Device with ID deleted successfully",
+             message: "Device deleted successfully",
              onClickAction: async () => {
                console.log("Response handleDeleteDevice");
                window.location.reload();
@@ -2051,6 +2051,7 @@ function AndroidDetails() {
               {complexDetailShow == 2 ? 
               <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
               : <>
+              {complexDetailShow == 0 ?  
               <ErrorBoundary>{
                 <div className="container">
                   <Row>
@@ -2085,7 +2086,7 @@ function AndroidDetails() {
                   </Row>
                 </div>
                 }
-                </ErrorBoundary>
+                </ErrorBoundary> : <></>}
               </>}</>
             }
           </div>
