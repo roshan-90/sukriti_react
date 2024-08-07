@@ -29,12 +29,13 @@ import {
   executelistIotSingleLambda,
   executeDeleteDeviceLambda,
   executeShareQrLambda,
-  executeKioskDeviceLambda
+  executeKioskDeviceLambda,
+  executeEnterpriseGetLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { selectUser } from "../../features/authenticationSlice";
-import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails,setResetData , setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
+import { setListEnterprise , setSelectedOptionEnterprise , setSelectedDevice , setListOfPolicy, setPolicyName , setPolicyDetails,setResetData , setClientName, setBillingGroup , setComplexName,setEnterpriseDetail, setListDevice} from "../../features/androidManagementSlice";
 import { Card, CardBody, CardTitle, CardText, Row, Col } from "reactstrap";
 import {
   Modal,
@@ -140,6 +141,7 @@ function AndroidDetails() {
   const listofPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const policyName = useSelector((state) => state.androidManagement.policyName);
   const policyDetails = useSelector((state) => state.androidManagement.policyDetails);
+  const enterpriseDetail = useSelector((state) => state.androidManagement.enterpriseDetail);
   const [listDevices, setListDevices] = useState(undefined);
   const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
   const confirmationDialog = useRef();
@@ -248,14 +250,55 @@ function AndroidDetails() {
     }
   }
 
+  const handleGetEnterprise = async (enterpriseId) => {
+    try {
+      dispatch(startLoading()); // Dispatch the startLoading action
+      console.log('enterpriseId',enterpriseId);
+      let enterpriseDetail = await executeEnterpriseGetLambda(user?.credentials, enterpriseId)
+      console.log('enterpriseDetail',enterpriseDetail);
+      if(enterpriseDetail.statusCode == 200) {
+          dispatch(setEnterpriseDetail(enterpriseDetail.body))
+      } else if(enterpriseDetail.statusCode == 400) {
+        setDialogData({
+          title: "Error found",
+          message: "Something went wrong Please try again later",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: 'SomethingWent wrong Please try again later',
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleGetEnterprise -->`);
+          },
+        });
+      }
+    } catch (err) {
+      handleError(err, "fetchListDevicesData");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
   const handleCheckboxChange = (event) => {
       setIsChecked(event.target.checked);
   };
 
   const handleChangeIotEnterprise = async (selectionOption) => {
+    setComplexDetailShow(0)
+    dispatch(setListDevice(null));
+    dispatch(setListOfPolicy(null));
+    dispatch(setPolicyName(null));
+    dispatch(setPolicyDetails(null));
+    dispatch(setSelectedDevice(null));
     console.log('selectionOption',selectionOption);
+    console.log('enterprise value', selectionOption.value)
     dispatch(setSelectedOptionEnterprise(selectionOption))
-    ListofPolicyFunction(selectionOption.value)
+    await handleGetEnterprise(selectionOption.value)
+    await ListofPolicyFunction(selectionOption.value)
   }
 
   
@@ -2007,7 +2050,43 @@ function AndroidDetails() {
               <>
               {complexDetailShow == 2 ? 
               <ErrorBoundary>{memoizedDeviceInfoComponent}</ErrorBoundary>
-              : <></>}</>
+              : <>
+              <ErrorBoundary>{
+                <div className="container">
+                  <Row>
+                      <b>Enterprise Details</b> 
+                  </Row>
+                <Row style={{width: "95%"}}>
+                  <Col md="12">
+                    <Card
+                        style={{
+                          ...whiteSurface,
+                          background: "white",
+                          margin: "10px",
+                        }}
+                      >
+                        <CardBody>
+                        <CardText>
+                            <pre>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>name: </b> {enterpriseDetail.name ?? ''}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Enterprise Display Name: </b> {enterpriseDetail.enterpriseDisplayName ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Contact Email: </b> {enterpriseDetail.contactInfo?.contactEmail ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Name: </b> {enterpriseDetail.contactInfo?.dataProtectionOfficerName ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Email: </b> {enterpriseDetail.contactInfo?.dataProtectionOfficerEmail ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Data Protection Officer Phone: </b> {enterpriseDetail.contactInfo?.dataProtectionOfficerPhone ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Name: </b> {enterpriseDetail.contactInfo?.euRepresentativeName ?? ''}</p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Email: </b> {enterpriseDetail.contactInfo?.euRepresentativeEmail ?? ''} </p>
+                              <p style={{border: '1px solid black', padding: '10px'}}><b>Representative Phone: </b> {enterpriseDetail.contactInfo?.euRepresentativePhone ?? ''} </p>
+                            </pre>
+                          </CardText>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                  </Row>
+                </div>
+                }
+                </ErrorBoundary>
+              </>}</>
             }
           </div>
         </div>
