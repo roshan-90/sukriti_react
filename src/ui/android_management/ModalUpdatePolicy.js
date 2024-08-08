@@ -145,6 +145,11 @@ const ModalUpdatePolicy = ({ data }) => {
       if(data.policyDetails?.applications?.length > 0) {
         setApplicationState(true);
         setApplications(data.policyDetails.applications)
+        if(data.policyDetails?.kioskPackage) {
+          let item = data.policyDetails.applications.filter((datas) => datas.packageName == data.policyDetails.kioskPackage);
+          console.log('item kiosk',item)
+          setSelectedKiosk(item[0])
+        }
       } else {
 
       }
@@ -366,9 +371,14 @@ const ModalUpdatePolicy = ({ data }) => {
 
   const handleDeleteapplication = async(index) => {
     console.log('index',index);
-    setApplications((prevApplications) => 
-      prevApplications.filter((_, i) => i !== index)
-    );
+    console.log('applications',applications[index])
+    if(applications[index].packageName == selectedKiosk.packageName) {
+      alert("You can delete this application by exiting kiosk mode.")
+    } else {
+      setApplications((prevApplications) => 
+        prevApplications.filter((_, i) => i !== index)
+      );
+    }
   }
 
   if(data) {
@@ -668,6 +678,8 @@ const ModalUpdatePolicy = ({ data }) => {
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.userControlSettings}</span>
               </Col>
               <Col className="cabin-text">
+              <>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.packageName == selectedKiosk.packageName ? 'Kiosk Mode' : ''}</span>
                   <Button
                       onClick={() => {
                         handleDeleteapplication(index);
@@ -687,7 +699,8 @@ const ModalUpdatePolicy = ({ data }) => {
                         className="edit-button"
                       >
                         <EditIcon />
-                      </Button>
+                  </Button>
+                  </>
               </Col>
             </Row>
             )}

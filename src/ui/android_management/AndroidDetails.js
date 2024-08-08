@@ -1494,7 +1494,7 @@ function AndroidDetails() {
                             >
                               {data.cabin_name.split('_')[3] + '_' + data.cabin_name.split('_')[4]}
                             </div>
-                            {data.deviceId && (
+                            {(data.deviceId && data.DEVICE_PROV_COMPLETED_INFO_RESP_INIT) && (
                             <div
                             className="col-md-2">
                               <Form>
@@ -1678,6 +1678,14 @@ function AndroidDetails() {
                         <p>
                           Serial Number:{" "}
                           {selectedDeviceFetch.android_data?.hardwareInfo?.serialNumber}
+                        </p>
+                        <p>
+                          Device:{" "}
+                          {selectedDeviceFetch.deviceId}
+                        </p>
+                        <p>
+                          Maintenance Mode:{" "}
+                          {selectedDeviceFetch.isKioskEnabled == false ? 'False' : 'True'}
                         </p>
                         {/* Add more hardware info fields as needed */}
                       </CardText>
