@@ -172,10 +172,27 @@ const ModalUpdatePolicy = ({ data }) => {
     setApplicationState(!applicationState)
     setModalAddApplication({
       title: "Add New Application",
+      onClose: async()=>{
+        setModalAddApplication(false)
+      },
       onClickAction: async (data) => {
         console.log('clicked ', data);
-        setApplications((prevApplications) => [...prevApplications, data]);
-      },
+        setApplications((prevApplications) => {
+          // Check if the packageName already exists
+          const existingIndex = prevApplications.findIndex(
+              (app) => app.packageName === data.packageName
+          );
+      
+          // If it exists, replace the existing object with the new data
+          if (existingIndex !== -1) {
+              return prevApplications.map((app, index) =>
+                  index === existingIndex ? data : app
+              );
+          }
+      
+          // If it doesn't exist, add the new data to the list
+          return [...prevApplications, data];
+      });      },
     });
   }
 
@@ -403,6 +420,7 @@ const ModalUpdatePolicy = ({ data }) => {
                 type="text"
                 onChange= {(e) => setPolicyName(e.target.value)}
                 value={policyName}
+                disabled
               />
             <br/>
             <Form>

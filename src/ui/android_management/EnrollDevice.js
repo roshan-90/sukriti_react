@@ -818,7 +818,7 @@ export default function EnrollDevice() {
                 title: "Success",
                 message: "Policy Created is successfully",
                 onClickAction: async () => {
-                  window.location.reload();
+                  // window.location.reload();
                   console.log("createPolicy function");
                 },
               })

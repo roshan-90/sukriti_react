@@ -25,6 +25,7 @@ const ModalCreatePolicy = ({ data }) => {
   const [message, setMessage] = useState("");
   const [policyName, setPolicyName] = useState('');
   const [onClickAction, setOnClickAction] = useState(undefined);
+  const [onCloseAction, setOnCloseAction] = useState(undefined);
   const [selectedDeviceState, setSelectedDeviceState] = useState(null);
   const [powerButtonActions, setPowerButtonActions] = useState(null);
   const [systemErrorWarnings , setSystemErrorWarnings] = useState(null);
@@ -116,13 +117,19 @@ const ModalCreatePolicy = ({ data }) => {
       setTitle(data.title);
       setMessage(data.message);
       setOnClickAction(() => data.onClickAction || undefined);
+      setOnCloseAction(() => data?.onClose || undefined);
       setOpen(true);
+      setPowerButtonActions({ label: 'POWER_BUTTON_AVAILABLE', value: 'POWER_BUTTON_AVAILABLE' })
+      setSystemErrorWarnings({ label: 'ERROR_AND_WARNINGS_ENABLED', value: 'ERROR_AND_WARNINGS_ENABLED' })
+      setSystemNavigation({ label: 'NAVIGATION_ENABLED', value: 'NAVIGATION_ENABLED' })
+      setStatusBar({ label: 'NOTIFICATIONS_AND_SYSTEM_INFO_ENABLED', value: 'NOTIFICATIONS_AND_SYSTEM_INFO_ENABLED' })
+      setDeviceSettings({ label: 'SETTINGS_ACCESS_ALLOWED', value: 'SETTINGS_ACCESS_ALLOWED' });
     }
   }, [data]);
 
   const handleClose = () => {
     setOpen(false);
-    data.onClose();
+    onCloseAction();
   };
 
   const handleButtonClick = () => {
@@ -171,7 +178,7 @@ const ModalCreatePolicy = ({ data }) => {
         data.kioskPackage = selectedKiosk.packageName
         console.log('data check',data);
         console.log('selectedKiosk',selectedKiosk);
-      handleClose();
+        handleClose();
       if (onClickAction !== undefined) {
         let requestBody = {
           policy_name: policyName,
@@ -271,10 +278,28 @@ const ModalCreatePolicy = ({ data }) => {
     setApplicationState(!applicationState)
     setModalAddApplication({
       title: "Add New Application",
+      onClose: async()=>{
+        setModalAddApplication(false)
+      },
       onClickAction: async (data) => {
         console.log('clicked ', data);
-        setApplications((prevApplications) => [...prevApplications, data]);
-      },
+        setApplications((prevApplications) => {
+                  // Check if the packageName already exists
+                  const existingIndex = prevApplications.findIndex(
+                      (app) => app.packageName === data.packageName
+                  );
+              
+                  // If it exists, replace the existing object with the new data
+                  if (existingIndex !== -1) {
+                      return prevApplications.map((app, index) =>
+                          index === existingIndex ? data : app
+                      );
+                  }
+              
+                  // If it doesn't exist, add the new data to the list
+                  return [...prevApplications, data];
+              });
+            },
     });
   }
 

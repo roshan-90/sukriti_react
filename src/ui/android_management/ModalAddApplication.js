@@ -25,6 +25,7 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
   const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
   const [title, setTitle] = useState("");
   const [onClickAction, setOnClickAction] = useState(undefined);
+  const [onCloseAction, setOnCloseAction] = useState(undefined);
   const [packageNameVerify, setPackageNameVerify ] = useState(null);
   const [applications, setApplications] = useState([]);
   const [dialogData, setDialogData] = useState(null);
@@ -68,6 +69,7 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
     if (data) {
       setTitle(data.title);
       setOnClickAction(() => data.onClickAction || undefined);
+      setOnCloseAction(() => data.onClose || undefined);
       setOpen(true);
     }
   }, [data]);
@@ -75,6 +77,7 @@ const ModalAddApplication = ({ data , setApplicationState}) => {
   const handleClose = () => {
     setOpen(false);
     setApplicationState(false);
+    onCloseAction();
   };
 
   const handleError = (err, Custommessage, onclick = null) => {

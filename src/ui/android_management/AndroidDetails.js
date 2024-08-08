@@ -1131,6 +1131,9 @@ function AndroidDetails() {
       setDialogCreatePolicy({
         title: "Create Policy",
         message: selectedOptionEnterprise.label,
+        onClose: async()=>{
+          setDialogCreatePolicy(false)
+        },
         onClickAction: async (data) => {
           data.enterprises_id = selectedOptionEnterprise.value;
           console.log('data',data);
@@ -1144,7 +1147,7 @@ function AndroidDetails() {
                 title: "Success",
                 message: "Policy Created is successfully",
                 onClickAction: async () => {
-                  window.location.reload();
+                  // window.location.reload();
                   console.log("createPolicy function");
                 },
               })
