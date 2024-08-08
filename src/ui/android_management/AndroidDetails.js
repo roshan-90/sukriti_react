@@ -30,7 +30,8 @@ import {
   executeDeleteDeviceLambda,
   executeShareQrLambda,
   executeKioskDeviceLambda,
-  executeEnterpriseGetLambda
+  executeEnterpriseGetLambda,
+  executeReintiate_DEVICE_PROV_GET_INFO_RESP_INITLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -733,8 +734,39 @@ function AndroidDetails() {
             console.log("error handleReinitateDevice");
           },
         })
-      } else if (device.DEVICE_POLICY_STATE == 'FAIL' ) {
-
+      } else if (device.DEVICE_PROV_GET_INFO_RESP_INIT == 'FAIL' ) {
+        try{
+          dispatch(startLoading()); // Dispatch the startLoading action
+          let object = {
+            command : "reinitate_init_topic",
+            topic: `PROVISIONING/${device.serial_number}/RECEIVE_PROV_INFO`,
+            serial_number: device.serial_number
+          }
+          console.log('object',object);
+          let result_data = await executeReintiate_DEVICE_PROV_GET_INFO_RESP_INITLambda(user?.credentials, object);
+          if(result_data.statusCode == 200) {
+            setDialogData({
+              title: "Success",
+              message: result_data.body,
+              onClickAction: async () => {
+                console.log("Response handleReinitateDevice");
+              },
+            })
+          } else {
+            setDialogData({
+              title: "Error",
+              message: "Something went wrong",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("error handleReinitateDevice");
+              },
+            })
+          }
+        } catch( err) {
+          handleError(err, 'Error handleReinitateDevice')
+        } finally {
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
       } else if (device.DEVICE_PROV_COMPLETED_INFO_RESP_INIT == 'FAIL' ) {
         setDialogData({
           title: "Do One of the following things",
