@@ -403,7 +403,7 @@ export const RegisterCabin = ({ openModal , selected, setModalToggle}) => { // R
     console.log('form setwarning for submit form',formData);
     setDialogData({
       title: "Confirms",
-      message: `Are you Sure submitForm ${formData.Name} Complex`,
+      message: `Are you Sure submitForm Cabin`,
       onClickAction: () => {
         // Handle the action when the user clicks OK
         console.log('submitForm Cabin');

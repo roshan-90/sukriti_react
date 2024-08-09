@@ -1488,7 +1488,7 @@ function AndroidDetails() {
                               <div style={circleActive}></div>
                             </div>
                             <div
-                              className="col-md-6"
+                              className="col-md-3"
                               style={textStyle}
                               onClick={() => handleClickDevice(data)}
                             >
@@ -1496,7 +1496,7 @@ function AndroidDetails() {
                             </div>
                             {(data.deviceId && data.DEVICE_PROV_COMPLETED_INFO_RESP_INIT) && (
                             <div
-                            className="col-md-2">
+                            className="col-md-5">
                               <Form>
                                 <FormGroup switch>
                                 <Input
@@ -1504,6 +1504,7 @@ function AndroidDetails() {
                                   checked={data.isKioskEnabled}
                                   onClick={(e) => handlekiosk(e,data)}
                                 />
+                                <p>Handover</p>
                                 </FormGroup>
                               </Form>
                             </div>
