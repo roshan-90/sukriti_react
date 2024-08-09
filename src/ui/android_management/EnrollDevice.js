@@ -97,6 +97,8 @@ export default function EnrollDevice() {
   const [serialNumberEnable, setSerialNumberEnable] = useState(false);
   const [applicationDetails, setApplicationDetails] = useState(false);
   const [qrShare , setQrShare] = useState(null);
+  const [nextBtn , setNextBtn] = useState(false);
+  const [policyEnabled, setPolicyEnabled] = useState(false)
 
   useEffect(() => {
     setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
@@ -122,10 +124,12 @@ export default function EnrollDevice() {
     dispatch(setCabinName(null));
     setSerialNumberEnable(false);
     setApplicationDetails(false);
+    console.log('dddd')
   },[]);
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
+    setNextBtn(true)
   };
 
   const handlePolicy = (value) => {
@@ -408,6 +412,7 @@ export default function EnrollDevice() {
     ListOfIotBillingGroup();
     setComplexChanged(true)
     ListOfIotCabin(selectedOption.value);
+    setNextBtn(true)
   }
 
   const handleChangeLanguage = (selectedOption) => {
@@ -465,6 +470,7 @@ export default function EnrollDevice() {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setNextBtn(true)
   };
 
   const handleStep = (step) => () => {
@@ -472,11 +478,13 @@ export default function EnrollDevice() {
   };
 
   console.log('activeStep', activeStep);
+  console.log('completed', completed);
   const handleComplete = () => {
     const newCompleted = completed;
     newCompleted[activeStep] = true;
     setCompleted(newCompleted);
     handleNext();
+    setNextBtn(false)
   };
 
   const handleReset = () => {
@@ -645,6 +653,7 @@ export default function EnrollDevice() {
         dispatch(setListOfPolicy(options));
         if(result.statusCode == 200) {
           setSerialNumberEnable(true);
+          setNextBtn(true)
           setDialogData({
             title: "Success",
             message: result.body,
@@ -681,6 +690,48 @@ export default function EnrollDevice() {
     }
   }
 
+  const handlePolicySave = async() => {
+    try{
+      dispatch(startLoading());
+      let policy_details_section = {
+        serial_number: serialNumber,
+        command: "update-data",
+        details_type: "policy_details",
+        value : {
+          policy_name : policyName
+        },
+      }
+      console.log('policy_details_section', policy_details_section);
+      let policy_update = await executeUpdateDeviceLambda(user?.credentials,policy_details_section);
+      console.log('policy_update',policy_update);
+      if(policy_update.statusCode == 200) {
+        setPolicyEnabled(true);
+        setNextBtn(true)
+        setDialogData({
+          title: "Success",
+          message: "Policy Details " + policy_update.body,
+          onClickAction: async () => {
+            console.log('handlePolicySave clicked')
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: 'Policy Details not save Please try again',
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handlePolicySave -->`);
+          },
+        });
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+        return true;
+      }
+    } catch (error) {
+      handleError(error, 'Error handleSaveData')
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
   const handleSaveDetails = async () => {
     try {
       if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
@@ -706,56 +757,26 @@ export default function EnrollDevice() {
     let application_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
     console.log('application_result',application_update);
     if(application_update.statusCode == 200) {
+      setApplicationDetails(true);
+      setNextBtn(true)
       setDialogData({
         title: "Success",
         message: "Application Details " + application_update.body,
         onClickAction: async () => {
-          object_application_details = {
-            serial_number: serialNumber,
-            command: "update-data",
-            details_type: "policy_details",
-            value : {
-              policy_name : policyName
-            },
+          let object = {
+            name : selectedOptionEnterprise.value,
+            policy_name: policyName,
+            serial_number: serialNumber
           }
-          let policy_update = await executeUpdateDeviceLambda(user?.credentials,object_application_details);
-          console.log('policy_update',policy_update);
-
-          if(policy_update.statusCode == 200) {
-            setApplicationDetails(true);
-            setDialogData({
-              title: "Success",
-              message: "Policy Details " + policy_update.body,
-              onClickAction: async () => {
-                let object = {
-                  name : selectedOptionEnterprise.value,
-                  policy_name: policyName,
-                  serial_number: serialNumber
-                }
-                let Qr_result = await executelistProvisionLambda(user?.credentials, object);
-                if(Qr_result.statusCode == 200) {
-                  console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
-                  setQrImage(JSON.parse(Qr_result.body).imageUrl)
-                  dispatch(stopLoading()); // Dispatch the stopLoading action
-                } else {
-                  setDialogData({
-                    title: "QR Token Error",
-                    message: 'Provision Token Not created Please try again',
-                    onClickAction: () => {
-                      // Handle the action when the user clicks OK
-                      console.log(`handleSaveDetails -->`);
-                    },
-                  });
-                  dispatch(stopLoading()); // Dispatch the stopLoading action
-                  return true;
-                }
-                
-              },
-            });
+          let Qr_result = await executelistProvisionLambda(user?.credentials, object);
+          if(Qr_result.statusCode == 200) {
+            console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
+            setQrImage(JSON.parse(Qr_result.body).imageUrl)
+            dispatch(stopLoading()); // Dispatch the stopLoading action
           } else {
             setDialogData({
-              title: "Error",
-              message: 'Policy Details not save Please try again',
+              title: "QR Token Error",
+              message: 'Provision Token Not created Please try again',
               onClickAction: () => {
                 // Handle the action when the user clicks OK
                 console.log(`handleSaveDetails -->`);
@@ -843,7 +864,72 @@ export default function EnrollDevice() {
     }
   }
 
+  useEffect(() => {
+    if (nextBtn) {
+    } else {
+      enabled();
+    }
+  }, [nextBtn]);
 
+  function enabled() {
+
+    let key_array = Object.keys(completed);
+    console.log('key_array',key_array);
+    console.log(key_array.indexOf(String(activeStep)))
+    let check = key_array.indexOf(String(activeStep))
+    console.log('key check', check)
+    if(check == 1) {
+      console.log('ttt')
+      setNextBtn(true)
+    } else {
+      console.log('ttt33')
+    }
+
+    if(serialNumberEnable == true && activeStep == 2) {
+      console.log('aaaa')
+      setNextBtn(true)
+    }
+
+    if(policyEnabled == true && activeStep == 3) {
+      console.log('bb')
+      setNextBtn(true)
+    }
+
+    if(applicationDetails == true && activeStep == 4) {
+      console.log('ccc')
+      setNextBtn(true)
+    }
+    return
+    // console.log('function is call',activeStep)
+    // console.log('check', completed[activeStep]);
+    // if(activeStep == 0 && selectedOptionIotComplex.value !== '' ) {
+    //   console.log('first component ');
+    //   if(activeStep == 1) {
+    //     if(selectedCabin) {
+    //       console.log('second component ');
+    //       console.log('checking true',selectedCabin)
+    //       setNextBtn(true)
+    //     }
+    //   }
+    //   setNextBtn(true)
+    // }
+
+    // if(activeStep == 1 && selectedCabin) {
+    //   console.log('second component ');
+    //   console.log('checking true',selectedCabin)
+    //   setNextBtn(true)
+    // }
+
+
+    // if(activeStep == 0 && selectedOptionIotComplex.value !== '' ) {
+    //   setNextBtn(true)
+    // }
+
+    // if(activeStep == 1 && selectedCabin) {
+    //   console.log('second page')
+    //   setNextBtn(true)
+    // }
+  }
   return (
     <div className="container-fluid" style={{ backgroundColor: '#fff' }}>
     <Box sx={{ width: '62%', backgroundColor: '#fff', padding: '20px', marginLeft: '20%'}}>
@@ -1030,6 +1116,14 @@ export default function EnrollDevice() {
                       </Col>
                     </Row>
                     ))}
+                    {policyEnabled == true ? <></> : (
+                     <Button
+                        variant="contained"
+                        onClick={handlePolicySave}
+                      >
+                        Submit
+                      </Button>
+                    )}
                     </>
                   )}
                 </div>
@@ -1039,6 +1133,7 @@ export default function EnrollDevice() {
                   <h3> Application Details</h3>
                   {policyName && (
                     <>
+                    <label>unattended Timmer</label>
                       <Input
                       id="unattended_timmer"
                       name="unattended_timmer"
@@ -1048,12 +1143,16 @@ export default function EnrollDevice() {
                       value = {applicationFormData.unattended_timmer}
                     />
                       <br />
+                      <label>Application Type</label>
                       <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
                       <br />
+                      <label>Upi Payment Status</label>
                       <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
                       <br />
+                      <label>Select Language</label>
                       <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
                       <br />
+                      <label>Margin Left</label>
                       <Input
                       id="margin_left"
                       name="margin_left"
@@ -1063,6 +1162,7 @@ export default function EnrollDevice() {
                       value = {applicationFormData.margin_left}
                     />
                     <br />
+                    <label>Margin Right</label>
                     <Input
                       id="margin_right"
                       name="margin_right"
@@ -1072,6 +1172,7 @@ export default function EnrollDevice() {
                       value = {applicationFormData.margin_right}
                     />
                     <br />
+                    <label>Margin Top</label>
                     <Input
                       id="margin_top"
                       name="margin_top"
@@ -1081,6 +1182,7 @@ export default function EnrollDevice() {
                       value = {applicationFormData.margin_top}
                     />
                     <br />
+                    <label>Margin Bottom</label>
                     <Input
                       id="margin_bottom"
                       name="margin_bottom"
@@ -1138,15 +1240,23 @@ export default function EnrollDevice() {
             Back
           </Button>
           &nbsp;&nbsp;&nbsp;&nbsp;
-          {activeStep === steps.length ? <> </> : (
-          <Button
-            variant="contained"
-            onClick={handleComplete}
-          >
-            {/* {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'} */}
-            {'Next'}
-          </Button>
+          {nextBtn && (
+            <Button
+              variant="contained"
+              onClick={handleComplete}
+            >
+              {/* {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'} */}
+              {'Next'}
+            </Button>
           )}
+          {/* {activeStep === steps.length ? <> </> : (
+            <Button
+              variant="contained"
+              onClick={handleComplete}
+            >
+              {'Next'}
+            </Button>
+            )} */}
         </div>
       </div>
     </Box>
