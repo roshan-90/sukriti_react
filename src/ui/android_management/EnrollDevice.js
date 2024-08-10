@@ -994,7 +994,8 @@ export default function EnrollDevice() {
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={label} completed={completed[index]}>
-            <StepButton color="inherit" onClick={handleStep(index)}>
+            {/* <StepButton color="inherit" onClick={handleStep(index)}> */}
+            <StepButton color="inherit">
               {label}
             </StepButton>
           </Step>
