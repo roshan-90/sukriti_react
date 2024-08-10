@@ -694,7 +694,7 @@ function AndroidDetails() {
              message: "Device deleted successfully",
              onClickAction: async () => {
                console.log("Response handleDeleteDevice");
-               window.location.reload();
+               handleResetComplex();
              },
            })
          } else {
@@ -734,8 +734,12 @@ function AndroidDetails() {
       if(device.DEVICE_PROV_GET_INFO_PUBLISH == 'FAIL') {
         setDialogData({
           title: "Do One of the following things",
-          message: "1. Scan QR and enroll device \n\n\n\n" +
-          "2. Launch Sukriti Iot Admin app and enter serial number (if asked) and sign in into the control panel",
+          message: (
+            <>
+              1. Scan QR and enroll device <br /><br />
+              2. Launch Sukriti Iot Admin app and enter the serial number (if asked) and sign in to the control panel
+            </>
+          ),
           onClickAction: () => {
             // Handle the action when the user clicks OK
             console.log("error handleReinitateDevice");
@@ -901,7 +905,7 @@ function AndroidDetails() {
 
   };
 
-  const handleQr = async (qr) => {
+  const handleQr = async (qr, serialNumber) => {
     console.log('qr',qr);
     setQrShare({
       title: "Share QR",
@@ -912,7 +916,7 @@ function AndroidDetails() {
           console.log('data',data);
           dispatch(startLoading()); // Dispatch the startLoading action
           // Handle the action when the user clicks OK
-          let result_data =  await executeShareQrLambda(user?.credentials, data, qr);
+          let result_data =  await executeShareQrLambda(user?.credentials, data, qr,serialNumber);
           console.log('result_data',result_data);
           if(result_data.statusCode == 200) {
             setDialogData({
@@ -1591,7 +1595,7 @@ function AndroidDetails() {
                     </Button>
                   {selectedDeviceFetch?.qr_details?.qr && (
                     <Button
-                      onClick={() => handleQr(selectedDeviceFetch?.qr_details?.qr)}
+                      onClick={() => handleQr(selectedDeviceFetch?.qr_details?.qr,selectedDeviceFetch?.serial_number)}
                       color="primary"
                       className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
                       style={{

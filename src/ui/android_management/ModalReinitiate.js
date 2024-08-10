@@ -322,7 +322,7 @@ const ModalReinitiate = ({ data }) => {
     setCompleted({});
   };
 
-  const handleQr = async (qr) => {
+  const handleQr = async (qr, serialNumber) => {
     console.log('qr',qr);
     setQrShare({
       title: "Share QR",
@@ -333,7 +333,7 @@ const ModalReinitiate = ({ data }) => {
           console.log('data',data);
           dispatch(startLoading()); // Dispatch the startLoading action
           // Handle the action when the user clicks OK
-          let result_data =  await executeShareQrLambda(user?.credentials, data, qr);
+          let result_data =  await executeShareQrLambda(user?.credentials, data, qr,serialNumber);
           console.log('result_data',result_data);
           if(result_data.statusCode == 200) {
             setDialogData({
@@ -804,7 +804,7 @@ const ModalReinitiate = ({ data }) => {
                    <h3 className="image-text">QR Show</h3>
                    <img src={qrImage} alt="QR Image" className="centered-image" />
                    {(data.data.QR_CREATED_STATE == "TRUE" || qrDisable == true)? <><Button
-                      onClick={() => handleQr(qrImage)}
+                      onClick={() => handleQr(qrImage, data.data.serial_number)}
                       color="primary"
                       className="px-2 d-flex align-items-center edit_button_device" // Adjust padding and add flex properties
                       style={{
