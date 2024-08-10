@@ -479,6 +479,7 @@ export default function EnrollDevice() {
         ? steps.findIndex((step, i) => !(i in completed))
         : activeStep + 1;
     setActiveStep(newActiveStep);
+    setNextBtn(false)
   };
 
   const handleBack = () => {
@@ -492,12 +493,12 @@ export default function EnrollDevice() {
 
   console.log('activeStep', activeStep);
   console.log('completed', completed);
+
   const handleComplete = () => {
     const newCompleted = completed;
     newCompleted[activeStep] = true;
     setCompleted(newCompleted);
     handleNext();
-    setNextBtn(false)
   };
 
   const handleReset = () => {
@@ -512,26 +513,43 @@ export default function EnrollDevice() {
     setSelectedOptionIotDistrict(null);
     setSelectedOptionIotCity(null);
     setSelectedOptionIotComplex(null);
-    dispatch(setResetData());
+    dispatch(setStateIotList([]))
+    dispatch(setDistrictIotList([]))
+    dispatch(setCityIotList([]))
+    dispatch(setComplexIotList([]))
+    dispatch(setComplexIotDetail({}))
+    dispatch(setComplexName(null))
+    setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
+    setUpiPaymentStatus({ label: 'No', value: 'No' })
+    setSelectedOptionLanguage({ label: 'Hindi', value: 'Hindi' })
     setApplicationFormData({
-      application_details: "",
-      application_type: "",
-      upi_payment_status: "",
-      language: "",
-      margin_left: "",
-      margin_right: "",
-      margin_top: "",
-      margin_bottom: ""
-    })
+      unattended_timmer: 20,
+      application_type: 'Cabin Automation System without BWT',
+      upi_payment_status: 'No',
+      language: 'Hindi',
+      margin_left: 0,
+      margin_right: 0,
+      margin_top: 0,
+      margin_bottom: 0
+    });
     setQrImage(null);
     setSerialNumber(null);
     dispatch(setListOfPolicy(null))
-    dispatch(setCabinList([]));
     dispatch(setPolicyName(null));
+    dispatch(setCabinList([]));
+    dispatch(setCabinDetails(null));
     dispatch(setCabinName(null));
     setSerialNumberEnable(false);
     setApplicationDetails(false);
+    setPolicyEnabled(false)
+    setNextBtn(false)
+    setQrShare(false)
   };
+
+  const handleResetComplex = () => {
+    console.log('handleResetComplex clicked')
+    handleReset();
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -673,6 +691,7 @@ export default function EnrollDevice() {
             onClickAction: () => {
               // Handle the action when the user clicks OK
               console.log(`handleSaveData function -->`);
+              handleComplete();
             },
           });
         } else {
@@ -725,8 +744,10 @@ export default function EnrollDevice() {
           message: "Policy Details " + policy_update.body,
           onClickAction: async () => {
             console.log('handlePolicySave clicked')
+            handleComplete()
           },
         });
+        dispatch(stopLoading()); // Dispatch the stopLoading action
       } else {
         setDialogData({
           title: "Error",
@@ -741,8 +762,9 @@ export default function EnrollDevice() {
       }
     } catch (error) {
       handleError(error, 'Error handlePolicySave')
-    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
+
+    } finally {
     }
   }
 
@@ -787,6 +809,7 @@ export default function EnrollDevice() {
             console.log('Qr_result', JSON.parse(Qr_result.body).imageUrl);
             setQrImage(JSON.parse(Qr_result.body).imageUrl)
             dispatch(stopLoading()); // Dispatch the stopLoading action
+            handleComplete()
           } else {
             setDialogData({
               title: "QR Token Error",
@@ -817,8 +840,8 @@ export default function EnrollDevice() {
 
     } catch (error) {
       handleError(error, 'Error handleSaveData')
-    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
+    } finally {
     }
   }
 
@@ -998,7 +1021,8 @@ export default function EnrollDevice() {
               {activeStep === 0 && (
                 <div>
                   {(ComplexIotDetails['key'] !== null && complexChanged) && (
-                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} /> // Pass complexChanged as a prop
+                    <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} 
+                    handleResetComplex={handleResetComplex} /> // Pass complexChanged as a prop
                   )}
                   {(registerComplex) && (
                     <RegisterComplex openModal={registerComplex} selected={selectedOptionIotComplex} setModalToggle={OpenRegisterModal} /> // Pass complexChanged as a prop
@@ -1131,7 +1155,7 @@ export default function EnrollDevice() {
                   {(listOfPolicy?.length > 0 && serialNumberEnable == true) && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
-                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => !policyName && handlePolicy(policy.value)}
+                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => !policyEnabled && handlePolicy(policy.value)}
                     >
                        <Col xs="auto">
                         <Input
@@ -1140,7 +1164,7 @@ export default function EnrollDevice() {
                           value={policy.value}
                           checked={policyName === policy.value}
                           onChange={() => handlePolicy(policy.value)}
-                          disabled={!!policyName}
+                          disabled={!!policyEnabled}
                         />
                       </Col>
                       <Col xs="auto" className="cabin-icon-col">

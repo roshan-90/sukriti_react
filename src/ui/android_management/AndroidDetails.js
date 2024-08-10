@@ -167,6 +167,13 @@ function AndroidDetails() {
     setComplexDetailShow(1);
   }
 
+  const handleResetComplex = () => {
+    console.log('handleResetComplex clicked')
+    setComplexDetailShow(3)
+    dispatch(setListDevice(null));
+    dispatch(setSelectedDevice(null));
+  }
+
   const OpenRegisterModal = () => {
     setRegisterComplex(!registerComplex);
   }
@@ -1869,7 +1876,7 @@ function AndroidDetails() {
           <RegisterComplex openModal={registerComplex} selected={registerComplex} setModalToggle={OpenRegisterModal} /> // Pass complexChanged as a prop
         )}
         {(ComplexIotDetails['key'] !== null && complexChanged) && (
-          <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} /> // Pass complexChanged as a prop
+          <UpdateComplex complexChanged={complexChanged} selected={selectedOptionIotComplex} setComplexChanged={setComplexChanged} handleResetComplex={handleResetComplex}/> // Pass complexChanged as a prop
         )}
         <div className="row">
           <div className="col-md-2" style={{}}>

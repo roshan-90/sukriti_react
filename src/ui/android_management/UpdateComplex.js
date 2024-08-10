@@ -15,7 +15,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { setResetData } from "../../features/androidManagementSlice";
 
-export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) => { // Receive complexChanged as a prop
+export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, handleResetComplex = null}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const ListclientName = useSelector((state) => state.androidManagement.clientName);
@@ -258,6 +258,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
           message: "Complex update is successfully",
           onClickAction: () => {
             // Handle the action when the user clicks OK
+            handleResetComplex()
             toggle();   
           },
         });
@@ -304,7 +305,9 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
         message: result.body,
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          toggle();        },
+          toggle();      
+          handleResetComplex();  
+        },
       });
       } catch (error) {
         handleError(error, 'Error deleteComplex')
@@ -431,7 +434,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged}) =
                         placeholder="complex"
                         type="text"
                         disabled={true}
-                        value={selected.value}
+                        value={selected?.value}
                       />
                     </Col>
                   </FormGroup>
