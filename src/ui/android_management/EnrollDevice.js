@@ -15,6 +15,7 @@ import {
   executeShareQrLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
+import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 // import {
 //   Card,
@@ -333,44 +334,56 @@ export default function EnrollDevice() {
   }
 
   const handleQr = async (qr) => {
-    console.log('qr',qr);
-    setQrShare({
-      title: "Share QR",
-      message: "Share Qr",
-      onClickAction: async (data) => {
-        try{
-          console.log('check qr', qr);
-          console.log('data',data);
-          dispatch(startLoading()); // Dispatch the startLoading action
-          // Handle the action when the user clicks OK
-          let result_data =  await executeShareQrLambda(user?.credentials, data, qr);
-          console.log('result_data',result_data);
-          if(result_data.statusCode == 200) {
-            setDialogData({
-              title: "Success",
-              message: " Qr is sent to your email successfully",
-              onClickAction: async () => {
-                // Handle the action when the user clicks OK
-                console.log("handleQr");
-              },
-            })
-          } else {
-            setDialogData({
-              title: "Error",
-              message: "Something went wrong please try again later",
-              onClickAction: () => {
-                // Handle the action when the user clicks OK
-                console.log("error handleQr");
-              },
-            })
+    if(serialNumber) {
+      console.log('qr',qr);
+      setQrShare({
+        title: "Share QR",
+        message: "Share Qr",
+        onClickAction: async (data) => {
+          try{
+            console.log('check qr', qr);
+            console.log('data',data);
+            dispatch(startLoading()); // Dispatch the startLoading action
+            // Handle the action when the user clicks OK
+            let result_data =  await executeShareQrLambda(user?.credentials, data, qr,serialNumber);
+            console.log('result_data',result_data);
+            if(result_data.statusCode == 200) {
+              setDialogData({
+                title: "Success",
+                message: " Qr is sent to your email successfully",
+                onClickAction: async () => {
+                  // Handle the action when the user clicks OK
+                  console.log("handleQr");
+                },
+              })
+            } else {
+              setDialogData({
+                title: "Error",
+                message: "Something went wrong please try again later",
+                onClickAction: () => {
+                  // Handle the action when the user clicks OK
+                  console.log("error handleQr");
+                },
+              })
+            }
+          } catch( err) {
+            handleError(err, 'Error handleQr')
+          } finally {
+            dispatch(stopLoading()); // Dispatch the stopLoading action
           }
-        } catch( err) {
-          handleError(err, 'Error handleQr')
-        } finally {
-          dispatch(stopLoading()); // Dispatch the stopLoading action
-        }
-      },
-    })
+        },
+      })
+
+    } else {
+      setDialogData({
+        title: "Error",
+        message: "Serial Number Not found",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log("error handleQr");
+        },
+      })
+    }
   }
 
   // Handle change in react-select 
@@ -727,7 +740,8 @@ export default function EnrollDevice() {
         return true;
       }
     } catch (error) {
-      handleError(error, 'Error handleSaveData')
+      handleError(error, 'Error handlePolicySave')
+    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
@@ -803,6 +817,7 @@ export default function EnrollDevice() {
 
     } catch (error) {
       handleError(error, 'Error handleSaveData')
+    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
@@ -850,7 +865,7 @@ export default function EnrollDevice() {
                 onClickAction: () => {
                   // Handle the action when the user clicks OK
                   console.log("error createPolicy");
-                  window.location.reload();
+                  navigate("/android_management")
                 },
               })
             }
@@ -862,6 +877,10 @@ export default function EnrollDevice() {
         },
       })
     }
+  }
+
+  const handleRedirect = () => {
+    navigate("/android_management")
   }
 
   useEffect(() => {
@@ -883,6 +902,11 @@ export default function EnrollDevice() {
       setNextBtn(true)
     } else {
       console.log('ttt33')
+    }
+
+    if(selectedCabin && activeStep == 1) {
+      console.log('aaaa')
+      setNextBtn(true)
     }
 
     if(serialNumberEnable == true && activeStep == 2) {
@@ -951,6 +975,7 @@ export default function EnrollDevice() {
             </StepButton>
           </Step>
         ))}
+      <Button variant="contained" onClick={handleRedirect}><CloseIcon /></Button>
       </Stepper>
       <div>
         <br />
@@ -984,13 +1009,20 @@ export default function EnrollDevice() {
                           ListOfIotState();
                         }
                       }} placeholder="Select State" 
+                      isDisabled={selectedOptionIotComplex && selectedOptionIotComplex.value !== ''} 
                       />
                     <br />
-                    <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District" />
+                    <Select options={districtIotList || []} value={selectedOptionIotDistrict} onChange={handleChangeIotDistrict} placeholder="Select District"
+                                          isDisabled={selectedOptionIotComplex && selectedOptionIotComplex.value !== ''} 
+                                          />
                     <br />
-                    <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" />
+                    <Select options={cityIotList || []} value={selectedOptionIotCity} onChange={handleChangeIotCity} placeholder="Select City" 
+                                          isDisabled={selectedOptionIotComplex && selectedOptionIotComplex.value !== ''} 
+                    />
                     <br />
-                    <Select options={complexIotList || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex"/> 
+                    <Select options={complexIotList || []} value={selectedOptionIotComplex} onChange={handleChangeIotComplex} placeholder="Select Complex" 
+                                          isDisabled={selectedOptionIotComplex && selectedOptionIotComplex.value !== ''} 
+/> 
                     <br />
                     <Button
                       variant="contained"
@@ -1011,7 +1043,8 @@ export default function EnrollDevice() {
                     <RegisterCabin openModal={registerCabin} selected={selectedOptionIotComplex} setModalToggle={OpenRegisterCabinModal} /> // Pass complexChanged as a prop
                   )}
                  {cabinList && cabinList.map((cabin, index) => (
-                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handleCabinDetails(cabin)}
+                  <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row"     onClick={() => !selectedCabin && handleCabinDetails(cabin)} // Disable row click if selectedCabin exists
+
                   >
                      <Col xs="auto">
                       <Input
@@ -1020,6 +1053,7 @@ export default function EnrollDevice() {
                         value={cabin}
                         checked={selectedCabin === cabin}
                         onChange={() => handleRadioChange(cabin)}
+                        disabled={!!selectedCabin} // Disable radio button if selectedCabin exists
                       />
                     </Col>
                     <Col xs="auto" className="cabin-icon-col">
@@ -1097,7 +1131,7 @@ export default function EnrollDevice() {
                   {(listOfPolicy?.length > 0 && serialNumberEnable == true) && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
-                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => handlePolicy(policy.value)}
+                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => !policyName && handlePolicy(policy.value)}
                     >
                        <Col xs="auto">
                         <Input
@@ -1106,6 +1140,7 @@ export default function EnrollDevice() {
                           value={policy.value}
                           checked={policyName === policy.value}
                           onChange={() => handlePolicy(policy.value)}
+                          disabled={!!policyName}
                         />
                       </Col>
                       <Col xs="auto" className="cabin-icon-col">
@@ -1257,6 +1292,10 @@ export default function EnrollDevice() {
               {'Next'}
             </Button>
             )} */}
+             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+              <Box sx={{ flex: '1 1 auto' }} />
+              <Button variant="contained" onClick={handleReset}>Reset</Button>
+            </Box>
         </div>
       </div>
     </Box>

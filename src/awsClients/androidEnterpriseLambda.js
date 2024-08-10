@@ -1048,7 +1048,8 @@ export function executeVerifyPackageNameLambda(
 export function executeShareQrLambda(
   credentials,
   email,
-  qr
+  qr,
+  serialNumber
 ) {
   return new Promise(function (resolve, reject) {
     var lambda = new AWS.Lambda({
@@ -1060,7 +1061,8 @@ export function executeShareQrLambda(
       FunctionName: "shareQR",
       Payload: JSON.stringify({
         email: email,
-        qr: qr
+        qr: qr,
+        serial_number: serialNumber
       })
     };
     
