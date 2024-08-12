@@ -647,7 +647,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
 
   const handleVerify = async () => {
     try {
-      if(formData.Name && selectedOptionIotCity.value && selectedOptionIotDistrict.value && selectedOption.value && formData.DATE ){
+      if(formData?.Name && selectedOptionIotCity?.value && selectedOptionIotDistrict?.value && selectedOption?.value){
         setFormData(prevFormData => ({
             ...prevFormData,
             DISTRICT_CODE: selectedOptionIotDistrict.value,
@@ -656,7 +656,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
             STATE_NAME: selectedOption.label
         }));
 
-      if(selectedOptionIotCity.value) {
+      if(selectedOptionIotCity?.value) {
         let complexList = await ListOfIotComplex(selectedOptionIotCity.value);
         let uuid = await setUUID(complexList.length ? complexList.length : 0);
         console.log('uuid' , uuid);

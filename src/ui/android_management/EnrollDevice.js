@@ -607,6 +607,47 @@ export default function EnrollDevice() {
     }
   }
 
+  const listOfPolicyLambda = async () => {
+    try{
+        dispatch(startLoading());
+        let enterprise_id = selectedOptionEnterprise.value;
+        let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
+        console.log('listPolicy', listPolicy);
+        const options = listPolicy.body.map(item => ({
+          value: item.name,
+          label: item.name
+        }));
+        console.log('options',options)
+        dispatch(setListOfPolicy(options));
+        if(listPolicy.statusCode == 200) {
+          // setSerialNumberEnable(true);
+          // setNextBtn(true)
+          // setDialogData({
+          //   title: "Success",
+          //   message: "Poli",
+          //   onClickAction: () => {
+          //     // Handle the action when the user clicks OK
+          //     console.log(`listOfPolicyLambda function -->`);
+          //   },
+          // });
+        } else {
+          setDialogData({
+            title: "Error",
+            message: 'SomethingWent wrong Please try again',
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`listOfPolicyLambda -->`);
+            },
+          });
+        }
+      } catch (error) {
+        handleError(error, 'Error listOfPolicyLambda')
+      } finally {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }
+  }
+
+
   const handleSaveData = async () => {
     if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
       { 
@@ -874,6 +915,7 @@ export default function EnrollDevice() {
             let result_data =  await executeCreatePolicyLambda(user?.credentials, data);
             console.log('result_data',result_data);
             if(result_data.statusCode == 200) {
+              await listOfPolicyLambda();
               setDialogData({
                 title: "Success",
                 message: "Policy Created is successfully",
