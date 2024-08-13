@@ -1042,7 +1042,7 @@ export default function EnrollDevice() {
             </StepButton>
           </Step>
         ))}
-      <Button variant="contained" onClick={handleRedirect}><CloseIcon /></Button>
+      <Button variant="contained" sx={{borderRadius: '26px'}} className="close_btn" onClick={handleRedirect}><CloseIcon /></Button>
       </Stepper>
       <div>
         <br />
@@ -1197,8 +1197,10 @@ export default function EnrollDevice() {
                     <AddIcon /> Create Policy 
                   </Button>
                   <br />
+                  <br />
                   {(listOfPolicy?.length > 0 && serialNumberEnable == true) && (
                     <>
+                    
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
                     <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" onClick={() => !policyEnabled && handlePolicy(policy.value)}
                     >
