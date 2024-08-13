@@ -17,6 +17,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ModalUpdateApplication from './ModalUpdateApplication';
 import { GoPackage } from "react-icons/go";
+import './common.css'
+
 
 const ModalCreatePolicy = ({ data }) => {
   const dispatch = useDispatch();
@@ -605,7 +607,7 @@ console.log('applications',applications);
                 marginBottom: '10px',
                 alignItems: 'center',
                 backgroundColor: 'ghostwhite',
-                width: '70%',
+                width: '80%',
               }}
               className="cabin-row clickable-row"
             >
@@ -648,6 +650,7 @@ console.log('applications',applications);
                       >
                         <EditIcon />
                       </Button>
+                      <span className="kioskmode_class">&nbsp;&nbsp;&nbsp;&nbsp;<b>{item?.packageName == selectedKiosk?.packageName ? 'Kiosk Mode' : ''}</b></span>
               </Col>
             </Row>
             )}
