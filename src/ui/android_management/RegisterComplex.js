@@ -347,10 +347,10 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     if(complexVerify == true) {
       setDialogData({
         title: "Confirms",
-        message: `Are you Sure submitForm ${formData.Name} Complex`,
+        message: `Are you sure you want to create new Complex`,
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log('submitForm complex');
+          console.log(`submitForm complex ${formData.Name}`);
           submitForm();
         },
       });

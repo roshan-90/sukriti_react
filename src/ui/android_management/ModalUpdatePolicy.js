@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
- 
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,7 +17,7 @@ import { BiMaleFemale } from "react-icons/bi";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { GoPackage } from "react-icons/go";
-
+import './common.css'
 
 const ModalUpdatePolicy = ({ data }) => {
   const dispatch = useDispatch();
@@ -636,15 +635,15 @@ const ModalUpdatePolicy = ({ data }) => {
                 style={{
                   fontSize: "small"
                 }}>
-                  <span>{item.packageName}</span>
+                  <span>{item?.packageName}</span>
                   <br />
-                  <span> &nbsp;&nbsp;&nbsp;&nbsp;{item.installType}</span>
+                  <span> &nbsp;&nbsp;&nbsp;&nbsp;{item?.installType}</span>
                   <br />
-                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.defaultPermissionPolicy}</span>
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item?.defaultPermissionPolicy}</span>
                   <br />
-                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.autoUpdateMode}</span>
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item?.autoUpdateMode}</span>
                   <br />
-                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.userControlSettings}</span>
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;{item?.userControlSettings}</span>
                 </Col>
             </Row>
               </>
@@ -667,19 +666,19 @@ const ModalUpdatePolicy = ({ data }) => {
               style={{
                 fontSize: "small"
               }}>
-                <span>{item.packageName}</span>
+                <span>{item?.packageName}</span>
                 <br />
-                <span> &nbsp;&nbsp;&nbsp;&nbsp;{item.installType}</span>
+                <span> &nbsp;&nbsp;&nbsp;&nbsp;{item?.installType}</span>
                 <br />
-                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.defaultPermissionPolicy}</span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item?.defaultPermissionPolicy}</span>
                 <br />
-                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.autoUpdateMode}</span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item?.autoUpdateMode}</span>
                 <br />
-                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.userControlSettings}</span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;{item?.userControlSettings}</span>
               </Col>
               <Col className="cabin-text">
               <>
-              <span>&nbsp;&nbsp;&nbsp;&nbsp;{item.packageName == selectedKiosk.packageName ? 'Kiosk Mode' : ''}</span>
+                
                   <Button
                       onClick={() => {
                         handleDeleteapplication(index);
@@ -700,6 +699,8 @@ const ModalUpdatePolicy = ({ data }) => {
                       >
                         <EditIcon />
                   </Button>
+                  <span className="kioskmode_class">&nbsp;&nbsp;&nbsp;&nbsp;<b>{item?.packageName == selectedKiosk?.packageName ? 'Kiosk Mode' : ''}</b></span>
+
                   </>
               </Col>
             </Row>

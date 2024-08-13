@@ -1196,6 +1196,7 @@ export default function EnrollDevice() {
                   >
                     <AddIcon /> Create Policy 
                   </Button>
+                  <br />
                   {(listOfPolicy?.length > 0 && serialNumberEnable == true) && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
@@ -1236,7 +1237,7 @@ export default function EnrollDevice() {
                   <h3> Application Details</h3>
                   {policyName && (
                     <>
-                    <label>unattended Timmer</label>
+                    <label>Unattended Timmer</label>
                       <Input
                       id="unattended_timmer"
                       name="unattended_timmer"
@@ -1338,20 +1339,22 @@ export default function EnrollDevice() {
         )}
 
         <br />
-        <div sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button variant="contained" disabled={activeStep === 0} onClick={handleBack}>
-            Back
-          </Button>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          {nextBtn && (
-            <Button
-              variant="contained"
-              onClick={handleComplete}
-            >
-              {/* {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'} */}
-              {'Next'}
+        <Box  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button variant="contained" disabled={activeStep === 0} onClick={handleBack}>
+              Back
             </Button>
-          )}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            {nextBtn && (
+              <Button
+                variant="contained"
+                onClick={handleComplete}
+              >
+                {/* {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Next'} */}
+                {'Next'}
+              </Button>
+            )}
+            </Box >
           {/* {activeStep === steps.length ? <> </> : (
             <Button
               variant="contained"
@@ -1360,11 +1363,11 @@ export default function EnrollDevice() {
               {'Next'}
             </Button>
             )} */}
-             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Box sx={{ flex: '1 1 auto' }} />
+             {/* <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+              <Box sx={{ flex: '1 1 auto' }} /> */}
               <Button variant="contained" onClick={handleReset}>Reset</Button>
-            </Box>
-        </div>
+            {/* </Box> */}
+        </Box >
       </div>
     </Box>
     </div>

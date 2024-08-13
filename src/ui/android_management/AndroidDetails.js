@@ -1606,7 +1606,7 @@ function AndroidDetails() {
                         marginLeft: "15px"
                       }}
                         // Add the inert attribute conditionally
-                        inert={true}
+                        inert={"true"}
                     >
                       <span style={{ marginRight: '2px', color: "blue"}}><ShareIcon/></span>
                     </Button>

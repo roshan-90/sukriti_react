@@ -700,7 +700,8 @@ const ReportsHome = ({ isOnline }) => {
       default:
         break;
     }
-
+    console.log('value',moment(value).format('x'));
+    // console.log('updatedAssignDetails',updatedAssignDetails);
     setAssignDetails(updatedAssignDetails);
   };
   const handleUpdate = (configName, configValue) => {
