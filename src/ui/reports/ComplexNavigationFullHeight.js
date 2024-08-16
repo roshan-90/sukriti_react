@@ -34,7 +34,7 @@ const ComplexNavigationFullHeight = (props) => {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
   const reportParms = { complex: "all", duration: "90" };
-  const [complexfetchFull , setComplexFetchFull] = useState(false);
+  const [complexfetchFull , setComplexFetchFull] = useState(true);
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -142,6 +142,7 @@ const ComplexNavigationFullHeight = (props) => {
   const initFetchCompletedUserAccessTreeAction = async () => {
     try {
       dispatch(startLoading()); // Dispatch the startLoading action
+      setComplexFetchFull(false);
       const result = await executeFetchCompletedUserAccessTree(
         user?.user.userName,
         user?.credentials
