@@ -82,6 +82,7 @@ const ReportsHome = ({ isOnline }) => {
     useOnlineStatus();
   const complexComposition = useRef();
   const [openComponet, setOpenComponet] = useState(false);
+  const [customComplexName, setCustomComplexName] = useState(null);
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
   const navigate = useNavigate();
@@ -112,12 +113,13 @@ const ReportsHome = ({ isOnline }) => {
 
   const generatePDF = () => {
     setLoadingPdf(true);
-
+    let currentTimestamp = Date.now();
+    console.log('customComplexName',customComplexName);
     const input = document.getElementById("pdf-content");
     // Define options for html2pdf
     const options = {
       margin: 5,
-      filename: "SmartTolilet.pdf",
+      filename: `SmartTolilet_${currentTimestamp}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },
@@ -544,6 +546,7 @@ const ReportsHome = ({ isOnline }) => {
     reportParms.complex = selectedComplex.name;
     reportParms.duration = 15;
     localStorage.setItem("complex_name", selectedComplex.name);
+    setCustomComplexName(selectedComplex.name)
     // if (isOnline == false) {
       let value = localStorage.getItem("report_dashboard");
       filter_complex(JSON.parse(value), 15);
@@ -715,6 +718,7 @@ const ReportsHome = ({ isOnline }) => {
     localStorage.setItem("selection_key", "15 Days");
     localStorage.setItem("complex_name", "all");
     dispatch(setReportData(dashboard_data));
+    setCustomComplexName('All')
   }, []);
 
   const resetData = () => {
@@ -1204,7 +1208,7 @@ const ReportsHome = ({ isOnline }) => {
   };
 
   const YourComponent = () => {
-    console.log("YourComponent is rendered");
+    console.log("YourComponent is rendered",customComplexName);
     return (
       <>
         {" "}
@@ -1221,7 +1225,7 @@ const ReportsHome = ({ isOnline }) => {
               display: "flexbox",
               alignItems: "center",
             }}
-          >
+          > <b>{customComplexName ?? "All"} Complex</b>
             <div style={{ width: "30%", float: "right" }}>
               <DropDownLabel
                 label={"Duration"}

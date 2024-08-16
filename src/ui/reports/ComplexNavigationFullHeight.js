@@ -34,6 +34,7 @@ const ComplexNavigationFullHeight = (props) => {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
   const reportParms = { complex: "all", duration: "90" };
+  const [complexfetchFull , setComplexFetchFull] = useState(false);
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -134,6 +135,7 @@ const ComplexNavigationFullHeight = (props) => {
       } catch (err) {
         // Catch an error here
         handleError(err, "overloopData");
+        dispatch(stopLoading()); // Dispatch the stopLoading action
       }
   }
 
@@ -145,13 +147,14 @@ const ComplexNavigationFullHeight = (props) => {
         user?.credentials
       );
       await storeComplexdata(result);
+      dispatch(stopLoading()); // Dispatch the stopLoading action
       dispatch(setAccessTree(result));
       await overloopData(complex_array);
       // localStorage.setItem("accessTree", JSON.stringify(complex_array));
       console.log("_defineAccess", result);
+      setComplexFetchFull(true);
     } catch (err) {
       handleError(err, "initFetchCompletedUserAccessTreeAction");
-    } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
@@ -164,6 +167,19 @@ const ComplexNavigationFullHeight = (props) => {
   }, [user?.accessTree]);
 
   const handleComplexSelection = (treeEdge) => {
+    console.log('complexfetchFull', complexfetchFull);
+    if(complexfetchFull == false) {
+      setDialogData({
+        title: "Error",
+        message: "complex name's data is fetching Please try again after some time",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log('function handleComplexSelection');
+        },
+      });
+      return true;
+    }
+
     console.log("complexnavigationfullheight -->clicke");
     console.log("_handleComplexSelection", treeEdge);
     const stateIndex = treeEdge.stateIndex;
@@ -235,7 +251,7 @@ const ComplexNavigationFullHeight = (props) => {
 
   const memoizedTreeComponent = useMemo(() => {
     return <ComponentSelector />;
-  }, [user?.accessTree]);
+  }, [user?.accessTree,complexfetchFull]);
 
   // if (user?.accessTree === undefined) {
   //   return <NoDataComponent />;
