@@ -156,6 +156,7 @@ const Home = ({ isOnline }) => {
       if (reportParms.duration == "15") {
         setLocalStorageItem("dashboard_15", JSON.stringify(result));
       }
+      dispatch(stopLoading()); // Dispatch the stopLoading action
       await checkAndUpdateFunction(24);
       let result_90 = await executeFetchDashboardLambda(
         user?.username,
@@ -198,27 +199,47 @@ const Home = ({ isOnline }) => {
         case duration === 15:
           let dashboard_15 = getLocalStorageItem("dashboard_15");
           console.log("this is reportParms is 15 is selected", dashboard_15);
-          dispatch(setDashboardData(dashboard_15));
+          if(dashboard_15 == undefined || dashboard_15 == null) {
+            
+          } else {
+            dispatch(setDashboardData(dashboard_15));
+          }
           break;
         case duration === 30:
           let dashboard_30 = getLocalStorageItem("dashboard_30");
           console.log("this is reportparms is 30 selected", dashboard_30);
-          dispatch(setDashboardData(dashboard_30));
+          if(dashboard_30 == undefined || dashboard_30 == null) {
+            
+          } else {
+            dispatch(setDashboardData(dashboard_30));
+          }
           break;
         case duration === 45:
           let dashboard_45 = getLocalStorageItem("dashboard_45");
           console.log("this is reportParms is 45 selected", dashboard_45);
-          dispatch(setDashboardData(dashboard_45));
+          if(dashboard_45 == undefined || dashboard_45 == null) {
+            
+          } else {
+            dispatch(setDashboardData(dashboard_45));
+          }
           break;
         case duration === 60:
           let dashboard_60 = getLocalStorageItem("dashboard_60");
           console.log("this is reportparms is 60 selected", dashboard_60);
-          dispatch(setDashboardData(dashboard_60));
+          if(dashboard_60 == undefined || dashboard_60 == null) {
+            
+          } else {
+            dispatch(setDashboardData(dashboard_60));
+          }
           break;
         case duration === 90:
           let dashboard_90 = getLocalStorageItem("dashboard_90");
           console.log("this is reportparms is 90 selected", dashboard_90);
-          dispatch(setDashboardData(dashboard_90));
+          if(dashboard_90 == undefined || dashboard_90 == null) {
+            
+          } else {
+            dispatch(setDashboardData(dashboard_90));
+          }
           break;
         default:
           console.log("default switch working");
