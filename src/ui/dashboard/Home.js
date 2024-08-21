@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectUser,
   selectIsAuthenticated,
+  setLoadingPdf
 } from "../../features/authenticationSlice";
 import { useNavigate } from "react-router-dom";
 import {
@@ -142,6 +143,7 @@ const Home = ({ isOnline }) => {
 
   const fetchDashboardData = async (duration) => {
     try {
+      dispatch(setLoadingPdf(true));
       dispatch(startLoading()); // Dispatch the startLoading action
       await fetchAndInitClientList();
       var result = await executeFetchDashboardLambda(
@@ -169,6 +171,7 @@ const Home = ({ isOnline }) => {
       if (isOnline == true) {
         fetch_dashboard();
       }
+      dispatch(setLoadingPdf(false));
     } catch (err) {
       handleError(err, "fetchDashboardData");
       dispatch(stopLoading()); // Dispatch the stopLoading action

@@ -7,6 +7,7 @@ const initialState = {
   authenticated: false,
   user: null,
   accessTree: undefined,
+  loadingPdf: false
 };
 
 const authSlice = createSlice({
@@ -29,16 +30,20 @@ const authSlice = createSlice({
     setAccessTree: (state, action) => {
       state.accessTree = action.payload;
     },
+    setLoadingPdf: (state, action) => {
+      state.loadingPdf  = action.payload;
+    },
     clearUser: (state) => {
       state.username = null;
       state.credentials = null;
       state.authenticated = false;
+      state.loadingPdf = false;
       // localStorage.clear();
     },
   },
 });
 
-export const { setUser, clearUser, setUsername, setLoggedIn, setAccessTree } =
+export const { setUser, clearUser, setUsername, setLoggedIn, setAccessTree, setLoadingPdf } =
   authSlice.actions;
 export const selectUser = (state) => state.authentication;
 export const selectIsAuthenticated = (state) =>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Collapse,
@@ -12,7 +12,7 @@ import {
 } from "reactstrap";
 import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
-import { clearUser, selectUser , setAccessTree} from "../features/authenticationSlice";
+import { clearUser, selectUser , setAccessTree, setLoadingPdf} from "../features/authenticationSlice";
 import Badge from "@mui/material/Badge";
 import MessageDialog from "../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import {
@@ -27,6 +27,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const loadingPdf = useSelector((state) => state.authentication.loadingPdf);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const [dialogData, setDialogData] = useState(null);
@@ -35,7 +36,9 @@ const AppBar = ({ isOnline }) => {
     getLocalStorageItem,
     chunkArray
   } = useOnlineStatus();
-  const [loadingPdf, setLoadingPdf] = useState(false);
+  // const [loadingPdf, setLoadingPdf] = useState(false);
+
+  console.log('isOnline', isOnline);
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -366,7 +369,7 @@ const AppBar = ({ isOnline }) => {
   };
 
   const syncFunction = async () => {
-    setLoadingPdf(true);
+    dispatch(setLoadingPdf(true));
     console.log("syncFunction click");
     if(isOnline == false) {
       setDialogData({
@@ -390,7 +393,7 @@ const AppBar = ({ isOnline }) => {
     await fetch_dashboard();
     await initFetchCompletedUserAccessTreeAction()
     console.log("syncFunction is Complete");
-    setLoadingPdf(false);
+    dispatch(setLoadingPdf(false));
   };
 
   const setOfflineMessage = (title) => {
@@ -517,7 +520,13 @@ const AppBar = ({ isOnline }) => {
               <NavLink
                 style={navLinkStyle}
                 onClick={() => {
-                  navigate("/android_management");
+                  if (isOnline) {
+                    navigate("/android_management");
+                  } else {
+                    setOfflineMessage("Offline")(
+                      "Feature is not available in Offline Mode"
+                    )("Android Management");
+                  }
                 }}
               >
                 Devices Management
