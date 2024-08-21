@@ -14,6 +14,7 @@ import {
   setUsername,
   setUser,
   selectUser,
+  setTriggerFunction
 } from "./features/authenticationSlice";
 import AppBar from "./components/AppBar";
 import { Container } from "reactstrap";
@@ -88,6 +89,8 @@ const App = () => {
     function onlineHandler() {
       console.log("Online");
       setIsOnline(true);
+      console.log('s4s4s4');
+      dispatch(setTriggerFunction(true));
     }
 
     const offlineHandler = () => {
@@ -309,6 +312,21 @@ const App = () => {
   //     </Router>
   //   </React.Suspense>
   // );
+
+  // let size = function (bytes) {
+  //   if (bytes === 0) {
+  //     return "0.00 B";
+  //   }
+    
+  //   let e = Math.floor(Math.log(bytes) / Math.log(1024));
+  //   return (bytes / Math.pow(1024, e)).toFixed(2) +
+  //     ' ' + ' KMGTP'.charAt(e) + 'B';
+  // }
+  
+  // let bytes = 2887577600;
+  
+  // console.log(bytes + " bytes = " + size(bytes));
+  
 };
 
 export default App;

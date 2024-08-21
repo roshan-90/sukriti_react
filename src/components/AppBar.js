@@ -12,7 +12,7 @@ import {
 } from "reactstrap";
 import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
-import { clearUser, selectUser , setAccessTree, setLoadingPdf} from "../features/authenticationSlice";
+import { clearUser, selectUser , setAccessTree, setLoadingPdf, setTriggerFunction} from "../features/authenticationSlice";
 import Badge from "@mui/material/Badge";
 import MessageDialog from "../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import {
@@ -28,6 +28,7 @@ const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const loadingPdf = useSelector((state) => state.authentication.loadingPdf);
+  const triggerFunction = useSelector((state) => state.authentication.triggerFunction);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const [dialogData, setDialogData] = useState(null);
@@ -366,7 +367,7 @@ const AppBar = ({ isOnline }) => {
     array.forEach((duration) => {
       filter_date(dashboard_90, duration);
     });
-  };
+  };  
 
   const syncFunction = async () => {
     dispatch(setLoadingPdf(true));
@@ -395,6 +396,14 @@ const AppBar = ({ isOnline }) => {
     console.log("syncFunction is Complete");
     dispatch(setLoadingPdf(false));
   };
+
+  console.log('triggerFunction',triggerFunction)
+  if(isOnline == true) {
+    if(triggerFunction == true) {
+      syncFunction();
+      dispatch(setTriggerFunction(false));
+    }
+  }
 
   const setOfflineMessage = (title) => {
     return (message) => {

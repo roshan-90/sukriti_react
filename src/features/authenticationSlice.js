@@ -7,7 +7,8 @@ const initialState = {
   authenticated: false,
   user: null,
   accessTree: undefined,
-  loadingPdf: false
+  loadingPdf: false,
+  triggerFunction: false,
 };
 
 const authSlice = createSlice({
@@ -33,17 +34,21 @@ const authSlice = createSlice({
     setLoadingPdf: (state, action) => {
       state.loadingPdf  = action.payload;
     },
+    setTriggerFunction: (state, action) => {
+      state.triggerFunction = action.payload;
+    },
     clearUser: (state) => {
       state.username = null;
       state.credentials = null;
       state.authenticated = false;
       state.loadingPdf = false;
+      state.triggerFunction = false
       // localStorage.clear();
     },
   },
 });
 
-export const { setUser, clearUser, setUsername, setLoggedIn, setAccessTree, setLoadingPdf } =
+export const { setUser, clearUser, setUsername, setLoggedIn, setAccessTree, setLoadingPdf, setTriggerFunction } =
   authSlice.actions;
 export const selectUser = (state) => state.authentication;
 export const selectIsAuthenticated = (state) =>
