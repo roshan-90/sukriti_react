@@ -171,7 +171,7 @@ const ComplexNavigationFullHeight = (props) => {
     console.log('complexfetchFull', complexfetchFull);
     if(complexfetchFull == false) {
       setDialogData({
-        title: "Error",
+        title: "Please Wait",
         message: "complex name's data is fetching Please try again after some time",
         onClickAction: () => {
           // Handle the action when the user clicks OK

@@ -174,6 +174,7 @@ const Home = ({ isOnline }) => {
       dispatch(setLoadingPdf(false));
     } catch (err) {
       handleError(err, "fetchDashboardData");
+      dispatch(setLoadingPdf(false));
       dispatch(stopLoading()); // Dispatch the stopLoading action
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
