@@ -96,6 +96,7 @@ const ReportsHome = ({ isOnline }) => {
   let title = "";
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
+  const { handleOnlineState } = useOnlineStatus();
 
   const toggleDialog = () => {
     console.log("visibility", visibility);
@@ -715,6 +716,9 @@ const ReportsHome = ({ isOnline }) => {
 
   useEffect(() => {
     // fetchDashboardData(15);
+    if (isOnline == false) {
+      handleOnlineState();
+    }
     localStorage.setItem("selection_key", "15 Days");
     localStorage.setItem("complex_name", "all");
     dispatch(setReportData(dashboard_data));
@@ -1726,6 +1730,7 @@ const ReportsHome = ({ isOnline }) => {
                             }}
                             type="email"
                             placeholder="Email"
+                            disabled={!isOnline}
                             onChange={(event) =>
                               updateAssignDetailsField(
                                 "email",
