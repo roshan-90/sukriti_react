@@ -48,23 +48,11 @@ const PdfGenerate = ({
   });
   const generatePDF = () => {
     setLoadingPdf(true);
+    let currentTimestamp = Date.now();
     const input = document.getElementById("pdf-generate-content");
-
-    //     const cssStyles = `
-    //     <style>
-    //       thead tr {
-    //         border-color: inherit;
-    //         border-style: solid;
-    //         border-width: 4px; /* Adjust the border width as needed */
-    //       }
-    //     </style>
-    // `;
-    //     // Combine CSS styles with HTML content
-    //     const htmlContent = cssStyles + input.innerHTML;
-    // Define options for html2pdf
     const options = {
       margin: 5,
-      filename: "SmartTolilet.pdf",
+      filename: `SmartTolilet_${currentTimestamp}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },
@@ -113,11 +101,15 @@ const PdfGenerate = ({
 
         // Save the PDF
         // dispatch(stopLoading()); // Dispatch the stopLoading action
-        pdf.save();
+        pdf.save(options.filename);  // Ensure the filename is set here
         setTimeout(() => {
           setLoadingPdf(false);
           onClick();
         }, 4000);
+      })
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+        setLoadingPdf(false); // Stop loading if there's an error
       });
   };
 
