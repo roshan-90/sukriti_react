@@ -104,10 +104,10 @@ const CabinDetails = (props, ref) => {
   console.log("checking detail 2 :-> ", complex_store?.cabinDetail);
   const ComponenetSelector = () => {
     if (cabinDetails == undefined) {
-      return <div />;
+      return ;
     } else if (complex_store?.cabin?.cabinType === "BWT") {
       return (
-        <div style={{ width: "95%", margin: "auto" }}>
+        <div style={{ width: "95%", marginLeft: "75px"}}>
           <TurbidityAndWaterRecycled
             turbidityAndWaterRecycled={cabinDetails.turbidityAndWaterRecycled}
             uiResult={cabinDetails.uiResult.data}
@@ -142,7 +142,7 @@ const CabinDetails = (props, ref) => {
       );
     } else {
       return (
-        <div style={{ width: "95%", marginLeft: "60px" }}>
+        <div style={{ width: "95%", marginLeft: "75px" }}>
           <CabinUsageFeedback
             usageAndFeedback={cabinDetails.usageAndFeedback}
             uiResult={cabinDetails.uiResult.data}
