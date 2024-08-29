@@ -208,6 +208,8 @@ export function executeFetchReportLambda2(
       scheduleDuration: scheduleDuration,
       startDate: startDate,
       endDate: endDate,
+      scheduleStartDate: ScheduleStartDate,
+      scheduleEndDate: ScheduleEndDate,
       usageStats: usageStats,
       collectionStats: collectionStats,
       upiStats: upiStats,
