@@ -16,6 +16,7 @@ import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import LinearProgress from "@mui/material/LinearProgress";
+import ReportCover from './ReportCover';
 
 const PdfGenerate = ({
   StartDate,
@@ -865,17 +866,17 @@ const PdfGenerate = ({
       <>
         {loadingPdf == false && (
           <div
-            style={{
-              ...whiteSurface,
-              background: "white",
-              marginTop: "20px",
-              width: "100%",
-              height: "100%",
-              padding: "10px",
-              paddingBottom: "20px",
-              overflowX: "auto", // Enable horizontal scrolling
-              fontSize: "10px",
-            }}
+          style={{
+            ...whiteSurface,
+            background: "white",
+            marginTop: "20px",
+            width: "100%",
+            height: "100%",
+            padding: "10px",
+            paddingBottom: "20px",
+            overflowX: "auto", // Enable horizontal scrolling
+            fontSize: "10px",
+          }}
           >
             <div
               style={{
@@ -884,6 +885,11 @@ const PdfGenerate = ({
               }}
               id="pdf-generate-content"
             >
+              <div>
+                  <ReportCover />
+                  <br/>
+              </div>
+
               <div style={{ marginBottom: "20px" }}>
                 <div
                   className="row pdf-section"
