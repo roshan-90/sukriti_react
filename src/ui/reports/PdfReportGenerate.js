@@ -886,7 +886,7 @@ const PdfGenerate = ({
               id="pdf-generate-content"
             >
               <div>
-                  <ReportCover />
+                  <ReportCover StartDate={StartDate} EndDate={EndDate} />
                   <br/>
               </div>
 
