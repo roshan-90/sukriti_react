@@ -1243,33 +1243,41 @@ const ReportsHome = ({ isOnline }) => {
               data={reportData?.data?.dashboardChartData?.usage}
               pieChartData={reportData?.data?.pieChartData?.usage}
             />
-            <StatsItem
-              className="page-break"
-              name="Collection Stats"
-              total={reportData?.data?.dataSummary?.collection}
-              data={reportData?.data?.dashboardChartData?.collection}
-              pieChartData={reportData?.data?.pieChartData?.collection}
-            />
-            <StatsItem
-              name="UPI Stats"
-              total={reportData?.data?.dataSummary?.upiCollection}
-              data={reportData?.data?.dashboardChartData?.upiCollection}
-              pieChartData={reportData?.data?.pieChartData?.upiCollection}
-            />
-            <BWTStatsItem
-              className="page-break"
-              name="Recycled Water"
-              total={reportData?.data?.bwtdataSummary?.waterRecycled}
-              data={reportData?.data?.bwtdashboardChartData?.waterRecycled}
-              pieChartData={reportData?.data?.bwtpieChartData?.usage}
-            />
+              {reportData?.data?.uiResult?.collection_stats === "true" && (
+                <>
+                  <StatsItem
+                    className="page-break"
+                    name="Collection Stats"
+                    total={reportData?.data?.dataSummary?.collection}
+                    data={reportData?.data?.dashboardChartData?.collection}
+                    pieChartData={reportData?.data?.pieChartData?.collection}
+                  />
+                  <StatsItem
+                    name="UPI Stats"
+                    total={reportData?.data?.dataSummary?.upiCollection}
+                    data={reportData?.data?.dashboardChartData?.upiCollection}
+                    pieChartData={reportData?.data?.pieChartData?.upiCollection}
+                  />
+                </>
+              )}
+              {reportData?.data?.uiResult?.bwt_stats === "true" &&
+                  reportData?.data?.bwtDataSummary !== undefined ? (
+                  <BWTStatsItem
+                    className="page-break"
+                    name="Recycled Water"
+                    total={reportData?.data?.bwtdataSummary?.waterRecycled}
+                    data={reportData?.data?.bwtdashboardChartData?.waterRecycled}
+                    pieChartData={reportData?.data?.bwtpieChartData?.usage}
+                  />
+              ) : null}
             <StatsItem
               className="page-break"
               name="Feedback Stats"
               total={reportData?.data?.dataSummary?.feedback}
               data={reportData?.data?.dashboardChartData?.feedback}
               pieChartData={reportData?.data?.pieChartData?.feedback}
-            />
+            /> 
+            
           </div>
         </div>
         <table
@@ -1779,7 +1787,7 @@ const ReportsHome = ({ isOnline }) => {
                             </div>
 
                             {reportData?.data?.uiResult?.data
-                              .collection_stats === "true" && (
+                              ?.collection_stats === "true" && (
                               <>
                                 <div className="React__checkbox">
                                   <Label>
@@ -1819,7 +1827,7 @@ const ReportsHome = ({ isOnline }) => {
                                 <span className="React__checkbox--span" />
                               </Label>
                             </div>
-                            {reportData?.data?.uiResult?.data.bwt_stats ===
+                            {reportData?.data?.uiResult?.data?.bwt_stats ===
                               "true" && (
                               <div className="React__checkbox">
                                 <Label>
