@@ -61,7 +61,8 @@ const ModalReinitiate = ({ data }) => {
     margin_left: "",
     margin_right: "",
     margin_top: "",
-    margin_bottom: ""
+    margin_bottom: "",
+    isAmsEnabled: ""
   })
   const [qrImage, setQrImage] = useState(null);
   const dispatch = useDispatch();
@@ -77,6 +78,7 @@ const ModalReinitiate = ({ data }) => {
   const [ApplicationDisable, setApplicationDisable] = useState(false);
   const [qrDisable, setQrDisable] = useState(false);
   const [qrShare , setQrShare] = useState(null);
+  const [amsEnableOptions, setAmsEnableOption] = useState(false);
 
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
@@ -116,7 +118,11 @@ const ModalReinitiate = ({ data }) => {
     { label: 'Urdu', value: 'Urdu' }
   ];
 
-  
+  const AmsEnable = [
+    { label: 'True', value: true},
+    { label: 'False', value: false}
+  ];
+
   useEffect(() => {
     console.log('data',data);
     if (data) {
@@ -135,11 +141,17 @@ const ModalReinitiate = ({ data }) => {
           margin_left: data.data.application_details.margin_left ?? '',
           margin_right:data.data.application_details.margin_right ?? '',
           margin_top: data.data.application_details.margin_top ?? '',
-          margin_bottom: data.data.application_details.margin_bottom ?? ''
+          margin_bottom: data.data.application_details.margin_bottom ?? '',
+          isAmsEnabled: data.data.application_details?.isAmsEnabled ? true : false
         })
         setApplicationTypeOption({ label: data.data.application_details.application_type, value: data.data.application_details.application_type})
         setUpiPaymentStatus({ label: data.data.application_details.upi_payment_status, value: data.data.application_details.upi_payment_status})
         setSelectedOptionLanguage({ label: data.data.application_details.language, value: data.data.application_details.language})
+        if(data.data.application_details?.isAmsEnabled == true) {
+          setAmsEnableOption({ label: 'True', value: true})
+        } else {
+          setAmsEnableOption({ label: 'False', value: false})
+        }
       } else {
         setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
         setUpiPaymentStatus({ label: 'No', value: 'No' })
@@ -152,8 +164,10 @@ const ModalReinitiate = ({ data }) => {
           margin_left: 0,
           margin_right: 0,
           margin_top: 0,
-          margin_bottom: 0
+          margin_bottom: 0,
+          isAmsEnabled: false
         })
+        setAmsEnableOption({ label: 'False', value: false})
       }
 
       if(data.data.QR_CREATED_STATE == "TRUE") {
@@ -558,6 +572,14 @@ const ModalReinitiate = ({ data }) => {
     }));
   }
 
+  const handleChangeAmsField = (selectedOption) => {
+    setAmsEnableOption(selectedOption);
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      isAmsEnabled: selectedOption.value,
+    }));
+}
+
   const handleChangeUpiPaymentStatus = (selectedOption) => {
     console.log('handleChangeUpiPaymentStatus',selectedOption);
     setUpiPaymentStatus(selectedOption);
@@ -672,6 +694,7 @@ const ModalReinitiate = ({ data }) => {
 
                   {(data.data.DEVICE_APPLICATION_STATE == "TRUE" || ApplicationDisable == true) ? 
                    <>
+                   <label>Unattended Timmer</label>
                    <Input
                    id="unattended_timmer"
                    name="unattended_timmer"
@@ -682,12 +705,19 @@ const ModalReinitiate = ({ data }) => {
                    disabled
                  />
                    <br />
+                   <label>Application Type</label>
                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" isDisabled/>
                    <br />
+                   <label>Upi Payment Status</label>
                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" isDisabled/>
                    <br />
+                   <label>Select Language</label>
                    <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" isDisabled />
                    <br />
+                   <label>Ams Enable</label> 
+                    <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" />
+                    <br />
+                    <label>Margin Left</label>
                    <Input
                    id="margin_left"
                    name="margin_left"
@@ -698,6 +728,7 @@ const ModalReinitiate = ({ data }) => {
                    disabled
                  />
                  <br />
+                 <label>Margin Right</label>
                  <Input
                    id="margin_right"
                    name="margin_right"
@@ -708,6 +739,7 @@ const ModalReinitiate = ({ data }) => {
                    disabled
                  />
                  <br />
+                 <label>Margin Top</label>
                  <Input
                    id="margin_top"
                    name="margin_top"
@@ -718,6 +750,7 @@ const ModalReinitiate = ({ data }) => {
                    disabled
                  />
                  <br />
+                 <label>Margin Bottom</label>
                  <Input
                    id="margin_bottom"
                    name="margin_bottom"
@@ -733,6 +766,7 @@ const ModalReinitiate = ({ data }) => {
                     <>
                     {policyName && (
                       <>
+                      <label>Unattended Timmer</label>
                       <Input
                       id="unattended_timmer"
                       name="unattended_timmer"
@@ -742,12 +776,19 @@ const ModalReinitiate = ({ data }) => {
                       value={applicationFormData.unattended_timmer}
                     />
                     <br />
+                    <label>Application Type</label>
                     <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
                     <br />
+                    <label>Upi Payment Status</label>
                     <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
                     <br />
+                    <label>Select Language</label>
                     <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
                     <br />
+                    <label>Ams Enable</label> 
+                    <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" />
+                    <br />
+                    <label>Margin Left</label>
                     <Input
                     id="margin_left"
                     name="margin_left"
@@ -757,6 +798,7 @@ const ModalReinitiate = ({ data }) => {
                     value={applicationFormData.margin_left}
                   />
                   <br />
+                  <label>Margin Right</label>
                   <Input
                     id="margin_right"
                     name="margin_right"
@@ -766,6 +808,7 @@ const ModalReinitiate = ({ data }) => {
                     value={applicationFormData.margin_right}
                   />
                   <br />
+                  <label>Margin Top</label>
                   <Input
                     id="margin_top"
                     name="margin_top"
@@ -775,6 +818,7 @@ const ModalReinitiate = ({ data }) => {
                     value={applicationFormData.margin_top}
                   />
                   <br />
+                  <label>Margin Bottom</label>
                   <Input
                     id="margin_bottom"
                     name="margin_bottom"

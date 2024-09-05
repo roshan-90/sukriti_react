@@ -92,7 +92,8 @@ export default function EnrollDevice() {
     margin_left: "",
     margin_right: "",
     margin_top: "",
-    margin_bottom: ""
+    margin_bottom: "",
+    isAmsEnabled: ""
   })
   const [qrImage, setQrImage] = useState(null);
   const [serialNumberEnable, setSerialNumberEnable] = useState(false);
@@ -100,6 +101,7 @@ export default function EnrollDevice() {
   const [qrShare , setQrShare] = useState(null);
   const [nextBtn , setNextBtn] = useState(false);
   const [policyEnabled, setPolicyEnabled] = useState(false)
+  const [amsEnableOptions, setAmsEnableOption] = useState(false);
 
   useEffect(() => {
     setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
@@ -113,8 +115,10 @@ export default function EnrollDevice() {
       margin_left: 0,
       margin_right: 0,
       margin_top: 0,
-      margin_bottom: 0
+      margin_bottom: 0,
+      isAmsEnabled: false
     });
+    setAmsEnableOption({ label: 'False', value: false})
     setSelectedOption(null);
     setSelectedOptionIotDistrict(null)
     setSelectedOptionIotCity(null);
@@ -149,6 +153,11 @@ export default function EnrollDevice() {
   const upiPaymentStatusOption = [
     { label: 'Yes', value: 'Yes' },
     { label: 'No', value: 'No' },
+  ];
+
+  const AmsEnable = [
+    { label: 'True', value: true},
+    { label: 'False', value: false}
   ];
 
   const language = [
@@ -435,6 +444,14 @@ export default function EnrollDevice() {
       ...prevFormData,
       language: selectedOption.value,
     }));
+  }
+
+  const handleChangeAmsField = (selectedOption) => {
+      setAmsEnableOption(selectedOption);
+      setApplicationFormData( prevFormData => ({
+        ...prevFormData,
+        isAmsEnabled: selectedOption.value,
+      }));
   }
 
   const handleChangeUpiPaymentStatus = (selectedOption) => {
@@ -1257,6 +1274,9 @@ export default function EnrollDevice() {
                       <br />
                       <label>Select Language</label>
                       <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                      <br />
+                      <label>Ams Enable</label> 
+                      <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" />
                       <br />
                       <label>Margin Left</label>
                       <Input
