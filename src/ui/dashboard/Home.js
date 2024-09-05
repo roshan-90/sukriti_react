@@ -521,7 +521,7 @@ const Home = ({ isOnline }) => {
       <MessageDialog data={dialogData} />
       {dashboard_data?.data ? (
         <div>
-          <h1>Welcome, {user?.username}!</h1>
+          <h1>Welcome, {user?.user.name}</h1>
           <Summary
             chartData={dashboard_data.data.dashboardChartData}
             bwtChartData={dashboard_data.data.bwtdashboardChartData}

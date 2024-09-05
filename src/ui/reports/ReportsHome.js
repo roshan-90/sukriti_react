@@ -1508,8 +1508,22 @@ const ReportsHome = ({ isOnline }) => {
     );
   };
 
+  const TreeComponent1 = () => {
+    return (
+      <>
+       <ComplexNavigationFullHeight2
+          setComplexSelection={setComplexSelection}
+        />
+      </>
+    )
+  }
+
   const memoizedTreeComponent = useMemo(() => {
     return <TreeComponent />;
+  }, []);
+
+  const memoizedTreeComponent1 = useMemo(() => {
+    return <TreeComponent1 />
   }, []);
 
   const PdfComponent = () => {
@@ -1655,6 +1669,7 @@ const ReportsHome = ({ isOnline }) => {
                   >
                     <h5>Select Complex</h5>
                   </label>
+                  {/* {memoizedTreeComponent1} */}
                   <ComplexNavigationFullHeight2
                     setComplexSelection={setComplexSelection}
                   />
