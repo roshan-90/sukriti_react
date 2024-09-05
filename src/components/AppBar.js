@@ -525,6 +525,7 @@ const AppBar = ({ isOnline }) => {
                 </NavLink>
               </NavItem>
             ) : null}
+              {user?.user?.userRole === "Super Admin" ? (
             <NavItem>
               <NavLink
                 style={navLinkStyle}
@@ -541,6 +542,7 @@ const AppBar = ({ isOnline }) => {
                 Devices Management
               </NavLink>
             </NavItem>
+            ) : null}
           </Nav>
           <span
             style={{
