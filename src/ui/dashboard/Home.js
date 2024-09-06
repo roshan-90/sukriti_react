@@ -61,11 +61,11 @@ const Home = ({ isOnline }) => {
     } else {
       let getuser =  localStorage.getItem('set_user');  
       let dashboard_15 = getLocalStorageItem("dashboard_15");
-      console.log('getuser',getuser);
-      console.log('user?.username', getuser !== user?.username);   
-      console.log('condition change :-> 2',dashboard_15 == undefined);
-      console.log('condition change : -> 3',(getuser !== null && getuser !== user?.username ));
-      console.log('dashboard_15',dashboard_15);
+      // console.log('getuser',getuser);
+      // console.log('user?.username', getuser !== user?.username);   
+      // console.log('condition change :-> 2',dashboard_15 == undefined);
+      // console.log('condition change : -> 3',(getuser !== null && getuser !== user?.username ));
+      // console.log('dashboard_15',dashboard_15);
       if((getuser !== null && getuser !== user?.username ) || dashboard_15 == undefined){
         console.log('1:-->')
         fetchDashboardData(15);
@@ -521,7 +521,7 @@ const Home = ({ isOnline }) => {
       <MessageDialog data={dialogData} />
       {dashboard_data?.data ? (
         <div>
-          <h1>Welcome, {user?.user.name}</h1>
+          <h1>Welcome, {user?.user?.name}</h1>
           <Summary
             chartData={dashboard_data.data.dashboardChartData}
             bwtChartData={dashboard_data.data.bwtdashboardChartData}

@@ -543,14 +543,34 @@ const ReportsHome = ({ isOnline }) => {
   };
 
   const setComplexSelection = async (selectedComplex) => {
-    localStorage.setItem("selection_key", "15 Days");
+    // console.log('setComplex selection clicked',reportParms);
+    // console.log('selection key', localStorage.getItem('selection_key'));
+    let date_duration;
+    switch(true) {
+      case (localStorage.getItem('selection_key') == "15 Days"):
+        date_duration = 15;
+        break;
+      case (localStorage.getItem('selection_key') == "30 Days"):
+        date_duration = 30;
+        break;
+      case (localStorage.getItem('selection_key') == "45 Days"):
+        date_duration = 45;
+        break;
+      case (localStorage.getItem('selection_key') == "60 Days"):
+        date_duration = 60;
+        break;
+      case (localStorage.getItem('selection_key') == "90 Days"):
+        date_duration = 90;
+        break;
+    }
+    localStorage.setItem("selection_key", localStorage.getItem('selection_key'));
     reportParms.complex = selectedComplex.name;
-    reportParms.duration = 15;
+    reportParms.duration = date_duration;
     localStorage.setItem("complex_name", selectedComplex.name);
     setCustomComplexName(selectedComplex.name)
     // if (isOnline == false) {
       let value = localStorage.getItem("report_dashboard");
-      filter_complex(JSON.parse(value), 15);
+      filter_complex(JSON.parse(value), date_duration);
     // } else {
     //   console.log("selecte :->");
     //   fetchDashboardReport([selectedComplex.name]);
@@ -1213,6 +1233,7 @@ const ReportsHome = ({ isOnline }) => {
 
   const YourComponent = () => {
     console.log("YourComponent is rendered",customComplexName);
+    console.log('reportData?.data?.bwtDataSummary',user?.user?.userRole);
     return (
       <>
         {" "}
@@ -1243,7 +1264,7 @@ const ReportsHome = ({ isOnline }) => {
               data={reportData?.data?.dashboardChartData?.usage}
               pieChartData={reportData?.data?.pieChartData?.usage}
             />
-              {reportData?.data?.uiResult?.collection_stats === "true" && (
+              {(user?.user?.userRole == "Super Admin") && (
                 <>
                   <StatsItem
                     className="page-break"
@@ -1260,8 +1281,7 @@ const ReportsHome = ({ isOnline }) => {
                   />
                 </>
               )}
-              {reportData?.data?.uiResult?.bwt_stats === "true" &&
-                  reportData?.data?.bwtDataSummary !== undefined ? (
+              {(user?.user?.userRole == "Super Admin") ? (
                   <BWTStatsItem
                     className="page-break"
                     name="Recycled Water"
@@ -1294,18 +1314,24 @@ const ReportsHome = ({ isOnline }) => {
               <th colSpan="5" scope="colgroup">
                 Usage
               </th>
-              <th colSpan="5" scope="colgroup">
-                Collection
-              </th>
-              <th colSpan="5" scope="colgroup">
-                Upi
-              </th>
+              {(user?.user?.userRole == "Super Admin") && (
+                <>
+                  <th colSpan="5" scope="colgroup">
+                    Collection
+                  </th>
+                  <th colSpan="5" scope="colgroup">
+                    Upi
+                  </th>
+                </>
+              )}
               <th colSpan="5" scope="colgroup">
                 Feedback
               </th>
-              <th colSpan="1" scope="colgroup">
-                Recycled
-              </th>
+              {(user?.user?.userRole == "Super Admin") && (
+                <th colSpan="1" scope="colgroup">
+                  Recycled
+                </th>
+              )}
             </tr>
             <tr></tr>
             <tr>
@@ -1315,22 +1341,28 @@ const ReportsHome = ({ isOnline }) => {
               <th scope="col">FWC</th>
               <th scope="col">PWC</th>
               <th scope="col">MUR</th>
+              {(user?.user?.userRole == "Super Admin") && (
+                <>
+                <th scope="col">All</th>
+                <th scope="col">MWC</th>
+                <th scope="col">FWC</th>
+                <th scope="col">PWC</th>
+                <th scope="col">MUR</th>
+                <th scope="col">All</th>
+                <th scope="col">MWC</th>
+                <th scope="col">FWC</th>
+                <th scope="col">PWC</th>
+                <th scope="col">MUR</th>
+                </>
+              )}
               <th scope="col">All</th>
               <th scope="col">MWC</th>
               <th scope="col">FWC</th>
               <th scope="col">PWC</th>
               <th scope="col">MUR</th>
-              <th scope="col">All</th>
-              <th scope="col">MWC</th>
-              <th scope="col">FWC</th>
-              <th scope="col">PWC</th>
-              <th scope="col">MUR</th>
-              <th scope="col">All</th>
-              <th scope="col">MWC</th>
-              <th scope="col">FWC</th>
-              <th scope="col">PWC</th>
-              <th scope="col">MUR</th>
-              <th scope="col">BWT</th>
+              {(user?.user?.userRole == "Super Admin") && (
+                <th scope="col">BWT</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -1347,6 +1379,9 @@ const ReportsHome = ({ isOnline }) => {
                     <td>{usage.fwc}</td>
                     <td>{usage.pwc}</td>
                     <td>{usage.mur}</td>
+                    {(user?.user?.userRole == "Super Admin") && (
+                      <>
+                      
                     <td>
                       {
                         reportData?.data?.dashboardChartData.collection[index]
@@ -1412,6 +1447,8 @@ const ReportsHome = ({ isOnline }) => {
                         ].mur
                       }
                     </td>
+                      </>
+                    )}
                     <td>
                       {typeof reportData?.data?.dashboardChartData.feedback[
                         index
@@ -1472,7 +1509,9 @@ const ReportsHome = ({ isOnline }) => {
                               .mur
                           ).toFixed(0)}
                     </td>
-                    <td>NA</td>
+                    {(user?.user?.userRole == "Super Admin") && (
+                      <td>NA</td>
+                    )}
                   </tr>
                   {shouldBreakPage && (
                     <tr
