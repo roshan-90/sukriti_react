@@ -22,6 +22,7 @@ import { updateSelectedComplex } from "../../features/complesStoreSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import './ComplexNavigationCompact.css';
 
 const ComplexNavigationCompact = (props) => {
   const selectionSummary = useRef();
@@ -164,7 +165,7 @@ const ComplexNavigationCompact = (props) => {
         </div>
       )}
       <MessageDialog data={dialogData} />
-      <div className="row" style={{ background: "white", padding: "5px", width: "143%"}}>
+      <div className="row complex-navigationCompactTree" style={{ background: "white", padding: "5px"}}>
         <Header />
         {memoizedTreeComponent}
       </div>

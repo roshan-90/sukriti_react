@@ -1,0 +1,9 @@
+.complex-navigationCompactTree {
+  width: 140%; /* Default width */
+}
+
+@media (min-width: 1920px) {
+  .complex-navigationCompactTree {
+    width: 120%; /* Set width to 125% for screens that are at least 1920px wide */
+  }
+}
