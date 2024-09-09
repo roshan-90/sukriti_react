@@ -1015,14 +1015,14 @@ const PdfGenerate = ({
                       )}
                       {bwtStats && <td>NA</td>}
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <th scope="row">BWT</th>
                       {usageStats && <td>0</td>}
                       {collectionStats && <td>0</td>}
                       {upiStats && <td>0</td>}
                       {feedbackStats && <td>0.0</td>}
                       {bwtStats && <td>0</td>}
-                    </tr>
+                    </tr> */}
                     <tr></tr>
                   </tbody>
                 </table>
@@ -1493,14 +1493,14 @@ const PdfGenerate = ({
                         )}
                         {bwtStats && <td>NA</td>}
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <th scope="row">BWT</th>
                         {usageStats && <td>0</td>}
                         {collectionStats && <td>0</td>}
                         {upiStats && <td>0</td>}
                         {feedbackStats && <td>0.0</td>}
                         {bwtStats && <td>0</td>}
-                      </tr>
+                      </tr> */}
                       <tr></tr>
                     </tbody>
                   </table>

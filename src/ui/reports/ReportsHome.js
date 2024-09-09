@@ -1708,10 +1708,7 @@ const ReportsHome = ({ isOnline }) => {
                   >
                     <h5>Select Complex</h5>
                   </label>
-                  {/* {memoizedTreeComponent1} */}
-                  <ComplexNavigationFullHeight2
-                    setComplexSelection={setComplexSelection}
-                  />
+                  {memoizedTreeComponent1}
                 </div>
                 <div
                   className="scheduleReport"
