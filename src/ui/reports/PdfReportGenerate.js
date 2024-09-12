@@ -388,46 +388,74 @@ const PdfGenerate = ({
     upiCollection: 0,
     usage: 0,
   };
-  const filterDashboadData = (data, key) => {
-    for (let i = 0; i < data.length; i++) {
-      // console.log(" filter dashboard data", data[i]);
-      // console.log("key--->", key);
-      // console.log(
-      //   "filter dashboard data 22",
-      //   summaryPayload.dashboardChartData[key]
-      // );
-      // Find the object with the same date
-      let existingItem = summaryPayload.dashboardChartData[key].find(
-        (item) => item.date === data[i].date
-      );
 
-      if (key == "feedback") {
-        // If the date is present, update its 'all' value
-        if (existingItem) {
-          existingItem.all += Number(data[i].all);
-          existingItem.mwc += Number(data[i].mwc);
-          existingItem.fwc += Number(data[i].fwc);
-          existingItem.pwc += Number(data[i].pwc);
-          existingItem.mur += Number(data[i].mur);
-        } else {
-          // If the date is not present, push the new object
-          summaryPayload.dashboardChartData[key].push(data[i]);
-        }
-      } else {
-        // If the date is present, update its 'all' value
-        if (existingItem) {
-          existingItem.all += Number(data[i].all);
-          existingItem.mwc += Number(data[i].mwc);
-          existingItem.fwc += Number(data[i].fwc);
-          existingItem.pwc += Number(data[i].pwc);
-          existingItem.mur += Number(data[i].mur);
-        } else {
-          // If the date is not present, push the new object
-          summaryPayload.dashboardChartData[key].push(data[i]);
-        }
-      }
-    }
-  };
+
+  // const filterDashboadData = async (data, key, summary_dashboard) => { 
+  //   for (let i = 0; i < data.length; i++) {
+  //     console.log(" filter dashboard data", data[i]);
+  //     console.log("key--->", key);
+  //     console.log(
+  //       "filter dashboard data 22",
+  //       summary_dashboard[key]
+  //     );
+  //     // Find the object with the same date
+  //       // Find the object with the same date
+  //   let existingItemIndex = summary_dashboard[key].findIndex(
+  //     (item) => item.date === data[i].date
+  //   );
+    
+  //   let existingItem = summary_dashboard[key][existingItemIndex];
+
+  //     console.log('before existingItem',existingItem);
+  //     if (key == "feedback") {
+  //       // If the date is present, update its 'all' value
+  //       if (existingItem) {
+  //         // existingItem.all += Number(data[i].all);
+  //         // existingItem.mwc += Number(data[i].mwc);
+  //         // existingItem.fwc += Number(data[i].fwc);
+  //         // existingItem.pwc += Number(data[i].pwc);
+  //         // existingItem.mur += Number(data[i].mur);
+  //       } else {
+  //         // If the date is not present, push the new object
+  //         summary_dashboard[key].push(data[i]);
+  //       }
+  //     } else {
+  //       // If the date is present, update its 'all' value
+  //       if (existingItem) {
+  //         console.log("Existing item found before update:", existingItem);
+    
+  //         // Update the values
+  //         const updatedItem = {
+  //           ...existingItem,
+  //           all: Number(existingItem.all || 0) + Number(data[i].all || 0),
+  //           mwc: Number(existingItem.mwc || 0) + Number(data[i].mwc || 0),
+  //           fwc: Number(existingItem.fwc || 0) + Number(data[i].fwc || 0),
+  //           pwc: Number(existingItem.pwc || 0) + Number(data[i].pwc || 0),
+  //           mur: Number(existingItem.mur || 0) + Number(data[i].mur || 0),
+  //         };
+    
+  //         // Replace the existing item with the updated one
+  //         summary_dashboard[key][existingItemIndex] = updatedItem;
+    
+  //         console.log("Updated item:", updatedItem);
+  //       } else {
+  //         console.log("No existing item found, pushing new data:", data[i]);
+          
+  //         // If the date is not present, push the new object
+  //         summary_dashboard[key].push({
+  //           ...data[i],
+  //           all: Number(data[i].all || 0),
+  //           mwc: Number(data[i].mwc || 0),
+  //           fwc: Number(data[i].fwc || 0),
+  //           pwc: Number(data[i].pwc || 0),
+  //           mur: Number(data[i].mur || 0)
+  //         });
+  //       }
+    
+  //     }
+  //     console.log("Updated summary_dashboard:", summary_dashboard);
+  //   }
+  // };
 
   const createSummaryFunction = async (data) => {
     const summaryFunction = (key, data) => {
@@ -529,21 +557,25 @@ const PdfGenerate = ({
     Object.keys(data?.data?.dashboardChartData).forEach((key) => {
       // Filter data based on date range for each key
       // console.log("createSummaryFunction key", key);
-      filteredData[key] = filterByDateRange(
-        data.data.dashboardChartData[key],
-        startDateString,
-        endDateString
-      );
+      // filteredData[key] = filterByDateRange(
+      //   data.data.dashboardChartData[key],
+      //   startDateString,
+      //   endDateString
+      // );
 
       // console.log("createSummaryFunction filteredData", filteredData[key]);
-      filterDashboadData(filteredData[key], key);
-      summaryFunction(key, filteredData[key]);
+      summaryFunction(key, data?.data?.dashboardChartData[key]);
+      // await filterDashboadData(data?.data?.dashboardChartData[key], key);
     });
 
     // console.log("summaryPayload", summaryPayload);
-    Object.assign(data?.data?.dashboardChartData, filteredData);
-    dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
+    // Object.assign(data?.data?.dashboardChartData, filteredData);
     console.log("feedback_summary", feedback_summary);
+    console.log('dataSummary check',dataSummary);
+    console.log('feedback check', dataSummary.feedback);
+    console.log('dataSummary.count',totalCount);
+    dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(0);
+    console.log('after dataSummary',dataSummary);
     if (feedback_summary[0].value !== 0) {
       feedback_summary[0].value = parseInt(
         Number(feedback_summary[0].value / totalCount).toFixed(0)
@@ -564,6 +596,7 @@ const PdfGenerate = ({
         Number(feedback_summary[3].value / totalCount).toFixed(0)
       );
     }
+
     console.log("data?.data.dataSummary :->2", dataSummary);
     // Object.assign(data?.data.dataSummary, {
     //   collection: dataSummary.collection,
@@ -579,6 +612,12 @@ const PdfGenerate = ({
     //   usage: usage_summary,
     // });
   };
+
+  // const createSummaryDashboardStructure = async (data,summary_dashboard) => {
+  //   Object.keys(data?.data?.dashboardChartData).forEach(async (key) => {
+  //     await filterDashboadData(data?.data?.dashboardChartData[key], key,summary_dashboard);
+  //   });
+  // }
 
   const StatsItem = (props) => {
     let pageBreakClass;
@@ -797,6 +836,101 @@ const PdfGenerate = ({
     );
   };
 
+ // Separate variables for each key
+let usage = [];
+let feedback = [];
+let collection = [];
+let upiCollection = [];
+
+const filterDashboadData = async (data, key, summaryVariable) => {
+  for (let i = 0; i < data.length; i++) {
+    let currentItem = data[i];
+
+    console.log(`Processing item in ${key}:`, currentItem);
+
+    // Find the object with the same date
+    let existingItemIndex = summaryVariable.findIndex(
+      (item) => item.date === currentItem.date
+    );
+
+    let existingItem = summaryVariable[existingItemIndex];
+
+    if (key === "feedback") {
+      if (existingItem) {
+        console.log("Feedback item already exists, skipping.");
+      } else {
+        console.log("Pushing new feedback data:", currentItem);
+        summaryVariable.push(currentItem);
+      }
+    } else {
+      if (existingItem) {
+        console.log("Existing item found, updating:", existingItem);
+
+        summaryVariable[existingItemIndex] = {
+          ...existingItem,
+          all: Number(existingItem.all) + Number(currentItem.all),
+          mwc: Number(existingItem.mwc) + Number(currentItem.mwc),
+          fwc: Number(existingItem.fwc) + Number(currentItem.fwc),
+          pwc: Number(existingItem.pwc) + Number(currentItem.pwc),
+          mur: Number(existingItem.mur) + Number(currentItem.mur),
+        };
+
+        console.log("Updated item:", summaryVariable[existingItemIndex]);
+      } else {
+        console.log("No existing item found, pushing new data:", currentItem);
+
+        summaryVariable.push({
+          ...currentItem,
+          all: Number(currentItem.all),
+          mwc: Number(currentItem.mwc),
+          fwc: Number(currentItem.fwc),
+          pwc: Number(currentItem.pwc),
+          mur: Number(currentItem.mur),
+        });
+      }
+    }
+
+    // Log updated summary after each iteration
+    console.log(`Updated ${key} summary:`, summaryVariable);
+  }
+};
+
+// Process report data using separate variables
+const processReportData = async (reportData) => {
+  for (const data of reportData) {
+    await createSummaryDashboardStructure(data);
+  }
+};
+
+const createSummaryDashboardStructure = async (data) => {
+  for (const key of Object.keys(data?.data?.dashboardChartData)) {
+    let summaryVariable;
+
+    // Map the key to the correct summary variable
+    switch (key) {
+      case "usage":
+        summaryVariable = usage;
+        break;
+      case "feedback":
+        summaryVariable = feedback;
+        break;
+      case "collection":
+        summaryVariable = collection;
+        break;
+      case "upiCollection":
+        summaryVariable = upiCollection;
+        break;
+      default:
+        summaryVariable = [];
+        break;
+    }
+
+    await filterDashboadData(data?.data?.dashboardChartData[key], key, summaryVariable);
+    console.log(`Check after processing ${key}:`, summaryVariable);
+  }
+};
+
+
   if (hasdata) {
     console.log("hasdata", hasdata);
     console.log("reportData", reportData);
@@ -806,6 +940,27 @@ const PdfGenerate = ({
     summaryPayload.bwtdataSummary = reportData[0].data.bwtdataSummary;
     summaryPayload.complexName = "Data Report for all complex";
     summaryPayload.bwtpieChartData = reportData[0].data.bwtpieChartData;
+    console.log('latesttest', reportData);
+
+    reportData.forEach(async (data) => {
+      await createSummaryFunction(data);
+    });
+    
+      // Execute the async operation and log the final summary_dashboard
+      
+      // (async () => {
+      //   await processReportData(reportData);
+      // })();
+
+      console.log("Final usage summary:", usage);
+      console.log("Final feedback summary:", feedback);
+      console.log("Final collection summary:", collection);
+      console.log("Final upiCollection summary:", upiCollection);
+    // reportData.forEach(async (data) => {
+    //   await createSummaryDashboardStructure(data,summary_dashboard);
+    // });
+    console.log("data?.data.dataSummary :->23", dataSummary);
+
     summaryPayload.dashboardChartData = {
       usage: [],
       feedback: [],
@@ -813,10 +968,6 @@ const PdfGenerate = ({
       upiCollection: [],
     };
 
-    reportData.forEach(async (data) => {
-      await createSummaryFunction(data);
-    });
-    console.log("data?.data.dataSummary :->23", dataSummary);
     summaryPayload.dataSummary = {
       collection: dataSummary.collection,
       feedback: "5.0",

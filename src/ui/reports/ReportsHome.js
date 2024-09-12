@@ -809,7 +809,6 @@ const ReportsHome = ({ isOnline }) => {
       //   });
       //   return;
       // }
-
       if (
         !usageStats &&
         !collectionStats &&
