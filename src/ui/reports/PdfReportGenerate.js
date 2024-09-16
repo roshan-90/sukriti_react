@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "reactstrap";
 import { colorTheme, statsStyle } from "../../jsStyles/Style";
 import { whiteSurface } from "../../jsStyles/Style";
@@ -20,7 +20,7 @@ import ReportCover from './ReportCover';
 
 const PdfGenerate = ({
   StartDate,
-  EndDate,
+  EndDate ,
   usageStats,
   collectionStats,
   upiStats,
@@ -36,7 +36,7 @@ const PdfGenerate = ({
   const [hasdata, setHasdata] = useState(0);
   const navigate = useNavigate();
   const [loadingPdf, setLoadingPdf] = useState(false);
-
+  const [summaryUssagePayload, setSummaryUssagePayload] = useState(null);
   let summaryPayload = {};
   console.log("check report generated", {
     StartDate,
@@ -314,7 +314,7 @@ const PdfGenerate = ({
     // console.log("data totalCount", totalCount);
   };
 
-  const filter_complex = (all_report_data, name) => {
+  const filter_complex = async (all_report_data, name) => {
     // console.log("all_report_data :-->", all_report_data);
     let shouldContinue = true;
     // console.log("name :--> ", name);
@@ -322,13 +322,13 @@ const PdfGenerate = ({
       const response = all_report_data[i];
       for (let j = 0; j < response.length; j++) {
         const obj = response[j];
-        console.log("obj :->", obj);
+        // console.log("obj :->", obj);
         // Check if the object has the property 'complexName'
         if (shouldContinue && obj.hasOwnProperty("complexName")) {
           // Print or store the name
           if (obj.complexName === name) {
             console.log(obj.complexName);
-            // console.log("object data", obj);
+            console.log("object data", obj);
             filter_date(obj);
             // dispatch(setReportData(obj));
             // Update the flag to stop further iterations
@@ -345,18 +345,28 @@ const PdfGenerate = ({
     }
   };
 
-  let array = JSON.parse(localStorage.getItem("array_data"));
-  // let array = ["REGISTRY_OFFICE_MSCL"];
-  console.log("test props data");
+  const filterComplexData = async (value, array) => {
+    for (const name of array) {
+      await filter_complex(JSON.parse(value), name);
+    }
+  };
+  
+
   useEffect(() => {
-    let value = localStorage.getItem("report_dashboard");
-    console.log("check dashboard data", JSON.parse(value));
-    array.forEach((name) => {
-      filter_complex(JSON.parse(value), name);
-    });
+      let value = localStorage.getItem("report_dashboard");
+      console.log("check dashboard data", JSON.parse(value));
+      let array = JSON.parse(localStorage.getItem("array_data"));
+        // let array = ["REGISTRY_OFFICE_MSCL"];
+      console.log('checking array value', array);
+      filterComplexData(value, array);
+    // array.forEach((name) => {
+    //   filter_complex(JSON.parse(value), name);
+    // });
     setHasdata(1);
   }, []);
-
+  
+  console.log("test props data");
+  console.log('reportData check value', reportData);
   let totalCount = 0;
   let usage_summary = [
     { name: "MWC", value: 0 },
@@ -389,73 +399,6 @@ const PdfGenerate = ({
     usage: 0,
   };
 
-
-  // const filterDashboadData = async (data, key, summary_dashboard) => { 
-  //   for (let i = 0; i < data.length; i++) {
-  //     console.log(" filter dashboard data", data[i]);
-  //     console.log("key--->", key);
-  //     console.log(
-  //       "filter dashboard data 22",
-  //       summary_dashboard[key]
-  //     );
-  //     // Find the object with the same date
-  //       // Find the object with the same date
-  //   let existingItemIndex = summary_dashboard[key].findIndex(
-  //     (item) => item.date === data[i].date
-  //   );
-    
-  //   let existingItem = summary_dashboard[key][existingItemIndex];
-
-  //     console.log('before existingItem',existingItem);
-  //     if (key == "feedback") {
-  //       // If the date is present, update its 'all' value
-  //       if (existingItem) {
-  //         // existingItem.all += Number(data[i].all);
-  //         // existingItem.mwc += Number(data[i].mwc);
-  //         // existingItem.fwc += Number(data[i].fwc);
-  //         // existingItem.pwc += Number(data[i].pwc);
-  //         // existingItem.mur += Number(data[i].mur);
-  //       } else {
-  //         // If the date is not present, push the new object
-  //         summary_dashboard[key].push(data[i]);
-  //       }
-  //     } else {
-  //       // If the date is present, update its 'all' value
-  //       if (existingItem) {
-  //         console.log("Existing item found before update:", existingItem);
-    
-  //         // Update the values
-  //         const updatedItem = {
-  //           ...existingItem,
-  //           all: Number(existingItem.all || 0) + Number(data[i].all || 0),
-  //           mwc: Number(existingItem.mwc || 0) + Number(data[i].mwc || 0),
-  //           fwc: Number(existingItem.fwc || 0) + Number(data[i].fwc || 0),
-  //           pwc: Number(existingItem.pwc || 0) + Number(data[i].pwc || 0),
-  //           mur: Number(existingItem.mur || 0) + Number(data[i].mur || 0),
-  //         };
-    
-  //         // Replace the existing item with the updated one
-  //         summary_dashboard[key][existingItemIndex] = updatedItem;
-    
-  //         console.log("Updated item:", updatedItem);
-  //       } else {
-  //         console.log("No existing item found, pushing new data:", data[i]);
-          
-  //         // If the date is not present, push the new object
-  //         summary_dashboard[key].push({
-  //           ...data[i],
-  //           all: Number(data[i].all || 0),
-  //           mwc: Number(data[i].mwc || 0),
-  //           fwc: Number(data[i].fwc || 0),
-  //           pwc: Number(data[i].pwc || 0),
-  //           mur: Number(data[i].mur || 0)
-  //         });
-  //       }
-    
-  //     }
-  //     console.log("Updated summary_dashboard:", summary_dashboard);
-  //   }
-  // };
 
   const createSummaryFunction = async (data) => {
     const summaryFunction = (key, data) => {
@@ -612,12 +555,6 @@ const PdfGenerate = ({
     //   usage: usage_summary,
     // });
   };
-
-  // const createSummaryDashboardStructure = async (data,summary_dashboard) => {
-  //   Object.keys(data?.data?.dashboardChartData).forEach(async (key) => {
-  //     await filterDashboadData(data?.data?.dashboardChartData[key], key,summary_dashboard);
-  //   });
-  // }
 
   const StatsItem = (props) => {
     let pageBreakClass;
@@ -836,138 +773,34 @@ const PdfGenerate = ({
     );
   };
 
- // Separate variables for each key
-let usage = [];
-let feedback = [];
-let collection = [];
-let upiCollection = [];
 
-const filterDashboadData = async (data, key, summaryVariable) => {
-  for (let i = 0; i < data.length; i++) {
-    let currentItem = data[i];
 
-    console.log(`Processing item in ${key}:`, currentItem);
-
-    // Find the object with the same date
-    let existingItemIndex = summaryVariable.findIndex(
-      (item) => item.date === currentItem.date
-    );
-
-    let existingItem = summaryVariable[existingItemIndex];
-
-    if (key === "feedback") {
-      if (existingItem) {
-        console.log("Feedback item already exists, skipping.");
-      } else {
-        console.log("Pushing new feedback data:", currentItem);
-        summaryVariable.push(currentItem);
-      }
-    } else {
-      if (existingItem) {
-        console.log("Existing item found, updating:", existingItem);
-
-        summaryVariable[existingItemIndex] = {
-          ...existingItem,
-          all: Number(existingItem.all) + Number(currentItem.all),
-          mwc: Number(existingItem.mwc) + Number(currentItem.mwc),
-          fwc: Number(existingItem.fwc) + Number(currentItem.fwc),
-          pwc: Number(existingItem.pwc) + Number(currentItem.pwc),
-          mur: Number(existingItem.mur) + Number(currentItem.mur),
-        };
-
-        console.log("Updated item:", summaryVariable[existingItemIndex]);
-      } else {
-        console.log("No existing item found, pushing new data:", currentItem);
-
-        summaryVariable.push({
-          ...currentItem,
-          all: Number(currentItem.all),
-          mwc: Number(currentItem.mwc),
-          fwc: Number(currentItem.fwc),
-          pwc: Number(currentItem.pwc),
-          mur: Number(currentItem.mur),
-        });
-      }
-    }
-
-    // Log updated summary after each iteration
-    console.log(`Updated ${key} summary:`, summaryVariable);
-  }
-};
-
-// Process report data using separate variables
-const processReportData = async (reportData) => {
+const CreateSummaryData = async (reportData) => {
   for (const data of reportData) {
-    await createSummaryDashboardStructure(data);
+    await createSummaryFunction(data);
   }
 };
 
-const createSummaryDashboardStructure = async (data) => {
-  for (const key of Object.keys(data?.data?.dashboardChartData)) {
-    let summaryVariable;
+// reportData.forEach(async (data) => {
+//   await createSummaryFunction(data);
+// });
 
-    // Map the key to the correct summary variable
-    switch (key) {
-      case "usage":
-        summaryVariable = usage;
-        break;
-      case "feedback":
-        summaryVariable = feedback;
-        break;
-      case "collection":
-        summaryVariable = collection;
-        break;
-      case "upiCollection":
-        summaryVariable = upiCollection;
-        break;
-      default:
-        summaryVariable = [];
-        break;
-    }
+  // Execute the async operation and log the final summary_dashboard
+  
+  // (async () => {
+  //   await processReportData(reportData);
+  //   console.log('starting first only');
+  // })();
+  console.log('starting second  only');
 
-    await filterDashboadData(data?.data?.dashboardChartData[key], key, summaryVariable);
-    console.log(`Check after processing ${key}:`, summaryVariable);
-  }
-};
-
-
-  if (hasdata) {
-    console.log("hasdata", hasdata);
-    console.log("reportData", reportData);
+  const OfflineSummaryComponent = (summaryUssagePayload) => {
     summaryPayload.bwtAvalibility = reportData[0].data.bwtAvalibility;
     summaryPayload.bwtdashboardChartData =
       reportData[0].data.bwtdashboardChartData;
     summaryPayload.bwtdataSummary = reportData[0].data.bwtdataSummary;
     summaryPayload.complexName = "Data Report for all complex";
     summaryPayload.bwtpieChartData = reportData[0].data.bwtpieChartData;
-    console.log('latesttest', reportData);
-
-    reportData.forEach(async (data) => {
-      await createSummaryFunction(data);
-    });
-    
-      // Execute the async operation and log the final summary_dashboard
-      
-      // (async () => {
-      //   await processReportData(reportData);
-      // })();
-
-      console.log("Final usage summary:", usage);
-      console.log("Final feedback summary:", feedback);
-      console.log("Final collection summary:", collection);
-      console.log("Final upiCollection summary:", upiCollection);
-    // reportData.forEach(async (data) => {
-    //   await createSummaryDashboardStructure(data,summary_dashboard);
-    // });
-    console.log("data?.data.dataSummary :->23", dataSummary);
-
-    summaryPayload.dashboardChartData = {
-      usage: [],
-      feedback: [],
-      collection: [],
-      upiCollection: [],
-    };
-
+    summaryPayload.dashboardChartData = summaryUssagePayload.summaryUssagePayload;
     summaryPayload.dataSummary = {
       collection: dataSummary.collection,
       feedback: "5.0",
@@ -981,62 +814,11 @@ const createSummaryDashboardStructure = async (data) => {
       upiCollection: upiCollection_summary,
     };
 
-    dataSummary = {
-      collection: 0,
-      feedback: 0,
-      upiCollection: 0,
-      usage: 0,
-    };
-    usage_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    collection_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    upiCollection_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    feedback_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    console.log("summaryPayload test", summaryPayload);
-    // Assuming you want to render each item in the reportData array horizontally
+    console.log("after summaryPayload test", summaryPayload);
+    console.log('summaryUssagePayload :->', summaryUssagePayload.summaryUssagePayload);
     return (
       <>
-        {loadingPdf == false && (
-          <div
-          style={{
-            ...whiteSurface,
-            background: "white",
-            marginTop: "20px",
-            width: "100%",
-            height: "100%",
-            padding: "10px",
-            paddingBottom: "20px",
-            overflowX: "auto", // Enable horizontal scrolling
-            fontSize: "10px",
-          }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column", // Stack tables vertically
-              }}
-              id="pdf-generate-content"
-            >
-              <div>
+          <div>
                   <ReportCover StartDate={StartDate} EndDate={EndDate} />
                   <br/>
               </div>
@@ -1086,10 +868,13 @@ const createSummaryDashboardStructure = async (data) => {
                         </td>
                       )}
                       {feedbackStats && (
+                        // <td>
+                        //   {Number(
+                        //     summaryPayload?.pieChartData?.feedback[0].value
+                        //   ).toFixed(1)}
+                        // </td>
                         <td>
-                          {Number(
-                            summaryPayload?.pieChartData?.feedback[0].value
-                          ).toFixed(1)}
+                          {'5.0'}
                         </td>
                       )}
                       {bwtStats && <td>NA</td>}
@@ -1166,14 +951,6 @@ const createSummaryDashboardStructure = async (data) => {
                       )}
                       {bwtStats && <td>NA</td>}
                     </tr>
-                    {/* <tr>
-                      <th scope="row">BWT</th>
-                      {usageStats && <td>0</td>}
-                      {collectionStats && <td>0</td>}
-                      {upiStats && <td>0</td>}
-                      {feedbackStats && <td>0.0</td>}
-                      {bwtStats && <td>0</td>}
-                    </tr> */}
                     <tr></tr>
                   </tbody>
                 </table>
@@ -1345,8 +1122,10 @@ const createSummaryDashboardStructure = async (data) => {
                       <tr></tr>
                     </thead>
                     <tbody>
-                      {summaryPayload?.dashboardChartData.usage.map(
+                      {summaryPayload.dashboardChartData.usage.map(
                         (usage, index) => {
+                          console.log('index :->', index)
+                          console.log('usage :->', usage)
                           const rowCount = index + 1; // Adding 1 to start the count from 1
                           const shouldBreakPage =
                             rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
@@ -1354,7 +1133,7 @@ const createSummaryDashboardStructure = async (data) => {
                           return (
                             <React.Fragment key={index}>
                               <tr key={index}>
-                                <td style={{ "font-weight": "bold" }}>
+                                <td style={{ "fontWeight": "bold" }}>
                                   {usage.date}
                                 </td>
                                 {usageStats && <td>{usage.all}</td>}
@@ -1366,7 +1145,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .collection[index].all
+                                        .collection[index]?.all ?? 0
                                     }
                                   </td>
                                 )}
@@ -1374,7 +1153,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .collection[index].mwc
+                                        .collection[index]?.mwc ?? 0
                                     }
                                   </td>
                                 )}
@@ -1382,7 +1161,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .collection[index].fwc
+                                        .collection[index]?.fwc ?? 0
                                     }
                                   </td>
                                 )}
@@ -1390,7 +1169,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .collection[index].pwc
+                                        .collection[index]?.pwc ?? 0
                                     }
                                   </td>
                                 )}
@@ -1398,7 +1177,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .collection[index].mur
+                                        .collection[index]?.mur ?? 0
                                     }
                                   </td>
                                 )}
@@ -1406,7 +1185,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .upiCollection[index].all
+                                        .upiCollection[index]?.all ?? 0
                                     }
                                   </td>
                                 )}
@@ -1414,7 +1193,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .upiCollection[index].mwc
+                                        .upiCollection[index]?.mwc ?? 0
                                     }
                                   </td>
                                 )}
@@ -1422,7 +1201,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .upiCollection[index].fwc
+                                        .upiCollection[index]?.fwc ?? 0
                                     }
                                   </td>
                                 )}
@@ -1430,7 +1209,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .upiCollection[index].pwc
+                                        .upiCollection[index]?.pwc ?? 0
                                     }
                                   </td>
                                 )}
@@ -1438,7 +1217,7 @@ const createSummaryDashboardStructure = async (data) => {
                                   <td>
                                     {
                                       summaryPayload?.dashboardChartData
-                                        .upiCollection[index].mur
+                                        .upiCollection[index]?.mur ?? 0
                                     }
                                   </td>
                                 )}
@@ -1512,516 +1291,710 @@ const createSummaryDashboardStructure = async (data) => {
                   </table>
                 </div>
               </div>
-              {reportData.map((data, index) => (
-                <div
-                  key={index}
-                  style={{ marginBottom: "20px" }}
-                  className="pdf-section"
-                >
-                  <div
-                    className="row"
-                    style={{
-                      ...statsStyle.elementTitle,
-                      width: "98%",
-                      margin: "auto",
-                      padding: "10px",
-                      background: colorTheme.primary,
-                    }}
-                  >
-                    {`Data Report for complex : ${data?.data?.complexName}`}
-                  </div>
-                  <table
-                    style={{ width: "95%", height: "95%", margin: "30px" }}
-                    className="table table-bordered"
-                    key={index}
-                  >
-                    <thead>
-                      <tr></tr>
-                      <tr>
-                        <th scope="col">Cabin</th>
-                        {usageStats && <th scope="col">Usage</th>}
-                        {collectionStats && <th scope="col">Collection</th>}
-                        {upiStats && <th scope="col">UPI</th>}
-                        {feedbackStats && <th scope="col">Feedback</th>}
-                        {bwtStats && <th scope="col">Recycled</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr></tr>
-                      <tr>
-                        <th scope="row">MWC</th>
-                        {usageStats && (
-                          <td>{data?.data?.pieChartData?.usage[0].value}</td>
-                        )}
-                        {collectionStats && (
-                          <td>
-                            {data?.data?.pieChartData?.collection[0].value}
-                          </td>
-                        )}
-                        {upiStats && (
-                          <td>
-                            {data?.data?.pieChartData?.upiCollection[0].value}
-                          </td>
-                        )}
-                        {feedbackStats && (
-                          <td>
-                            {Number(
-                              data?.data?.pieChartData?.feedback[0].value
-                            ).toFixed(1)}
-                          </td>
-                        )}
-                        {bwtStats && <td>NA</td>}
-                      </tr>
-                      <tr>
-                        <th scope="row">FWC</th>
-                        {usageStats && (
-                          <td>{data?.data?.pieChartData?.usage[1].value}</td>
-                        )}
-                        {collectionStats && (
-                          <td>
-                            {data?.data?.pieChartData?.collection[1].value}
-                          </td>
-                        )}
-                        {upiStats && (
-                          <td>
-                            {data?.data?.pieChartData?.upiCollection[1].value}
-                          </td>
-                        )}
-                        {feedbackStats && (
-                          <td>
-                            {Number(
-                              data?.data?.pieChartData?.feedback[1].value
-                            ).toFixed(1)}
-                          </td>
-                        )}
-                        {bwtStats && <td>NA</td>}
-                      </tr>
-                      <tr>
-                        <th scope="row">PWC</th>
-                        {usageStats && (
-                          <td>{data?.data?.pieChartData?.usage[2].value}</td>
-                        )}
-                        {collectionStats && (
-                          <td>
-                            {data?.data?.pieChartData?.collection[2].value}
-                          </td>
-                        )}
-                        {upiStats && (
-                          <td>
-                            {data?.data?.pieChartData?.upiCollection[2].value}
-                          </td>
-                        )}
-                        {feedbackStats && (
-                          <td>
-                            {Number(
-                              data?.data?.pieChartData?.feedback[2].value
-                            ).toFixed(1)}
-                          </td>
-                        )}
-                        {bwtStats && <td>NA</td>}
-                      </tr>
-                      <tr>
-                        <th scope="row">MUR</th>
-                        {usageStats && (
-                          <td>{data?.data?.pieChartData?.usage[3].value}</td>
-                        )}
-                        {collectionStats && (
-                          <td>
-                            {data?.data?.pieChartData?.collection[3].value}
-                          </td>
-                        )}
-                        {upiStats && (
-                          <td>
-                            {data?.data?.pieChartData?.upiCollection[3].value}
-                          </td>
-                        )}
-                        {feedbackStats && (
-                          <td>
-                            {Number(
-                              data?.data?.pieChartData?.feedback[3].value
-                            ).toFixed(1)}
-                          </td>
-                        )}
-                        {bwtStats && <td>NA</td>}
-                      </tr>
-                      {/* <tr>
-                        <th scope="row">BWT</th>
-                        {usageStats && <td>0</td>}
-                        {collectionStats && <td>0</td>}
-                        {upiStats && <td>0</td>}
-                        {feedbackStats && <td>0.0</td>}
-                        {bwtStats && <td>0</td>}
-                      </tr> */}
-                      <tr></tr>
-                    </tbody>
-                  </table>
-                  <table
-                    style={{ width: "95%", height: "95%", margin: "30px" }}
-                  >
-                    <tbody>
-                      <tr>
-                        <td style={{ width: "80%" }}>
-                          <div style={{ width: "100" }}>
-                            {/* <Stats
-                            isDuration={false}
-                            chartData={data?.data?.dashboardChartData}
-                            pieChartData={data?.data?.pieChartData}
-                            dataSummary={data?.data?.dataSummary}
-                            bwtChartData={data?.data?.bwtdashboardChartData}
-                            bwtPieChartData={data?.data?.bwtpieChartData}
-                            bwtDataSummary={data?.data?.bwtdataSummary}
-                            dashboardUpiChartData={
-                              data?.data?.dashboardUpiChartData
-                            }
-                            pieChartUpiData={data?.data?.pieChartUpiData}
-                            uiResult={dashboard_data?.uiResult?.data}
-                          /> */}
-                              {/* {usageStats && <div  className="page-break" ></div> } */}
-                            {usageStats && (
-                              <StatsItem
-                                className="page-break"
-                                name="Usage Stats"
-                                total={data?.data?.dataSummary?.usage}
-                                data={data?.data?.dashboardChartData?.usage}
-                                pieChartData={data?.data?.pieChartData?.usage}
-                              />
-                            )}
-                            
-                            {collectionStats && (
-                              <StatsItem
-                                className={usageStats ? "" : "page-break"}
-                                name="Collection Stats"
-                                total={data?.data?.dataSummary?.collection}
-                                data={
-                                  data?.data?.dashboardChartData?.collection
-                                }
-                                pieChartData={
-                                  data?.data?.pieChartData?.collection
-                                }
-                              />
-                            )}
-                            {/* {usageStats != true && <div  className="page-break" ></div> } */}
+      </>
+    );
+  };
 
-                            {upiStats && (
-                              <StatsItem
-                                className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ) ? "page-break" : ""}
-                                name="UPI Stats"
-                                total={data?.data?.dataSummary?.upiCollection}
-                                data={
-                                  data?.data?.dashboardChartData?.upiCollection
-                                }
-                                pieChartData={
-                                  data?.data?.pieChartData?.upiCollection
-                                }
-                              />
-                            )}
-                            {bwtStats && (
-                              <BWTStatsItem
-                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true )) ? "page-break" : ""}
-                                name="Recycled Water"
-                                total={
-                                  data?.data?.bwtdataSummary?.waterRecycled
-                                }
-                                data={
-                                  data?.data?.bwtdashboardChartData
-                                    ?.waterRecycled
-                                }
-                                pieChartData={data?.data?.bwtpieChartData.usage}
-                              />
-                            )}
-                            {feedbackStats && (
-                              <StatsItem
-                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true )) ? "page-break" : ""}
-                                name="Feedback Stats"
-                                total={data?.data?.dataSummary?.feedback}
-                                data={data?.data?.dashboardChartData?.feedback}
-                                pieChartData={
-                                  data?.data?.pieChartData?.feedback
-                                }
-                              />
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div>
-                    <table
+  const memoizedSummaryComponent = useMemo(() => {
+    if(summaryUssagePayload) {
+      console.log('summaryUssagePayload jj',summaryUssagePayload)
+      return <OfflineSummaryComponent summaryUssagePayload={summaryUssagePayload}/>;
+    }
+  }, [summaryUssagePayload]);
+
+  const OfflineReportComponent = () => {
+    // Separate variables for each key
+      let usage = [];
+      let feedback = [];
+      let collection = [];
+      let upiCollection = [];
+
+      const filterDashboadData = async (data, key, summaryVariable) => {
+        for (let i = 0; i < data.length; i++) {
+          let currentItem = data[i];
+
+          // console.log(`Processing item in ${key}:`, currentItem);
+
+          // Find the object with the same date
+          let existingItemIndex = summaryVariable.findIndex(
+            (item) => item.date === currentItem.date
+          );
+
+          let existingItem = summaryVariable[existingItemIndex];
+
+          if (key === "feedback") {
+            if (existingItem) {
+              // console.log("Feedback item already exists, skipping.");
+            } else {
+              // console.log("Pushing new feedback data:", currentItem);
+              summaryVariable.push(currentItem);
+            }
+          } else {
+            if (existingItem) {
+              // console.log("Existing item found, updating:", existingItem);
+
+              summaryVariable[existingItemIndex] = {
+                ...existingItem,
+                all: Number(existingItem.all) + Number(currentItem.all),
+                mwc: Number(existingItem.mwc) + Number(currentItem.mwc),
+                fwc: Number(existingItem.fwc) + Number(currentItem.fwc),
+                pwc: Number(existingItem.pwc) + Number(currentItem.pwc),
+                mur: Number(existingItem.mur) + Number(currentItem.mur),
+              };
+
+              // console.log("Updated item:", summaryVariable[existingItemIndex]);
+            } else {
+              // console.log("No existing item found, pushing new data:", currentItem);
+
+              summaryVariable.push({
+                ...currentItem,
+                all: Number(currentItem.all),
+                mwc: Number(currentItem.mwc),
+                fwc: Number(currentItem.fwc),
+                pwc: Number(currentItem.pwc),
+                mur: Number(currentItem.mur),
+              });
+            }
+          }
+
+          // Log updated summary after each iteration
+          // console.log(`Updated ${key} summary:`, summaryVariable);
+        }
+      };
+
+      // Process report data using separate variables
+      const processReportData = async (reportData) => {
+        for (const data of reportData) {
+          await createSummaryDashboardStructure(data);
+        }
+      };
+
+      const createSummaryDashboardStructure = async (data) => {
+        for (const key of Object.keys(data?.data?.dashboardChartData)) {
+          let summaryVariable;
+
+          // Map the key to the correct summary variable
+          switch (key) {
+            case "usage":
+              summaryVariable = usage;
+              break;
+            case "feedback":
+              summaryVariable = feedback;
+              break;
+            case "collection":
+              summaryVariable = collection;
+              break;
+            case "upiCollection":
+              summaryVariable = upiCollection;
+              break;
+            default:
+              summaryVariable = [];
+              break;
+          }
+
+          await filterDashboadData(data?.data?.dashboardChartData[key], key, summaryVariable);
+          // console.log(`Check after processing ${key}:`, summaryVariable);
+        }
+      };
+
+    
+    (async () => {
+      await processReportData(reportData);
+      console.log("Final usage summary:", usage);
+      console.log("Final feedback summary:", feedback);
+      console.log("Final collection summary:", collection);
+      console.log("Final upiCollection summary:", upiCollection);
+      setSummaryUssagePayload({usage:usage,feedback:reportData[0].data.dashboardChartData.feedback, collection:collection, upiCollection:upiCollection })
+      console.log('Data processing completed');
+      console.log('summaryUssagePayload',summaryUssagePayload);
+    })();
+    console.log("data?.data.dataSummary :->23", dataSummary);
+    dataSummary = {
+      collection: 0,
+      feedback: 0,
+      upiCollection: 0,
+      usage: 0,
+    };
+    usage_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    collection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    upiCollection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    feedback_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    console.log("summaryPayload test", summaryPayload);
+    return (
+      <>
+       {reportData.map((data, index) => (
+                  <div
+                    key={index}
+                    style={{ marginBottom: "20px" }}
+                    className="pdf-section"
+                  >
+                    <div
+                      className="row"
                       style={{
-                        width: "100%",
-                        height: "100%",
-                        padding: "0px",
-                        fontSize: "13px",
+                        ...statsStyle.elementTitle,
+                        width: "98%",
+                        margin: "auto",
+                        padding: "10px",
+                        background: colorTheme.primary,
                       }}
+                    >
+                      {`Data Report for complex : ${data?.data?.complexName}`}
+                    </div>
+                    <table
+                      style={{ width: "95%", height: "95%", margin: "30px" }}
                       className="table table-bordered"
+                      key={index}
                     >
                       <thead>
                         <tr></tr>
                         <tr>
-                          <th colSpan="1" scope="colgroup"></th>
-                          {usageStats && (
-                            <th colSpan="5" scope="colgroup">
-                              Usage
-                            </th>
-                          )}
-                          {collectionStats && (
-                            <th colSpan="5" scope="colgroup">
-                              Collection
-                            </th>
-                          )}
-                          {upiStats && (
-                            <th colSpan="5" scope="colgroup">
-                              Upi
-                            </th>
-                          )}
-                          {feedbackStats && (
-                            <th colSpan="5" scope="colgroup">
-                              Feedback
-                            </th>
-                          )}
-                          {bwtStats && (
-                            <th colSpan="1" scope="colgroup">
-                              Recycled
-                            </th>
-                          )}
-                        </tr>
-                        <tr></tr>
-                        <tr>
-                          <th scope="col">Date</th>
-                          {usageStats && <th scope="col">All</th>}
-                          {usageStats && <th scope="col">MWC</th>}
-                          {usageStats && <th scope="col">FWC</th>}
-                          {usageStats && <th scope="col">PWC</th>}
-                          {usageStats && <th scope="col">MUR</th>}
-                          {collectionStats && <th scope="col">All</th>}
-                          {collectionStats && <th scope="col">MWC</th>}
-                          {collectionStats && <th scope="col">FWC</th>}
-                          {collectionStats && <th scope="col">PWC</th>}
-                          {collectionStats && <th scope="col">MUR</th>}
-                          {upiStats && <th scope="col">All</th>}
-                          {upiStats && <th scope="col">MWC</th>}
-                          {upiStats && <th scope="col">FWC</th>}
-                          {upiStats && <th scope="col">PWC</th>}
-                          {upiStats && <th scope="col">MUR</th>}
-                          {feedbackStats && <th scope="col">All</th>}
-                          {feedbackStats && <th scope="col">MWC</th>}
-                          {feedbackStats && <th scope="col">FWC</th>}
-                          {feedbackStats && <th scope="col">PWC</th>}
-                          {feedbackStats && <th scope="col">MUR</th>}
-                          {bwtStats && <th scope="col">BWT</th>}
+                          <th scope="col">Cabin</th>
+                          {usageStats && <th scope="col">Usage</th>}
+                          {collectionStats && <th scope="col">Collection</th>}
+                          {upiStats && <th scope="col">UPI</th>}
+                          {feedbackStats && <th scope="col">Feedback</th>}
+                          {bwtStats && <th scope="col">Recycled</th>}
                         </tr>
                       </thead>
                       <tbody>
-                        {data?.data?.dashboardChartData.usage.map(
-                          (usage, index) => {
-                            const rowCount = index + 1; // Adding 1 to start the count from 1
-                            const shouldBreakPage =
-                              rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
-
-                            return (
-                              <React.Fragment key={index}>
-                                <tr key={index}>
-                                  <td style={{ "font-weight": "bold" }}>
-                                    {usage.date}
-                                  </td>
-                                  {usageStats && <td>{usage.all}</td>}
-                                  {usageStats && <td>{usage.mwc}</td>}
-                                  {usageStats && <td>{usage.fwc}</td>}
-                                  {usageStats && <td>{usage.pwc}</td>}
-                                  {usageStats && <td>{usage.mur}</td>}
-                                  {collectionStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .collection[index].all
-                                      }
-                                    </td>
-                                  )}
-                                  {collectionStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .collection[index].mwc
-                                      }
-                                    </td>
-                                  )}
-                                  {collectionStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .collection[index].fwc
-                                      }
-                                    </td>
-                                  )}
-                                  {collectionStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .collection[index].pwc
-                                      }
-                                    </td>
-                                  )}
-                                  {collectionStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .collection[index].mur
-                                      }
-                                    </td>
-                                  )}
-                                  {upiStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .upiCollection[index].all
-                                      }
-                                    </td>
-                                  )}
-                                  {upiStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .upiCollection[index].mwc
-                                      }
-                                    </td>
-                                  )}
-                                  {upiStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .upiCollection[index].fwc
-                                      }
-                                    </td>
-                                  )}
-                                  {upiStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .upiCollection[index].pwc
-                                      }
-                                    </td>
-                                  )}
-                                  {upiStats && (
-                                    <td>
-                                      {
-                                        data?.data?.dashboardChartData
-                                          .upiCollection[index].mur
-                                      }
-                                    </td>
-                                  )}
-                                  {feedbackStats && (
-                                    <td>
-                                      {typeof data?.data?.dashboardChartData
-                                        .feedback[index].all === "number"
-                                        ? data.data.dashboardChartData.feedback[
-                                            index
-                                          ].all.toFixed(1)
-                                        : Number(
-                                            data.data.dashboardChartData
-                                              .feedback[index].all
-                                          ).toFixed(1)}
-                                    </td>
-                                  )}
-                                  {feedbackStats && (
-                                    <td>
-                                      {typeof data?.data?.dashboardChartData
-                                        .feedback[index].mwc === "number"
-                                        ? data.data.dashboardChartData.feedback[
-                                            index
-                                          ].mwc.toFixed(1)
-                                        : Number(
-                                            data.data.dashboardChartData
-                                              .feedback[index].mwc
-                                          ).toFixed(1)}
-                                    </td>
-                                  )}
-                                  {feedbackStats && (
-                                    <td>
-                                      {typeof data?.data?.dashboardChartData
-                                        .feedback[index].fwc === "number"
-                                        ? data.data.dashboardChartData.feedback[
-                                            index
-                                          ].fwc.toFixed(1)
-                                        : Number(
-                                            data.data.dashboardChartData
-                                              .feedback[index].fwc
-                                          ).toFixed(1)}
-                                    </td>
-                                  )}
-                                  {feedbackStats && (
-                                    <td>
-                                      {typeof data?.data?.dashboardChartData
-                                        .feedback[index].pwc === "number"
-                                        ? data.data.dashboardChartData.feedback[
-                                            index
-                                          ].pwc.toFixed(1)
-                                        : Number(
-                                            data.data.dashboardChartData
-                                              .feedback[index].pwc
-                                          ).toFixed(1)}
-                                    </td>
-                                  )}
-                                  {feedbackStats && (
-                                    <td>
-                                      {typeof data?.data?.dashboardChartData
-                                        .feedback[index].mur === "number"
-                                        ? data.data.dashboardChartData.feedback[
-                                            index
-                                          ].mur.toFixed(1)
-                                        : Number(
-                                            data.data.dashboardChartData
-                                              .feedback[index].mur
-                                          ).toFixed(1)}
-                                    </td>
-                                  )}
-                                  {bwtStats && <td>NA</td>}
-                                </tr>
-                                {shouldBreakPage && (
-                                  <tr
-                                    className="page-break"
-                                    style={{
-                                      marginBottom: "10px",
-                                      pageBreakAfter: "always",
-                                    }}
-                                  ></tr>
-                                )}
-                                {index ===
-                                  summaryPayload.dashboardChartData.usage
-                                    .length -
-                                    1 && (
-                                  <tr
-                                    className="page-break"
-                                    style={{
-                                      marginBottom: "10px",
-                                      pageBreakAfter: "always",
-                                    }}
-                                  ></tr>
-                                )}
-                              </React.Fragment>
-                            );
-                          }
-                        )}
+                        <tr></tr>
+                        <tr>
+                          <th scope="row">MWC</th>
+                          {usageStats && (
+                            <td>{data?.data?.pieChartData?.usage[0].value}</td>
+                          )}
+                          {collectionStats && (
+                            <td>
+                              {data?.data?.pieChartData?.collection[0].value}
+                            </td>
+                          )}
+                          {upiStats && (
+                            <td>
+                              {data?.data?.pieChartData?.upiCollection[0].value}
+                            </td>
+                          )}
+                          {feedbackStats && (
+                            <td>
+                              {Number(
+                                data?.data?.pieChartData?.feedback[0].value
+                              ).toFixed(1)}
+                            </td>
+                          )}
+                          {bwtStats && <td>NA</td>}
+                        </tr>
+                        <tr>
+                          <th scope="row">FWC</th>
+                          {usageStats && (
+                            <td>{data?.data?.pieChartData?.usage[1].value}</td>
+                          )}
+                          {collectionStats && (
+                            <td>
+                              {data?.data?.pieChartData?.collection[1].value}
+                            </td>
+                          )}
+                          {upiStats && (
+                            <td>
+                              {data?.data?.pieChartData?.upiCollection[1].value}
+                            </td>
+                          )}
+                          {feedbackStats && (
+                            <td>
+                              {Number(
+                                data?.data?.pieChartData?.feedback[1].value
+                              ).toFixed(1)}
+                            </td>
+                          )}
+                          {bwtStats && <td>NA</td>}
+                        </tr>
+                        <tr>
+                          <th scope="row">PWC</th>
+                          {usageStats && (
+                            <td>{data?.data?.pieChartData?.usage[2].value}</td>
+                          )}
+                          {collectionStats && (
+                            <td>
+                              {data?.data?.pieChartData?.collection[2].value}
+                            </td>
+                          )}
+                          {upiStats && (
+                            <td>
+                              {data?.data?.pieChartData?.upiCollection[2].value}
+                            </td>
+                          )}
+                          {feedbackStats && (
+                            <td>
+                              {Number(
+                                data?.data?.pieChartData?.feedback[2].value
+                              ).toFixed(1)}
+                            </td>
+                          )}
+                          {bwtStats && <td>NA</td>}
+                        </tr>
+                        <tr>
+                          <th scope="row">MUR</th>
+                          {usageStats && (
+                            <td>{data?.data?.pieChartData?.usage[3].value}</td>
+                          )}
+                          {collectionStats && (
+                            <td>
+                              {data?.data?.pieChartData?.collection[3].value}
+                            </td>
+                          )}
+                          {upiStats && (
+                            <td>
+                              {data?.data?.pieChartData?.upiCollection[3].value}
+                            </td>
+                          )}
+                          {feedbackStats && (
+                            <td>
+                              {Number(
+                                data?.data?.pieChartData?.feedback[3].value
+                              ).toFixed(1)}
+                            </td>
+                          )}
+                          {bwtStats && <td>NA</td>}
+                        </tr>
+                        {/* <tr>
+                          <th scope="row">BWT</th>
+                          {usageStats && <td>0</td>}
+                          {collectionStats && <td>0</td>}
+                          {upiStats && <td>0</td>}
+                          {feedbackStats && <td>0.0</td>}
+                          {bwtStats && <td>0</td>}
+                        </tr> */}
+                        <tr></tr>
                       </tbody>
                     </table>
+                    <table
+                      style={{ width: "95%", height: "95%", margin: "30px" }}
+                    >
+                      <tbody>
+                        <tr>
+                          <td style={{ width: "80%" }}>
+                            <div style={{ width: "100" }}>
+                              {/* <Stats
+                              isDuration={false}
+                              chartData={data?.data?.dashboardChartData}
+                              pieChartData={data?.data?.pieChartData}
+                              dataSummary={data?.data?.dataSummary}
+                              bwtChartData={data?.data?.bwtdashboardChartData}
+                              bwtPieChartData={data?.data?.bwtpieChartData}
+                              bwtDataSummary={data?.data?.bwtdataSummary}
+                              dashboardUpiChartData={
+                                data?.data?.dashboardUpiChartData
+                              }
+                              pieChartUpiData={data?.data?.pieChartUpiData}
+                              uiResult={dashboard_data?.uiResult?.data}
+                            /> */}
+                                {/* {usageStats && <div  className="page-break" ></div> } */}
+                              {usageStats && (
+                                <StatsItem
+                                  className="page-break"
+                                  name="Usage Stats"
+                                  total={data?.data?.dataSummary?.usage}
+                                  data={data?.data?.dashboardChartData?.usage}
+                                  pieChartData={data?.data?.pieChartData?.usage}
+                                />
+                              )}
+                              
+                              {collectionStats && (
+                                <StatsItem
+                                  className={usageStats ? "" : "page-break"}
+                                  name="Collection Stats"
+                                  total={data?.data?.dataSummary?.collection}
+                                  data={
+                                    data?.data?.dashboardChartData?.collection
+                                  }
+                                  pieChartData={
+                                    data?.data?.pieChartData?.collection
+                                  }
+                                />
+                              )}
+                              {/* {usageStats != true && <div  className="page-break" ></div> } */}
+
+                              {upiStats && (
+                                <StatsItem
+                                  className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ) ? "page-break" : ""}
+                                  name="UPI Stats"
+                                  total={data?.data?.dataSummary?.upiCollection}
+                                  data={
+                                    data?.data?.dashboardChartData?.upiCollection
+                                  }
+                                  pieChartData={
+                                    data?.data?.pieChartData?.upiCollection
+                                  }
+                                />
+                              )}
+                              {bwtStats && (
+                                <BWTStatsItem
+                                  className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true )) ? "page-break" : ""}
+                                  name="Recycled Water"
+                                  total={
+                                    data?.data?.bwtdataSummary?.waterRecycled
+                                  }
+                                  data={
+                                    data?.data?.bwtdashboardChartData
+                                      ?.waterRecycled
+                                  }
+                                  pieChartData={data?.data?.bwtpieChartData.usage}
+                                />
+                              )}
+                              {feedbackStats && (
+                                <StatsItem
+                                  className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true )) ? "page-break" : ""}
+                                  name="Feedback Stats"
+                                  total={data?.data?.dataSummary?.feedback}
+                                  data={data?.data?.dashboardChartData?.feedback}
+                                  pieChartData={
+                                    data?.data?.pieChartData?.feedback
+                                  }
+                                />
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div>
+                      <table
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          padding: "0px",
+                          fontSize: "13px",
+                        }}
+                        className="table table-bordered"
+                      >
+                        <thead>
+                          <tr></tr>
+                          <tr>
+                            <th colSpan="1" scope="colgroup"></th>
+                            {usageStats && (
+                              <th colSpan="5" scope="colgroup">
+                                Usage
+                              </th>
+                            )}
+                            {collectionStats && (
+                              <th colSpan="5" scope="colgroup">
+                                Collection
+                              </th>
+                            )}
+                            {upiStats && (
+                              <th colSpan="5" scope="colgroup">
+                                Upi
+                              </th>
+                            )}
+                            {feedbackStats && (
+                              <th colSpan="5" scope="colgroup">
+                                Feedback
+                              </th>
+                            )}
+                            {bwtStats && (
+                              <th colSpan="1" scope="colgroup">
+                                Recycled
+                              </th>
+                            )}
+                          </tr>
+                          <tr></tr>
+                          <tr>
+                            <th scope="col">Date</th>
+                            {usageStats && <th scope="col">All</th>}
+                            {usageStats && <th scope="col">MWC</th>}
+                            {usageStats && <th scope="col">FWC</th>}
+                            {usageStats && <th scope="col">PWC</th>}
+                            {usageStats && <th scope="col">MUR</th>}
+                            {collectionStats && <th scope="col">All</th>}
+                            {collectionStats && <th scope="col">MWC</th>}
+                            {collectionStats && <th scope="col">FWC</th>}
+                            {collectionStats && <th scope="col">PWC</th>}
+                            {collectionStats && <th scope="col">MUR</th>}
+                            {upiStats && <th scope="col">All</th>}
+                            {upiStats && <th scope="col">MWC</th>}
+                            {upiStats && <th scope="col">FWC</th>}
+                            {upiStats && <th scope="col">PWC</th>}
+                            {upiStats && <th scope="col">MUR</th>}
+                            {feedbackStats && <th scope="col">All</th>}
+                            {feedbackStats && <th scope="col">MWC</th>}
+                            {feedbackStats && <th scope="col">FWC</th>}
+                            {feedbackStats && <th scope="col">PWC</th>}
+                            {feedbackStats && <th scope="col">MUR</th>}
+                            {bwtStats && <th scope="col">BWT</th>}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {data?.data?.dashboardChartData.usage.map(
+                            (usage, index) => {
+                              const rowCount = index + 1; // Adding 1 to start the count from 1
+                              const shouldBreakPage =
+                                rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
+
+                              return (
+                                <React.Fragment key={index}>
+                                  <tr key={index}>
+                                    <td style={{ "fontWeight": "bold" }}>
+                                      {usage.date}
+                                    </td>
+                                    {usageStats && <td>{usage.all}</td>}
+                                    {usageStats && <td>{usage.mwc}</td>}
+                                    {usageStats && <td>{usage.fwc}</td>}
+                                    {usageStats && <td>{usage.pwc}</td>}
+                                    {usageStats && <td>{usage.mur}</td>}
+                                    {collectionStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .collection[index].all
+                                        }
+                                      </td>
+                                    )}
+                                    {collectionStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .collection[index].mwc
+                                        }
+                                      </td>
+                                    )}
+                                    {collectionStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .collection[index].fwc
+                                        }
+                                      </td>
+                                    )}
+                                    {collectionStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .collection[index].pwc
+                                        }
+                                      </td>
+                                    )}
+                                    {collectionStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .collection[index].mur
+                                        }
+                                      </td>
+                                    )}
+                                    {upiStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .upiCollection[index].all
+                                        }
+                                      </td>
+                                    )}
+                                    {upiStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .upiCollection[index].mwc
+                                        }
+                                      </td>
+                                    )}
+                                    {upiStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .upiCollection[index].fwc
+                                        }
+                                      </td>
+                                    )}
+                                    {upiStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .upiCollection[index].pwc
+                                        }
+                                      </td>
+                                    )}
+                                    {upiStats && (
+                                      <td>
+                                        {
+                                          data?.data?.dashboardChartData
+                                            .upiCollection[index].mur
+                                        }
+                                      </td>
+                                    )}
+                                    {feedbackStats && (
+                                      <td>
+                                        {typeof data?.data?.dashboardChartData
+                                          .feedback[index].all === "number"
+                                          ? data.data.dashboardChartData.feedback[
+                                              index
+                                            ].all.toFixed(1)
+                                          : Number(
+                                              data.data.dashboardChartData
+                                                .feedback[index].all
+                                            ).toFixed(1)}
+                                      </td>
+                                    )}
+                                    {feedbackStats && (
+                                      <td>
+                                        {typeof data?.data?.dashboardChartData
+                                          .feedback[index].mwc === "number"
+                                          ? data.data.dashboardChartData.feedback[
+                                              index
+                                            ].mwc.toFixed(1)
+                                          : Number(
+                                              data.data.dashboardChartData
+                                                .feedback[index].mwc
+                                            ).toFixed(1)}
+                                      </td>
+                                    )}
+                                    {feedbackStats && (
+                                      <td>
+                                        {typeof data?.data?.dashboardChartData
+                                          .feedback[index].fwc === "number"
+                                          ? data.data.dashboardChartData.feedback[
+                                              index
+                                            ].fwc.toFixed(1)
+                                          : Number(
+                                              data.data.dashboardChartData
+                                                .feedback[index].fwc
+                                            ).toFixed(1)}
+                                      </td>
+                                    )}
+                                    {feedbackStats && (
+                                      <td>
+                                        {typeof data?.data?.dashboardChartData
+                                          .feedback[index].pwc === "number"
+                                          ? data.data.dashboardChartData.feedback[
+                                              index
+                                            ].pwc.toFixed(1)
+                                          : Number(
+                                              data.data.dashboardChartData
+                                                .feedback[index].pwc
+                                            ).toFixed(1)}
+                                      </td>
+                                    )}
+                                    {feedbackStats && (
+                                      <td>
+                                        {typeof data?.data?.dashboardChartData
+                                          .feedback[index].mur === "number"
+                                          ? data.data.dashboardChartData.feedback[
+                                              index
+                                            ].mur.toFixed(1)
+                                          : Number(
+                                              data.data.dashboardChartData
+                                                .feedback[index].mur
+                                            ).toFixed(1)}
+                                      </td>
+                                    )}
+                                    {bwtStats && <td>NA</td>}
+                                  </tr>
+                                  {shouldBreakPage && (
+                                    <tr
+                                      className="page-break"
+                                      style={{
+                                        marginBottom: "10px",
+                                        pageBreakAfter: "always",
+                                      }}
+                                    ></tr>
+                                  )}
+                                  {index ===
+                                    data?.data?.dashboardChartData?.usage
+                                      .length -
+                                      1 && (
+                                    <tr
+                                      className="page-break"
+                                      style={{
+                                        marginBottom: "10px",
+                                        pageBreakAfter: "always",
+                                      }}
+                                    ></tr>
+                                  )}
+                                </React.Fragment>
+                              );
+                            }
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+      </>
+    );
+  };
+
+
+  const memoizedComponent = useMemo(() => {
+    console.log("hasdata memoized data checked:-> ", hasdata);
+    console.log("reportData again", reportData);
+    if(reportData.length > 0) {
+      return <OfflineReportComponent />;
+    }
+  }, [reportData]);
+  
+  if (hasdata) {
+    console.log("hasdata", hasdata);
+    console.log("reportData", reportData);
+    CreateSummaryData(reportData);
+    // Assuming you want to render each item in the reportData array horizontally
+    return (
+      <>
+        {loadingPdf == false && (
+            <div
+            style={{
+              ...whiteSurface,
+              background: "white",
+              marginTop: "20px",
+              width: "100%",
+              height: "100%",
+              padding: "10px",
+              paddingBottom: "20px",
+              overflowX: "auto", // Enable horizontal scrolling
+              fontSize: "10px",
+            }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column", // Stack tables vertically
+                }}
+                id="pdf-generate-content"
+              >
+                {memoizedSummaryComponent}
+                {memoizedComponent}
+              </div>
             </div>
-          </div>
-        )}
-        <Button
-          style={{ margin: "auto", marginTop: "12px" }}
-          color="primary"
-          className="px-4"
-          onClick={generatePDF}
-        >
-          {loadingPdf ? "Downloading..." : "Generate Offline PDF"}
-          {loadingPdf && (
-            <Stack sx={{ width: "100%", color: "grey.500" }} spacing={2}>
-              <LinearProgress color="secondary" />
-            </Stack>
           )}
-        </Button>
+          <Button
+            style={{ margin: "auto", marginTop: "12px" }}
+            color="primary"
+            className="px-4"
+            onClick={generatePDF}
+          >
+            {loadingPdf ? "Downloading..." : "Generate Offline PDF"}
+            {loadingPdf && (
+              <Stack sx={{ width: "100%", color: "grey.500" }} spacing={2}>
+                <LinearProgress color="secondary" />
+              </Stack>
+            )}
+          </Button>
       </>
     );
   }
