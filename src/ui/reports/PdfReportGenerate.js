@@ -37,6 +37,7 @@ const PdfGenerate = ({
   const navigate = useNavigate();
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [summaryUssagePayload, setSummaryUssagePayload] = useState(null);
+  const [datasummaryPayload, setDataSummaryPayload] = useState(null);
   let summaryPayload = {};
   console.log("check report generated", {
     StartDate,
@@ -367,194 +368,6 @@ const PdfGenerate = ({
   
   console.log("test props data");
   console.log('reportData check value', reportData);
-  let totalCount = 0;
-  let usage_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let collection_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let upiCollection_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let feedback_summary = [
-    { name: "MWC", value: 0 },
-    { name: "FWC", value: 0 },
-    { name: "PWC", value: 0 },
-    { name: "MUR", value: 0 },
-  ];
-  let dataSummary = {
-    collection: 0,
-    feedback: 0,
-    upiCollection: 0,
-    usage: 0,
-  };
-
-
-  const createSummaryFunction = async (data) => {
-    const summaryFunction = (key, data) => {
-      // console.log("summaryFunction11 :-->", data);
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].all !== 0) {
-          if (key in dataSummary) {
-            if (key === "feedback") {
-              // console.log("check key feedback :-->", key);
-              // console.log("total feedback", data.length);
-              totalCount = data.length;
-              dataSummary[key] += Number(data[i].all);
-              if (data[i].fwc !== 0) {
-                feedback_summary[1].value += Number(data[i].fwc);
-              }
-              if (data[i].mur !== 0) {
-                feedback_summary[3].value += Number(data[i].mur);
-              }
-              if (data[i].mwc !== 0) {
-                feedback_summary[0].value += Number(data[i].mwc);
-              }
-              if (data[i].pwc !== 0) {
-                feedback_summary[2].value += Number(data[i].pwc);
-              }
-            } else {
-              // console.log("check key :-->", key);
-              // console.log("check vlaue of key :-->", data[i].all);
-              dataSummary[key] += Number(data[i].all);
-              if (key === "usage") {
-                if (data[i].fwc !== 0) {
-                  // console.log("ussage summary-->fwc", data[i].fwc);
-                  usage_summary[1].value += Number(data[i].fwc);
-                }
-                if (data[i].mur !== 0) {
-                  // console.log("ussage summary-->mur", data[i].mur);
-                  usage_summary[3].value += Number(data[i].mur);
-                }
-                if (data[i].mwc !== 0) {
-                  // console.log("ussage summary-->mwc", data[i].mwc);
-                  usage_summary[0].value += Number(data[i].mwc);
-                }
-                if (data[i].pwc !== 0) {
-                  // console.log("ussage summary-->pwc", data[i].pwc);
-                  usage_summary[2].value += Number(data[i].pwc);
-                }
-                // console.log("usage_summary", usage_summary);
-                // console.log("usage_summary--1", usage_summary[0].name);
-              } else if (key === "upiCollection") {
-                if (data[i].fwc !== 0) {
-                  upiCollection_summary[1].value += Number(data[i].fwc);
-                }
-                if (data[i].mur !== 0) {
-                  upiCollection_summary[3].value += Number(data[i].mur);
-                }
-                if (data[i].mwc !== 0) {
-                  upiCollection_summary[0].value += Number(data[i].mwc);
-                }
-                if (data[i].pwc !== 0) {
-                  upiCollection_summary[2].value += Number(data[i].pwc);
-                }
-              } else if (key === "collection") {
-                if (data[i].fwc !== 0) {
-                  collection_summary[1].value += Number(data[i].fwc);
-                }
-                if (data[i].mur !== 0) {
-                  collection_summary[3].value += Number(data[i].mur);
-                }
-                if (data[i].mwc !== 0) {
-                  collection_summary[0].value += Number(data[i].mwc);
-                }
-                if (data[i].pwc !== 0) {
-                  collection_summary[2].value += Number(data[i].pwc);
-                }
-              }
-            }
-          }
-          // console.log("i :-->", data[i].all);
-          // console.log("value :->", key in dataSummary);
-        }
-      }
-    };
-
-    const startDateString = format_data(StartDate); // Example start date string
-    const endDateString = format_data(EndDate); // Example end date string
-
-    // Function to filter data based on date range
-    const filterByDateRange = (data, startDateString, endDateString) => {
-      const startDate = new Date(startDateString);
-      const endDate = new Date(endDateString);
-      return data.filter((entry) => {
-        const [day, month, year] = entry.date.split("/");
-        const entryDate = new Date(`${year}-${month}-${day}`);
-        return entryDate >= startDate && entryDate <= endDate;
-      });
-    };
-
-    const filteredData = {};
-    // console.log("create new", data.data);
-    Object.keys(data?.data?.dashboardChartData).forEach((key) => {
-      // Filter data based on date range for each key
-      // console.log("createSummaryFunction key", key);
-      // filteredData[key] = filterByDateRange(
-      //   data.data.dashboardChartData[key],
-      //   startDateString,
-      //   endDateString
-      // );
-
-      // console.log("createSummaryFunction filteredData", filteredData[key]);
-      summaryFunction(key, data?.data?.dashboardChartData[key]);
-      // await filterDashboadData(data?.data?.dashboardChartData[key], key);
-    });
-
-    // console.log("summaryPayload", summaryPayload);
-    // Object.assign(data?.data?.dashboardChartData, filteredData);
-    console.log("feedback_summary", feedback_summary);
-    console.log('dataSummary check',dataSummary);
-    console.log('feedback check', dataSummary.feedback);
-    console.log('dataSummary.count',totalCount);
-    dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(0);
-    console.log('after dataSummary',dataSummary);
-    if (feedback_summary[0].value !== 0) {
-      feedback_summary[0].value = parseInt(
-        Number(feedback_summary[0].value / totalCount).toFixed(0)
-      );
-    }
-    if (feedback_summary[1].value !== 0) {
-      feedback_summary[1].value = parseInt(
-        Number(feedback_summary[1].value / totalCount).toFixed(0)
-      );
-    }
-    if (feedback_summary[2].value !== 0) {
-      feedback_summary[2].value = parseInt(
-        Number(feedback_summary[2].value / totalCount).toFixed(0)
-      );
-    }
-    if (feedback_summary[3].value !== 0) {
-      feedback_summary[3].value = parseInt(
-        Number(feedback_summary[3].value / totalCount).toFixed(0)
-      );
-    }
-
-    console.log("data?.data.dataSummary :->2", dataSummary);
-    // Object.assign(data?.data.dataSummary, {
-    //   collection: dataSummary.collection,
-    //   feedback: dataSummary.feedback,
-    //   upiCollection: dataSummary.upiCollection,
-    //   usage: dataSummary.usage,
-    // });
-    // console.log("piechart", usage_summary);
-    // Object.assign(data?.data.pieChartData, {
-    //   collection: collection_summary,
-    //   feedback: feedback_summary,
-    //   upiCollection: upiCollection_summary,
-    //   usage: usage_summary,
-    // });
-  };
 
   const StatsItem = (props) => {
     let pageBreakClass;
@@ -774,13 +587,6 @@ const PdfGenerate = ({
   };
 
 
-
-const CreateSummaryData = async (reportData) => {
-  for (const data of reportData) {
-    await createSummaryFunction(data);
-  }
-};
-
 // reportData.forEach(async (data) => {
 //   await createSummaryFunction(data);
 // });
@@ -794,6 +600,7 @@ const CreateSummaryData = async (reportData) => {
   console.log('starting second  only');
 
   const OfflineSummaryComponent = (summaryUssagePayload) => {
+    console.log('datasummaryPayload checked :->', datasummaryPayload);
     summaryPayload.bwtAvalibility = reportData[0].data.bwtAvalibility;
     summaryPayload.bwtdashboardChartData =
       reportData[0].data.bwtdashboardChartData;
@@ -802,16 +609,25 @@ const CreateSummaryData = async (reportData) => {
     summaryPayload.bwtpieChartData = reportData[0].data.bwtpieChartData;
     summaryPayload.dashboardChartData = summaryUssagePayload.summaryUssagePayload;
     summaryPayload.dataSummary = {
-      collection: dataSummary.collection,
+      collection: datasummaryPayload.dataSummary.collection,
       feedback: "5.0",
-      upiCollection: dataSummary.upiCollection,
-      usage: dataSummary.usage,
+      upiCollection: datasummaryPayload.dataSummary.upiCollection,
+      usage: datasummaryPayload.dataSummary.usage,
     };
+    let feedback_summary_update = datasummaryPayload.feedback_summary.map((item) => {
+      console.log('item',item);
+       return {
+          ...item, // Spread the current object
+          value: item.value > 5 ? 5 : item.value // Update value based on condition
+      };
+  })
+
+  console.log('feedback_summary_update', feedback_summary_update);
     summaryPayload.pieChartData = {
-      usage: usage_summary,
-      feedback: feedback_summary,
-      collection: collection_summary,
-      upiCollection: upiCollection_summary,
+      usage: datasummaryPayload.usage_summary,
+      feedback: feedback_summary_update,
+      collection: datasummaryPayload.collection_summary,
+      upiCollection: datasummaryPayload.upiCollection_summary,
     };
 
     console.log("after summaryPayload test", summaryPayload);
@@ -1124,8 +940,6 @@ const CreateSummaryData = async (reportData) => {
                     <tbody>
                       {summaryPayload.dashboardChartData.usage.map(
                         (usage, index) => {
-                          console.log('index :->', index)
-                          console.log('usage :->', usage)
                           const rowCount = index + 1; // Adding 1 to start the count from 1
                           const shouldBreakPage =
                             rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
@@ -1298,9 +1112,9 @@ const CreateSummaryData = async (reportData) => {
   const memoizedSummaryComponent = useMemo(() => {
     if(summaryUssagePayload) {
       console.log('summaryUssagePayload jj',summaryUssagePayload)
-      return <OfflineSummaryComponent summaryUssagePayload={summaryUssagePayload}/>;
+      return <OfflineSummaryComponent summaryUssagePayload={summaryUssagePayload} datasummaryPayload={datasummaryPayload}/>;
     }
-  }, [summaryUssagePayload]);
+  }, [summaryUssagePayload,datasummaryPayload]);
 
   const OfflineReportComponent = () => {
     // Separate variables for each key
@@ -1397,7 +1211,7 @@ const CreateSummaryData = async (reportData) => {
         }
       };
 
-    
+        // summary dashboardchart data function start 
     (async () => {
       await processReportData(reportData);
       console.log("Final usage summary:", usage);
@@ -1408,37 +1222,199 @@ const CreateSummaryData = async (reportData) => {
       console.log('Data processing completed');
       console.log('summaryUssagePayload',summaryUssagePayload);
     })();
-    console.log("data?.data.dataSummary :->23", dataSummary);
-    dataSummary = {
+    
+    // summary dashboardchart data function end 
+
+    let totalCount = 0;
+    let usage_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let collection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let upiCollection_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let feedback_summary = [
+      { name: "MWC", value: 0 },
+      { name: "FWC", value: 0 },
+      { name: "PWC", value: 0 },
+      { name: "MUR", value: 0 },
+    ];
+    let dataSummary = {
       collection: 0,
       feedback: 0,
       upiCollection: 0,
       usage: 0,
     };
-    usage_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    collection_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    upiCollection_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
-    feedback_summary = [
-      { name: "MWC", value: 0 },
-      { name: "FWC", value: 0 },
-      { name: "PWC", value: 0 },
-      { name: "MUR", value: 0 },
-    ];
+
+    const createSummaryFunction = async (data) => {
+      const summaryFunction = (key, data) => {
+        // console.log("summaryFunction11 :-->", data);
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].all !== 0) {
+            if (key in dataSummary) {
+              if (key === "feedback") {
+                // console.log("check key feedback :-->", key);
+                // console.log("total feedback", data.length);
+                totalCount = data.length;
+                dataSummary[key] += Number(data[i].all);
+                if (data[i].fwc !== 0) {
+                  feedback_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  feedback_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  feedback_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  feedback_summary[2].value += Number(data[i].pwc);
+                }
+              } else {
+                // console.log("check key :-->", key);
+                // console.log("check vlaue of key :-->", data[i].all);
+                dataSummary[key] += Number(data[i].all);
+                if (key === "usage") {
+                  if (data[i].fwc !== 0) {
+                    // console.log("ussage summary-->fwc", data[i].fwc);
+                    usage_summary[1].value += Number(data[i].fwc);
+                  }
+                  if (data[i].mur !== 0) {
+                    // console.log("ussage summary-->mur", data[i].mur);
+                    usage_summary[3].value += Number(data[i].mur);
+                  }
+                  if (data[i].mwc !== 0) {
+                    // console.log("ussage summary-->mwc", data[i].mwc);
+                    usage_summary[0].value += Number(data[i].mwc);
+                  }
+                  if (data[i].pwc !== 0) {
+                    // console.log("ussage summary-->pwc", data[i].pwc);
+                    usage_summary[2].value += Number(data[i].pwc);
+                  }
+                  // console.log("usage_summary", usage_summary);
+                  // console.log("usage_summary--1", usage_summary[0].name);
+                } else if (key === "upiCollection") {
+                  if (data[i].fwc !== 0) {
+                    upiCollection_summary[1].value += Number(data[i].fwc);
+                  }
+                  if (data[i].mur !== 0) {
+                    upiCollection_summary[3].value += Number(data[i].mur);
+                  }
+                  if (data[i].mwc !== 0) {
+                    upiCollection_summary[0].value += Number(data[i].mwc);
+                  }
+                  if (data[i].pwc !== 0) {
+                    upiCollection_summary[2].value += Number(data[i].pwc);
+                  }
+                } else if (key === "collection") {
+                  if (data[i].fwc !== 0) {
+                    collection_summary[1].value += Number(data[i].fwc);
+                  }
+                  if (data[i].mur !== 0) {
+                    collection_summary[3].value += Number(data[i].mur);
+                  }
+                  if (data[i].mwc !== 0) {
+                    collection_summary[0].value += Number(data[i].mwc);
+                  }
+                  if (data[i].pwc !== 0) {
+                    collection_summary[2].value += Number(data[i].pwc);
+                  }
+                }
+              }
+            }
+            // console.log("i :-->", data[i].all);
+            // console.log("value :->", key in dataSummary);
+          }
+        }
+      };
+  
+      const startDateString = format_data(StartDate); // Example start date string
+      const endDateString = format_data(EndDate); // Example end date string
+  
+      // Function to filter data based on date range
+      const filterByDateRange = (data, startDateString, endDateString) => {
+        const startDate = new Date(startDateString);
+        const endDate = new Date(endDateString);
+        return data.filter((entry) => {
+          const [day, month, year] = entry.date.split("/");
+          const entryDate = new Date(`${year}-${month}-${day}`);
+          return entryDate >= startDate && entryDate <= endDate;
+        });
+      };
+  
+      const filteredData = {};
+      // console.log("create new", data.data);
+      Object.keys(data?.data?.dashboardChartData).forEach((key) => {
+        // Filter data based on date range for each key
+        // console.log("createSummaryFunction key", key);
+        // filteredData[key] = filterByDateRange(
+        //   data.data.dashboardChartData[key],
+        //   startDateString,
+        //   endDateString
+        // );
+  
+        // console.log("createSummaryFunction filteredData", filteredData[key]);
+        summaryFunction(key, data?.data?.dashboardChartData[key]);
+        // await filterDashboadData(data?.data?.dashboardChartData[key], key);
+      });
+  
+      // console.log("summaryPayload", summaryPayload);
+      // Object.assign(data?.data?.dashboardChartData, filteredData);
+      console.log("feedback_summary", feedback_summary);
+      console.log('dataSummary check',dataSummary);
+      console.log('feedback check', dataSummary.feedback);
+      console.log('dataSummary.count',totalCount);
+      dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(0);
+      console.log('after dataSummary',dataSummary);
+      if (feedback_summary[0].value !== 0) {
+        feedback_summary[0].value = parseInt(
+          Number(feedback_summary[0].value / totalCount).toFixed(0)
+        );
+      }
+      if (feedback_summary[1].value !== 0) {
+        feedback_summary[1].value = parseInt(
+          Number(feedback_summary[1].value / totalCount).toFixed(0)
+        );
+      }
+      if (feedback_summary[2].value !== 0) {
+        feedback_summary[2].value = parseInt(
+          Number(feedback_summary[2].value / totalCount).toFixed(0)
+        );
+      }
+      if (feedback_summary[3].value !== 0) {
+        feedback_summary[3].value = parseInt(
+          Number(feedback_summary[3].value / totalCount).toFixed(0)
+        );
+      }
+  
+      console.log("data?.data.dataSummary :->2", dataSummary);
+    };
+
+    const CreateSummaryData = async (reportData) => {
+      for (const data of reportData) {
+        await createSummaryFunction(data);
+      }
+    };
+
+    (async () => {
+      await CreateSummaryData(reportData);
+      console.log('starting first only');
+      console.log('dataSummary check again', dataSummary);
+      setDataSummaryPayload({dataSummary:dataSummary,usage_summary:usage_summary,feedback_summary:feedback_summary, upiCollection_summary:upiCollection_summary, collection_summary:collection_summary })
+      console.log('usage_summary check again', usage_summary);
+      console.log('feedback_summary check again', feedback_summary);
+    })();
+
     console.log("summaryPayload test", summaryPayload);
     return (
       <>
@@ -1952,7 +1928,6 @@ const CreateSummaryData = async (reportData) => {
   if (hasdata) {
     console.log("hasdata", hasdata);
     console.log("reportData", reportData);
-    CreateSummaryData(reportData);
     // Assuming you want to render each item in the reportData array horizontally
     return (
       <>
