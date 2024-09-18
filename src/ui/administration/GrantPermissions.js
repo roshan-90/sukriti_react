@@ -63,34 +63,60 @@ const GrantPermissions = () => {
     fetchAndInitClientList();
   }, []);
 
-  const initializeUiDetails = (data) => {
-    console.log("initializeUiDetail value ---", data);
+  const initializeUiDetails = (data , clientData = null) => {
     uiDetails.current = {
-      clientName: data?.CLIENT,
-      collection_stats: data?.collection_stats,
-      methane: data?.methane,
-      ammonia: data?.ammonia,
-      luminous: data?.luminous,
-      usage_charge: data?.usage_charge,
-      carbon_monooxide: data?.carbon_monooxide,
-      air_dryer_health: data?.air_dryer_health,
-      choke_health: data?.choke_health,
-      tap_health: data?.tap_health,
-      usage_charge_profile: data?.usage_charge_profile,
-      air_dryer_profile: data?.air_dryer_profile,
-      rfid_profile: data?.rfid_profile,
-      alp: data?.alp,
-      mp1_valve: data?.mp1_valve,
-      mp2_valve: data?.mp2_valve,
-      mp3_valve: data?.mp3_valve,
-      mp4_valve: data?.mp4_valve,
-      turbidity_value: data?.turbidity_value,
-      total_usage: data?.total_usage,
-      average_feedback: data?.average_feedback,
-      water_saved: data?.water_saved,
-      bwt_stats: data?.bwt_stats,
+      clientName: data?.CLIENT ?? clientData,
+      collection_stats: data?.collection_stats ?? "false",
+      methane: data?.methane ?? "false",
+      ammonia: data?.ammonia ?? "false",
+      luminous: data?.luminous ?? "false",
+      usage_charge: data?.usage_charge ?? "false",
+      carbon_monooxide: data?.carbon_monooxide ?? "false",
+      air_dryer_health: data?.air_dryer_health ?? "false",
+      choke_health: data?.choke_health ?? "false",
+      tap_health: data?.tap_health ?? "false",
+      usage_charge_profile: data?.usage_charge_profile ?? "false",
+      air_dryer_profile: data?.air_dryer_profile ?? "false",
+      rfid_profile: data?.rfid_profile ?? "false",
+      alp: data?.alp ?? "false",
+      mp1_valve: data?.mp1_valve ?? "false",
+      mp2_valve: data?.mp2_valve ?? "false",
+      mp3_valve: data?.mp3_valve ?? "false",
+      mp4_valve: data?.mp4_valve ?? "false",
+      turbidity_value: data?.turbidity_value ?? "false",
+      total_usage: data?.total_usage ?? "false",
+      average_feedback: data?.average_feedback ?? "false",
+      water_saved: data?.water_saved ?? "false",
+      bwt_stats: data?.bwt_stats ?? "false",
     };
+    dispatch(setData({
+      clientName: data?.CLIENT ?? clientData,
+      collection_stats: data?.collection_stats ?? "false",
+      methane: data?.methane ?? "false",
+      ammonia: data?.ammonia ?? "false",
+      luminous: data?.luminous ?? "false",
+      usage_charge: data?.usage_charge ?? "false",
+      carbon_monooxide: data?.carbon_monooxide ?? "false",
+      air_dryer_health: data?.air_dryer_health ?? "false",
+      choke_health: data?.choke_health ?? "false",
+      tap_health: data?.tap_health ?? "false",
+      usage_charge_profile: data?.usage_charge_profile ?? "false",
+      air_dryer_profile: data?.air_dryer_profile ?? "false",
+      rfid_profile: data?.rfid_profile ?? "false",
+      alp: data?.alp ?? "false",
+      mp1_valve: data?.mp1_valve ?? "false",
+      mp2_valve: data?.mp2_valve ?? "false",
+      mp3_valve: data?.mp3_valve ?? "false",
+      mp4_valve: data?.mp4_valve ?? "false",
+      turbidity_value: data?.turbidity_value ?? "false",
+      total_usage: data?.total_usage ?? "false",
+      average_feedback: data?.average_feedback ?? "false",
+      water_saved: data?.water_saved ?? "false",
+      bwt_stats: data?.bwt_stats ?? "false",
+    }));
   };
+
+
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
     let text = err.message.includes("expired");
@@ -133,9 +159,7 @@ const GrantPermissions = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchUILambda(clientData, user?.credentials);
-      dispatch(setData(result.data));
-      console.log("result.data", result.data);
-      initializeUiDetails(result.data);
+      initializeUiDetails(result.data, clientData);
     } catch (err) {
       handleError(err, "fetchClientWiseUI");
     } finally {
@@ -167,14 +191,11 @@ const GrantPermissions = () => {
   };
 
   const onClientSelected = (event) => {
-    console.log("onClientSelected value-->", event.target.value);
     uiDetails.current.clientName = event.target.value;
     fetchClientWiseUI(event.target.value);
   };
 
   const onSubmit = () => {
-    console.log("check for request copy--> 11", uiDetails);
-    console.log("check for request copy--> 12", uiDetails.current);
     initCreatePermissionRequest(uiDetails.current);
   };
 
