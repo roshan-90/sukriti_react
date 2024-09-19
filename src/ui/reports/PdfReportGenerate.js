@@ -804,7 +804,7 @@ const PdfGenerate = ({
                             )}
                             {collectionStats && (
                               <StatsItem
-                                className={usageStats ? "" : "page-break"}
+                                className={(usageStats == true && upiStats == false && bwtStats == false && feedbackStats == false && collectionStats == true)  ? "page-break" : ""}
                                 name="Collection Stats"
                                 total={summaryPayload?.dataSummary?.collection}
                                 data={
@@ -818,7 +818,7 @@ const PdfGenerate = ({
 
                             {upiStats && (
                               <StatsItem
-                                className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ) ? "page-break" : ""}
+                                className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false )|| (usageStats == true && collectionStats == false && bwtStats == false && feedbackStats == false && upiStats == true ) ) ? "page-break" : ""}
                                 name="UPI Stats"
                                 total={
                                   summaryPayload?.dataSummary?.upiCollection
@@ -835,7 +835,7 @@ const PdfGenerate = ({
                             {/* {((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false )) && <div  className="page-break" ></div> } */}
                             {bwtStats && (
                               <BWTStatsItem
-                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true )) ? "page-break" : ""}
+                                className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true ) || (usageStats == true && collectionStats == false && upiStats == false && feedbackStats == false && bwtStats == true )) ? "page-break" : ""}
                                 name="Recycled Water"
                                 total={
                                   summaryPayload?.bwtdataSummary?.waterRecycled
@@ -1595,7 +1595,7 @@ const PdfGenerate = ({
                               
                               {collectionStats && (
                                 <StatsItem
-                                  className={usageStats ? "" : "page-break"}
+                                  className={(usageStats == true && upiStats == false && bwtStats == false && feedbackStats == false && collectionStats == true)  ? "page-break" : ""}
                                   name="Collection Stats"
                                   total={data?.data?.dataSummary?.collection}
                                   data={
@@ -1610,7 +1610,7 @@ const PdfGenerate = ({
 
                               {upiStats && (
                                 <StatsItem
-                                  className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ) ? "page-break" : ""}
+                                  className={((usageStats == true && collectionStats == true ) || (usageStats == false && collectionStats == false ) || (usageStats == false && collectionStats == true && bwtStats == false && feedbackStats == false ) ||(usageStats == true && collectionStats == false && bwtStats == false && feedbackStats == false && upiStats == true )) ? "page-break" : ""}
                                   name="UPI Stats"
                                   total={data?.data?.dataSummary?.upiCollection}
                                   data={
@@ -1623,7 +1623,7 @@ const PdfGenerate = ({
                               )}
                               {bwtStats && (
                                 <BWTStatsItem
-                                  className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true )) ? "page-break" : ""}
+                                  className= {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == false ) || (usageStats == false && collectionStats == false && upiStats == false && feedbackStats == true ) || (usageStats == true && collectionStats == false && upiStats == false && feedbackStats == false && bwtStats == true )) ? "page-break" : ""}
                                   name="Recycled Water"
                                   total={
                                     data?.data?.bwtdataSummary?.waterRecycled
