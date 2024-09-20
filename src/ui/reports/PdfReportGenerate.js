@@ -804,7 +804,7 @@ const PdfGenerate = ({
                             )}
                             {collectionStats && (
                               <StatsItem
-                                className={(usageStats == true && upiStats == false && bwtStats == false && feedbackStats == false && collectionStats == true)  ? "page-break" : ""}
+                                className={((usageStats == true && upiStats == false && bwtStats == false && feedbackStats == false && collectionStats == true) ||  (usageStats == false && collectionStats == true && upiStats == true && feedbackStats == true &&bwtStats == false))  ? "page-break" : ""}
                                 name="Collection Stats"
                                 total={summaryPayload?.dataSummary?.collection}
                                 data={
@@ -852,7 +852,7 @@ const PdfGenerate = ({
                             {/* {((usageStats == true && collectionStats == true && upiStats == true ) || (usageStats == false && collectionStats == false && upiStats == false )) && <div  className="page-break" ></div> } */}
                             {feedbackStats && (
                               <StatsItem
-                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true ) || (usageStats == true && collectionStats == false && upiStats == false && bwtStats == false && feedbackStats == true )) ? "page-break" : ""}
+                                className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true ) || (usageStats == true && collectionStats == false && upiStats == false && bwtStats == false && feedbackStats == true ) || (usageStats == false && collectionStats == false && upiStats == true && bwtStats == true && feedbackStats == true )) ? "page-break" : ""}
                                 name="Feedback Stats"
                                 total={summaryPayload?.dataSummary?.feedback}
                                 data={
@@ -1595,7 +1595,7 @@ const PdfGenerate = ({
                               
                               {collectionStats && (
                                 <StatsItem
-                                  className={(usageStats == true && upiStats == false && bwtStats == false && feedbackStats == false && collectionStats == true)  ? "page-break" : ""}
+                                  className={((usageStats == true && upiStats == false && bwtStats == false && feedbackStats == false && collectionStats == true) ||  (usageStats == false && collectionStats == true && upiStats == true && feedbackStats == true &&bwtStats == false)) ? "page-break" : ""}
                                   name="Collection Stats"
                                   total={data?.data?.dataSummary?.collection}
                                   data={
@@ -1637,7 +1637,7 @@ const PdfGenerate = ({
                               )}
                               {feedbackStats && (
                                 <StatsItem
-                                  className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true ) || (usageStats == true && collectionStats == false && upiStats == false && bwtStats == false && feedbackStats == true )) ? "page-break" : ""}
+                                  className= {((usageStats == true && collectionStats == true && upiStats == true && bwtStats == true ) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == false) || (usageStats == false && collectionStats == true && upiStats == true && bwtStats == false) || (usageStats == false && collectionStats == false && upiStats == false && bwtStats == true ) || (usageStats == true && collectionStats == false && upiStats == false && bwtStats == false && feedbackStats == true ) || (usageStats == false && collectionStats == false && upiStats == true && bwtStats == true && feedbackStats == true )) ? "page-break" : ""}
                                   name="Feedback Stats"
                                   total={data?.data?.dataSummary?.feedback}
                                   data={data?.data?.dashboardChartData?.feedback}
