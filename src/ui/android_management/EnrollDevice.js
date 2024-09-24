@@ -721,6 +721,7 @@ export default function EnrollDevice() {
         let object = {
           command: "save-data",
           serial_number: serialNumber,
+          enterprises_id: selectedOptionEnterprise?.value,
           cabin_name: selectedCabin,
           cabin_details: Cabin_value_update,
           complex_details: complex_value_update,
