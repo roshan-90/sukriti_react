@@ -31,7 +31,9 @@ import {
   executeShareQrLambda,
   executeKioskDeviceLambda,
   executeEnterpriseGetLambda,
-  executeReintiate_DEVICE_PROV_GET_INFO_RESP_INITLambda
+  executeReintiate_DEVICE_PROV_GET_INFO_RESP_INITLambda,
+  executeSoftDeleteEnterpriseLambda,
+  executeUndoSoftDeleteEnterpriseLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -411,16 +413,28 @@ function AndroidDetails() {
         dispatch(stopLoading()); // Dispatch the stopLoading action
       }
   }
-  const handleEnterprises = async (enterprise) => {
+
+  const handleEnterprises = async () => {
+
+    console.log('handleEnterprise Function clicked ddd', selectedOptionEnterprise?.value)
     try {
         dispatch(startLoading()); // Dispatch the startLoading action
         console.log('handleDeleteEnterprises');
-        var result = await executeDeleteEnterpriseAndroidManagementLambda(user?.credentials, enterprise);
-        console.log('enterprise:-->', enterprise);
+        var result = await executeSoftDeleteEnterpriseLambda(user?.credentials, selectedOptionEnterprise?.value);
         console.log('result',result);
-        setSelectedEnterprises([]);
+        if(result.statusCode == 200) {
+          setDialogData({
+            title: "Success",
+            message: "Delete apply on this enterprise Successfully",
+            onClickAction: async () => {
+              dispatch(setSelectedOptionEnterprise(null))
+              dispatch(setEnterpriseDetail(null))
+              setSelectedEnterprises([]);
+            },
+          })
+        } 
     } catch( err) {
-      handleError(err, 'Error create android enterprise')
+      handleError(err, 'Error handle soft delete enterprise')
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
@@ -433,12 +447,25 @@ function AndroidDetails() {
          message: "Please Select Enterprise",
          onClickAction: () => {
            // Handle the action when the user clicks OK
-           console.log("handleDeleteDevice");
+           console.log("handleEnrollDevice");
          },
        })
        return
      } else {
+          if(enterpriseDetail?.state !== 'active') {
+            console.log('can not enroll device because this enterprise in inactive state',enterpriseDetail)
+            setDialogData({
+              title: "Validation Error",
+              message: "Can not enroll device because this enterprise in inactive state",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("handleEnrollDevice");
+              },
+            })
+            return
+          } else {
             navigate("/android_management/enroll_device")
+          }
      }
   }
 
@@ -503,6 +530,26 @@ function AndroidDetails() {
   }
 
   const handleDeleteEnterprise = async () => {
+    // Get the current timestamp in milliseconds
+    var timestamp = Date.now();
+    console.log('Current timestamp (milliseconds):', timestamp);
+
+    // Create a Date object for the current timestamp
+    var currentDate = new Date(timestamp);
+    console.log('Current date and time:', currentDate.toString());
+
+    // Set the TTL to 7 days from now
+    const ttlInSeconds = parseInt((Date.now() + 7 * 24 * 60 * 60 * 1000) / 1000); // 7 days in seconds
+    console.log('TTL (7 days later) in seconds:', ttlInSeconds);
+
+    // Create a Date object for the TTL date (7 days later)
+    var ttlDate = new Date(ttlInSeconds * 1000);
+    console.log('TTL date (7 days later):', ttlDate.toString());
+
+    // Calculate 20 minutes before the TTL date
+    const twentyMinutesBeforeTTL = new Date(ttlDate.getTime() - 15 * 60 * 1000);
+    console.log('Date 20 minutes before TTL:', twentyMinutesBeforeTTL.toString());
+
     try{
       if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
       { 
@@ -515,19 +562,62 @@ function AndroidDetails() {
           },
         })
       } else {
-        setDialogDeleteData({
-          title: `${selectedOptionEnterprise.label} Delete Enterprise`,
-          message: "Are You Sure you want to Delete this Enterprise",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(`clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
-            handleEnterprises(selectedOptionEnterprise.value)
-          },
-        });
+        confirmationDialog.current.showDialog(
+          `${selectedOptionEnterprise.label} Delete Enterprise`,
+          `These Device will be delete and will reset. You have until ${twentyMinutesBeforeTTL} to undo delete .`,
+          "DELETE",
+          handleEnterprises
+        );
+        // setDialogDeleteData({
+        //   title: `${selectedOptionEnterprise.label} Delete Enterprise`,
+        //   message: "Are You Sure you want to Delete this Enterprise",
+        //   onClickAction: () => {
+        //     // Handle the action when the user clicks OK
+        //     console.log(`clicked ${selectedOptionEnterprise.label} Delete Enterprise `);
+        //     handleEnterprises(selectedOptionEnterprise.value)
+        //   },
+        // });
       }
     } catch( err) {
       handleError(err, 'Error handleDeleteEnterprise')
     } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  const handleUndoSoftDelete = async () => {
+    try {
+      if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
+        { 
+            setDialogData({
+            title: "Validation Error",
+            message: "Please Select Enterprise",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("handleDeleteEnterprise");
+            },
+          })
+        } else {
+          dispatch(startLoading()); // Dispatch the startLoading action
+          console.log('handleUndoSoftDelete');
+          var result = await executeUndoSoftDeleteEnterpriseLambda(user?.credentials, selectedOptionEnterprise?.value);
+          console.log('result',result);
+          if(result.statusCode == 200) {
+            setDialogData({
+              title: "Success",
+              message: "Undo Delete this enterprise Successfully",
+              onClickAction: async () => {
+                dispatch(setSelectedOptionEnterprise(null))
+                dispatch(setEnterpriseDetail(null))
+                setSelectedEnterprises([]);
+              },
+            })
+          } 
+          setSelectedEnterprises([]);
+          dispatch(stopLoading()); // Dispatch the stopLoading action
+        }
+    } catch( err) {
+      handleError(err, 'Error handleUndoSoftDelete')
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   }
@@ -1328,26 +1418,25 @@ function AndroidDetails() {
             }}
           />
         </div>
-
-        <div style={{ float: "left", marginLeft: "10px" }}>
-          <div style={{ ...complexCompositionStyle.complexTitleClient }}>
-            {"Android Device List"} &nbsp;
-          </div>
-        </div>
-        <Button
-              onClick={() => handleEnrollDevice()}
-              color="primary"
-              className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
-              style={{
-                ...whiteSurfaceCircularBorder,
-                width: "50px",
-                height: "30px",
-                // borderRadius: "8%",
-                fontSize: "14px", // Adjust font size here
-              }}
-            >
-         <span style={{ marginRight: '2px', color: "blue"}}><AddIcon/></span>
-            </Button>
+            <div style={{ float: "left", marginLeft: "10px" }}>
+              <div style={{ ...complexCompositionStyle.complexTitleClient }}>
+                {"Android Device List"} &nbsp;
+              </div>
+            </div>
+              <Button
+                    onClick={() => handleEnrollDevice()}
+                    color="primary"
+                    className="px-2 d-flex align-items-center" // Adjust padding and add flex properties
+                    style={{
+                      ...whiteSurfaceCircularBorder,
+                      width: "50px",
+                      height: "30px",
+                      // borderRadius: "8%",
+                      fontSize: "14px", // Adjust font size here
+                    }}
+                  >
+              <span style={{ marginRight: '2px', color: "blue"}}><AddIcon/></span>
+              </Button>
       </div>
     );
   };
@@ -1533,7 +1622,7 @@ function AndroidDetails() {
 
   const memoizedListsDeviceComponent = useMemo(() => {
     return <ListsDeviceComponent />;
-  }, [listDeviceFetch,selectedOptionEnterprise,kioskState]);
+  }, [listDeviceFetch,selectedOptionEnterprise,kioskState,enterpriseDetail]);
 
   const DeviceInfoComponent = () => {
     console.log("selectedDeviceFetch", selectedDeviceFetch);
@@ -1933,16 +2022,18 @@ function AndroidDetails() {
                   >
                     <EditIcon />
                   </Button>
-                  <Button
-                    onClick={() => {
-                      handleDeleteEnterprise();
-                    }}
-                    outline
-                    color="primary"
-                    className="delete-button"
-                  >
-                    <DeleteIcon  color="error"/>
-                  </Button>
+                  {enterpriseDetail?.state == 'active' ? <Button
+                      onClick={() => {
+                        handleDeleteEnterprise();
+                      }}
+                      outline
+                      color="primary"
+                      className="delete-button"
+                    >
+                      <DeleteIcon  color="error"/>
+                    </Button>  : (
+                    null
+                  )}
                     </>
                   )}
                 </div>
@@ -1959,6 +2050,7 @@ function AndroidDetails() {
                       className="select-dropdown"
                     />
                   </div>
+                  {enterpriseDetail?.state == 'active' && (
                   <Button
                     onClick={() => {
                       createPolicy();
@@ -1969,6 +2061,7 @@ function AndroidDetails() {
                   >
                     <AddIcon />
                   </Button>
+                  )}
                   {
                    (selectedOptionEnterprise?.value !== "" && selectedOptionEnterprise !== null && selectedOptionEnterprise?.value !== undefined && policyDetails !== null) 
                    &&  (
@@ -2109,9 +2202,25 @@ function AndroidDetails() {
               {complexDetailShow == 0 ?  
               <ErrorBoundary>{
                 <div className="container">
-                  <Row>
+                  <Row style={{marginTop: "10px" , width: "35%"}}>
+                    <Col md="7">
                       <b>Enterprise Details</b> 
-                  </Row>
+                    </Col>
+                    <Col md="5">
+                        {enterpriseDetail?.state == 'inactive' && (
+                            <Button
+                              onClick={() => {
+                                handleUndoSoftDelete();
+                              }}
+                              outline
+                              color="primary"
+                              className="delete-button"
+                            >
+                              <span color="red">Undo Delete</span>
+                            </Button>
+                          )} 
+                    </Col>
+                  </Row>     
                 <Row style={{width: "95%"}}>
                   <Col md="12">
                     <Card

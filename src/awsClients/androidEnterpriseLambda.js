@@ -1172,3 +1172,65 @@ export function executeReintiate_DEVICE_PROV_GET_INFO_RESP_INITLambda(
     });
   });
 }
+
+export function executeSoftDeleteEnterpriseLambda(
+  credentials,
+  name
+) {
+  return new Promise(function (resolve, reject) {
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "Soft_delete_enterprise",
+      Payload: JSON.stringify({
+        name: name,
+        soft_delete: "true",
+      })
+    };
+    
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
+
+export function executeUndoSoftDeleteEnterpriseLambda(
+  credentials,
+  name
+) {
+  return new Promise(function (resolve, reject) {
+    var lambda = new AWS.Lambda({
+      region: "ap-south-1",
+      apiVersion: "2015-03-31",
+      credentials: credentials, // Pass the credentials from the Redux store
+    });
+    var pullParams = {
+      FunctionName: "undo_soft_delete_enterprise",
+      Payload: JSON.stringify({
+        name: name,
+        soft_delete: "false",
+      })
+    };
+    
+    lambda.invoke(pullParams, function (err, data) {
+      if (err) {
+        console.log("_lambda", err);
+        reject(err);
+      } else {
+        var pullResults = JSON.parse(data.Payload);
+        console.log("_lambda", pullResults);
+        resolve(pullResults);
+      }
+    });
+  });
+}
