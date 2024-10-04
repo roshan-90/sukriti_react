@@ -432,7 +432,14 @@ function AndroidDetails() {
               setSelectedEnterprises([]);
             },
           })
-        } 
+        } else {
+          setDialogData({
+            title: "Error",
+            message: "Something went wrong Please try again later",
+            onClickAction: async () => {
+            },
+          })
+        }
     } catch( err) {
       handleError(err, 'Error handle soft delete enterprise')
       dispatch(stopLoading()); // Dispatch the stopLoading action
@@ -610,10 +617,17 @@ function AndroidDetails() {
                 dispatch(setSelectedOptionEnterprise(null))
                 dispatch(setEnterpriseDetail(null))
                 setSelectedEnterprises([]);
+                setSelectedEnterprises([]);
               },
             })
-          } 
-          setSelectedEnterprises([]);
+          } else {
+            setDialogData({
+              title: "Error",
+              message: "Something went wrong Please try again later",
+              onClickAction: async () => {
+              },
+            })
+          }
           dispatch(stopLoading()); // Dispatch the stopLoading action
         }
     } catch( err) {
@@ -2208,6 +2222,16 @@ function AndroidDetails() {
                     </Col>
                     <Col md="5">
                         {enterpriseDetail?.state == 'inactive' && (
+                          <>
+                          <p> <span style={{ color: 'red' }}>
+                            {new Date(enterpriseDetail?.ttl * 1000).toLocaleString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span></p>
                             <Button
                               onClick={() => {
                                 handleUndoSoftDelete();
@@ -2218,6 +2242,7 @@ function AndroidDetails() {
                             >
                               <span color="red">Undo Delete</span>
                             </Button>
+                            </>
                           )} 
                     </Col>
                   </Row>     
