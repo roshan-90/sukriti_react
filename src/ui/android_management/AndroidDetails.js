@@ -64,13 +64,13 @@ import ModalEditDevices from './ModalEditDevices';
 import ModalCreatePolicy from './ModalCreatePolicy';
 import ModalUpdatePolicy from './ModalUpdatePolicy';
 import ConfirmationDialog from "../../dialogs/ConfirmationDialog";
+import DeleteEnterpriseDialog from "./DeleteEnterpriseDialog";
 import ModalDeletePolicy from './ModalDeletePolicy';
 import RegisterComplex from './RegisterComplex';
 import UpdateComplex from './UpdateComplex'
 import ModalReinitiate from './ModalReinitiate';
 import ShareIcon from '@mui/icons-material/Share';
 import ModalShareQR from "./ModalShareQR";
-
 
 const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
   const [formData, setFormData] = useState({
@@ -118,7 +118,6 @@ const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
     </Modal>
   );
 };
-
 function AndroidDetails() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -148,6 +147,7 @@ function AndroidDetails() {
   const [listDevices, setListDevices] = useState(undefined);
   const [dialogUpdatePolicy, setDialogUpdatePolicy] = useState(false);
   const confirmationDialog = useRef();
+  const Dialogdelete = useRef();
   const [complexDetailShow, setComplexDetailShow] = useState(3);
   const ComplexIotDetails = useSelector((state) => state.androidManagement.complexIotDetail);
   const [registerComplex, setRegisterComplex] = useState(false);
@@ -569,7 +569,7 @@ function AndroidDetails() {
           },
         })
       } else {
-        confirmationDialog.current.showDialog(
+        Dialogdelete.current.showDialog(
           `${selectedOptionEnterprise.label} Delete Enterprise`,
           `These Device will be delete and will reset. You have until ${twentyMinutesBeforeTTL} to undo delete .`,
           "DELETE",
@@ -1977,6 +1977,7 @@ function AndroidDetails() {
         <ModalCreatePolicy data={dialogCreatePolicy} />
         <ModalUpdatePolicy data={dialogUpdatePolicy} />
         <ConfirmationDialog ref={confirmationDialog} />
+        <DeleteEnterpriseDialog ref={Dialogdelete} />
         <ModalDeletePolicy data={dialogDeletePolicy} />
         <ModalReinitiate data={reinitiate} />
         {(registerComplex) && (
