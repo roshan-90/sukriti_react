@@ -12,14 +12,15 @@ import {
   executelistDDbCityLambda,
   executeAddDdbStateLambda,
   executeAddBillingroupLambda,
-  executeClientGroupLambda
+  executeClientGroupLambda,
+  executedFetchListLogoLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { setResetData } from "../../features/androidManagementSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setlogoList} from "../../features/androidManagementSlice";
 import ModalSelect from '../../dialogs/ModalSelect';
 import ModalClient from './ModalClient';
 import ModalBillingGroup from './ModalBillingGroup';
@@ -32,6 +33,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const ListclientName = useSelector((state) => state.androidManagement.clientName);
   const ListbillingGroups = useSelector((state) => state.androidManagement.billingGroups);
   const complexName = useSelector((state) => state.androidManagement.complexName);
+  const ListOfLogo = useSelector((state) => state.androidManagement.logoList);
   const [selectedClientName, setSelectedClientName] = useState(null); // State for react-select
   const [selectedbillingGroups, setSelectedbillingGroups] = useState(null); // State for react-select
   const [selectedDate, setSelectedDate] = useState(null);
@@ -196,8 +198,8 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
           label: item.NAME
         }));
         dispatch(setCityIotList(options));
-        ListOfIotClientName();
-        ListOfIotBillingGroup();
+        // ListOfIotClientName();
+        // ListOfIotBillingGroup();
       }
     } catch (error) {
       handleError(error, 'Error ListOfIotCity')
@@ -259,6 +261,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
     console.log('handleChangeClientName',selectedOption)
     setFormData({ ...formData, CLNT: selectedOption.value });
     setSelectedClientName(selectedOption)
+    FetchListOfLogo(selectedOption.value)
 
   }
 
@@ -562,6 +565,31 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
       },
     });
   }
+
+  const FetchListOfLogo = async (name) => {
+    try {
+      dispatch(startLoading());
+      var result = await executedFetchListLogoLambda(user?.credentials, name);
+      console.log('result FetchListOfLogo', result.body);
+      if(result.statusCode == 200) {
+        dispatch(setlogoList(result.body));
+      } else {
+        setDialogData({
+          title: "Error",
+          message: `Something Went wrong.`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log('FetchListOfLogo showing error')
+            },
+          });
+      }
+    } catch (error) {
+      handleError(error, 'Error FetchListOfLogo')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
 
   const ListOfIotClientName = async () => {
     try {
@@ -883,13 +911,24 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       </Label>
 
                       <Col sm={7}>
-                      <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
+                      <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName}  onMenuOpen={() => {
+                        if (!ListclientName || ListclientName.length === 0) {
+                          ListOfIotClientName();
+                        }
+                      }} placeholder="Client Name" />
                       </Col>
                       <Col sm={2}>
                         <Button color="success" onClick={handleModalClient}>
                           New
                         </Button>{' '}
                     </Col>
+                    {ListOfLogo.length > 0 && (ListOfLogo?.map((item, index) => {
+                     return (
+                      <Row> 
+                            <img key={index} src={item} style={{width:"20%"}}/>
+                      </Row> 
+                     )
+                    }))}
                     </FormGroup>
                     <FormGroup row>
                       <Label
@@ -899,7 +938,11 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                       <b style={{fontSize:"small"}}>  Billing Group</b>
                       </Label>
                       <Col sm={7}>
-                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} placeholder="Billing Group Name" />
+                        <Select options={ListbillingGroups || []} value={selectedbillingGroups} onChange={handleChangeBillingGroup} onMenuOpen={() => {
+                        if (!ListbillingGroups || ListbillingGroups.length === 0) {
+                          ListOfIotBillingGroup();
+                        }
+                      }} placeholder="Billing Group Name" />
                       </Col>
                       <Col sm={2}>
                         <Button color="success" onClick={handleBillingGroup}>
