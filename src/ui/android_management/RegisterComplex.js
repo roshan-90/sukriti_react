@@ -53,6 +53,29 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   const [modalBillingGroup, setModalBillingGroup] = useState(null);
   const [complexVerify, setComplexVerify ] = useState(null);
   const complexIotList = useSelector((state) => state.androidManagement.complexIotList);
+  const [checkedState, setCheckedState] = useState([]);
+
+ // Update checkedState when ListOfLogo changes
+ useEffect(() => {
+  if (ListOfLogo.length > 0) {
+    setCheckedState(new Array(ListOfLogo.length).fill(false));
+  }
+}, [ListOfLogo]);
+
+  // Function to handle checkbox change
+  const handleCheckboxChange = (index) => {
+    const updatedCheckedState = checkedState.map((item, i) =>
+      i === index ? !item : item
+  );
+  setCheckedState(updatedCheckedState);
+};
+
+ // Get all checked items
+ const getCheckedValues = () => {
+  return ListOfLogo.filter((item, index) => checkedState[index]);
+};
+
+console.log('Checked items:', getCheckedValues()); // Logs checked items
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -922,13 +945,27 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
                           New
                         </Button>{' '}
                     </Col>
-                    {ListOfLogo.length > 0 && (ListOfLogo?.map((item, index) => {
-                     return (
-                      <Row> 
-                            <img key={index} src={item} style={{width:"20%"}}/>
-                      </Row> 
-                     )
-                    }))}
+                    <Row style={{ margin: "10px" }}>
+                        {ListOfLogo.length > 0 && ListOfLogo.map((item, index) => (
+                          <div key={index} style={{ position: "relative", width: "20%", margin: "10px" }}>
+                            {/* Checkbox */}
+                            <input
+                              type="checkbox"
+                              id={`checkbox-${index}`}
+                              checked={checkedState[index]}
+                              onChange={() => handleCheckboxChange(index)}
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                zIndex: 1 // Ensure checkbox is above the image
+                              }}
+                            />
+                            {/* Image */}
+                            <img src={item} alt={`logo-${index}`} style={{ width: "100%" }} />
+                          </div>
+                        ))}
+                      </Row>
                     </FormGroup>
                     <FormGroup row>
                       <Label
