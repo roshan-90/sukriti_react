@@ -62,20 +62,7 @@ export const RegisterComplex = ({ openModal , selected, setModalToggle}) => { //
   }
 }, [ListOfLogo]);
 
-  // Function to handle checkbox change
-  const handleCheckboxChange = (index) => {
-    const updatedCheckedState = checkedState.map((item, i) =>
-      i === index ? !item : item
-  );
-  setCheckedState(updatedCheckedState);
-};
 
- // Get all checked items
- const getCheckedValues = () => {
-  return ListOfLogo.filter((item, index) => checkedState[index]);
-};
-
-console.log('Checked items:', getCheckedValues()); // Logs checked items
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -99,6 +86,7 @@ console.log('Checked items:', getCheckedValues()); // Logs checked items
     CITY_NAME : "",
     CIVL : "",
     CLNT : "",
+    CLIENT_LOGO: "https://sukriti-mis-logos.s3.amazonaws.com/IOCL/default.png",
     COCO : "false",
     CWTM : "",
     DATE : "",
@@ -132,7 +120,24 @@ console.log('Checked items:', getCheckedValues()); // Logs checked items
     Parent: ""
   });
 
+// Function to handle checkbox change (radio button-like behavior)
+const handleCheckboxChange = (index) => {
+  const updatedCheckedState = checkedState.map((_, i) =>
+    i === index ? true : false
+  );
+  console.log('logo value', ListOfLogo[index]);
+  setFormData({ ...formData, CLIENT_LOGO: ListOfLogo[index] });
+  setCheckedState(updatedCheckedState);
+};
 
+
+ // Get all checked items
+ const getCheckedValues = () => {
+  return ListOfLogo.filter((item, index) => checkedState[index]);
+};
+
+console.log('Checked items:', getCheckedValues()); // Logs checked items
+console.log('formData', formData);
 
   // useEffect(() => {
   //   if(ListclientName && ListbillingGroups ) {
@@ -352,7 +357,6 @@ console.log('Checked items:', getCheckedValues()); // Logs checked items
   const submitForm = (e) => {
     let name = formData.Name
     let Parent = formData.Parent;
-
     // Deleting the keys
     delete formData.Name;
     delete formData.Parent;
