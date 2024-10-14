@@ -17,7 +17,7 @@ import StepButton from '@mui/material/StepButton';
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import CardContent from '@mui/material/CardContent';
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName, setResetData} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName, setResetData, setwifiList} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { BiMaleFemale } from "react-icons/bi";
 import { selectUser } from "../../features/authenticationSlice";
@@ -25,7 +25,8 @@ import {
   executelistProvisionLambda,
   executeUpdateDeviceLambda,
   executeListPolicyLambda,
-  executeShareQrLambda
+  executeShareQrLambda,
+  executedFetchListWIFILambda
 } from "../../awsClients/androidEnterpriseLambda";
 import ShareIcon from '@mui/icons-material/Share';
 import ModalShareQR from "./ModalShareQR";
@@ -79,6 +80,12 @@ const ModalReinitiate = ({ data }) => {
   const [qrDisable, setQrDisable] = useState(false);
   const [qrShare , setQrShare] = useState(null);
   const [amsEnableOptions, setAmsEnableOption] = useState(false);
+  const listOfWifi = useSelector((state) => state.androidManagement.wifiList);
+  // State to track checkbox states and selected items
+  const [checkedState, setCheckedState] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [showRadios, setShowRadios] = useState(false); // To toggle radio buttons
+  const [defaultWifi, setDefaultWifi] = useState(null); // To store selected default Wi-Fi
 
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
@@ -122,6 +129,23 @@ const ModalReinitiate = ({ data }) => {
     { label: 'True', value: true},
     { label: 'False', value: false}
   ];
+
+   // Update checkedState when listOfWifi changes
+   useEffect(() => {
+    if (listOfWifi?.length > 0) {
+      setCheckedState(new Array(listOfWifi?.length).fill(false));
+    }
+  }, [listOfWifi]);
+
+    // Handle Set Default button click
+    const handleSetDefaultClick = () => {
+      setShowRadios(!showRadios); // Toggle visibility of radio buttons
+    };
+
+    // Handle radio button selection
+  const handleRadioWifiDefaultChange = (index) => {
+    setDefaultWifi(index); // Store the selected Wi-Fi index
+  };
 
   useEffect(() => {
     console.log('data',data);
@@ -176,7 +200,40 @@ const ModalReinitiate = ({ data }) => {
     }
   }, [data,]);
 
-  
+    
+  // Function to handle checkbox change and store selected items
+  const handleCheckboxChange = (index, item) => {
+    const updatedCheckedState = checkedState.map((_, i) => (i === index ? !checkedState[i] : checkedState[i]));
+    setCheckedState(updatedCheckedState);
+
+    // Update selected items list based on checked state
+    if (!checkedState[index]) {
+      // If unchecked -> checked, add item to selected items
+      setSelectedItems([...selectedItems, item]);
+    } else {
+      // If checked -> unchecked, remove item from selected items
+      setSelectedItems(selectedItems.filter((selectedItem) => selectedItem !== item));
+    }
+  };
+
+
+  const FetchListOFWIFI = async () => {
+    try {
+      dispatch(startLoading());
+      var result = await executedFetchListWIFILambda(user?.credentials); 
+      if(result.statusCode == 200) {
+        dispatch(setwifiList(result.body));
+      } else {
+        console.log(' error result.body',result.body)
+      }
+    } catch (error) {
+      handleError(error, 'Error FetchListOFWIFI')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  console.log('listOfWifi', listOfWifi);
 
   const handleClose = () => {
     setOpen(false);

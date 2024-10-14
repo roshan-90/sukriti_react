@@ -12,7 +12,8 @@ import {
   executelistProvisionLambda,
   executeUpdateDeviceLambda,
   executeCreatePolicyLambda,
-  executeShareQrLambda
+  executeShareQrLambda,
+  executedFetchListWIFILambda
 } from "../../awsClients/androidEnterpriseLambda";
 import StepButton from '@mui/material/StepButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -23,7 +24,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import { selectUser } from "../../features/authenticationSlice";
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName, setPolicyDetails, setResetData} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName, setPolicyDetails, setResetData, setwifiList} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
@@ -60,6 +61,7 @@ export default function EnrollDevice() {
   const selectedCabin = useSelector((state) => state.androidManagement.cabinName);
   const listOfPolicy = useSelector((state) => state.androidManagement.listOfPolicy);
   const policyName = useSelector((state) => state.androidManagement.policyName);
+  const listOfWifi = useSelector((state) => state.androidManagement.wifiList);
   const [complexChanged, setComplexChanged] = useState(false);
   const [registerComplex, setRegisterComplex] = useState(false);
   const [registerCabin, setRegisterCabin] = useState(false);
@@ -103,6 +105,12 @@ export default function EnrollDevice() {
   const [policyEnabled, setPolicyEnabled] = useState(false)
   const [amsEnableOptions, setAmsEnableOption] = useState(false);
 
+  // State to track checkbox states and selected items
+  const [checkedState, setCheckedState] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [showRadios, setShowRadios] = useState(false); // To toggle radio buttons
+  const [defaultWifi, setDefaultWifi] = useState(null); // To store selected default Wi-Fi
+
   useEffect(() => {
     setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
     setUpiPaymentStatus({ label: 'No', value: 'No' })
@@ -130,7 +138,25 @@ export default function EnrollDevice() {
     setSerialNumberEnable(false);
     setApplicationDetails(false);
     console.log('dddd')
+    
   },[]);
+
+  // Update checkedState when listOfWifi changes
+  useEffect(() => {
+    if (listOfWifi?.length > 0) {
+      setCheckedState(new Array(listOfWifi?.length).fill(false));
+    }
+  }, [listOfWifi]);
+
+    // Handle Set Default button click
+    const handleSetDefaultClick = () => {
+      setShowRadios(!showRadios); // Toggle visibility of radio buttons
+    };
+
+    // Handle radio button selection
+  const handleRadioWifiDefaultChange = (index) => {
+    setDefaultWifi(index); // Store the selected Wi-Fi index
+  };
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
@@ -140,6 +166,9 @@ export default function EnrollDevice() {
   const handlePolicy = (value) => {
     dispatch(setPolicyName(value));
   }
+  console.log('Selected Items:', selectedItems);
+  console.log('defaultWifi', defaultWifi);
+  console.log('showRadios', showRadios);
 
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
@@ -212,6 +241,40 @@ export default function EnrollDevice() {
     }
   };
   
+  // Function to handle checkbox change and store selected items
+  const handleCheckboxChange = (index, item) => {
+    const updatedCheckedState = checkedState.map((_, i) => (i === index ? !checkedState[i] : checkedState[i]));
+    setCheckedState(updatedCheckedState);
+
+    // Update selected items list based on checked state
+    if (!checkedState[index]) {
+      // If unchecked -> checked, add item to selected items
+      setSelectedItems([...selectedItems, item]);
+    } else {
+      // If checked -> unchecked, remove item from selected items
+      setSelectedItems(selectedItems.filter((selectedItem) => selectedItem !== item));
+    }
+  };
+
+
+  const FetchListOFWIFI = async () => {
+    try {
+      dispatch(startLoading());
+      var result = await executedFetchListWIFILambda(user?.credentials); 
+      if(result.statusCode == 200) {
+        dispatch(setwifiList(result.body));
+      } else {
+        console.log(' error result.body',result.body)
+      }
+    } catch (error) {
+      handleError(error, 'Error FetchListOFWIFI')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
+
+  console.log('listOfWifi', listOfWifi);
+
   const ListOfIotState = async () => {
     try {
       dispatch(startLoading());
@@ -425,8 +488,9 @@ export default function EnrollDevice() {
     setSelectedOptionIotCity(selectedOption);
     ListOfIotComplex(selectedOption.value)
   }
-  const handleChangeIotComplex = (selectedOption) => {
+  const handleChangeIotComplex = async (selectedOption) => {
     console.log('handleChangeIotComplex',selectedOption);
+    await FetchListOFWIFI();
     dispatch(setComplexName(selectedOption.value));
     setSelectedOptionIotComplex(selectedOption);
     ListOfIotComplexDetails(selectedOption.value)
@@ -1319,16 +1383,72 @@ export default function EnrollDevice() {
                       value = {applicationFormData.margin_bottom}
                     />
                     <br />
-                    {applicationDetails == true ? <></>: (
-                      <Button
-                        variant="contained"
-                        onClick={handleSaveDetails}
-                      >
-                        Save Details
+                    <label>Wifi Credentials</label>
+                    {/*  Component rendering Wi-Fi list with checkboxes */}
+                    {listOfWifi.map((item, index) => (
+                        <>
+                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "100%" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between", // Space between checkbox, text, and radio button
+                                width: "100%",  // Full width to avoid content breaking
+                                position: "relative",
+                              }}
+                            >
+                              {/* Left section (Checkbox + Wi-Fi info) */}
+                              <div style={{ display: "flex", alignItems: "center", width: "80%" }}>
+                                {/* Checkbox */}
+                                <input
+                                  type="checkbox"
+                                  id={`checkbox-${index}`}
+                                  checked={checkedState[index] || false} // Ensure checkedState[index] is boolean
+                                  onChange={() => handleCheckboxChange(index, item)} // Pass index and item for selection
+                                  style={{
+                                    marginRight: "20px", // Adds space between checkbox and text
+                                  }}
+                                />
+
+                                {/* Display Wi-Fi name and password */}
+                                <div style={{ flexGrow: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  <div>{item.name}</div>
+                                  <div>{item.password}</div>
+                                </div>
+                              </div>
+
+                              {/* Right section (Radio Button for Set Default) */}
+                              {showRadios && (
+                                <input
+                                  type="radio"
+                                  name="defaultWifi"
+                                  checked={defaultWifi === index}
+                                  onChange={() => handleRadioWifiDefaultChange(index)}
+                                  style={{ marginLeft: "20px" }}
+                                />
+                              )}
+                            </div>
+                          </Card>
+                          <br />
+                        </>
+                      ))}
+
+                      <br />
+                      
+                      <Button variant="contained" onClick={handleSetDefaultClick}>
+                        {showRadios ? 'Choose Default wifi' : 'Set Default Wifi'}
                       </Button>
-                    )}
+                      <br />
+                      <br />
+                      {applicationDetails == true ? <></> : (
+                        <Button variant="contained" onClick={handleSaveDetails}>
+                          Save Details
+                        </Button>
+                      )}
+
+
                     </>
-                  )}
+                   )}
                 </div>
               )}
               {activeStep === 5 && (
