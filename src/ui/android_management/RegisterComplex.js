@@ -595,6 +595,7 @@ console.log('formData', formData);
 
   const FetchListOfLogo = async (name) => {
     try {
+      dispatch(setlogoList([]));
       dispatch(startLoading());
       var result = await executedFetchListLogoLambda(user?.credentials, name);
       console.log('result FetchListOfLogo', result.body);

@@ -7,13 +7,14 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css'; // Importing the styles for react-datepicker
 import {
   executeUpdateComplexLambda,
-  executeDeleteComplexLambda
+  executeDeleteComplexLambda,
+  executedFetchListLogoLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
-import { setResetData } from "../../features/androidManagementSlice";
+import { setResetData, setlogoList } from "../../features/androidManagementSlice";
 
 export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, handleResetComplex = null}) => { // Receive complexChanged as a prop
   const [modal, setModal] = useState(true);
@@ -30,6 +31,8 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
+  const ListOfLogo = useSelector((state) => state.androidManagement.logoList);
+  const [checkedState, setCheckedState] = useState([]);
 
   const smartnessLevels = [
     { label: 'None', value: 'None' },
@@ -53,6 +56,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
     CITY_NAME : "",
     CIVL : "",
     CLNT : "",
+    CLIENT_LOGO: "https://sukriti-mis-logos.s3.amazonaws.com/IOCL/default.png",
     COCO : "",
     CWTM : "",
     DATE : "",
@@ -95,6 +99,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
         CITY_NAME : ComplexIotDetails.CITY_NAME,
         CIVL : ComplexIotDetails.CIVL,
         CLNT : ComplexIotDetails.CLNT,
+        CLIENT_LOGO: ComplexIotDetails?.CLIENT_LOGO ?? "https://sukriti-mis-logos.s3.amazonaws.com/IOCL/default.png",
         COCO : ComplexIotDetails.COCO,
         CWTM : ComplexIotDetails.CWTM,
         DATE : ComplexIotDetails.DATE,
@@ -125,6 +130,16 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
         THINGGROUPTYPE : ComplexIotDetails.THINGGROUPTYPE, 
         UUID : ComplexIotDetails.UUID
       })
+
+      // if(ComplexIotDetails?.CLIENT_LOGO) {
+      //   setFormData({ CLIENT_LOGO : ComplexIotDetails?.CLIENT_LOGO})
+      // }
+    }
+
+    if(ComplexIotDetails.CLNT) {
+      FetchListOfLogo(ComplexIotDetails.CLNT);
+    } else {
+      console.log('client name not found');
     }
 
     // Check if ComplexIotDetails is available and DATE is in the correct format
@@ -141,6 +156,13 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
       setSelectedDate(new Date());
     }
   }, [ComplexIotDetails]);
+
+  // Update checkedState when ListOfLogo changes
+ useEffect(() => {
+  if (ListOfLogo.length > 0) {
+    setCheckedState(new Array(ListOfLogo.length).fill(false));
+  }
+}, [ListOfLogo]);
 
   
   useEffect(() => {
@@ -159,6 +181,22 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
       setSelectedbillingGroups(selectetBillingOption || null);
     }
   },[ListclientName,ListbillingGroups])
+
+  // Function to handle checkbox change (radio button-like behavior)
+const handleCheckboxChange = (index) => {
+  const updatedCheckedState = checkedState.map((_, i) =>
+    i === index ? true : false
+  );
+  console.log('logo value', ListOfLogo[index]);
+  setFormData({ ...formData, CLIENT_LOGO: ListOfLogo[index] });
+  setCheckedState(updatedCheckedState);
+};
+
+
+ // Get all checked items
+ const getCheckedValues = () => {
+  return ListOfLogo.filter((item, index) => checkedState[index]);
+};
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -197,7 +235,7 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
     console.log('handleChangeClientName',selectedOption)
     setFormData({ ...formData, CLNT: selectedOption.value });
     setSelectedClientName(selectedOption)
-
+    FetchListOfLogo(selectedOption.value)
   }
 
   const handleChangeBillingGroup = (selectedOption) => {
@@ -291,6 +329,31 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
       }
     console.log('formData',outputArray)
     updateComplex(outputArray);
+  }
+
+  const FetchListOfLogo = async (name) => {
+    try {
+      dispatch(setlogoList([]));
+      dispatch(startLoading());
+      var result = await executedFetchListLogoLambda(user?.credentials, name);
+      console.log('result FetchListOfLogo', result.body);
+      if(result.statusCode == 200) {
+        dispatch(setlogoList(result.body));
+      } else {
+        setDialogData({
+          title: "Error",
+          message: `Something Went wrong.`,
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log('FetchListOfLogo showing error')
+            },
+          });
+      }
+    } catch (error) {
+      handleError(error, 'Error FetchListOfLogo')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
   }
 
   const deleteComplex = async() => {
@@ -513,6 +576,27 @@ export const UpdateComplex = ({ complexChanged , selected, setComplexChanged, ha
                       <Col sm={10}>
                       <Select options={ListclientName || []} value={selectedClientName} onChange={handleChangeClientName} placeholder="Client Name" />
                       </Col>
+                      <Row style={{ margin: "10px" }}>
+                        {ListOfLogo.length > 0 && ListOfLogo.map((item, index) => (
+                          <div key={index} style={{ position: "relative", width: "20%", margin: "10px" }}>
+                            {/* Checkbox */}
+                            <input
+                              type="checkbox"
+                              id={`checkbox-${index}`}
+                              checked={checkedState[index]}
+                              onChange={() => handleCheckboxChange(index)}
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                zIndex: 1 // Ensure checkbox is above the image
+                              }}
+                            />
+                            {/* Image */}
+                            <img src={item} alt={`logo-${index}`} style={{ width: "100%" }} />
+                          </div>
+                        ))}
+                      </Row>
                     </FormGroup>
                     <FormGroup row>
                       <Label
