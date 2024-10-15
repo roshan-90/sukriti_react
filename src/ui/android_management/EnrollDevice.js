@@ -95,7 +95,9 @@ export default function EnrollDevice() {
     margin_right: "",
     margin_top: "",
     margin_bottom: "",
-    isAmsEnabled: ""
+    isAmsEnabled: "",
+    wifiCredentials: [], // Initialize as an empty array
+    defaultWifi: {},
   })
   const [qrImage, setQrImage] = useState(null);
   const [serialNumberEnable, setSerialNumberEnable] = useState(false);
@@ -156,6 +158,11 @@ export default function EnrollDevice() {
     // Handle radio button selection
   const handleRadioWifiDefaultChange = (index) => {
     setDefaultWifi(index); // Store the selected Wi-Fi index
+    console.log(listOfWifi[index])
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      defaultWifi: listOfWifi[index],
+    }));
   };
 
   const handleRadioChange = (cabin) => {
@@ -169,7 +176,7 @@ export default function EnrollDevice() {
   console.log('Selected Items:', selectedItems);
   console.log('defaultWifi', defaultWifi);
   console.log('showRadios', showRadios);
-
+  console.log('applicationFormData', applicationFormData);
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
     { label: 'Toilet Monitoring System', value: 'Toilet Monitoring System'},
@@ -245,16 +252,35 @@ export default function EnrollDevice() {
   const handleCheckboxChange = (index, item) => {
     const updatedCheckedState = checkedState.map((_, i) => (i === index ? !checkedState[i] : checkedState[i]));
     setCheckedState(updatedCheckedState);
-
-    // Update selected items list based on checked state
+  
+    // Ensure that wifiCredentials is an array before working with it
+    const currentWifiCredentials = Array.isArray(applicationFormData.wifiCredentials) 
+      ? applicationFormData.wifiCredentials 
+      : [];  // If somehow it's not an array, fall back to an empty array
+  
+    let updatedWifiCredentials = [...currentWifiCredentials];
+  
     if (!checkedState[index]) {
-      // If unchecked -> checked, add item to selected items
+      // If unchecked -> checked, add listOfWifi[index] to wifiCredentials
+      updatedWifiCredentials.push(listOfWifi[index]); // Push the selected wifi data (name & password)
       setSelectedItems([...selectedItems, item]);
     } else {
-      // If checked -> unchecked, remove item from selected items
+      // If checked -> unchecked, remove listOfWifi[index] from wifiCredentials
+      updatedWifiCredentials = updatedWifiCredentials.filter(
+        (wifi) => wifi.name !== listOfWifi[index].name
+      ); // Remove by comparing the `name` field (or any unique field)
       setSelectedItems(selectedItems.filter((selectedItem) => selectedItem !== item));
     }
+  
+    // Update application form data with new wifiCredentials
+    setApplicationFormData({
+      ...applicationFormData,
+      wifiCredentials: updatedWifiCredentials
+    });
+  
+    console.log('updatedWifiCredentials', updatedWifiCredentials);
   };
+  
 
 
   const FetchListOFWIFI = async () => {
@@ -893,6 +919,9 @@ export default function EnrollDevice() {
   }
 
   const handleSaveDetails = async () => {
+
+    console.log('applicationFormData', applicationFormData)
+    return;
     try {
       if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
         { 
