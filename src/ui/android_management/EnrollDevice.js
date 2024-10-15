@@ -516,7 +516,6 @@ export default function EnrollDevice() {
   }
   const handleChangeIotComplex = async (selectedOption) => {
     console.log('handleChangeIotComplex',selectedOption);
-    await FetchListOFWIFI();
     dispatch(setComplexName(selectedOption.value));
     setSelectedOptionIotComplex(selectedOption);
     ListOfIotComplexDetails(selectedOption.value)
@@ -832,6 +831,7 @@ export default function EnrollDevice() {
         }));
         console.log('options',options)
         dispatch(setListOfPolicy(options));
+        await FetchListOFWIFI();
         if(result.statusCode == 200) {
           setSerialNumberEnable(true);
           setNextBtn(true)
@@ -919,9 +919,6 @@ export default function EnrollDevice() {
   }
 
   const handleSaveDetails = async () => {
-
-    console.log('applicationFormData', applicationFormData)
-    return;
     try {
       if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
         { 
@@ -934,6 +931,16 @@ export default function EnrollDevice() {
            },
          })
          return;
+        } else if (applicationFormData.wifiCredentials?.length == 0 || Object.keys(applicationFormData.defaultWifi)?.length === 0) {
+          setDialogData({
+            title: "Validation Error",
+            message: "Please Select Wifi Credentials and select default wifi credentials",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("handleSaveDetails");
+            },
+          })
+          return;
         }
     dispatch(startLoading());
     let object_application_details = {
