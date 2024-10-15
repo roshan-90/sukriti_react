@@ -63,7 +63,9 @@ const ModalReinitiate = ({ data }) => {
     margin_right: "",
     margin_top: "",
     margin_bottom: "",
-    isAmsEnabled: ""
+    isAmsEnabled: "",
+    wifiCredentials: [], // Initialize as an empty array
+    defaultWifi: {}
   })
   const [qrImage, setQrImage] = useState(null);
   const dispatch = useDispatch();
@@ -176,6 +178,24 @@ const ModalReinitiate = ({ data }) => {
         } else {
           setAmsEnableOption({ label: 'False', value: false})
         }
+        if(data.data.application_details?.wifiCredentials?.length > 0) {
+          setApplicationFormData({
+            wifiCredentials: data.data.application_details?.wifiCredentials ?? []
+          })
+          setSelectedItems(data.data.application_details.wifiCredentials);
+        } 
+        
+        if (data.data.application_details?.defaultWifi && Object.keys(data.data.application_details.defaultWifi).length !== 0) {
+          let indexData = listOfWifi.map((item) => item.name).indexOf(data.data.application_details.defaultWifi.name);
+        
+          console.log("indexData", indexData);
+          setApplicationFormData({
+            defaultWifi: data.data.application_details.defaultWifi ?? {}
+          });
+          setDefaultWifi(indexData);
+        }
+        
+        
       } else {
         setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
         setUpiPaymentStatus({ label: 'No', value: 'No' })
@@ -198,12 +218,19 @@ const ModalReinitiate = ({ data }) => {
         setQrImage(data.data.qr_details.qr)
       }
     }
+
+    (async function() {
+      await FetchListOFWIFI();
+    })();
+
   }, [data,]);
 
     
   // Function to handle checkbox change and store selected items
   const handleCheckboxChange = (index, item) => {
     const updatedCheckedState = checkedState.map((_, i) => (i === index ? !checkedState[i] : checkedState[i]));
+    console.log('updatedCheckedState',updatedCheckedState);
+
     setCheckedState(updatedCheckedState);
 
     // Update selected items list based on checked state
@@ -700,7 +727,7 @@ const ModalReinitiate = ({ data }) => {
               {activeStep === 0 && (
                 <div>
                   <h3>Lists of Policy</h3>
-                  {listOfPolicy.length > 0 && (
+                  {listOfPolicy?.length > 0 && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
                     <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" // Prevent click action if policy is already selected
@@ -817,7 +844,64 @@ const ModalReinitiate = ({ data }) => {
                    value={applicationFormData.margin_bottom}
                    disabled
                  />
-                 <br />
+                  <br />
+                    <label>Wifi Credentials</label>
+                    {/*  Component rendering Wi-Fi list with checkboxes */}
+                    {listOfWifi.map((item, index) => (
+                        <>
+                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "100%" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between", // Space between checkbox, text, and radio button
+                                width: "100%",  // Full width to avoid content breaking
+                                position: "relative",
+                              }}
+                            >
+                              {/* Left section (Checkbox + Wi-Fi info) */}
+                              <div style={{ display: "flex", alignItems: "center", width: "80%" }}>
+                                {/* Checkbox */}
+                                <input
+                                  type="checkbox"
+                                  id={`checkbox-${index}`}
+                                  checked={checkedState[index] || false} // Ensure checkedState[index] is boolean
+                                  onChange={() => handleCheckboxChange(index, item)} // Pass index and item for selection
+                                  style={{
+                                    marginRight: "20px", // Adds space between checkbox and text
+                                  }}
+                                />
+
+                                {/* Display Wi-Fi name and password */}
+                                <div style={{ flexGrow: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  <div>{item.name}</div>
+                                  <div>{item.password}</div>
+                                </div>
+                              </div>
+
+                              {/* Right section (Radio Button for Set Default) */}
+                              {showRadios && (
+                                <input
+                                  type="radio"
+                                  name="defaultWifi"
+                                  checked={defaultWifi === index}
+                                  onChange={() => handleRadioWifiDefaultChange(index)}
+                                  style={{ marginLeft: "20px" }}
+                                />
+                              )}
+                            </div>
+                          </Card>
+                          <br />
+                        </>
+                      ))}
+
+                      <br />
+                      
+                      <Button variant="contained" onClick={handleSetDefaultClick}>
+                        {showRadios ? 'Choose Default wifi' : 'Set Default Wifi'}
+                      </Button>
+                      <br />
+                      <br />
                  </>
                   : (
                     <>
@@ -884,7 +968,64 @@ const ModalReinitiate = ({ data }) => {
                     onChange={(e) => handleChange(e)}
                     value={applicationFormData.margin_bottom}
                   />
-                  <br />
+                   <br />
+                    <label>Wifi Credentials</label>
+                    {/*  Component rendering Wi-Fi list with checkboxes */}
+                    {listOfWifi.map((item, index) => (
+                        <>
+                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "100%" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between", // Space between checkbox, text, and radio button
+                                width: "100%",  // Full width to avoid content breaking
+                                position: "relative",
+                              }}
+                            >
+                              {/* Left section (Checkbox + Wi-Fi info) */}
+                              <div style={{ display: "flex", alignItems: "center", width: "80%" }}>
+                                {/* Checkbox */}
+                                <input
+                                  type="checkbox"
+                                  id={`checkbox-${index}`}
+                                  checked={checkedState[index] || false} // Ensure checkedState[index] is boolean
+                                  onChange={() => handleCheckboxChange(index, item)} // Pass index and item for selection
+                                  style={{
+                                    marginRight: "20px", // Adds space between checkbox and text
+                                  }}
+                                />
+
+                                {/* Display Wi-Fi name and password */}
+                                <div style={{ flexGrow: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  <div>{item.name}</div>
+                                  <div>{item.password}</div>
+                                </div>
+                              </div>
+
+                              {/* Right section (Radio Button for Set Default) */}
+                              {showRadios && (
+                                <input
+                                  type="radio"
+                                  name="defaultWifi"
+                                  checked={defaultWifi === index}
+                                  onChange={() => handleRadioWifiDefaultChange(index)}
+                                  style={{ marginLeft: "20px" }}
+                                />
+                              )}
+                            </div>
+                          </Card>
+                          <br />
+                        </>
+                      ))}
+
+                      <br />
+                      
+                      <Button variant="contained" onClick={handleSetDefaultClick}>
+                        {showRadios ? 'Choose Default wifi' : 'Set Default Wifi'}
+                      </Button>
+                      <br />
+                      <br />
                     <Button
                       variant="contained"
                       onClick={handleSaveDetails}
