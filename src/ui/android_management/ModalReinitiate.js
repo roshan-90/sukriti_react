@@ -147,6 +147,10 @@ const ModalReinitiate = ({ data }) => {
     // Handle radio button selection
   const handleRadioWifiDefaultChange = (index) => {
     setDefaultWifi(index); // Store the selected Wi-Fi index
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      defaultWifi: listOfWifi[index],
+    }));
   };
 
   useEffect(() => {
@@ -240,21 +244,38 @@ const ModalReinitiate = ({ data }) => {
 
     
   // Function to handle checkbox change and store selected items
-  const handleCheckboxChange = (index, item) => {
-    const updatedCheckedState = checkedState.map((_, i) => (i === index ? !checkedState[i] : checkedState[i]));
-    console.log('updatedCheckedState',updatedCheckedState);
+ // Function to handle checkbox change and store selected items
+ const handleCheckboxChange = (index, item) => {
+  const updatedCheckedState = checkedState.map((_, i) => (i === index ? !checkedState[i] : checkedState[i]));
+  setCheckedState(updatedCheckedState);
 
-    setCheckedState(updatedCheckedState);
+  // Ensure that wifiCredentials is an array before working with it
+  const currentWifiCredentials = Array.isArray(applicationFormData.wifiCredentials) 
+    ? applicationFormData.wifiCredentials 
+    : [];  // If somehow it's not an array, fall back to an empty array
 
-    // Update selected items list based on checked state
-    if (!checkedState[index]) {
-      // If unchecked -> checked, add item to selected items
-      setSelectedItems([...selectedItems, item]);
-    } else {
-      // If checked -> unchecked, remove item from selected items
-      setSelectedItems(selectedItems.filter((selectedItem) => selectedItem !== item));
-    }
-  };
+  let updatedWifiCredentials = [...currentWifiCredentials];
+
+  if (!checkedState[index]) {
+    // If unchecked -> checked, add listOfWifi[index] to wifiCredentials
+    updatedWifiCredentials.push(listOfWifi[index]); // Push the selected wifi data (name & password)
+    setSelectedItems([...selectedItems, item]);
+  } else {
+    // If checked -> unchecked, remove listOfWifi[index] from wifiCredentials
+    updatedWifiCredentials = updatedWifiCredentials.filter(
+      (wifi) => wifi.name !== listOfWifi[index].name
+    ); // Remove by comparing the `name` field (or any unique field)
+    setSelectedItems(selectedItems.filter((selectedItem) => selectedItem !== item));
+  }
+
+  // Update application form data with new wifiCredentials
+  setApplicationFormData({
+    ...applicationFormData,
+    wifiCredentials: updatedWifiCredentials
+  });
+
+  console.log('updatedWifiCredentials', updatedWifiCredentials);
+};
 
   
 
@@ -511,6 +532,7 @@ const ModalReinitiate = ({ data }) => {
               message: "Policy Details " + policy_update.body,
               onClickAction: async () => {
                 console.log('successs policy details')
+                handleComplete();
               },
             });
           } else {
@@ -598,6 +620,9 @@ const ModalReinitiate = ({ data }) => {
 
   const handleSaveDetails = async () => {
     try {
+      console.log('1', applicationFormData.wifiCredentials);
+      console.log('2', applicationFormData.defaultWifi);
+
       if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined) 
         { 
            setDialogData({
@@ -610,8 +635,17 @@ const ModalReinitiate = ({ data }) => {
          })
          
          return;
+        } else if (applicationFormData.wifiCredentials == undefined || applicationFormData.defaultWifi == undefined || applicationFormData.wifiCredentials?.length == 0 || Object.keys(applicationFormData.defaultWifi)?.length === 0) {
+          setDialogData({
+            title: "Validation Error",
+            message: "Please Select Wifi Credentials and select default wifi credentials",
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log("handleSaveDetails");
+            },
+          })
+          return;
         }
-
         if(data.data.serial_number == undefined ||  data.data.serial_number == '' || policyName == null) {
           setDialogData({
             title: "Validation Error",
@@ -640,6 +674,7 @@ const ModalReinitiate = ({ data }) => {
             message: "Application Details " + application_update.body,
             onClickAction: async () => {
               console.log('application details success');
+              handleComplete();
             }
           });
         } else {
@@ -716,7 +751,10 @@ const ModalReinitiate = ({ data }) => {
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={label} completed={completed[index]}>
-            <StepButton color="inherit" onClick={handleStep(index)}>
+            {/* <StepButton color="inherit" onClick={handleStep(index)}>
+              {label}
+            </StepButton> */}
+            <StepButton color="inherit">
               {label}
             </StepButton>
           </Step>
@@ -746,7 +784,7 @@ const ModalReinitiate = ({ data }) => {
                   {listOfPolicy?.length > 0 && (
                     <>
                     {listOfPolicy && listOfPolicy.map((policy, index) => (
-                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '100%' }} className="cabin-row clickable-row" // Prevent click action if policy is already selected
+                    <Row key={index} style={{ marginBottom: '10px', alignItems: 'center', backgroundColor: 'ghostwhite', width: '70%' }} className="cabin-row clickable-row" // Prevent click action if policy is already selected
 
                     >
                        <Col xs="auto">
@@ -803,19 +841,44 @@ const ModalReinitiate = ({ data }) => {
                    onChange={(e) => handleChange(e)}
                    value={applicationFormData.unattended_timmer}
                    disabled
+                   style={{ width: "70%"}}
                  />
                    <br />
                    <label>Application Type</label>
-                   <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" isDisabled/>
+                   <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" isDisabled
+                   styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }}
+                   />
                    <br />
                    <label>Upi Payment Status</label>
-                   <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" isDisabled/>
+                   <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" isDisabled
+                   styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }}/>
                    <br />
                    <label>Select Language</label>
-                   <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" isDisabled />
+                   <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" isDisabled 
+                   styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }} />
                    <br />
                    <label>Ams Enable</label> 
-                    <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" />
+                    <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" isDisabled styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }}/>
                     <br />
                     <label>Margin Left</label>
                    <Input
@@ -826,6 +889,7 @@ const ModalReinitiate = ({ data }) => {
                    onChange={handleChange}
                    value={applicationFormData.margin_left}
                    disabled
+                   style={{ width: "70%"}}
                  />
                  <br />
                  <label>Margin Right</label>
@@ -837,6 +901,7 @@ const ModalReinitiate = ({ data }) => {
                    onChange={(e) => handleChange(e)}
                    value={applicationFormData.margin_right}
                    disabled
+                   style={{ width: "70%"}}
                  />
                  <br />
                  <label>Margin Top</label>
@@ -848,6 +913,7 @@ const ModalReinitiate = ({ data }) => {
                    onChange={(e) => handleChange(e)}
                    value={applicationFormData.margin_top}
                    disabled
+                   style={{ width: "70%"}}
                  />
                  <br />
                  <label>Margin Bottom</label>
@@ -859,19 +925,20 @@ const ModalReinitiate = ({ data }) => {
                    onChange={(e) => handleChange(e)}
                    value={applicationFormData.margin_bottom}
                    disabled
+                   style={{ width: "70%"}}
                  />
                   <br />
                     <label>Wifi Credentials</label>
                     {/*  Component rendering Wi-Fi list with checkboxes */}
                     {listOfWifi.map((item, index) => (
                         <>
-                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "100%" }}>
+                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "70%" }}>
                             <div
                               style={{
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between", // Space between checkbox, text, and radio button
-                                width: "100%",  // Full width to avoid content breaking
+                                width: "70%",  // Full width to avoid content breaking
                                 position: "relative",
                               }}
                             >
@@ -886,6 +953,7 @@ const ModalReinitiate = ({ data }) => {
                                   style={{
                                     marginRight: "20px", // Adds space between checkbox and text
                                   }}
+                                  disabled
                                 />
 
                                 {/* Display Wi-Fi name and password */}
@@ -903,6 +971,7 @@ const ModalReinitiate = ({ data }) => {
                                   checked={defaultWifi === index}
                                   onChange={() => handleRadioWifiDefaultChange(index)}
                                   style={{ marginLeft: "20px" }}
+                                  disabled
                                 />
                               )}
                             </div>
@@ -911,12 +980,6 @@ const ModalReinitiate = ({ data }) => {
                         </>
                       ))}
 
-                      <br />
-                      
-                      <Button variant="contained" onClick={handleSetDefaultClick}>
-                        {showRadios ? 'Choose Default wifi' : 'Set Default Wifi'}
-                      </Button>
-                      <br />
                       <br />
                  </>
                   : (
@@ -931,19 +994,40 @@ const ModalReinitiate = ({ data }) => {
                       type="number"
                       onChange={(e) => handleChange(e)}
                       value={applicationFormData.unattended_timmer}
+                      style={{ width: "70%"}}
                     />
                     <br />
                     <label>Application Type</label>
-                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
+                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }}/>
                     <br />
                     <label>Upi Payment Status</label>
-                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
+                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }}/>
                     <br />
                     <label>Select Language</label>
-                    <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" />
+                    <Select options={language || []} value={selectedOptionLanguage} onChange={handleChangeLanguage} placeholder="Select Language" styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }}/>
                     <br />
                     <label>Ams Enable</label> 
-                    <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" />
+                    <Select options={AmsEnable} value={amsEnableOptions} onChange={handleChangeAmsField} placeholder="Select Ams Field" styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "70%",
+                    }),
+                  }} />
                     <br />
                     <label>Margin Left</label>
                     <Input
@@ -953,6 +1037,7 @@ const ModalReinitiate = ({ data }) => {
                     type="text"
                     onChange={handleChange}
                     value={applicationFormData.margin_left}
+                    style={{ width: "70%"}}
                   />
                   <br />
                   <label>Margin Right</label>
@@ -963,6 +1048,7 @@ const ModalReinitiate = ({ data }) => {
                     type="text"
                     onChange={(e) => handleChange(e)}
                     value={applicationFormData.margin_right}
+                    style={{ width: "70%"}}
                   />
                   <br />
                   <label>Margin Top</label>
@@ -973,6 +1059,7 @@ const ModalReinitiate = ({ data }) => {
                     type="text"
                     onChange={(e) => handleChange(e)}
                     value={applicationFormData.margin_top}
+                    style={{ width: "70%"}}
                   />
                   <br />
                   <label>Margin Bottom</label>
@@ -983,19 +1070,20 @@ const ModalReinitiate = ({ data }) => {
                     type="text"
                     onChange={(e) => handleChange(e)}
                     value={applicationFormData.margin_bottom}
+                    style={{ width: "70%"}}
                   />
                    <br />
                     <label>Wifi Credentials</label>
                     {/*  Component rendering Wi-Fi list with checkboxes */}
                     {listOfWifi.map((item, index) => (
                         <>
-                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "100%" }}>
+                          <Card variant="outlined" key={index} style={{ margin: "10px", padding: "15px", width: "70%" }}>
                             <div
                               style={{
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between", // Space between checkbox, text, and radio button
-                                width: "100%",  // Full width to avoid content breaking
+                                width: "70%",  // Full width to avoid content breaking
                                 position: "relative",
                               }}
                             >
@@ -1009,6 +1097,7 @@ const ModalReinitiate = ({ data }) => {
                                   onChange={() => handleCheckboxChange(index, item)} // Pass index and item for selection
                                   style={{
                                     marginRight: "20px", // Adds space between checkbox and text
+
                                   }}
                                 />
 
@@ -1037,17 +1126,21 @@ const ModalReinitiate = ({ data }) => {
 
                       <br />
                       
-                      <Button variant="contained" onClick={handleSetDefaultClick}>
-                        {showRadios ? 'Choose Default wifi' : 'Set Default Wifi'}
-                      </Button>
-                      <br />
-                      <br />
-                    <Button
-                      variant="contained"
-                      onClick={handleSaveDetails}
-                    >
-                      Save Details
-                    </Button>
+                      { ApplicationDisable == false && (
+                        <> 
+                          <Button variant="contained" onClick={handleSetDefaultClick}>
+                            {showRadios ? 'Choose Default wifi' : 'Set Default Wifi'}
+                          </Button>
+                          <br />
+                          <br />
+                          <Button
+                            variant="contained"
+                            onClick={handleSaveDetails}
+                          >
+                            Save Details
+                          </Button>
+                      </>
+                      )}
                   </>
                     )}
                     

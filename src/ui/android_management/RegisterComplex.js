@@ -281,6 +281,7 @@ console.log('formData', formData);
     // dispatch(setDistrictIotList([]));
     // dispatch(setCityIotList([]));
     // dispatch(setComplexIotList([]));
+    dispatch(setlogoList([]));
     setModal(!modal)
     setModalToggle(false)
   };

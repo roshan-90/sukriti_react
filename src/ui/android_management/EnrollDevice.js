@@ -931,7 +931,7 @@ export default function EnrollDevice() {
            },
          })
          return;
-        } else if (applicationFormData.wifiCredentials?.length == 0 || Object.keys(applicationFormData.defaultWifi)?.length === 0) {
+        } else if (applicationFormData.wifiCredentials == undefined || applicationFormData.defaultWifi == undefined || applicationFormData.wifiCredentials?.length == 0 || Object.keys(applicationFormData.defaultWifi)?.length === 0) {
           setDialogData({
             title: "Validation Error",
             message: "Please Select Wifi Credentials and select default wifi credentials",
@@ -1454,7 +1454,7 @@ export default function EnrollDevice() {
                               </div>
 
                               {/* Right section (Radio Button for Set Default) */}
-                              {showRadios && (
+                              {checkedState[index] && showRadios && (
                                 <input
                                   type="radio"
                                   name="defaultWifi"

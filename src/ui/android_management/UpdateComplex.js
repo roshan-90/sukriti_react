@@ -227,6 +227,7 @@ const handleCheckboxChange = (index) => {
   console.log('selected', selected);
 
   const toggle = () => {
+    dispatch(setlogoList([]));
     setModal(!modal)
     setComplexChanged(false)
   };
