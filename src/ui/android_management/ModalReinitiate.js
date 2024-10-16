@@ -133,11 +133,11 @@ const ModalReinitiate = ({ data }) => {
   ];
 
    // Update checkedState when listOfWifi changes
-   useEffect(() => {
-    if (listOfWifi?.length > 0) {
-      setCheckedState(new Array(listOfWifi?.length).fill(false));
-    }
-  }, [listOfWifi]);
+  //  useEffect(() => {
+  //   if (listOfWifi?.length > 0) {
+  //     setCheckedState(new Array(listOfWifi?.length).fill(false));
+  //   }
+  // }, [listOfWifi]);
 
     // Handle Set Default button click
     const handleSetDefaultClick = () => {
@@ -178,16 +178,25 @@ const ModalReinitiate = ({ data }) => {
         } else {
           setAmsEnableOption({ label: 'False', value: false})
         }
+
         if(data.data.application_details?.wifiCredentials?.length > 0) {
           setApplicationFormData({
             wifiCredentials: data.data.application_details?.wifiCredentials ?? []
           })
           setSelectedItems(data.data.application_details.wifiCredentials);
+
+           // Check if listOfWifi items match with wifiCredentials
+          let wifiMatchStatus = listOfWifi.map(listItem => {
+            return data.data.application_details?.wifiCredentials.some(cred => 
+              cred.name === listItem.name && cred.password === listItem.password
+            );
+          });
+          console.log("wifiMatchStatus", wifiMatchStatus); // [true, true, false]
+          setCheckedState(wifiMatchStatus)
         } 
         
         if (data.data.application_details?.defaultWifi && Object.keys(data.data.application_details.defaultWifi).length !== 0) {
           let indexData = listOfWifi.map((item) => item.name).indexOf(data.data.application_details.defaultWifi.name);
-        
           console.log("indexData", indexData);
           setApplicationFormData({
             defaultWifi: data.data.application_details.defaultWifi ?? {}
@@ -212,11 +221,15 @@ const ModalReinitiate = ({ data }) => {
           isAmsEnabled: false
         })
         setAmsEnableOption({ label: 'False', value: false})
+        if (listOfWifi?.length > 0) {
+          setCheckedState(new Array(listOfWifi?.length).fill(false));
+        }
       }
 
       if(data.data.QR_CREATED_STATE == "TRUE") {
         setQrImage(data.data.qr_details.qr)
       }
+
     }
 
     (async function() {
@@ -243,6 +256,7 @@ const ModalReinitiate = ({ data }) => {
     }
   };
 
+  
 
   const FetchListOFWIFI = async () => {
     try {
@@ -261,6 +275,8 @@ const ModalReinitiate = ({ data }) => {
   }
 
   console.log('listOfWifi', listOfWifi);
+  console.log('checkedState', checkedState);
+  console.log('selectedItems', selectedItems);
 
   const handleClose = () => {
     setOpen(false);
@@ -879,8 +895,8 @@ const ModalReinitiate = ({ data }) => {
                                 </div>
                               </div>
 
-                              {/* Right section (Radio Button for Set Default) */}
-                              {showRadios && (
+                             {/* Right section (Radio Button for Set Default) - Only show if the checkbox is checked */}
+                             {checkedState[index] && showRadios && (
                                 <input
                                   type="radio"
                                   name="defaultWifi"
@@ -1003,8 +1019,8 @@ const ModalReinitiate = ({ data }) => {
                                 </div>
                               </div>
 
-                              {/* Right section (Radio Button for Set Default) */}
-                              {showRadios && (
+                              {/* Right section (Radio Button for Set Default) - Only show if the checkbox is checked */}
+                              {checkedState[index] && showRadios && (
                                 <input
                                   type="radio"
                                   name="defaultWifi"
