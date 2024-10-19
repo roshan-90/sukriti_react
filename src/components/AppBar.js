@@ -543,6 +543,22 @@ const AppBar = ({ isOnline }) => {
               </NavLink>
             </NavItem>
             ) : null}
+            <NavItem>
+              <NavLink
+                style={navLinkStyle}
+                onClick={() => {
+                  if (isOnline) {
+                    navigate("/user-profile");
+                  } else {
+                    setOfflineMessage("Offline")(
+                      "Feature is not available in Offline Mode"
+                    )("User Profile");
+                  }
+                }}
+              >
+                User Profile
+              </NavLink>
+            </NavItem>
           </Nav>
           <span
             style={{

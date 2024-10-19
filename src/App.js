@@ -51,6 +51,7 @@ const IncidenceTicketDetails = lazy(() =>
 const AndroidManagement = lazy(() =>
   import("./ui/android_management/AndroidDetails")
 );
+const UserProfile = lazy(() => import("./ui/profile/UserProfile"))
 
 const App = () => {
   const dispatch = useDispatch();
@@ -268,6 +269,12 @@ const App = () => {
                       exact={true}
                       name={"Enroll Device"}
                       element={<EnrollDevice />}
+                    />
+                    <Route
+                      path={"/user-profile"}
+                      exact={true}
+                      name={"User Profile"}
+                      element={<UserProfile />}
                     />
                     <Route path="/*" element={<Navigate to="/dashboard" />} />
                   </Routes>
