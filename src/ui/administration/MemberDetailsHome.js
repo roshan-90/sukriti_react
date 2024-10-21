@@ -77,6 +77,7 @@ const MemberDetailsHome = (props) => {
     }
   };
   const initFetchCompletedUserAccessTreeAction = async () => {
+    console.log('id :->',id);
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchCompletedUserAccessTree(

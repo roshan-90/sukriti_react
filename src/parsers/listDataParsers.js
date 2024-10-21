@@ -85,3 +85,22 @@ export function fromUserDetails(mUser) {
 
   return item;
 }
+
+export function fromUserProfileDetails(mUser) {
+  console.log("_fromUserProfileDetails", mUser);
+  var item = {};
+  item = {
+    "User Name": mUser?.userName,
+    "Account Status": mUser?.userStatus,
+    Role: mUser?.userRole,
+    "Client": mUser?.clientName,
+    Name: mUser?.name,
+    Gender: mUser?.gender,
+    // "Address": mUser?.addess,
+    Email: mUser?.email,
+    "Phone Number": mUser?.phoneNumber,
+    Created: mUser?.createdOn,
+  };
+
+  return item;
+}
