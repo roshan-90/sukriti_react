@@ -58,6 +58,7 @@ const AddTeamMember = () => {
     clientName: "",
     organisationName: "",
   });
+  const [selectUserRole, setSelectedUserRole] = useState(null);
 
   // const messageDialog = useRef();
   // const loadingDialog = useRef();
@@ -170,6 +171,7 @@ const AddTeamMember = () => {
     const userRole = getRole(value);
     formDetails.current.userRole = userRole;
     setSelectedRole(userRole);
+    setSelectedUserRole(value)
   };
 
   const onClientSelected = (index, value) => {
@@ -243,6 +245,7 @@ const AddTeamMember = () => {
     }
   };
 
+
   return (
     <div className="col-md-12">
       {isLoading && (
@@ -308,16 +311,20 @@ const AddTeamMember = () => {
             <Card className="p-4">
               <CardBody>
                 <Form>
-                  <p style={Styles.formLabel}>Client Selection</p>
-                  <InputGroup className="mb-4">
-                    <InputGroupText>
-                      <LockOutlinedIcon />
-                    </InputGroupText>
-                    <Dropdown
-                      options={populateClientList()}
-                      onSelection={onClientSelected}
-                    />
-                  </InputGroup>
+                  {selectUserRole !== "Vendor Admin" && (
+                    <>
+                    <p style={Styles.formLabel}>Client Selection</p>
+                    <InputGroup className="mb-4">
+                      <InputGroupText>
+                        <LockOutlinedIcon />
+                      </InputGroupText>
+                      <Dropdown
+                        options={populateClientList()}
+                        onSelection={onClientSelected}
+                      />
+                    </InputGroup>
+                    </>
+                    )}
 
                   <InputGroup className="mb-3">
                     <InputGroupText>
