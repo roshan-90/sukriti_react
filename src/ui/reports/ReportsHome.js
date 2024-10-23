@@ -20,6 +20,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { DropDownLabel } from "../../components/DisplayLabels";
 import {
+  executeFetchCompletedUserAccessTree,
   executeFetchDashboardLambda,
   executeReportFetchDashboardLambda,
 } from "../../awsClients/administrationLambdas";
@@ -49,6 +50,15 @@ import {
   BWTFullLineChart,
 } from "../dashboard/component/ReportChart";
 import { colorTheme, whiteSurface } from "../../jsStyles/Style";
+import NoDataComponent from "../../components/NoDataComponent";
+import StateList from "./defineAccess/SateList";
+import { TreeItemType } from "../../nomenclature/nomenclature";
+import { getSelectionSummary } from "../../components/accessTree/accessTreeUtils";
+import {
+  getTrimmedAccessTree,
+  getAccessKeys,
+} from "../../components/accessTree/accessTreeUtils";
+import Header from './header';
 
 const ReportsHome = ({ isOnline }) => {
   const [visibility, setVisibility] = useState(false);
@@ -97,6 +107,10 @@ const ReportsHome = ({ isOnline }) => {
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
   const { handleOnlineState } = useOnlineStatus();
+  const stateList = useRef(null);
+  const [accessTree, setAccessTree] = useState(undefined);
+  const [accessSummary, setAccessSummary] = useState([]);
+  const selectionSummary = useRef(null);
 
   const toggleDialog = () => {
     console.log("visibility", visibility);
@@ -728,6 +742,7 @@ const ReportsHome = ({ isOnline }) => {
     // console.log('updatedAssignDetails',updatedAssignDetails);
     setAssignDetails(updatedAssignDetails);
   };
+
   const handleUpdate = (configName, configValue) => {
     console.log("_updateCommand", configName, configValue);
     const index = actionOptions.indexOf(configValue);
@@ -743,6 +758,7 @@ const ReportsHome = ({ isOnline }) => {
     localStorage.setItem("complex_name", "all");
     dispatch(setReportData(dashboard_data));
     setCustomComplexName('All')
+    initFetchCompletedUserAccessTreeAction();
   }, []);
 
   const resetData = () => {
@@ -1010,7 +1026,104 @@ const ReportsHome = ({ isOnline }) => {
     }
   };
 
-  const getPDF = () => {
+  function findComplexes(accessTree, array) {
+    let foundComplexes = [];
+
+    function searchForComplexes(tree, key, type) {
+        if (tree.states) {
+            tree.states.forEach(state => {
+                if (type === "State" && state.code === key) {
+                    // State level match
+                    state.districts.forEach(district => {
+                        district.cities.forEach(city => {
+                            city.complexes.forEach(complex => {
+                                foundComplexes.push({
+                                    state: state.name,
+                                    district: district.name,
+                                    city: city.name,
+                                    complex: complex
+                                });
+                            });
+                        });
+                    });
+                } else {
+                    // Traverse districts for District or lower levels
+                    state.districts.forEach(district => {
+                        if (type === "District" && district.code === key) {
+                            // District level match
+                            district.cities.forEach(city => {
+                                city.complexes.forEach(complex => {
+                                    foundComplexes.push({
+                                        state: state.name,
+                                        district: district.name,
+                                        city: city.name,
+                                        complex: complex
+                                    });
+                                });
+                            });
+                        } else {
+                            // Traverse cities for City or Complex levels
+                            district.cities.forEach(city => {
+                                if (type === "City" && city.code === key) {
+                                    // City level match
+                                    city.complexes.forEach(complex => {
+                                        foundComplexes.push({
+                                            state: state.name,
+                                            district: district.name,
+                                            city: city.name,
+                                            complex: complex
+                                        });
+                                    });
+                                } else {
+                                    // Traverse complexes for Complex level
+                                    city.complexes.forEach(complex => {
+                                        if (type === "Complex" && complex.uuid === key) {
+                                            // Complex level match
+                                            foundComplexes.push({
+                                                state: state.name,
+                                                district: district.name,
+                                                city: city.name,
+                                                complex: complex
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    array.forEach(item => {
+        searchForComplexes(accessTree.country, item.key, item.type);
+    });
+
+    return foundComplexes;
+}
+
+
+  const getPDF = async () => {
+
+    const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
+    const accessKeys = await getAccessKeys(trimmedAccessTree);
+    console.log('1', accessTree)
+    console.log('2', trimmedAccessTree)
+    console.log('3', trimmedAccessTree)
+    console.log('4', accessKeys)
+    let result = findComplexes(accessTree, accessKeys);
+    // console.log("result", result);
+    let storeComplexArray = [];
+
+    for( let i=0; i < result.length; i++) {
+        // console.log(i + " " + array[i].complex.name)
+        storeComplexArray.push(result[i].complex.name)
+    }
+    // console.log('storeComplexArray', storeComplexArray)
+    // console.log('lenght of complex', storeComplexArray.length)
+
+    return;
     fetchReportData();
   };
 
@@ -1530,6 +1643,96 @@ const ReportsHome = ({ isOnline }) => {
     );
   };
 
+  const initFetchCompletedUserAccessTreeAction = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      const result = await executeFetchCompletedUserAccessTree(
+        user?.username,
+        user?.credentials
+      );
+      console.log("define initFetchCompletedUserAccessTreeAction-->", result);
+      setAccessTree(result);
+    } catch (err) {
+      handleError(err, "initFetchCompletedUserAccessTreeAction");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
+
+
+  const handleUserSelection = (nodeType, treeEdge, selected) => {
+    const stateIndex = treeEdge.stateIndex;
+    const districtIndex = treeEdge.districtIndex;
+    const cityIndex = treeEdge.cityIndex;
+    const complexIndex = treeEdge.complexIndex;
+    console.log("checking handleUserSelection", nodeType);
+    console.log("checking handleUserSelection1", treeEdge);
+    console.log("checking handleUserSelection2", selected);
+    console.log('TreeItemType', TreeItemType);
+    console.log("checking", nodeType === TreeItemType.State);
+    if (nodeType === TreeItemType.State) {
+      console.log("checking state"); 
+      setAccessTree((prevTree) => {
+        const updatedTree = { ...prevTree };
+        console.log("checking updatedTree", updatedTree);
+        updatedTree.country.states[stateIndex].selected = selected;
+        console.log(
+          "checking updatedTree2",
+          updatedTree.country.states[stateIndex]
+        );
+        return updatedTree;
+      });
+    } else if (nodeType === TreeItemType.District) {
+      setAccessTree((prevTree) => {
+        const updatedTree = { ...prevTree };
+        updatedTree.country.states[stateIndex].districts[
+          districtIndex
+        ].selected = selected;
+        return updatedTree;
+      });
+    } else if (nodeType === TreeItemType.City) {
+      console.log("_itemExpansion", "City", treeEdge, selected);
+      setAccessTree((prevTree) => {
+        const updatedTree = { ...prevTree };
+        updatedTree.country.states[stateIndex].districts[districtIndex].cities[
+          cityIndex
+        ].selected = selected;
+        return updatedTree;
+      });
+    } else if (nodeType === TreeItemType.Complex) {
+      setAccessTree((prevTree) => {
+        const updatedTree = { ...prevTree };
+        updatedTree.country.states[stateIndex].districts[districtIndex].cities[
+          cityIndex
+        ].complexes[complexIndex].selected = selected;
+        return updatedTree;
+      });
+    }
+
+    setAccessSummary(getSelectionSummary(accessTree));
+    selectionSummary.current?.setAccessSummary(accessSummary);
+    stateList.current?.updateData(accessTree);
+  };
+
+  const ComponentSelector1 = () => {
+    if (accessTree === undefined) {
+      return <NoDataComponent />;
+    } else {
+      if (accessTree === undefined) {
+        setAccessTree(accessTree);
+        console.log("_accessTree", accessTree);
+      }
+
+      return (
+        <StateList
+          ref={stateList}
+          listData={accessTree}
+          handleUserSelection={handleUserSelection}
+        />
+      );
+    }
+  };
+
   // Memoize the YourComponent instance
   const memoizedYourComponent = useMemo(() => {
     return <YourComponent />;
@@ -1548,11 +1751,13 @@ const ReportsHome = ({ isOnline }) => {
 
   const TreeComponent1 = () => {
     return (
-      <>
-       <ComplexNavigationFullHeight2
+      <div style={{ background: "white", width: "95%" }}>
+      <Header />
+      <ComponentSelector1 />
+       {/* <ComplexNavigationFullHeight2
           setComplexSelection={setComplexSelection}
-        />
-      </>
+          /> */}
+      </div>
     )
   }
 
@@ -1562,7 +1767,7 @@ const ReportsHome = ({ isOnline }) => {
 
   const memoizedTreeComponent1 = useMemo(() => {
     return <TreeComponent1 />
-  }, []);
+  }, [accessTree]);
 
   const PdfComponent = () => {
     return (
@@ -2109,7 +2314,7 @@ const ReportsHome = ({ isOnline }) => {
                   className="px-4"
                   onClick={getPDF}
                 >
-                  Download Pdf
+                  Download Pdfd
                 </Button>
               )}
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Button } from "reactstrap";
 import { whiteSurface } from "../../jsStyles/Style";
 // import MessageDialog from "../../dialogs/MessageDialog";
@@ -219,28 +219,26 @@ const MemberAccess = (props) => {
   }, [props.accessTree]);
 
   console.log("checked accesstree", accessTree);
-  if (!accessTree) {
-    return null;
-  }
+  
 
   const ComponentSelector = () => {
-    if (accessTree === undefined) {
-      return <NoDataComponent />;
-    } else {
-      if (accessTree === undefined) {
-        setAccessTree(props.accessTree);
-        console.log("_accessTree", accessTree);
-      }
-
-      return (
-        <StateList
-          ref={stateList}
-          listData={accessTree}
-          handleUserSelection={handleUserSelection}
-        />
-      );
-    }
+    return (
+      <StateList
+        ref={stateList}
+        listData={accessTree}
+        handleUserSelection={handleUserSelection}
+      />
+    );
   };
+
+ // Memoize the component if there’s a performance concern
+const memoizedTreeComponent = useMemo(() => {
+  return <ComponentSelector />;
+}, [accessTree, handleUserSelection]); // Add dependencies if needed
+
+if (!accessTree) {
+  return null;
+}
 
   return (
     <>
@@ -279,7 +277,7 @@ const MemberAccess = (props) => {
         </div>
 
         <div className="col-md-8 offset-md-1" style={{ clear: "both" }}>
-          <ComponentSelector />
+        {memoizedTreeComponent}
         </div>
       </div>
     </>

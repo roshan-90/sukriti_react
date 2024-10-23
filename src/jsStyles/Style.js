@@ -129,6 +129,37 @@ export const complexFont = {
   fontStyle: "normal",
 };
 
+// Tree With Checkbox in Reports sections
+export const stateFontReport = {
+  color: `black`,
+  fontSize: "12px",
+  fontWeight: "normal",
+  fontStyle: "normal",
+  textAlign: "left",
+  padding: "0",
+};
+
+export const districtFontReport = {
+  color: `black`,
+  fontSize: "11px",
+  fontWeight: "normal",
+  fontStyle: "normal",
+};
+
+export const cityFontReport = {
+  color: `black`,
+  fontSize: "10px",
+  fontWeight: "normal",
+  fontStyle: "normal",
+};
+
+export const complexFontReport = {
+  color: `black`,
+  fontSize: "10px",
+  fontWeight: "normal",
+  fontStyle: "normal",
+};
+
 export const compactComplexnavStyle = {
   stateFont: {
     color: `black`,
