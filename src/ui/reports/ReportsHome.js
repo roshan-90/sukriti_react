@@ -1120,10 +1120,13 @@ const ReportsHome = ({ isOnline }) => {
         // console.log(i + " " + array[i].complex.name)
         storeComplexArray.push(result[i].complex.name)
     }
-    // console.log('storeComplexArray', storeComplexArray)
-    // console.log('lenght of complex', storeComplexArray.length)
 
-    return;
+    // Convert array to Set
+    const setFromArr = new Set(storeComplexArray);
+
+    // Convert Set back to array (if needed)
+    const newArray = Array.from(setFromArr);
+    localStorage.setItem("array_data", JSON.stringify(newArray));
     fetchReportData();
   };
 
