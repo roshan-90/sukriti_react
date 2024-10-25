@@ -31,7 +31,7 @@ const DistrictList = (props) => {
         type={TreeItemType.District}
         treeEdge={TreeEdge(props.treeEdge.stateIndex, districtIndex)}
         recursiveAccess={item.recursive === 1}
-        expanded={false}
+        expanded={item?.expanded == true ? true : false}
         selected={item.selected}
         displayData={item.name}
         displayDataStyle={districtFont}

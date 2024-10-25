@@ -215,6 +215,30 @@ const MemberAccess = (props) => {
   //   localStorage.setItem('hasTreeValue', 0)
   // };
 
+  const removeExpandedFromOtherStates = (accessTree, currentStateIndex) => {
+    accessTree.country.states.forEach((state, index) => {
+      // Only keep expanded key on the current state index
+      state.expanded = index === currentStateIndex;
+  
+      // If there are expanded districts, cities, or complexes within this state, remove them
+      if (state.districts) {
+        state.districts.forEach(district => {
+          district.expanded = false;
+          if (district.cities) {
+            district.cities.forEach(city => {
+              city.expanded = false;
+              if (city.complexes) {
+                city.complexes.forEach(complex => {
+                  complex.expanded = false;
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  };
+  
 
   const handleUserSelection = (nodeType, treeEdge, selected) => {
     const stateIndex = treeEdge.stateIndex;
@@ -223,16 +247,26 @@ const MemberAccess = (props) => {
     const complexIndex = treeEdge.complexIndex;
   
     const updatedTree = { ...accessTreeRef.current }; // Access the current value of the ref
-  
+    
+    console.log('stateIndex', stateIndex);
+    removeExpandedFromOtherStates(updatedTree, treeEdge.stateIndex); // Remove expanded flags except for the current state
+
     if (nodeType === TreeItemType.State) {
       updatedTree.country.states[stateIndex].selected = selected;
+      // updatedTree.country.states[stateIndex].expanded = true;
     } else if (nodeType === TreeItemType.District) {
       updatedTree.country.states[stateIndex].districts[districtIndex].selected = selected;
+      updatedTree.country.states[stateIndex].expanded = true;
     } else if (nodeType === TreeItemType.City) {
       updatedTree.country.states[stateIndex].districts[districtIndex].cities[cityIndex].selected = selected;
+      updatedTree.country.states[stateIndex].expanded = true;
+      updatedTree.country.states[stateIndex].districts[districtIndex].expanded = true;
     } else if (nodeType === TreeItemType.Complex) {
       updatedTree.country.states[stateIndex].districts[districtIndex].cities[cityIndex].complexes[complexIndex].selected = selected;
-    }
+      updatedTree.country.states[stateIndex].expanded = true;
+      updatedTree.country.states[stateIndex].districts[districtIndex].expanded = true;
+      updatedTree.country.states[stateIndex].districts[districtIndex].cities[cityIndex].expanded = true;    }
+    
   
     accessTreeRef.current = updatedTree; // Update the ref value without triggering re-render
   

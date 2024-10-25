@@ -41,7 +41,7 @@ const CityList = (props) => {
         type={TreeItemType.City}
         recursiveAccess={item.recursive === 1}
         selected={item.selected}
-        expanded={false}
+        expanded={item?.expanded == true ? true : false}
         displayData={item.name}
         displayDataStyle={cityFont}
         listComponent={getListComponent(item, cityIndex)}
