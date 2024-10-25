@@ -111,6 +111,7 @@ const ReportsHome = ({ isOnline }) => {
   const [accessTree, setAccessTree] = useState(undefined);
   const [accessSummary, setAccessSummary] = useState([]);
   const selectionSummary = useRef(null);
+  const accessTreeRef = useRef(); // Store the accessTree in a ref
 
   const toggleDialog = () => {
     console.log("visibility", visibility);
@@ -1103,15 +1104,31 @@ const ReportsHome = ({ isOnline }) => {
     return foundComplexes;
 }
 
+  const removeAllExpandedKeys = (node) => {
+    // Remove expanded key at the current node level, if it exists
+    if (node.expanded !== undefined) {
+      delete node.expanded;
+    }
+
+    // Recursively remove expanded key in child nodes if they exist
+    if (node.states) {
+      node.states.forEach(state => removeAllExpandedKeys(state));
+    }
+    if (node.districts) {
+      node.districts.forEach(district => removeAllExpandedKeys(district));
+    }
+    if (node.cities) {
+      node.cities.forEach(city => removeAllExpandedKeys(city));
+    }
+    if (node.complexes) {
+      node.complexes.forEach(complex => removeAllExpandedKeys(complex));
+    }
+  };
 
   const getPDF = async () => {
-
-    const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
+    removeAllExpandedKeys(accessTreeRef.current.country); // Remove all expanded keys in the tree
+    const trimmedAccessTree = await getTrimmedAccessTree(accessTreeRef.current);
     const accessKeys = await getAccessKeys(trimmedAccessTree);
-    console.log('1', accessTree)
-    console.log('2', trimmedAccessTree)
-    console.log('3', trimmedAccessTree)
-    console.log('4', accessKeys)
     let result = findComplexes(accessTree, accessKeys);
     // console.log("result", result);
     let storeComplexArray = [];
@@ -1654,6 +1671,7 @@ const ReportsHome = ({ isOnline }) => {
         user?.credentials
       );
       console.log("define initFetchCompletedUserAccessTreeAction-->", result);
+      accessTreeRef.current = result
       setAccessTree(result);
     } catch (err) {
       handleError(err, "initFetchCompletedUserAccessTreeAction");
@@ -1663,78 +1681,88 @@ const ReportsHome = ({ isOnline }) => {
   };
 
 
+  const removeExpandedFromOtherStates = (accessTree, currentStateIndex) => {
+    accessTree.country.states.forEach((state, index) => {
+      // If this is the current state index, skip removing expanded
+      if (index === currentStateIndex) {
+        // state.expanded = true; // Ensure the current state is expanded
+      } else {
+        // Remove expanded key for this state and all nested nodes
+        state.expanded = false;
+        
+        if (state.districts) {
+          state.districts.forEach(district => {
+            district.expanded = false;
+            if (district.cities) {
+              district.cities.forEach(city => {
+                city.expanded = false;
+                if (city.complexes) {
+                  city.complexes.forEach(complex => {
+                    complex.expanded = false;
+                  });
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+  };
+  
+
   const handleUserSelection = (nodeType, treeEdge, selected) => {
     const stateIndex = treeEdge.stateIndex;
     const districtIndex = treeEdge.districtIndex;
     const cityIndex = treeEdge.cityIndex;
     const complexIndex = treeEdge.complexIndex;
-    console.log("checking handleUserSelection", nodeType);
-    console.log("checking handleUserSelection1", treeEdge);
-    console.log("checking handleUserSelection2", selected);
-    console.log('TreeItemType', TreeItemType);
-    console.log("checking", nodeType === TreeItemType.State);
-    if (nodeType === TreeItemType.State) {
-      console.log("checking state"); 
-      setAccessTree((prevTree) => {
-        const updatedTree = { ...prevTree };
-        console.log("checking updatedTree", updatedTree);
-        updatedTree.country.states[stateIndex].selected = selected;
-        console.log(
-          "checking updatedTree2",
-          updatedTree.country.states[stateIndex]
-        );
-        return updatedTree;
-      });
-    } else if (nodeType === TreeItemType.District) {
-      setAccessTree((prevTree) => {
-        const updatedTree = { ...prevTree };
-        updatedTree.country.states[stateIndex].districts[
-          districtIndex
-        ].selected = selected;
-        return updatedTree;
-      });
-    } else if (nodeType === TreeItemType.City) {
-      console.log("_itemExpansion", "City", treeEdge, selected);
-      setAccessTree((prevTree) => {
-        const updatedTree = { ...prevTree };
-        updatedTree.country.states[stateIndex].districts[districtIndex].cities[
-          cityIndex
-        ].selected = selected;
-        return updatedTree;
-      });
-    } else if (nodeType === TreeItemType.Complex) {
-      setAccessTree((prevTree) => {
-        const updatedTree = { ...prevTree };
-        updatedTree.country.states[stateIndex].districts[districtIndex].cities[
-          cityIndex
-        ].complexes[complexIndex].selected = selected;
-        return updatedTree;
-      });
-    }
+  
+    const updatedTree = { ...accessTreeRef.current }; // Access the current value of the ref
+    
+    removeExpandedFromOtherStates(updatedTree, treeEdge.stateIndex); // Remove expanded flags except for the current state
 
-    setAccessSummary(getSelectionSummary(accessTree));
+    if (nodeType === TreeItemType.State) {
+      updatedTree.country.states[stateIndex].selected = selected;
+      // updatedTree.country.states[stateIndex].expanded = true;
+    } else if (nodeType === TreeItemType.District) {
+      updatedTree.country.states[stateIndex].districts[districtIndex].selected = selected;
+      updatedTree.country.states[stateIndex].expanded = true;
+    } else if (nodeType === TreeItemType.City) {
+      updatedTree.country.states[stateIndex].districts[districtIndex].cities[cityIndex].selected = selected;
+      updatedTree.country.states[stateIndex].expanded = true;
+      updatedTree.country.states[stateIndex].districts[districtIndex].expanded = true;
+    } else if (nodeType === TreeItemType.Complex) {
+      updatedTree.country.states[stateIndex].districts[districtIndex].cities[cityIndex].complexes[complexIndex].selected = selected;
+      updatedTree.country.states[stateIndex].expanded = true;
+      updatedTree.country.states[stateIndex].districts[districtIndex].expanded = true;
+      updatedTree.country.states[stateIndex].districts[districtIndex].cities[cityIndex].expanded = true;    }
+    
+  
+    accessTreeRef.current = updatedTree; // Update the ref value without triggering re-render
+  
+    // If you need to trigger a render for UI changes, you can update state
+    // e.g., setAccessTree({...updatedTree}) if needed
+  
+    setAccessSummary(getSelectionSummary(accessTreeRef.current));
     selectionSummary.current?.setAccessSummary(accessSummary);
-    stateList.current?.updateData(accessTree);
+    stateList.current?.updateData(accessTreeRef.current);
   };
 
-  const ComponentSelector1 = () => {
-    if (accessTree === undefined) {
-      return <NoDataComponent />;
-    } else {
-      if (accessTree === undefined) {
-        setAccessTree(accessTree);
-        console.log("_accessTree", accessTree);
-      }
-
+  const ComponentSelector1 = React.memo(({ accessTrees }) => {
+    if (accessTrees.current) {
       return (
-        <StateList
-          ref={stateList}
-          listData={accessTree}
-          handleUserSelection={handleUserSelection}
-        />
+        <>
+          {/* <h3>{accessTrees.current.country.states[0].name}</h3>
+          <h4>{accessTrees.current.country.states[0].selected === true ? "32" : "00"}</h4> */}
+          <StateList
+            ref={stateList}
+            listData={accessTrees.current}
+            handleUserSelection={handleUserSelection}
+          />
+        </>
       );
     }
-  };
+    return null;
+  });
 
   // Memoize the YourComponent instance
   const memoizedYourComponent = useMemo(() => {
@@ -1756,7 +1784,7 @@ const ReportsHome = ({ isOnline }) => {
     return (
       <div style={{ background: "white", width: "95%" }}>
       <Header />
-      <ComponentSelector1 />
+      <ComponentSelector1 accessTrees={accessTreeRef}/>
        {/* <ComplexNavigationFullHeight2
           setComplexSelection={setComplexSelection}
           /> */}
@@ -1770,7 +1798,7 @@ const ReportsHome = ({ isOnline }) => {
 
   const memoizedTreeComponent1 = useMemo(() => {
     return <TreeComponent1 />
-  }, [accessTree]);
+  }, [accessTree, accessTreeRef]);
 
   const PdfComponent = () => {
     return (
@@ -1915,7 +1943,8 @@ const ReportsHome = ({ isOnline }) => {
                   >
                     <h5>Select Complex</h5>
                   </label>
-                  {memoizedTreeComponent1}
+                  {/* {memoizedTreeComponent1} */}
+                  <TreeComponent1 />
                 </div>
                 <div
                   className="scheduleReport"
@@ -2317,7 +2346,7 @@ const ReportsHome = ({ isOnline }) => {
                   className="px-4"
                   onClick={getPDF}
                 >
-                  Download Pdfd
+                  Download Pdf
                 </Button>
               )}
 

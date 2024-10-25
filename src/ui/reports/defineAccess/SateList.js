@@ -24,7 +24,7 @@ const SateList = (props) => {
         treeEdge={TreeEdge(stateIndex)}
         type={TreeItemType.State}
         recursiveAccess={item.recursive === 1}
-        expanded={false}
+        expanded={item?.expanded == true ? true : false}
         selected={item.selected}
         displayData={item.name}
         displayDataStyle={stateFontReport}

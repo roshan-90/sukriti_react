@@ -110,6 +110,27 @@ const MemberAccess = (props) => {
     }
   };
 
+  const removeAllExpandedKeys = (node) => {
+    // Remove expanded key at the current node level, if it exists
+    if (node.expanded !== undefined) {
+      delete node.expanded;
+    }
+  
+    // Recursively remove expanded key in child nodes if they exist
+    if (node.states) {
+      node.states.forEach(state => removeAllExpandedKeys(state));
+    }
+    if (node.districts) {
+      node.districts.forEach(district => removeAllExpandedKeys(district));
+    }
+    if (node.cities) {
+      node.cities.forEach(city => removeAllExpandedKeys(city));
+    }
+    if (node.complexes) {
+      node.complexes.forEach(complex => removeAllExpandedKeys(complex));
+    }
+  };
+
   const handleSubmitAction = async () => {
     console.log("define meeber cliced", data);
     // console.log("_trimmedAccess", props.location.bundle);
@@ -121,7 +142,9 @@ const MemberAccess = (props) => {
     }
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
-      const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
+      // const trimmedAccessTree = await getTrimmedAccessTree(accessTree);
+
+      const trimmedAccessTree = await getTrimmedAccessTree(accessTreeRef.current);
       const accessKeys = await getAccessKeys(trimmedAccessTree);
 
       const defineAccessRequest = {
@@ -153,6 +176,8 @@ const MemberAccess = (props) => {
   };
 
   const onSubmit = () => {
+    removeAllExpandedKeys(accessTreeRef.current.country); // Remove all expanded keys in the tree
+
     confirmationDialog.current.showDialog(
       "Confirm Action",
       "To update the user permanently, type 'UPDATE' below",
@@ -217,24 +242,28 @@ const MemberAccess = (props) => {
 
   const removeExpandedFromOtherStates = (accessTree, currentStateIndex) => {
     accessTree.country.states.forEach((state, index) => {
-      // Only keep expanded key on the current state index
-      state.expanded = index === currentStateIndex;
-  
-      // If there are expanded districts, cities, or complexes within this state, remove them
-      if (state.districts) {
-        state.districts.forEach(district => {
-          district.expanded = false;
-          if (district.cities) {
-            district.cities.forEach(city => {
-              city.expanded = false;
-              if (city.complexes) {
-                city.complexes.forEach(complex => {
-                  complex.expanded = false;
-                });
-              }
-            });
-          }
-        });
+      // If this is the current state index, skip removing expanded
+      if (index === currentStateIndex) {
+        // state.expanded = true; // Ensure the current state is expanded
+      } else {
+        // Remove expanded key for this state and all nested nodes
+        state.expanded = false;
+        
+        if (state.districts) {
+          state.districts.forEach(district => {
+            district.expanded = false;
+            if (district.cities) {
+              district.cities.forEach(city => {
+                city.expanded = false;
+                if (city.complexes) {
+                  city.complexes.forEach(complex => {
+                    complex.expanded = false;
+                  });
+                }
+              });
+            }
+          });
+        }
       }
     });
   };
