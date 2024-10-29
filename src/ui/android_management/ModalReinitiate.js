@@ -17,7 +17,7 @@ import StepButton from '@mui/material/StepButton';
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import CardContent from '@mui/material/CardContent';
-import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinList, setCabinDetails, setCabinName, setListOfPolicy, setPolicyName, setResetData, setwifiList} from "../../features/androidManagementSlice";
+import { setStateIotList, setDistrictIotList, setCityIotList, setComplexIotList, setComplexIotDetail,setClientName, setBillingGroup , setComplexName, setCabinDetails, setCabinName, setCabinList, setListOfPolicy, setPolicyName, setResetData, setwifiList} from "../../features/androidManagementSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { BiMaleFemale } from "react-icons/bi";
 import { selectUser } from "../../features/authenticationSlice";
@@ -26,7 +26,8 @@ import {
   executeUpdateDeviceLambda,
   executeListPolicyLambda,
   executeShareQrLambda,
-  executedFetchListWIFILambda
+  executedFetchListWIFILambda,
+  executelistIotCabinDynamicLambda
 } from "../../awsClients/androidEnterpriseLambda";
 import ShareIcon from '@mui/icons-material/Share';
 import ModalShareQR from "./ModalShareQR";
@@ -90,6 +91,7 @@ const ModalReinitiate = ({ data }) => {
   const [defaultWifi, setDefaultWifi] = useState(null); // To store selected default Wi-Fi
   const [dummyCabinShow, setDummyCabinShow] = useState(false);
   const [dummyCabin, setDummyCabin] = useState(null);
+  const cabinList = useSelector((state) => state.androidManagement.cabinList);
 
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
@@ -166,7 +168,7 @@ const ModalReinitiate = ({ data }) => {
         dispatch(setPolicyName(data.data.policy_name))
       }
       console.log('data.data.application_details',data.data.application_details);
-
+      setDummyCabinShow(false)
       if(data.data.DEVICE_APPLICATION_STATE == "TRUE") {
         setApplicationFormData({
           unattended_timmer: data.data.application_details.unattended_timmer ?? '',
@@ -189,6 +191,7 @@ const ModalReinitiate = ({ data }) => {
           if(data.data.application_details.dummy_bwt_cabin) {
             setDummyCabinShow(true);
             setDummyCabin(data.data.application_details.dummy_bwt_cabin);
+            setApplicationFormData({dummy_bwt_cabin: data.data.application_details.dummy_bwt_cabin ?? null,})
           }
         }
 
@@ -216,15 +219,12 @@ const ModalReinitiate = ({ data }) => {
           });
           setDefaultWifi(indexData);
         }
-        
-        
       } else {
-        setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
+        // setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
         setUpiPaymentStatus({ label: 'No', value: 'No' })
         setSelectedOptionLanguage({ label: 'Hindi', value: 'Hindi' })
         setApplicationFormData({
           unattended_timmer: 20,
-          application_type: 'Cabin Automation System without BWT',
           upi_payment_status: 'No',
           language: 'Hindi',
           margin_left: 0,
@@ -242,10 +242,28 @@ const ModalReinitiate = ({ data }) => {
       if(data.data.QR_CREATED_STATE == "TRUE") {
         setQrImage(data.data.qr_details.qr)
       }
-      setDummyCabinShow(false)
-
+      
+      if(data.data.cabin_name.includes('BWT')) {
+        setApplicationTypeOption({ label: 'Black Water Treatment', value: 'Black Water Treatment'})
+        setApplicationFormData( prevFormData => ({
+          ...prevFormData,
+          application_type: 'Black Water Treatment',
+        }));
+      } else if (data.data.cabin_name.includes('UR')) {
+        setApplicationTypeOption({ label: 'Entry Management System', value: 'Entry Management System'})
+        setApplicationFormData( prevFormData => ({
+          ...prevFormData,
+          application_type: 'Entry Management System',
+        }));
+      } else if (data.data.cabin_name.includes('WC')) {
+        setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
+        setApplicationFormData( prevFormData => ({
+          ...prevFormData,
+          application_type: 'Cabin Automation System Without BWT',
+        }));
+      }
     }
-
+    dispatch(setCabinList([]));
     (async function() {
       await FetchListOFWIFI();
     })();
@@ -287,7 +305,20 @@ const ModalReinitiate = ({ data }) => {
   console.log('updatedWifiCredentials', updatedWifiCredentials);
 };
 
-  
+const ListOfIotCabin = async (value) => {
+  try {
+      console.log('selectedOptionIotComplex',value);
+    dispatch(startLoading());
+    let command = "list-iot-thing";
+    var result = await executelistIotCabinDynamicLambda(user?.username, user?.credentials, value, command);
+    console.log('result',result.body.things);
+    dispatch(setCabinList(result.body.things));
+  } catch (error) {
+    handleError(error, 'Error ListOfIotCabin')
+  } finally {
+    dispatch(stopLoading()); // Dispatch the stopLoading action
+  }
+}
 
   const FetchListOFWIFI = async () => {
     try {
@@ -358,24 +389,24 @@ const ModalReinitiate = ({ data }) => {
 
   }
 
-  const handleChangeApplicationType = (selectedOption) => {
-    console.log('handleChangeApplicationType',selectedOption);
+  const handleChangeApplicationType = async (selectedOption) => {
     setApplicationTypeOption(selectedOption);
     setApplicationFormData( prevFormData => ({
       ...prevFormData,
       application_type: selectedOption.value,
     }));
     if(selectedOption.value == "Cabin Automation System with BWT") {
+      await ListOfIotCabin(data.data.complex_name);
       setDummyCabinShow(true)
     } else {
       setDummyCabinShow(false);
-      setDummyCabin(null);
       setApplicationFormData(prevFormData => {
         const updatedFormData = { ...prevFormData };
         delete updatedFormData.dummy_bwt_cabin;
         return updatedFormData;
       });
     }
+    setDummyCabin(null);
   }
   const handleChange = (e) => {
     const { name , value } = e.target;
@@ -693,7 +724,7 @@ const ModalReinitiate = ({ data }) => {
           if(dummyCabin == '' || dummyCabin == null || dummyCabin == undefined) {
             setDialogData({
               title: "Validation Error",
-              message: "Please Select BWT",
+              message: "Please Select BWT or Register BWT Thing",
               onClickAction: () => {
                 // Handle the action when the user clicks OK
                 console.log("handleSaveDetails");
@@ -899,20 +930,16 @@ const ModalReinitiate = ({ data }) => {
                   }}
                    />
                    <br />
-                   {dummyCabinShow && (
-                      <Select 
-                      options={dummyCabin}
-                      value={dummyCabin} 
-                      onChange={handleChangeDummyCabin} 
-                      isDisabled
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          width: "70%",
-                        }),
-                      }}
-                    />
-                    )}
+                   {data.data.application_details?.dummy_bwt_cabin !== undefined && (
+                     <Input
+                     id="bwt_selected"
+                     name="bwt_selected"
+                     type="text"
+                     value={data.data.application_details.dummy_bwt_cabin}
+                     disabled
+                     style={{ width: "70%"}}
+                   />
+                    )} 
                     <br />
                    <label>Upi Payment Status</label>
                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" isDisabled
@@ -1058,12 +1085,72 @@ const ModalReinitiate = ({ data }) => {
                     />
                     <br />
                     <label>Application Type</label>
-                    <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" styles={{
+                    {/* <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       width: "70%",
                     }),
-                  }}/>
+                  }}/> */}
+                   {data.data.cabin_name.includes('BWT') && (
+                        <Select 
+                          options={applicationType.filter(option => option.value === 'Black Water Treatment')} 
+                          value={applicationTypeOption} 
+                          onChange={handleChangeApplicationType} 
+                          placeholder="Application Type" 
+                          styles={{
+                            control: (baseStyles, state) => ({
+                              ...baseStyles,
+                              width: "70%",
+                            }),
+                          }}
+                        />
+                      )}
+                      {data.data.cabin_name.includes('WC') && (
+                        <Select 
+                          options={applicationType.filter(option => option.value !== 'Black Water Treatment')} 
+                          value={applicationTypeOption} 
+                          onChange={handleChangeApplicationType} 
+                          placeholder="Application Type" 
+                          styles={{
+                            control: (baseStyles, state) => ({
+                              ...baseStyles,
+                              width: "70%",
+                            }),
+                          }}
+                        />
+                      )}
+                       {data.data.cabin_name.includes('UR') && (
+                        <Select 
+                          options={applicationType.filter(option => option.value === 'Entry Management System')} 
+                          value={applicationTypeOption} 
+                          onChange={handleChangeApplicationType} 
+                          placeholder="Application Type" 
+                          styles={{
+                            control: (baseStyles, state) => ({
+                              ...baseStyles,
+                              width: "70%",
+                            }),
+                          }}
+                        />
+                      )}
+                    <br />
+                    {dummyCabinShow && (
+                        <Select 
+                        options={cabinList
+                          .filter(cabin => cabin.includes('BWT'))
+                          .map(cabin => ({ label: cabin, value: cabin }))
+                        }
+                        value={dummyCabin} 
+                        onChange={handleChangeDummyCabin} 
+                        placeholder="Please Select Bwt" 
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            width: "70%",
+                          }),
+                        }}
+                      />
+                      )}
                     <br />
                     <label>Upi Payment Status</label>
                     <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" styles={{
