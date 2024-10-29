@@ -88,6 +88,8 @@ const ModalReinitiate = ({ data }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [showRadios, setShowRadios] = useState(false); // To toggle radio buttons
   const [defaultWifi, setDefaultWifi] = useState(null); // To store selected default Wi-Fi
+  const [dummyCabinShow, setDummyCabinShow] = useState(false);
+  const [dummyCabin, setDummyCabin] = useState(null);
 
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
@@ -183,6 +185,13 @@ const ModalReinitiate = ({ data }) => {
           setAmsEnableOption({ label: 'False', value: false})
         }
 
+        if(data.data.application_details.application_type == "Cabin Automation System with BWT") {
+          if(data.data.application_details.dummy_bwt_cabin) {
+            setDummyCabinShow(true);
+            setDummyCabin(data.data.application_details.dummy_bwt_cabin);
+          }
+        }
+
         if(data.data.application_details?.wifiCredentials?.length > 0) {
           setApplicationFormData({
             wifiCredentials: data.data.application_details?.wifiCredentials ?? []
@@ -233,6 +242,7 @@ const ModalReinitiate = ({ data }) => {
       if(data.data.QR_CREATED_STATE == "TRUE") {
         setQrImage(data.data.qr_details.qr)
       }
+      setDummyCabinShow(false)
 
     }
 
@@ -337,6 +347,17 @@ const ModalReinitiate = ({ data }) => {
       setSelectedOption(null);
     }
   };
+
+  const handleChangeDummyCabin = async(selectedOption) => {
+    console.log('handleChangeDummyCabin', selectedOption);
+    setDummyCabin(selectedOption);
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      dummy_bwt_cabin: selectedOption.value,
+    }));
+
+  }
+
   const handleChangeApplicationType = (selectedOption) => {
     console.log('handleChangeApplicationType',selectedOption);
     setApplicationTypeOption(selectedOption);
@@ -344,6 +365,17 @@ const ModalReinitiate = ({ data }) => {
       ...prevFormData,
       application_type: selectedOption.value,
     }));
+    if(selectedOption.value == "Cabin Automation System with BWT") {
+      setDummyCabinShow(true)
+    } else {
+      setDummyCabinShow(false);
+      setDummyCabin(null);
+      setApplicationFormData(prevFormData => {
+        const updatedFormData = { ...prevFormData };
+        delete updatedFormData.dummy_bwt_cabin;
+        return updatedFormData;
+      });
+    }
   }
   const handleChange = (e) => {
     const { name , value } = e.target;
@@ -657,6 +689,19 @@ const ModalReinitiate = ({ data }) => {
           })
           return;
         } 
+        if(applicationFormData.application_type == "Cabin Automation System with BWT") {
+          if(dummyCabin == '' || dummyCabin == null || dummyCabin == undefined) {
+            setDialogData({
+              title: "Validation Error",
+              message: "Please Select BWT",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("handleSaveDetails");
+              },
+            })
+            return;
+          }
+        }
         dispatch(startLoading());
         let object_application_details = {
           serial_number: data.data.serial_number,
@@ -854,6 +899,21 @@ const ModalReinitiate = ({ data }) => {
                   }}
                    />
                    <br />
+                   {dummyCabinShow && (
+                      <Select 
+                      options={dummyCabin}
+                      value={dummyCabin} 
+                      onChange={handleChangeDummyCabin} 
+                      isDisabled
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          width: "70%",
+                        }),
+                      }}
+                    />
+                    )}
+                    <br />
                    <label>Upi Payment Status</label>
                    <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" isDisabled
                    styles={{

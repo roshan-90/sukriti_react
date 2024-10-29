@@ -112,6 +112,8 @@ export default function EnrollDevice() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [showRadios, setShowRadios] = useState(false); // To toggle radio buttons
   const [defaultWifi, setDefaultWifi] = useState(null); // To store selected default Wi-Fi
+  const [dummyCabinShow, setDummyCabinShow] = useState(false);
+  const [dummyCabin, setDummyCabin] = useState(null);
 
   useEffect(() => {
     setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
@@ -140,6 +142,7 @@ export default function EnrollDevice() {
     setSerialNumberEnable(false);
     setApplicationDetails(false);
     console.log('dddd')
+    setDummyCabinShow(false)
     
   },[]);
 
@@ -156,18 +159,25 @@ export default function EnrollDevice() {
     };
 
     // Handle radio button selection
-  const handleRadioWifiDefaultChange = (index) => {
-    setDefaultWifi(index); // Store the selected Wi-Fi index
-    console.log(listOfWifi[index])
-    setApplicationFormData( prevFormData => ({
-      ...prevFormData,
-      defaultWifi: listOfWifi[index],
-    }));
-  };
+    const handleRadioWifiDefaultChange = (index) => {
+      setDefaultWifi(index); // Store the selected Wi-Fi index
+      console.log(listOfWifi[index])
+      setApplicationFormData( prevFormData => ({
+        ...prevFormData,
+        defaultWifi: listOfWifi[index],
+      }));
+    };
 
   const handleRadioChange = (cabin) => {
     dispatch(setCabinName(cabin));
     setNextBtn(true)
+    if(cabin.includes('BWT')) {
+      setApplicationTypeOption({ label: 'Black Water Treatment', value: 'Black Water Treatment'})
+    } else if (cabin.includes('UR')) {
+      setApplicationTypeOption({ label: 'Entry Management System', value: 'Entry Management System'})
+    } else if (cabin.includes('WC')) {
+      setApplicationTypeOption({ label: 'Cabin Automation System Without BWT', value: 'Cabin Automation System without BWT'})
+    }
   };
 
   const handlePolicy = (value) => {
@@ -177,6 +187,7 @@ export default function EnrollDevice() {
   console.log('defaultWifi', defaultWifi);
   console.log('showRadios', showRadios);
   console.log('applicationFormData', applicationFormData);
+
   const applicationType = [
     { label: 'Entry Management System', value: 'Entry Management System'},
     { label: 'Toilet Monitoring System', value: 'Toilet Monitoring System'},
@@ -552,6 +563,16 @@ export default function EnrollDevice() {
     }));
   }
 
+  const handleChangeDummyCabin = async(selectedOption) => {
+    console.log('handleChangeDummyCabin', selectedOption);
+    setDummyCabin(selectedOption);
+    setApplicationFormData( prevFormData => ({
+      ...prevFormData,
+      dummy_bwt_cabin: selectedOption.value,
+    }));
+
+  }
+
   const handleChangeApplicationType = (selectedOption) => {
     console.log('handleChangeApplicationType',selectedOption);
     setApplicationTypeOption(selectedOption);
@@ -559,6 +580,17 @@ export default function EnrollDevice() {
       ...prevFormData,
       application_type: selectedOption.value,
     }));
+    if(selectedOption.value == "Cabin Automation System with BWT") {
+      setDummyCabinShow(true)
+    } else {
+      setDummyCabinShow(false);
+      setDummyCabin(null);
+      setApplicationFormData(prevFormData => {
+        const updatedFormData = { ...prevFormData };
+        delete updatedFormData.dummy_bwt_cabin;
+        return updatedFormData;
+      });
+    }
   }
 
   const totalSteps = () => {
@@ -942,6 +974,19 @@ export default function EnrollDevice() {
           })
           return;
         }
+        if(applicationFormData.application_type == "Cabin Automation System with BWT") {
+          if(dummyCabin == '' || dummyCabin == null || dummyCabin == undefined) {
+            setDialogData({
+              title: "Validation Error",
+              message: "Please Select BWT",
+              onClickAction: () => {
+                // Handle the action when the user clicks OK
+                console.log("handleSaveDetails");
+              },
+            })
+            return;
+          }
+        }
     dispatch(startLoading());
     let object_application_details = {
       serial_number: serialNumber,
@@ -1220,6 +1265,7 @@ export default function EnrollDevice() {
               )}
               {activeStep === 1 && (
                  <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                    <p>Note :- If you are going to select product type as Cabin Automation System with BWT, please register a BWT Cabin if you haven't already registered it. </p>
                     <h3> Cabin Details </h3>
                     <br/>
                   {dialogCabinDetails &&(
@@ -1357,6 +1403,8 @@ export default function EnrollDevice() {
                   <h3> Application Details</h3>
                   {policyName && (
                     <>
+                    {console.log('checking log')}
+                    {console.log('application', cabinDetails.thingName)}
                     <label>Unattended Timmer</label>
                       <Input
                       id="unattended_timmer"
@@ -1368,7 +1416,43 @@ export default function EnrollDevice() {
                     />
                       <br />
                       <label>Application Type</label>
-                      <Select options={applicationType || []} value={applicationTypeOption} onChange={handleChangeApplicationType} placeholder="Application Type" />
+                      {cabinDetails.thingName.includes('BWT') && (
+                        <Select 
+                          options={applicationType.filter(option => option.value === 'Black Water Treatment')} 
+                          value={applicationTypeOption} 
+                          onChange={handleChangeApplicationType} 
+                          placeholder="Application Type" 
+                        />
+                      )}
+                      {cabinDetails.thingName.includes('WC') && (
+                        <Select 
+                          options={applicationType.filter(option => option.value !== 'Black Water Treatment')} 
+                          value={applicationTypeOption} 
+                          onChange={handleChangeApplicationType} 
+                          placeholder="Application Type" 
+                        />
+                      )}
+                       {cabinDetails.thingName.includes('UR') && (
+                        <Select 
+                          options={applicationType.filter(option => option.value === 'Entry Management System')} 
+                          value={applicationTypeOption} 
+                          onChange={handleChangeApplicationType} 
+                          placeholder="Application Type" 
+                        />
+                      )}
+                      <br />
+                      {/* <label>Please selecte BWT</label> */}
+                      {dummyCabinShow && (
+                        <Select 
+                        options={cabinList
+                          .filter(cabin => cabin.includes('BWT'))
+                          .map(cabin => ({ label: cabin, value: cabin }))
+                        }
+                        value={dummyCabin} 
+                        onChange={handleChangeDummyCabin} 
+                        placeholder="List of BWT" 
+                      />
+                      )}
                       <br />
                       <label>Upi Payment Status</label>
                       <Select options={upiPaymentStatusOption || []} value={upiPaymentStatus} onChange={handleChangeUpiPaymentStatus} placeholder="UPI Payment Status" />
@@ -1484,7 +1568,7 @@ export default function EnrollDevice() {
 
 
                     </>
-                   )}
+                    )} 
                 </div>
               )}
               {activeStep === 5 && (
