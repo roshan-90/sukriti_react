@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "reactstrap";
 // import LoadingDialog from "../../dialogs/LoadingDialog";
@@ -23,21 +23,85 @@ import {
   getPublishTopicName,
 } from "./quickConfig/utils/ConfigValidationHelper";
 import { executePublishConfigLambda } from "../../awsClients/quickConfigLambdas";
+import { setClientList } from "../../features/adminstrationSlice";
+import { executelistClientsLambda } from "../../awsClients/administrationLambdas";
+import { startLoading, stopLoading } from "../../features/loadingSlice";
+import { selectUser } from "../../features/authenticationSlice";
+import QuickConfigUsageModal from './quickConfig/QuickConfigUsageModal';
+
 
 const QuickConfig = (props) => {
   const dispatch = useDispatch();
   const configData = useSelector((state) => state.dashboard.configData);
   const clientList = useSelector((state) => state.adminstration.clientList);
   const userDetails = useSelector((state) => state.authentication.user);
+  const user = useSelector(selectUser);
+
+  useEffect(() => {
+    if(clientList.length == 0) {
+      const fetchClientList = async () => {
+        await fetchAndInitClientList();
+      };
+      fetchClientList();
+    }
+  }, [clientList])
 
   const configViewData = {};
-  //   const messageDialog = useRef(null);
-  //   const loadingDialog = useRef(null);
   const dialogQuickConfigUsageCharge = useRef(null);
   const dialogQuickConfigFlush = useRef(null);
   const dialogQuickConfigFloorClean = useRef(null);
   const dialogQuickConfigLightAndFan = useRef(null);
   const dialogQuickConfigDataRequest = useRef(null);
+  const [dialogData, setDialogData] = useState(null);
+  const [isConfigUsageModalVisible, setIsConfigUsageModalVisible] = useState(false);
+  const [clientListUpdate, setClientListUpdate] = useState([]);
+
+  console.log('client list', clientList);
+  console.log('client list length', clientList.length);
+
+  const UsageConfigtoggleModal = () => setIsConfigUsageModalVisible(!isConfigUsageModalVisible);
+
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+  
+  const fetchAndInitClientList = async () => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    try {
+      var result = await executelistClientsLambda(user?.credentials);
+      console.log("QuickConfig fetchAndInitClientList", result);
+      const options = result.clientList.map(item => ({
+        value: item.name,
+        label: item.name
+      }));
+      dispatch(setClientList(result.clientList));
+      setClientListUpdate(options)
+    } catch (err) {
+      handleError(err, "fetchAndInitClientList");
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  };
 
   console.log("sdf props quickConfig", props);
   const usageChargeConfigView = () => (
@@ -151,13 +215,38 @@ const QuickConfig = (props) => {
 
   const handleDataRequestConfigUpdate = () => {};
 
+  const handleOnClick = (data) => {
+    let targetName = data.selectClient.value;
+    let paymentMode = configViewData['QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG']?.id_paymentMode ?? null;
+    let usageCharge = configViewData['QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG']?.id_usageCharge ?? null;
+
+    console.log('is clicked',data);
+    console.log('configViewData', configViewData['QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG']);
+    console.log({targetName,paymentMode,usageCharge })
+  }
+
   return (
     <div
       className="animated fadeIn"
       style={{ ...whiteSurface, background: "white", marginTop: "20px" }}
     >
+      <QuickConfigUsageModal
+        visibility={isConfigUsageModalVisible}
+        toggleDialog={UsageConfigtoggleModal}
+        title="Quick Config"
+        tabData={[
+          {
+            type: QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG,
+            label: "Usage Charge ff",
+            configView: usageChargeConfigView,
+          },
+        ]}
+        onClick={handleOnClick}
+        clientList={clientListUpdate}
+      />
       {/* <MessageDialog ref={messageDialog} />
       <LoadingDialog ref={loadingDialog} /> */}
+
       <QuickConfigDialog
         ref={dialogQuickConfigUsageCharge}
         handleUpdate={handleConfigUpdate}
@@ -167,7 +256,7 @@ const QuickConfig = (props) => {
         tabData={[
           {
             type: QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG,
-            label: "Usage Charge",
+            label: "Usage Charge ff",
             configView: usageChargeConfigView,
           },
         ]}
@@ -267,7 +356,8 @@ const QuickConfig = (props) => {
               "Configure payment charge and payment mode settings in one go."
             }
             onClick={() => {
-              dialogQuickConfigUsageCharge.current.showDialog();
+              UsageConfigtoggleModal()
+              // dialogQuickConfigUsageCharge.current.showDialog();
             }}
           />
         )}

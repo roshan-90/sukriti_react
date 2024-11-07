@@ -18,6 +18,7 @@ import { dashboardStyle } from "../../../jsStyles/Style";
 import { whiteSurface } from "../../../jsStyles/Style";
 import RxInputCheckbox from "./utils/RxInputCheckbox";
 import { CabinType } from "../../../nomenclature/nomenclature";
+import { QuickConfigTabs } from "../nomenclature/nomenclature";
 
 const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onClick, clientList}) => {
   const [activeTab, setActiveTab] = useState(tabData[0]?.type || "");
@@ -28,6 +29,9 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
     [CabinType.PD]: false,
     [CabinType.MUR]: false,
   });
+  const configViewData = {};
+  const [entryCharge, setEntryCharge] = useState(0)
+  const [paymentMode, setPaymentMode] = useState(null)
 
   const toggleTab = (tab) => {
     if (activeTab !== tab) {
@@ -138,6 +142,161 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
     );
   };
 
+  function EntryChargeLabel(props) {
+    const [duration, setDuration] = useState(props.defaultEntryCharge);
+  
+    return (
+      <div
+        className="row"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "0",
+          margin: "0px 0px 30px 0px",
+        }}
+      >
+        <div
+          className="col-md-2"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            padding: "0",
+          }}
+        >
+          <div
+            style={{
+              ...cabinDetailsStyle.cabinHealth.itemTitle,
+              textAlign: "end",
+            }}
+          >
+            {"Entry Charge"}
+          </div>
+        </div>
+  
+        <div
+          className="col-md-1"
+          style={{
+            marginLeft: "12px",
+          }}
+        >
+          &#x20b9;
+        </div>
+        <div
+          className="col-md-6"
+          style={{
+            marginLeft: "8px",
+          }}
+        >
+          <RxInputText
+            text={props.defaultEntryCharge}
+            placeholder={""}
+            onChange={(text) => {
+              console.log("_onChange", text);
+              props.handleUpdate(props.configTab, props.id, text);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+  
+  function PaymentModeLabel(props) {
+    const [paymentMode, setPaymentMode] = useState(props.defaultPaymentMode);
+  
+    return (
+      <div
+        className="row"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "0",
+          margin: "0px 0px 30px 0px",
+        }}
+      >
+        <div
+          className="col-md-2"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            padding: "0",
+          }}
+        >
+          <div
+            style={{
+              ...cabinDetailsStyle.cabinHealth.itemTitle,
+              textAlign: "end",
+            }}
+          >
+            {"Payment Mode"}
+          </div>
+        </div>
+  
+        <div
+          className="col-md-1"
+          style={{
+            marginLeft: "12px",
+          }}
+        >
+          <img
+            src={icNonCritical}
+            alt=""
+            style={{
+              width: "30px",
+              height: "30px",
+              borderRadius: "5%",
+            }}
+          />
+        </div>
+        <div
+          className="col-md-6"
+          style={{
+            marginLeft: "8px",
+          }}
+        >
+          <Dropdown
+            options={["None", "Coin", "RFID", "Coin and RF"]}
+            // onChange={(text) => {
+            //   console.log('_onChange', text)
+            //   props.handleUpdate(props.configTab,props.id,text)
+            //  }}
+            onSelection={(index, value) => {
+              setPaymentMode(value);
+              props.handleUpdate(props.configTab, props.id, value);
+            }}
+            // onSelection={(index,value) => {setCriticality(value); {props.onSelection(index,value)}}}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  function handleupdateEntryCharges(data) {
+    console.log('data', data)
+  }
+
+  function handleupdatePaymentMode(data) {
+    console.log('data', data)
+  }
+
+
+  function UsageChargeConfigView(props) {
+    return (
+      <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
+        <EntryChargeLabel
+          configTab={QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG}
+          handleUpdate={handleupdateEntryCharges}
+        />
+  
+        <PaymentModeLabel
+          configTab={QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG}
+          handleUpdate={handleupdatePaymentMode}
+        />
+      </div>
+    );
+  }
+
   const renderTabPane = () => {
     const activeConfigView = tabData.find((item) => item.type === activeTab)?.configView;
     return (
@@ -190,7 +349,7 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
                   padding: "10px",
                 }}
               >
-                {activeConfigView ? activeConfigView() : <p>No content available</p>}
+                <UsageChargeConfigView />
               </div>
             </td>
           </tr>
@@ -200,6 +359,12 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       </TabPane>
     );
   };
+
+  const handleClick = () => {
+    console.log('selectedScope', selectedScope);
+    console.log('selectClient', selectClient);
+
+  }
 
   return (
     <Modal isOpen={visibility} toggle={toggleDialog} className="modal-la" style={{ width: "900px" }}>
@@ -247,7 +412,7 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
         </table>
       </ModalBody>
       <ModalFooter>
-        <Button color="primary" onClick={onClick}>
+        <Button color="primary" onClick={() => onClick({selectedScope,selectClient })}>
           SUBMIT
         </Button>
       </ModalFooter>
