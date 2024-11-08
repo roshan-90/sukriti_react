@@ -237,7 +237,7 @@ const QuickConfig = (props) => {
         tabData={[
           {
             type: QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG,
-            label: "Usage Charge ff",
+            label: "Usage Charge",
             configView: usageChargeConfigView,
           },
         ]}

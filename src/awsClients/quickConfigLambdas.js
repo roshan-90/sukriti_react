@@ -3,7 +3,7 @@ import Result from "../Entity/Result";
 
 export function executePublishConfigLambda(credentials, topic, config, metadata) {
   return new Promise(function (resolve, reject) {
-    var payload = { topic: topic, payload: config, info: metadata };
+    var payload = { topic: topic, payload: JSON.stringify(config), info: JSON.stringify(metadata) };
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",

@@ -84,13 +84,17 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setselectClient(null);
     setSelectedScope({
       [CabinType.MWC]: false,
       [CabinType.FWC]: false,
       [CabinType.PD]: false,
       [CabinType.MUR]: false,
     });
+    if((user?.user?.userRole == "Super Admin" || user?.user?.userRole == "Client Super Admin")) {
+      setselectClient(null);
+    } else {
+      setselectClient({lable: user?.user?.clientName, value:user?.user?.clientName})
+    }
   }, []);
 
 
@@ -129,6 +133,27 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       dispatch(startLoading());
       var result = await executePublishConfigLambda(user?.credentials, topic,payloadConfigArray,infoConfigArray);
       console.log('result',result);
+      if(result.result == 1) {
+        setDialogData({
+          title: "Success",
+          message: "update config submitted successfully",
+          onClickAction: () => {
+            handleModalClose()
+            // Handle the action when the user clicks OK
+            console.log(`SubmitQuickConfigUsage -->`);
+          },
+        });
+      } else {
+        setDialogData({
+          title: "Error",
+          message: result.message,
+          onClickAction: () => {
+            handleModalClose()
+            // Handle the action when the user clicks OK
+            console.log(`error SubmitQuickConfigUsage -->`);
+          },
+        });
+      }
     } catch (error) {
       handleError(error, 'Error SubmitQuickConfigUsage')
     } finally {
@@ -342,7 +367,9 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
                 }}
               >
                 {/*  client selection */}
-                <ClientSelection />
+                {(user?.user?.userRole == "Super Admin" || user?.user?.userRole == "Client Super Admin") && (
+                  <ClientSelection />
+                )}
                 {/*  Scope Config */}
                 <ScopeConfig />
               </div>
@@ -543,6 +570,8 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       [CabinType.MUR]: false,
     });
     setEnteryCharge("")
+    setPaymentMode(null)
+    setDialogData(null)
   }
 
   
