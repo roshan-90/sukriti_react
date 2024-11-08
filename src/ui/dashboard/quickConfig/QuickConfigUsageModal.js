@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Modal,
   ModalHeader,
@@ -17,8 +17,45 @@ import Select from 'react-select'; // Importing react-select
 import { dashboardStyle } from "../../../jsStyles/Style";
 import { whiteSurface } from "../../../jsStyles/Style";
 import RxInputCheckbox from "./utils/RxInputCheckbox";
-import { CabinType } from "../../../nomenclature/nomenclature";
-import { QuickConfigTabs } from "../nomenclature/nomenclature";
+import { CabinType,QuickConfigTabs } from "../../../nomenclature/nomenclature";
+import icNonCritical from "../../../assets/img/icons/ic_health_ok.png";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../../../features/authenticationSlice";
+import { GiConsoleController } from "react-icons/gi";
+import { executePublishConfigLambda } from "../../../awsClients/quickConfigLambdas";
+
+export const cabinDetailsStyle = {
+  componentTitle: {
+    color: `black`,
+    fontSize: "18px",
+    fontWeight: "bold",
+    fontStyle: "bold",
+  },
+  cabinStatus: {
+    gaugeTitle: {
+      color: `black`,
+      fontSize: "10px",
+      fontWeight: "bold",
+      fontStyle: "bold",
+    },
+    gaugeValue: {
+      color: `black`,
+      fontSize: "10px",
+    },
+  },
+  cabinHealth: {
+    itemTitle: {
+      color: `black`,
+      fontSize: "10px",
+      fontWeight: "bold",
+      fontStyle: "bold",
+    },
+    itemValue: {
+      color: `black`,
+      fontSize: "10px",
+    },
+  },
+};
 
 const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onClick, clientList}) => {
   const [activeTab, setActiveTab] = useState(tabData[0]?.type || "");
@@ -30,8 +67,27 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
     [CabinType.MUR]: false,
   });
   const configViewData = {};
-  const [entryCharge, setEntryCharge] = useState(0)
   const [paymentMode, setPaymentMode] = useState(null)
+  const EntryArray = [
+    { label: 'None', value: 'None'},
+    { label: 'Coin', value: 'Coin'},
+    { label: 'RFID', value: 'RFID'},
+    { label: 'Coin and RF', value: 'Coin and RF'},
+  ];
+  const entryChargeRef = useRef("");
+  const user = useSelector(selectUser);
+  const [enteryCharge, setEnteryCharge] = useState("");
+
+  useEffect(() => {
+    setselectClient(null);
+    setSelectedScope({
+      [CabinType.MWC]: false,
+      [CabinType.FWC]: false,
+      [CabinType.PD]: false,
+      [CabinType.MUR]: false,
+    });
+  }, []);
+
 
   const toggleTab = (tab) => {
     if (activeTab !== tab) {
@@ -141,69 +197,8 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       </div>
     );
   };
-
-  function EntryChargeLabel(props) {
-    const [duration, setDuration] = useState(props.defaultEntryCharge);
   
-    return (
-      <div
-        className="row"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "0",
-          margin: "0px 0px 30px 0px",
-        }}
-      >
-        <div
-          className="col-md-2"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            padding: "0",
-          }}
-        >
-          <div
-            style={{
-              ...cabinDetailsStyle.cabinHealth.itemTitle,
-              textAlign: "end",
-            }}
-          >
-            {"Entry Charge"}
-          </div>
-        </div>
-  
-        <div
-          className="col-md-1"
-          style={{
-            marginLeft: "12px",
-          }}
-        >
-          &#x20b9;
-        </div>
-        <div
-          className="col-md-6"
-          style={{
-            marginLeft: "8px",
-          }}
-        >
-          <RxInputText
-            text={props.defaultEntryCharge}
-            placeholder={""}
-            onChange={(text) => {
-              console.log("_onChange", text);
-              props.handleUpdate(props.configTab, props.id, text);
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-  
-  function PaymentModeLabel(props) {
-    const [paymentMode, setPaymentMode] = useState(props.defaultPaymentMode);
-  
+  function PaymentModeLabel() {  
     return (
       <div
         className="row"
@@ -255,46 +250,21 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
             marginLeft: "8px",
           }}
         >
-          <Dropdown
-            options={["None", "Coin", "RFID", "Coin and RF"]}
-            // onChange={(text) => {
-            //   console.log('_onChange', text)
-            //   props.handleUpdate(props.configTab,props.id,text)
-            //  }}
-            onSelection={(index, value) => {
-              setPaymentMode(value);
-              props.handleUpdate(props.configTab, props.id, value);
-            }}
-            // onSelection={(index,value) => {setCriticality(value); {props.onSelection(index,value)}}}
-          />
+          <Select options={EntryArray || []} value={paymentMode} onChange={handleupdatePaymentMode} placeholder="Select Payment" />
         </div>
       </div>
     );
   }
 
-  function handleupdateEntryCharges(data) {
-    console.log('data', data)
+  const handleupdateEntryCharges = (e) => {
+    // entryChargeRef.current = e.target.value;
+    console.log('data', e.target.value)
+    setEnteryCharge(e.target.value)
   }
 
   function handleupdatePaymentMode(data) {
     console.log('data', data)
-  }
-
-
-  function UsageChargeConfigView(props) {
-    return (
-      <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
-        <EntryChargeLabel
-          configTab={QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG}
-          handleUpdate={handleupdateEntryCharges}
-        />
-  
-        <PaymentModeLabel
-          configTab={QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG}
-          handleUpdate={handleupdatePaymentMode}
-        />
-      </div>
-    );
+    setPaymentMode(data)
   }
 
   const renderTabPane = () => {
@@ -349,7 +319,70 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
                   padding: "10px",
                 }}
               >
-                <UsageChargeConfigView />
+                {/* <UsageChargeConfigView /> */}
+                <div style={{ margin: "10px 10px 10px 10px", width: "100%" }}>
+                    <div
+                  className="row"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0",
+                    margin: "0px 0px 30px 0px",
+                  }}
+                >
+                  <div
+                    className="col-md-2"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      padding: "0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        ...cabinDetailsStyle.cabinHealth.itemTitle,
+                        textAlign: "end",
+                      }}
+                    >
+                      {"Entry Charge"}
+                    </div>
+                  </div>
+            
+                  <div
+                    className="col-md-1"
+                    style={{
+                      marginLeft: "12px",
+                    }}
+                  >
+                    &#x20b9;
+                  </div>
+                  <div
+                    className="col-md-6"
+                    style={{
+                      marginLeft: "8px",
+                    }}
+                  >
+                    <input
+                      // ref={entryChargeRef}
+                      defaultValue={enteryCharge}
+                      type="text"
+                      placeholder=""
+                      onChange={(e) => handleupdateEntryCharges(e)}
+                    />
+                  </div>
+                    </div>
+
+                  {/* <EntryChargeLabel
+                    configTab={QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG}
+                    handleUpdate={handleupdateEntryCharges}
+                  /> */}
+            
+                  <PaymentModeLabel
+                    configTab={QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG}
+                    handleUpdate={handleupdatePaymentMode}
+                  />
+                </div>
               </div>
             </td>
           </tr>
@@ -360,14 +393,67 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
     );
   };
 
+  // Function to generate  info target configuration array
+  const createTargetConfig = (scope, client) => {
+    console.log('user', user?.user)
+    return Object.keys(scope)
+      .filter((key) => scope[key]) // Filter only true values
+      .map((key) => ({
+        configType: "UCEMS/USAGE-CHARGE",
+        user: user?.user.userName,
+        client: user?.user.clientName,
+        targetType: "Client",
+        targetSubType: key.split(".")[1] == 'PD' ? "PWC" : key.split(".")[1], // Extract target type (e.g., "MWC" from "CabinType.MWC")
+        targetName: client.value,
+      }));
+  };
+
+  const createpayloadConfig = (scope, client, enteryCharge, paymentMode) => {
+    console.log('user', user?.user)
+    return Object.keys(scope)
+      .filter((key) => scope[key]) // Filter only true values
+      .map((key) => ({
+        Cabinpaymentmode: paymentMode.value,
+        Entrychargeamount: enteryCharge ?? 0,
+        THING_NAME: client.value + "_ALL",
+        cabin_type: key.split(".")[1] == "PD" ? "PWC" : key.split(".")[1], // Extract target type (e.g., "MWC" from "CabinType.MWC")
+        user_type: key.split(".")[1] == "MWC" ? 'MALE' : key.split(".")[1] == "FWC" ? "FEMALE" : key.split(".")[1] == "PD" ? "PD" : key.split(".")[1] == "MUR" ? 'MALE' : "",
+      }));
+  };
+
   const handleClick = () => {
     console.log('selectedScope', selectedScope);
     console.log('selectClient', selectClient);
+    console.log('paymentMode', paymentMode);
+    console.log('enteryCharge', enteryCharge);
+    const infoConfigArray = createTargetConfig(selectedScope,selectClient);
+    const payloadConfigArray = createpayloadConfig(selectedScope, selectClient, enteryCharge,paymentMode);
+    let object = {
+      info: infoConfigArray,
+      payload: payloadConfigArray,
+      topic: `TEST/${selectClient.value}/TOPIC_SSF_READ_UCEMS_CONFIG`
+    }
+    console.log("infoConfigArray", infoConfigArray);
+    console.log("payloadConfigArray", payloadConfigArray);
+    console.log('payload', object);
 
   }
 
+  const handleModalClose = () => {
+    console.log('modal is close')
+    setselectClient(null);
+    setSelectedScope({
+      [CabinType.MWC]: false,
+      [CabinType.FWC]: false,
+      [CabinType.PD]: false,
+      [CabinType.MUR]: false,
+    });
+  }
+
+  
   return (
-    <Modal isOpen={visibility} toggle={toggleDialog} className="modal-la" style={{ width: "900px" }}>
+    <Modal isOpen={visibility} toggle={toggleDialog} className="modal-la" style={{ width: "900px" }}  onClosed={handleModalClose} // This function will fire when the modal closes
+>
       <ModalHeader style={{ background: "#5DC0A6", color: "white" }} toggle={toggleDialog}>
         {title}
       </ModalHeader>
@@ -412,7 +498,7 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
         </table>
       </ModalBody>
       <ModalFooter>
-        <Button color="primary" onClick={() => onClick({selectedScope,selectClient })}>
+        <Button color="primary" onClick={() => handleClick()}>
           SUBMIT
         </Button>
       </ModalFooter>
