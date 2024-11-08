@@ -1,13 +1,13 @@
 import AWS from "aws-sdk";
 import Result from "../Entity/Result";
 
-export function executePublishConfigLambda(topic, config, metadata) {
+export function executePublishConfigLambda(credentials, topic, config, metadata) {
   return new Promise(function (resolve, reject) {
     var payload = { topic: topic, payload: config, info: metadata };
-
     var lambda = new AWS.Lambda({
       region: "ap-south-1",
       apiVersion: "2015-03-31",
+      credentials: credentials,
     });
     var pullParams = {
       FunctionName: "mis_publish_config_generic",

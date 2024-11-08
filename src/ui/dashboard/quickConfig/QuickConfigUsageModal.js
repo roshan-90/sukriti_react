@@ -23,6 +23,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../../features/authenticationSlice";
 import { GiConsoleController } from "react-icons/gi";
 import { executePublishConfigLambda } from "../../../awsClients/quickConfigLambdas";
+import MessageDialog from "../../../dialogs/MessageDialog"; // Adjust the path based on your project structure
+import { startLoading, stopLoading } from "../../../features/loadingSlice";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export const cabinDetailsStyle = {
   componentTitle: {
@@ -74,9 +77,11 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
     { label: 'RFID', value: 'RFID'},
     { label: 'Coin and RF', value: 'Coin and RF'},
   ];
-  const entryChargeRef = useRef("");
   const user = useSelector(selectUser);
   const [enteryCharge, setEnteryCharge] = useState("");
+  const [dialogData, setDialogData] = useState(null);
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setselectClient(null);
@@ -94,6 +99,42 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       setActiveTab(tab);
     }
   };
+
+  const handleError = (err, Custommessage, onclick = null) => {
+    console.log("error -->", err);
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
+  const SubmitQuickConfigUsage = async (topic,payloadConfigArray,infoConfigArray) => {
+    try {
+      dispatch(startLoading());
+      var result = await executePublishConfigLambda(user?.credentials, topic,payloadConfigArray,infoConfigArray);
+      console.log('result',result);
+    } catch (error) {
+      handleError(error, 'Error SubmitQuickConfigUsage')
+    } finally {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }
+  }
 
   const handleChangeClient = (selectedOption) => {
     console.log('handleChangeClient',selectedOption);
@@ -421,22 +462,75 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       }));
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
     console.log('selectedScope', selectedScope);
     console.log('selectClient', selectClient);
     console.log('paymentMode', paymentMode);
     console.log('enteryCharge', enteryCharge);
+    let selectedScopeCheck = Object.keys(selectedScope).filter((key) => selectedScope[key])
+    console.log("selectedScopeCheck",selectedScopeCheck);
+
+    if(selectClient?.value == '' || selectClient == null || selectClient == undefined) {
+      setDialogData({
+        title: "Validation Error",
+        message: "Please Select Client",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleClick quick config usage modal-->`);
+        },
+      });
+      return true;
+    } else if (selectedScopeCheck.length == 0) {
+      setDialogData({
+        title: "Validation Error",
+        message: "Please Select config",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleClick quick config usage modal-->`);
+        },
+      });
+      return true;
+    } else if (paymentMode?.value == '' || paymentMode == null || paymentMode == undefined) {
+      setDialogData({
+        title: "Validation Error",
+        message: "Please Select paymentMode",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleClick quick config usage modal-->`);
+        },
+      });
+      return true;
+    } else if (enteryCharge == '' || enteryCharge == null || enteryCharge == undefined) {
+      setDialogData({
+        title: "Validation Error",
+        message: "Please enter charge amount",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleClick quick config usage modal-->`);
+        },
+      });
+      return true;
+    } else if (user?.user.userName == '') {
+      setDialogData({
+        title: "Validation Error",
+        message: "user name not found",
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`handleClick quick config usage modal-->`);
+        },
+      });
+      return true;
+    } else {
+
+    }
     const infoConfigArray = createTargetConfig(selectedScope,selectClient);
     const payloadConfigArray = createpayloadConfig(selectedScope, selectClient, enteryCharge,paymentMode);
-    let object = {
-      info: infoConfigArray,
-      payload: payloadConfigArray,
-      topic: `TEST/${selectClient.value}/TOPIC_SSF_READ_UCEMS_CONFIG`
-    }
+    let topic = `TEST/${selectClient?.value}/TOPIC_SSF_READ_UCEMS_CONFIG`
     console.log("infoConfigArray", infoConfigArray);
     console.log("payloadConfigArray", payloadConfigArray);
-    console.log('payload', object);
+    console.log('topic', topic);
 
+    await SubmitQuickConfigUsage(topic,payloadConfigArray,infoConfigArray);
   }
 
   const handleModalClose = () => {
@@ -448,12 +542,22 @@ const QuickConfigUsageModal = ({ visibility, toggleDialog, title, tabData, onCli
       [CabinType.PD]: false,
       [CabinType.MUR]: false,
     });
+    setEnteryCharge("")
   }
 
   
   return (
     <Modal isOpen={visibility} toggle={toggleDialog} className="modal-la" style={{ width: "900px" }}  onClosed={handleModalClose} // This function will fire when the modal closes
 >
+    {isLoading && (
+        <div className="loader-container">
+          <CircularProgress
+            className="loader"
+            style={{ color: "rgb(93 192 166)" }}
+          />
+        </div>
+      )}
+    <MessageDialog data={dialogData} />
       <ModalHeader style={{ background: "#5DC0A6", color: "white" }} toggle={toggleDialog}>
         {title}
       </ModalHeader>
