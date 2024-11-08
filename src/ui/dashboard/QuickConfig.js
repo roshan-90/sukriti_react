@@ -28,6 +28,7 @@ import { executelistClientsLambda } from "../../awsClients/administrationLambdas
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import QuickConfigUsageModal from './quickConfig/QuickConfigUsageModal';
+import QuickConfigFlushModal from './quickConfig/QuickConfigFlushModal';
 
 
 const QuickConfig = (props) => {
@@ -53,13 +54,16 @@ const QuickConfig = (props) => {
   const dialogQuickConfigLightAndFan = useRef(null);
   const dialogQuickConfigDataRequest = useRef(null);
   const [dialogData, setDialogData] = useState(null);
-  const [isConfigUsageModalVisible, setIsConfigUsageModalVisible] = useState(false);
   const [clientListUpdate, setClientListUpdate] = useState([]);
+  const [isConfigUsageModalVisible, setIsConfigUsageModalVisible] = useState(false);
+  const [isConfigFlushModalVisible, setIsConfigFlushModalVisible] = useState(false);
 
   console.log('client list', clientList);
   console.log('client list length', clientList.length);
 
   const UsageConfigtoggleModal = () => setIsConfigUsageModalVisible(!isConfigUsageModalVisible);
+  const FlushConfigtoggleModal = () => setIsConfigFlushModalVisible(!isConfigFlushModalVisible);
+
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -244,6 +248,31 @@ const QuickConfig = (props) => {
         onClick={handleOnClick}
         clientList={clientListUpdate}
       />
+      <QuickConfigFlushModal
+        visibility={isConfigFlushModalVisible}
+        toggleDialog={FlushConfigtoggleModal}
+        title="Flush Config"
+        tabData = {[
+          {
+            type: QuickConfigTabs.TAB_PRE_FLUSH_CONFIG,
+            label: "Pre Flush",
+            configView: preFlushConfigView,
+          },
+          {
+            type: QuickConfigTabs.TAB_MINI_FLUSH_CONFIG,
+            label: "Mini Flush",
+            configView: miniFlushConfigView,
+          },
+          {
+            type: QuickConfigTabs.TAB_FULL_FLUSH_CONFIG,
+            label: "Full Flush",
+            configView: fullFlushConfigView,
+          },
+        ]}
+        onClick={handleOnClick}
+        clientList={clientListUpdate}
+      />
+
       {/* <MessageDialog ref={messageDialog} />
       <LoadingDialog ref={loadingDialog} /> */}
 
@@ -256,7 +285,7 @@ const QuickConfig = (props) => {
         tabData={[
           {
             type: QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG,
-            label: "Usage Charge ff",
+            label: "Usage Charge",
             configView: usageChargeConfigView,
           },
         ]}
@@ -368,7 +397,8 @@ const QuickConfig = (props) => {
           }
           onClick={() => {
             console.log("showDialogdsfdsfa", dialogQuickConfigFlush);
-            dialogQuickConfigFlush.current.showDialog();
+            // dialogQuickConfigFlush.current.showDialog();
+            FlushConfigtoggleModal();
           }}
         />
         <DescriptionItem
