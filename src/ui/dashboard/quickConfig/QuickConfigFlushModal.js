@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalHeader,
@@ -16,12 +16,10 @@ import {
 import Select from "react-select"; // Importing react-select
 import { dashboardStyle } from "../../../jsStyles/Style";
 import { whiteSurface } from "../../../jsStyles/Style";
-import RxInputCheckbox from "./utils/RxInputCheckbox";
 import { CabinType, QuickConfigTabs } from "../../../nomenclature/nomenclature";
 import icNonCritical from "../../../assets/img/icons/ic_health_ok.png";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../../features/authenticationSlice";
-import { GiConsoleController } from "react-icons/gi";
 import { executePublishConfigLambda } from "../../../awsClients/quickConfigLambdas";
 import MessageDialog from "../../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { startLoading, stopLoading } from "../../../features/loadingSlice";
@@ -92,13 +90,12 @@ const QuickConfigFlushModal = ({
   const [isEnabledPre, setIsEnabledPre] = useState(null);
   const [isEnabledMini, setIsEnabledMini] = useState(null);
   const [isEnabledFull, setIsEnabledFull] = useState(null);
-  const [miniflushDuration, setMiniFlushDuration] = useState("");
-  const [miniActivationDelay, setMiniActivationDelay] = useState("");
-  const [FullflushDuration, setFullFlushDuration] = useState("");
-  const [FullActivationDelay, setFullActivationDelay] = useState("");
+  const [miniflushDuration, setMiniFlushDuration] = useState(0);
+  const [miniActivationDelay, setMiniActivationDelay] = useState(0);
+  const [FullflushDuration, setFullFlushDuration] = useState(0);
+  const [FullActivationDelay, setFullActivationDelay] = useState(0);
 
   const user = useSelector(selectUser);
-  const [enteryCharge, setEnteryCharge] = useState("");
   const [dialogData, setDialogData] = useState(null);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const dispatch = useDispatch();
@@ -303,69 +300,6 @@ const QuickConfigFlushModal = ({
     );
   };
 
-  function PaymentModeLabel() {
-    return (
-      <div
-        className="row"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "0",
-          margin: "0px 0px 30px 0px",
-        }}
-      >
-        <div
-          className="col-md-2"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            padding: "0",
-          }}
-        >
-          <div
-            style={{
-              ...cabinDetailsStyle.cabinHealth.itemTitle,
-              textAlign: "end",
-            }}
-          >
-            {"Payment Mode"}
-          </div>
-        </div>
-
-        <div
-          className="col-md-1"
-          style={{
-            marginLeft: "12px",
-          }}
-        >
-          <img
-            src={icNonCritical}
-            alt=""
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "5%",
-            }}
-          />
-        </div>
-        <div
-          className="col-md-6"
-          style={{
-            marginLeft: "8px",
-          }}
-        >
-          <Select
-            options={EntryArray || []}
-            value={paymentMode}
-            onChange={handleupdatePaymentMode}
-            placeholder="Select Payment"
-          />
-        </div>
-      </div>
-    );
-  }
-
   function getEnabledIcon(criticality) {
     if (criticality == "Disabled") return icCritical;
   
@@ -373,7 +307,7 @@ const QuickConfigFlushModal = ({
   }
 
   const handleupdatePreIsEnable = (data) => {
-    console.log('handleupdateIsEnable', data);
+    console.log('handleupdatePreIsEnable', data);
     setIsEnabledPre(data);
   }
 
@@ -586,93 +520,18 @@ const QuickConfigFlushModal = ({
     setMiniActivationDelay(e.target.value);
   }
 
-const DurationLabelFlush = ()  => {
-  return (
-      <div
-        className="row"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "0",
-          margin: "0px 0px 30px 0px",
-        }}
-      >
-        <div
-          className="col-md-2"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            padding: "0",
-          }}
-        >
-          <div
-            style={{
-              ...cabinDetailsStyle.cabinHealth.itemTitle,
-              textAlign: "end",
-            }}
-          >
-            {"Flush Duration"}
-          </div>
-        </div>
-
-        <div
-          className="col-md-1"
-          style={{
-            marginLeft: "12px",
-          }}
-        >
-          <img
-            src={icNonCritical}
-            alt=""
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "5%",
-            }}
-          />
-        </div>
-        <div
-          className="col-md-6"
-          style={{
-            marginLeft: "8px",
-          }}
-        >
-          <input
-            defaultValue={miniflushDuration}
-            type="text"
-            placeholder=""
-            onChange={(e) => handleUpdateMiniFlush(e)}
-          />
-        </div>
-
-        <div className="col-md-1" style={{}}>
-          Sec
-        </div>
-      </div>
-  );
-}
-
-  const handleupdateEntryCharges = (e) => {
-    // entryChargeRef.current = e.target.value;
-    console.log("data", e.target.value);
-    setEnteryCharge(e.target.value);
-  };
-
-  function handleupdatePaymentMode(data) {
-    console.log("data", data);
-    setPaymentMode(data);
+  const handleUpdateFullFlush = (e) => {
+    console.log('handleUpdateFullFlush', e.target.value);
+    setFullFlushDuration(e.target.value);
   }
 
-  const handleUpdatePreFlush = () => {
-
+  const handleUpdateFulldelay = (e) => {
+    console.log('handleUpdateFulldelay', e.target.value);
+    setFullActivationDelay(e.target.value);
   }
 
- 
   const renderTabPane = () => {
     const activeConfigView = tabData.find((item) => item.type === activeTab);
-    console.log("activeTab", activeTab);
-    console.log("activeConfigView", activeConfigView);
     return (
       <TabPane tabId={activeTab}>
         <table style={{ width: "100%", padding: "0px" }}>
@@ -814,7 +673,6 @@ const DurationLabelFlush = ()  => {
                               <input
                                 defaultValue={miniflushDuration}
                                 type="text"
-                                placeholder=""
                                 onChange={(e) => handleUpdateMiniFlush(e)}
                               />
                             </div>
@@ -909,6 +767,132 @@ const DurationLabelFlush = ()  => {
                           configTab={QuickConfigTabs.TAB_PRE_FLUSH_CONFIG}
                           id={'id_autoFullFlush'}
                         />
+
+                         {/* Duration Flush Label */}
+                         <div
+                            className="row"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "0",
+                              margin: "0px 0px 30px 0px",
+                            }}
+                          >
+                            <div
+                              className="col-md-2"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "flex-end",
+                                padding: "0",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  ...cabinDetailsStyle.cabinHealth.itemTitle,
+                                  textAlign: "end",
+                                }}
+                              >
+                                {"Flush Duration"}
+                              </div>
+                            </div>
+
+                            <div
+                              className="col-md-1"
+                              style={{
+                                marginLeft: "12px",
+                              }}
+                            >
+                              <img
+                                src={icNonCritical}
+                                alt=""
+                                style={{
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "5%",
+                                }}
+                              />
+                            </div>
+                            <div
+                              className="col-md-6"
+                              style={{
+                                marginLeft: "8px",
+                              }}
+                            >
+                              <input
+                                defaultValue={FullflushDuration}
+                                type="text"
+                                onChange={(e) => handleUpdateFullFlush(e)}
+                              />
+                            </div>
+
+                            <div className="col-md-1" style={{}}>
+                              Sec
+                            </div>
+                          </div>
+                          <div
+                            className="row"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "0",
+                              margin: "0px 0px 30px 0px",
+                            }}
+                          >
+                            <div
+                              className="col-md-2"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "flex-end",
+                                padding: "0",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  ...cabinDetailsStyle.cabinHealth.itemTitle,
+                                  textAlign: "end",
+                                }}
+                              >
+                                {"Acticvation Delay"}
+                              </div>
+                            </div>
+
+                            <div
+                              className="col-md-1"
+                              style={{
+                                marginLeft: "12px",
+                              }}
+                            >
+                              <img
+                                src={icNonCritical}
+                                alt=""
+                                style={{
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "5%",
+                                }}
+                              />
+                            </div>
+                            <div
+                              className="col-md-6"
+                              style={{
+                                marginLeft: "8px",
+                              }}
+                            >
+                              <input
+                                defaultValue={FullActivationDelay}
+                                type="text"
+                                placeholder=""
+                                onChange={(e) => handleUpdateFulldelay(e)}
+                              />
+                            </div>
+
+                            <div className="col-md-1" style={{}}>
+                              Sec
+                            </div>
+                          </div>
+
                     </div>
                   </div>
                 </td>
@@ -923,12 +907,11 @@ const DurationLabelFlush = ()  => {
   };
 
   // Function to generate  info target configuration array
-  const createTargetConfig = (scope, client) => {
-    console.log("user", user?.user);
+  const createTargetConfig = (scope, client, configType) => {
     return Object.keys(scope)
       .filter((key) => scope[key]) // Filter only true values
       .map((key) => ({
-        configType: "UCEMS/USAGE-CHARGE",
+        configType: configType == "pre-flush" ? "CMS/PRE-FLUSH" : configType == "mini-flush" ? "CMS/MINI-FLUSH" : configType == "full-flush" ? "CMS/FULL-FLUSH": "",
         user: user?.user.userName,
         client: user?.user.clientName,
         targetType: "Client",
@@ -936,14 +919,13 @@ const DurationLabelFlush = ()  => {
         targetName: client.value,
       }));
   };
+  
 
-  const createpayloadConfig = (scope, client, enteryCharge, paymentMode) => {
-    console.log("user", user?.user);
+  const createpayloadPreConfig = (scope, client, isEnabledPre) => {
     return Object.keys(scope)
       .filter((key) => scope[key]) // Filter only true values
       .map((key) => ({
-        Cabinpaymentmode: paymentMode.value,
-        Entrychargeamount: enteryCharge ?? 0,
+        Autopreflush: isEnabledPre,
         THING_NAME: client.value + "_ALL",
         cabin_type: key.split(".")[1] == "PD" ? "PWC" : key.split(".")[1], // Extract target type (e.g., "MWC" from "CabinType.MWC")
         user_type:
@@ -959,15 +941,57 @@ const DurationLabelFlush = ()  => {
       }));
   };
 
+  const createpayloadMiniConfig = (scope, client, isEnabledmini, duration, delay) => {
+    return Object.keys(scope)
+      .filter((key) => scope[key]) // Filter only true values
+      .map((key) => ({
+        Autominiflushenabled: isEnabledmini,
+        Miniflushdurationtimer: duration == 0 ? "0" : duration,
+        Miniflushactivationtimer: delay == 0 ? "0" : delay,
+        THING_NAME: client.value + "_ALL",
+        cabin_type: key.split(".")[1] == "PD" ? "PWC" : key.split(".")[1], // Extract target type (e.g., "MWC" from "CabinType.MWC")
+        user_type:
+          key.split(".")[1] == "MWC"
+            ? "MALE"
+            : key.split(".")[1] == "FWC"
+            ? "FEMALE"
+            : key.split(".")[1] == "PD"
+            ? "PD"
+            : key.split(".")[1] == "MUR"
+            ? "MALE"
+            : "",
+      }));
+  }
+
+  const createpayloadFullConfig = (scope, client, isEnabledFull, duration, delay) => {
+    return Object.keys(scope)
+      .filter((key) => scope[key]) // Filter only true values
+      .map((key) => ({
+        Autofullflushenabled: isEnabledFull,
+        fullflushdurationtimer: duration == 0 ? "0" : duration,
+        fullflushactivationtimer: delay == 0 ? "0" : delay,
+        THING_NAME: client.value + "_ALL",
+        cabin_type: key.split(".")[1] == "PD" ? "PWC" : key.split(".")[1], // Extract target type (e.g., "MWC" from "CabinType.MWC")
+        user_type:
+          key.split(".")[1] == "MWC"
+            ? "MALE"
+            : key.split(".")[1] == "FWC"
+            ? "FEMALE"
+            : key.split(".")[1] == "PD"
+            ? "PD"
+            : key.split(".")[1] == "MUR"
+            ? "MALE"
+            : "",
+      }));
+  }
+
   const handleClick = async () => {
-    console.log("selectedScope", selectedScope);
-    console.log("selectClient", selectClient);
-    console.log("paymentMode", paymentMode);
-    console.log("enteryCharge", enteryCharge);
+    let configType;
+    let payloadConfigArray;
+    let topic = `TEST/${selectClient?.value}/TOPIC_SSF_READ_CMS_CONFIG`;
     let selectedScopeCheck = Object.keys(selectedScope).filter(
       (key) => selectedScope[key]
     );
-    console.log("selectedScopeCheck", selectedScopeCheck);
 
     if (
       selectClient?.value == "" ||
@@ -993,34 +1017,6 @@ const DurationLabelFlush = ()  => {
         },
       });
       return true;
-    } else if (
-      paymentMode?.value == "" ||
-      paymentMode == null ||
-      paymentMode == undefined
-    ) {
-      setDialogData({
-        title: "Validation Error",
-        message: "Please Select paymentMode",
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log(`handleClick quick config usage modal-->`);
-        },
-      });
-      return true;
-    } else if (
-      enteryCharge == "" ||
-      enteryCharge == null ||
-      enteryCharge == undefined
-    ) {
-      setDialogData({
-        title: "Validation Error",
-        message: "Please enter charge amount",
-        onClickAction: () => {
-          // Handle the action when the user clicks OK
-          console.log(`handleClick quick config usage modal-->`);
-        },
-      });
-      return true;
     } else if (user?.user.userName == "") {
       setDialogData({
         title: "Validation Error",
@@ -1033,16 +1029,58 @@ const DurationLabelFlush = ()  => {
       return true;
     } else {
     }
-    const infoConfigArray = createTargetConfig(selectedScope, selectClient);
-    const payloadConfigArray = createpayloadConfig(
-      selectedScope,
-      selectClient,
-      enteryCharge,
-      paymentMode
-    );
-    let topic = `TEST/${selectClient?.value}/TOPIC_SSF_READ_UCEMS_CONFIG`;
-    console.log("infoConfigArray", infoConfigArray);
-    console.log("payloadConfigArray", payloadConfigArray);
+
+    const activeConfigView = tabData.find((item) => item.type === activeTab);
+
+    if(activeConfigView.label == 'Pre Flush'){
+      if (isEnabledPre == null || isEnabledPre == undefined) {
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Automatic Pre Flush",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleClick quick config usage modal-->`);
+          },
+        });
+        return true;
+      }
+      configType = "pre-flush"
+      payloadConfigArray = createpayloadPreConfig(selectedScope,selectClient,isEnabledPre?.value)
+    } else if(activeConfigView.label == 'Mini Flush') {
+      if (isEnabledMini == null || isEnabledMini == undefined) {
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Automatic Mini Flush",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleClick quick config usage modal-->`);
+          },
+        });
+        return true;
+      }
+      configType = "mini-flush"
+      payloadConfigArray = createpayloadMiniConfig(selectedScope,selectClient, isEnabledMini?.value, miniflushDuration, miniActivationDelay)
+    } else if(activeConfigView.label == 'Full Flush') {
+      if (isEnabledFull == null || isEnabledFull == undefined) {
+        setDialogData({
+          title: "Validation Error",
+          message: "Please Select Automatic Full Flush",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+            console.log(`handleClick quick config usage modal-->`);
+          },
+        });
+        return true;
+      }
+      configType = "full-flush"
+      payloadConfigArray = createpayloadFullConfig(selectedScope,selectClient, isEnabledFull?.value, miniflushDuration, miniActivationDelay)
+    } else {
+    }
+
+    const infoConfigArray = createTargetConfig(selectedScope, selectClient, configType);
+
+    console.log('infoConfigArray', infoConfigArray);
+    console.log('payloadConfigArray', payloadConfigArray);
     console.log("topic", topic);
 
     await SubmitQuickConfigUsage(topic, payloadConfigArray, infoConfigArray);
@@ -1057,7 +1095,6 @@ const DurationLabelFlush = ()  => {
       [CabinType.PD]: false,
       [CabinType.MUR]: false,
     });
-    setEnteryCharge("");
     setPaymentMode(null);
     setDialogData(null);
   };
