@@ -29,7 +29,7 @@ import { startLoading, stopLoading } from "../../features/loadingSlice";
 import { selectUser } from "../../features/authenticationSlice";
 import QuickConfigUsageModal from './quickConfig/QuickConfigUsageModal';
 import QuickConfigFlushModal from './quickConfig/QuickConfigFlushModal';
-
+import QuickConfigFloorModal from './quickConfig/QuickConfigFloorModal';
 
 const QuickConfig = (props) => {
   const dispatch = useDispatch();
@@ -57,13 +57,14 @@ const QuickConfig = (props) => {
   const [clientListUpdate, setClientListUpdate] = useState([]);
   const [isConfigUsageModalVisible, setIsConfigUsageModalVisible] = useState(false);
   const [isConfigFlushModalVisible, setIsConfigFlushModalVisible] = useState(false);
+  const [isConfigFloorModalVisible, setIsConfigFloorModalVisible] = useState(false);
 
   console.log('client list', clientList);
   console.log('client list length', clientList.length);
 
   const UsageConfigtoggleModal = () => setIsConfigUsageModalVisible(!isConfigUsageModalVisible);
   const FlushConfigtoggleModal = () => setIsConfigFlushModalVisible(!isConfigFlushModalVisible);
-
+  const FloorConfigtoggleModal = () => setIsConfigFloorModalVisible(!isConfigFloorModalVisible);
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -272,6 +273,20 @@ const QuickConfig = (props) => {
         onClick={handleOnClick}
         clientList={clientListUpdate}
       />
+      <QuickConfigFloorModal
+        visibility={isConfigFloorModalVisible}
+        toggleDialog={FloorConfigtoggleModal}
+        title="Floor Clean Config"
+        tabData = {[
+          {
+            type: QuickConfigTabs.TAB_FLOOR_CLEAN_CONFIG,
+            label: "Floor Clean Config",
+            configView: floorCleanConfigView,
+          },
+        ]}
+        onClick={handleOnClick}
+        clientList={clientListUpdate}
+      />
 
       {/* <MessageDialog ref={messageDialog} />
       <LoadingDialog ref={loadingDialog} /> */}
@@ -407,7 +422,8 @@ const QuickConfig = (props) => {
             "Configure payment charge and payment mode settings in one go."
           }
           onClick={() => {
-            dialogQuickConfigFloorClean.current.showDialog();
+            // dialogQuickConfigFloorClean.current.showDialog();
+            FloorConfigtoggleModal();
           }}
         />
         <DescriptionItem
@@ -419,7 +435,7 @@ const QuickConfig = (props) => {
             dialogQuickConfigLightAndFan.current.showDialog();
           }}
         />
-        <DescriptionItem
+        {/* <DescriptionItem
           title={"Data Request Config"}
           label={
             "Configure payment charge and payment mode settings in one go."
@@ -427,7 +443,7 @@ const QuickConfig = (props) => {
           onClick={() => {
             dialogQuickConfigDataRequest.current.showDialog();
           }}
-        />
+        /> */}
       </div>
     </div>
   );
