@@ -571,11 +571,11 @@ const QuickConfigFloorModal = ({
   };
 
   // Function to generate  info target configuration array
-  const createTargetConfig = (scope, client, configType) => {
+  const createTargetConfig = (scope, client) => {
     return Object.keys(scope)
       .filter((key) => scope[key]) // Filter only true values
       .map((key) => ({
-        configType: configType == "pre-flush" ? "CMS/PRE-FLUSH" : configType == "mini-flush" ? "CMS/MINI-FLUSH" : configType == "full-flush" ? "CMS/FULL-FLUSH": "",
+        configType: "CMS/FLOOR-CLEAN",
         user: user?.user.userName,
         client: user?.user.clientName,
         targetType: "Client",
@@ -584,13 +584,13 @@ const QuickConfigFloorModal = ({
       }));
   };
   
-  const createpayloadFullConfig = (scope, client, isEnabledFull, duration, delay) => {
+  const createpayloadFullConfig = (scope, client, isEnabledFull, count, duration) => {
     return Object.keys(scope)
       .filter((key) => scope[key]) // Filter only true values
       .map((key) => ({
-        Autofullflushenabled: isEnabledFull,
-        fullflushdurationtimer: duration == 0 ? "0" : duration,
-        fullflushactivationtimer: delay == 0 ? "0" : delay,
+        Autofloorenabled: isEnabledFull,
+        Floorcleancount: count == 0 ? "0" : count,
+        Floorcleandurationtimer: duration == 0 ? "0" : duration,
         THING_NAME: client.value + "_ALL",
         cabin_type: key.split(".")[1] == "PD" ? "PWC" : key.split(".")[1], // Extract target type (e.g., "MWC" from "CabinType.MWC")
         user_type:
@@ -669,19 +669,12 @@ const QuickConfigFloorModal = ({
     console.log('floorCleanDuration', floorCleanDuration);
     console.log('selectedScope', selectedScope);
     console.log('selectClient', selectClient);
-    return;
-   if(activeConfigView.label == 'Full Flush') {
-      
-      configType = "full-flush"
-      // payloadConfigArray = createpayloadFullConfig(selectedScope,selectClient, isEnabledFull?.value, miniflushDuration, miniActivationDelay)
-    } 
 
-    const infoConfigArray = createTargetConfig(selectedScope, selectClient, configType);
-
+    const infoConfigArray = createTargetConfig(selectedScope, selectClient);
+    payloadConfigArray = createpayloadFullConfig(selectedScope,selectClient, isEnabledFull?.value, floorCleanCount, floorCleanDuration)
     console.log('infoConfigArray', infoConfigArray);
     console.log('payloadConfigArray', payloadConfigArray);
     console.log("topic", topic);
-
     await SubmitQuickConfigUsage(topic, payloadConfigArray, infoConfigArray);
   };
 
