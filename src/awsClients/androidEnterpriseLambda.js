@@ -787,9 +787,7 @@ export function executeDeleteDeviceLambda(
           enterpriseId: object.enterpriseId,
           command: object.command,
           abandonDevice: object.abandonDevice,
-          value: {
-            [object.serialNumber]: object.deviceId
-          }
+          value: object.value
         })
       };
     } else {
@@ -799,7 +797,7 @@ export function executeDeleteDeviceLambda(
           enterpriseId: object.enterpriseId,
           command: object.command,
           abandonDevice: object.abandonDevice,
-          serial_number: object.serialNumber
+          value: object.value
         })
       };
     }

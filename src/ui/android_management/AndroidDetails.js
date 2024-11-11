@@ -900,9 +900,10 @@ function AndroidDetails() {
     console.log('handleDeleteDevice device id :->', device);
     let AwsCommissionStatus = device.DEVICE_PROV_COMPLETED_INFO_RESP_INIT;
     let enrollmentstatus = device.DEVICE_PROV_GET_INFO_PUBLISH
-    let deviceId = device?.android_data?.name ?? null;
+    let deviceId = device?.deviceId;
     let serialNumber = device?.serial_number ?? null;
     console.log('check',{AwsCommissionStatus, enrollmentstatus ,deviceId,serialNumber});
+
     if(selectedOptionEnterprise?.value == "" || selectedOptionEnterprise == null || selectedOptionEnterprise?.value == undefined || serialNumber == null || serialNumber == undefined) 
       { 
          setDialogData({
@@ -913,37 +914,43 @@ function AndroidDetails() {
            console.log("handleDeleteDevice");
          },
        })
+       return;
      }
 
     if(AwsCommissionStatus == "FAIL" || enrollmentstatus == "FAIL") {
       if (serialNumber !== null && deviceId != null && serialNumber !== undefined && deviceId != undefined) {
-        console.log('if if abandoned false')
+        console.log('first if abandoned false')
         let object = {
           enterpriseId : selectedOptionEnterprise?.value,
-          deviceId : deviceId,
           command : "delete_device",
-          serialNumber: serialNumber,
-          abandonDevice: false
+          abandonDevice: false,
+          value : {
+            [serialNumber] : deviceId
+          }
         }
          await handleDeviceDelete(object);
       } else {
-        console.log('if else abandon true device');
+        console.log('Second if else abandon true device');
         let object = {
           enterpriseId : selectedOptionEnterprise?.value,
           command : "delete_device",
           serialNumber: serialNumber,
-          abandonDevice: true
+          abandonDevice: true,
+          value: {
+            serial_number : serialNumber 
+          }
         }
         await handleDeviceDelete(object);
       }
     } else if (serialNumber !== null && deviceId != null && serialNumber !== undefined && deviceId != undefined) {
-      console.log('else if abandoned false')
+      console.log('Third else if abandoned false')
       let object = {
         enterpriseId : selectedOptionEnterprise?.value,
-        deviceId : deviceId,
         command : "delete_device",
-        serialNumber: serialNumber,
-        abandonDevice: false
+        abandonDevice: false,
+        value : {
+          [serialNumber] : deviceId
+        }
       }
        await handleDeviceDelete(object);
     } else {
