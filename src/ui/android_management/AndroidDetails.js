@@ -492,7 +492,7 @@ function AndroidDetails() {
       setDialogEditEnterprise({
         title: "Edit Enterprise",
         message: selectedOptionEnterprise.label,
-        onClickAction: async (data) => {
+        onClickAction: async (data, contactInfo) => {
           try{
             dispatch(startLoading()); // Dispatch the startLoading action
             // Handle the action when the user clicks OK
@@ -501,7 +501,8 @@ function AndroidDetails() {
               object_key: "enterpriseDisplayName",
               enterpriseId: selectedOptionEnterprise?.value,
               command: "patch_enterprise",
-              value: data
+              value: data,
+              contactInfo: contactInfo
             }
             let result_data =  await executeUpdateEnterpriseLambda(user?.credentials, object);
             console.log('result_data',result_data);

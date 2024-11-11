@@ -689,7 +689,7 @@ export function executeUpdateDeviceLambda(
 
 export function executeUpdateEnterpriseLambda(
   credentials,
-  object,
+  object
 ) {
   return new Promise(function (resolve, reject) {
     console.log(
@@ -709,7 +709,8 @@ export function executeUpdateEnterpriseLambda(
         command: object.command,
         updateMask: object_key,
         updateBody: {
-          [object_key]: object.value
+          [object_key]: object.value,
+          contactInfo: object.contactInfo
         }
       })
     };

@@ -14,7 +14,14 @@ const ModalEditEnterprise = ({ data }) => {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [onClickAction, setOnClickAction] = useState(undefined);
-  const [displayName, setDisplayName] = useState(null); // State for react-select
+  const [displayName, setDisplayName] = useState(""); // State for react-select
+  const [contactEmail, setContactEmail] = useState(""); // State for react-select
+  const [dataProtectionOfficerName, setDataProtectionOfficerName] = useState(""); // State for react-select
+  const [dataProtectionOfficerEmail, setDataProtectionOfficerEmail] = useState(""); // State for react-select
+  const [dataProtectionOfficerPhone, setDataProtectionOfficerPhone] = useState(""); // State for react-select
+  const [euRepredentativeName, setEuRepredentativeName] = useState(""); // State for react-select
+  const [euRepredentativeEmail, setEuRepredentativeEmail] = useState(""); // State for react-select
+  const [euRepredentativePhone, setEuRepredentativePhone] = useState(""); // State for react-select
 
   useEffect(() => {
     if (data) {
@@ -31,9 +38,20 @@ const ModalEditEnterprise = ({ data }) => {
   };
 
   const handleButtonClick = () => {
+    let contactInfo = {
+      contactEmail: contactEmail,
+      dataProtectionOfficerEmail: dataProtectionOfficerEmail,
+      dataProtectionOfficerName: dataProtectionOfficerName,
+      dataProtectionOfficerPhone: dataProtectionOfficerPhone,
+      euRepresentativeEmail: euRepredentativeEmail,
+      euRepresentativeName: euRepredentativeName,
+      euRepresentativePhone: euRepredentativePhone
+    }
+    console.log('object', {displayName, contactEmail, dataProtectionOfficerName, dataProtectionOfficerEmail, dataProtectionOfficerPhone, euRepredentativeName, euRepredentativeEmail, euRepredentativePhone});
+
     handleClose();
     if (onClickAction !== undefined) {
-      onClickAction(displayName);
+      onClickAction(displayName, contactInfo);
       setOpen(false);
       setDisplayName(null);
     }
@@ -61,7 +79,7 @@ const ModalEditEnterprise = ({ data }) => {
                     for="Enterprise Name"
                   >
                     Enterprise Name
-                </Label>
+              </Label>
               <Input
                 id="enterprise"
                 name="enterprise"
@@ -77,6 +95,69 @@ const ModalEditEnterprise = ({ data }) => {
                 placeholder="Please Enter displayName"
                 type="text"
                 onChange= {(e) => setDisplayName(e.target.value)}
+              />
+              <br/>
+              <Label
+                check
+                for="Contact Info"
+              >
+                  Contact Info
+              </Label>
+              <br/>
+              <Input
+                id="contactEmail"
+                name="contactEmail"
+                placeholder="Please Enter contact Email"
+                type="text"
+                onChange= {(e) => setContactEmail(e.target.value)}
+              />
+              <br/>
+               <Input
+                id="dataProtectionOfficerName"
+                name="dataProtectionOfficerName"
+                placeholder="data Protection Officer Name"
+                type="text"
+                onChange= {(e) => setDataProtectionOfficerName(e.target.value)}
+              />
+              <br/>
+               <Input
+                id="dataProtectionOfficerEmail"
+                name="dataProtectionOfficerEmail"
+                placeholder="data Protection Officer Email"
+                type="text"
+                onChange= {(e) => setDataProtectionOfficerEmail(e.target.value)}
+              />
+              <br/>
+               <Input
+                id="dataProtectionOfficerPhone"
+                name="dataProtectionOfficerPhone"
+                placeholder="data Protection Officer Phone"
+                type="text"
+                onChange= {(e) => setDataProtectionOfficerPhone(e.target.value)}
+              />
+              <br/>
+               <Input
+                id="EURepresentativeName"
+                name="EURepresentativeName"
+                placeholder="EU Representative Name"
+                type="text"
+                onChange= {(e) => setEuRepredentativeName(e.target.value)}
+              />
+              <br/>
+               <Input
+                id="EURepresentativeEmail"
+                name="EURepresentativeEmail"
+                placeholder="EU Representative Email"
+                type="text"
+                onChange= {(e) => setEuRepredentativeEmail(e.target.value)}
+              />
+              <br/>
+               <Input
+                id="EURepresentativePhone"
+                name="EURepresentativePhone"
+                placeholder="EU Representative Phone"
+                type="text"
+                onChange= {(e) => setEuRepredentativePhone(e.target.value)}
               />
           </div>
         </DialogContent>

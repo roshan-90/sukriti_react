@@ -19,35 +19,33 @@ const List = (props) => {
   };
 
   const getData = (data, rowIndex) => {
-    console.log("_getRowData", data);
     return data.map((item, index) => {
       if (index !== 0) {
         return (
-          <td key={index}>
-            <div className={"col-md-12"}>
-              <div className={"row justiy-content-center"}>{item}</div>
+          <td key={index} className="text-center">
+            <div className="d-flex justify-content-center align-items-center">
+              {item}
             </div>
           </td>
         );
       }
       return (
-        <td key={index}>
-          <div className={"col-md-12"}>
-            <div className={"row justiy-content-center"}>
-              <Link
-                to={{
-                  pathname: `/vendor/vendorDetails/${item}`,
-                  data: props.data[rowIndex],
-                }}
-              >
-                {item}
-              </Link>
-            </div>
+        <td key={index} className="text-center">
+          <div className="d-flex justify-content-center align-items-center">
+            <Link
+              to={{
+                pathname: `/vendor/vendorDetails/${item}`,
+                data: props.data[rowIndex],
+              }}
+            >
+              {item}
+            </Link>
           </div>
         </td>
       );
     });
   };
+  
 
   const getHeaderData = () => {
     const row = dataList[0];
