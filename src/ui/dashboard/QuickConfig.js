@@ -30,6 +30,7 @@ import { selectUser } from "../../features/authenticationSlice";
 import QuickConfigUsageModal from './quickConfig/QuickConfigUsageModal';
 import QuickConfigFlushModal from './quickConfig/QuickConfigFlushModal';
 import QuickConfigFloorModal from './quickConfig/QuickConfigFloorModal';
+import QuickConfigLightFanModal from './quickConfig/QuickConfigLightFanModal';
 
 const QuickConfig = (props) => {
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ const QuickConfig = (props) => {
   const [isConfigUsageModalVisible, setIsConfigUsageModalVisible] = useState(false);
   const [isConfigFlushModalVisible, setIsConfigFlushModalVisible] = useState(false);
   const [isConfigFloorModalVisible, setIsConfigFloorModalVisible] = useState(false);
+  const [isConfigLightFanModalVisible, setIsConfigLightFanModalVisible] = useState(false);
 
   console.log('client list', clientList);
   console.log('client list length', clientList.length);
@@ -65,6 +67,7 @@ const QuickConfig = (props) => {
   const UsageConfigtoggleModal = () => setIsConfigUsageModalVisible(!isConfigUsageModalVisible);
   const FlushConfigtoggleModal = () => setIsConfigFlushModalVisible(!isConfigFlushModalVisible);
   const FloorConfigtoggleModal = () => setIsConfigFloorModalVisible(!isConfigFloorModalVisible);
+  const LightFanConfigtoggleModal = () => setIsConfigLightFanModalVisible(!isConfigLightFanModalVisible);
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -221,15 +224,11 @@ const QuickConfig = (props) => {
   const handleDataRequestConfigUpdate = () => {};
 
   const handleOnClick = (data) => {
-    let targetName = data.selectClient.value;
-    let paymentMode = configViewData['QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG']?.id_paymentMode ?? null;
-    let usageCharge = configViewData['QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG']?.id_usageCharge ?? null;
-
-    console.log('is clicked',data);
-    console.log('configViewData', configViewData['QuickConfigTabs.TAB_USAGE_CHARGE_CONFIG']);
-    console.log({targetName,paymentMode,usageCharge })
   }
 
+  const handleOnClickLightFan = (data) => {
+  }
+  
   return (
     <div
       className="animated fadeIn"
@@ -288,6 +287,25 @@ const QuickConfig = (props) => {
         clientList={clientListUpdate}
       />
 
+      <QuickConfigLightFanModal
+        visibility={isConfigLightFanModalVisible}
+        toggleDialog={LightFanConfigtoggleModal}
+        title="Light and Fan Config"
+        tabData = {[
+          {
+            type: QuickConfigTabs.TAB_LIGHT_CONFIG,
+            label: "Light Config",
+            configView: lightConfigView,
+          },
+          {
+            type: QuickConfigTabs.TAB_FAN_CONFIG,
+            label: "Fan Config",
+            configView: fanConfigView,
+          },
+        ]}
+        onClick={handleOnClick}
+        clientList={clientListUpdate}
+        />
       {/* <MessageDialog ref={messageDialog} />
       <LoadingDialog ref={loadingDialog} /> */}
 
@@ -432,7 +450,8 @@ const QuickConfig = (props) => {
             "Configure payment charge and payment mode settings in one go."
           }
           onClick={() => {
-            dialogQuickConfigLightAndFan.current.showDialog();
+            // dialogQuickConfigLightAndFan.current.showDialog();
+            LightFanConfigtoggleModal();
           }}
         />
         {/* <DescriptionItem
