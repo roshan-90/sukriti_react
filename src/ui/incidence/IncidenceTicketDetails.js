@@ -217,11 +217,19 @@ function IncidenceTicketDetails(props) {
   const toggle = (tab) => {
     if (currentActiveTab !== tab) setCurrentActiveTab(tab);
   };
+
   const [image, setImage] = useState([]);
   async function executeGetImage() {
-    let fileName = await getListingS3(complex, user?.credentials);
-    setImage(fileName);
+    
+    if(complex == null || complex == undefined) {
+      let fileName = await getListingS3(id_name, user?.credentials);
+      setImage(fileName);
+    } else {
+      let fileName = await getListingS3(complex, user?.credentials);
+      setImage(fileName);
+    }
   }
+
   useEffect(() => {
     executeGetImage();
   }, []);

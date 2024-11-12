@@ -118,6 +118,7 @@ const CreateEnterpriseModal = ({ isOpen, toggleModal }) => {
     </Modal>
   );
 };
+
 function AndroidDetails() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
