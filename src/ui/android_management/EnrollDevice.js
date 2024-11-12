@@ -43,6 +43,7 @@ import ModalCreatePolicy from './ModalCreatePolicy';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import ModalShareQR from "./ModalShareQR";
+import MessageDialogTable from '../../dialogs/MessageDialogTable';
 
 const steps = ['Step 1', 'Step 2', 'Step 3','step 4', 'step 5', 'step 6'];
 
@@ -69,6 +70,7 @@ export default function EnrollDevice() {
   const [dialogData, setDialogData] = useState(null);
   const [dialogCabinDetails, setDialogCabinDetails] = useState(false);
   const selectedOptionEnterprise = useSelector((state) => state.androidManagement.selectedOptionEnterprise);
+  const [dialogTableData, setDialogTableData] = useState(null);
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
@@ -234,6 +236,24 @@ export default function EnrollDevice() {
     { label: 'Telugu', value: 'Telugu' },
     { label: 'Urdu', value: 'Urdu' }
   ];
+
+  const  AttributeFilter = (complexDetails,value) => {
+      if (value == 1) {
+          const stateNameAttribute = complexDetails.Attributes.find(attribute => attribute.Name === 'STATE_NAME');
+          const stateName = stateNameAttribute ? stateNameAttribute.Value : 'Not Found';
+          return stateName;
+      } else if (value == 2) {
+          const districtNameAttribute = complexDetails.Attributes.find(attribute => attribute.Name === 'DISTRICT_NAME');
+          const districtName = districtNameAttribute ? districtNameAttribute.Value : 'Not Found';
+          return districtName;
+      } else if (value == 3) {
+          const cityNameAttribute = complexDetails.Attributes.find(attribute => attribute.Name === 'CITY_NAME');
+          const cityName = cityNameAttribute ? cityNameAttribute.Value : 'Not Found';
+          return cityName;
+      } else {
+          
+      }
+  }
 
   const handleError = (err, Custommessage, onclick = null) => {
     console.log("error -->", err);
@@ -854,6 +874,41 @@ export default function EnrollDevice() {
         console.log('object',object);
         let result = await executeSaveDevicesLambda(user?.credentials, object);
         console.log('executeSaveDevicesLambda result', result);
+        if(result.statusCode == 403) {
+          setDialogTableData({
+            title: "Success",
+            message: result.body,
+            table:  `
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px;">Sr.No.</th>
+                  <th style="border: 1px solid #ddd; padding: 8px;">Serial Name</th>
+                  <th style="border: 1px solid #ddd; padding: 8px;">State</th>
+                  <th style="border: 1px solid #ddd; padding: 8px;">District</th>
+                  <th style="border: 1px solid #ddd; padding: 8px;">City</th>
+                  <th style="border: 1px solid #ddd; padding: 8px;">Complex</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${result.data.serial_number}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${AttributeFilter(result.data.complex_details,1)}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${AttributeFilter(result.data.complex_details,2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${AttributeFilter(result.data.complex_details,3)}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${result.data.complex_name}</td>
+                </tr>
+              </tbody>
+            </table>
+          `,
+            onClickAction: () => {
+              // Handle the action when the user clicks OK
+              console.log(`handleSaveData function -->`);
+            },
+          });
+          return;
+        } 
         let enterprise_id = selectedOptionEnterprise.value;
         let listPolicy = await executeListPolicyLambda(user?.credentials, enterprise_id);
         console.log('listPolicy', listPolicy);
@@ -1195,6 +1250,7 @@ export default function EnrollDevice() {
           </div>
         )}
         <MessageDialog data={dialogData} />
+        <MessageDialogTable data={dialogTableData} />
         <ModalShareQR data={qrShare} />
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
