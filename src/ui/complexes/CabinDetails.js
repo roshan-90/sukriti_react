@@ -107,7 +107,7 @@ const CabinDetails = (props, ref) => {
       return ;
     } else if (complex_store?.cabin?.cabinType === "BWT") {
       return (
-        <div style={{ width: "95%", marginLeft: "75px"}}>
+        <div style={{ width: "95%", marginLeft: "25px"}}>
           <TurbidityAndWaterRecycled
             turbidityAndWaterRecycled={cabinDetails.turbidityAndWaterRecycled}
             uiResult={cabinDetails.uiResult.data}
@@ -142,7 +142,7 @@ const CabinDetails = (props, ref) => {
       );
     } else {
       return (
-        <div style={{ width: "95%", marginLeft: "75px" }}>
+        <div style={{ width: "95%", marginLeft: "25px" }}>
           <CabinUsageFeedback
             usageAndFeedback={cabinDetails.usageAndFeedback}
             uiResult={cabinDetails.uiResult.data}

@@ -154,14 +154,14 @@ function ComplexDetails(props) {
       <div className="animated fadeIn" style={{ padding: "10px" }}>
         {/* <Mqtt5 /> */}
         <div className="row">
-          <div className="col-md-2" style={{}}>
+          <div className="col-md-3" style={{}}>
             {/* <MessageDialog ref={messageDialog} /> */}
             <ErrorBoundary>{memoizedTreeComponent}</ErrorBoundary>
             <ErrorBoundary>
               <ComplexComposition ref={complexComposition} />
             </ErrorBoundary>
           </div>
-          <div className="col-md-10" style={{}}>
+          <div className="col-md-9" style={{}}>
             <ErrorBoundary>
               <CabinDetails />
             </ErrorBoundary>

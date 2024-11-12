@@ -106,9 +106,9 @@
   background: white;
 }
 
-.complex-composition {
-  width: 140%; /* Default width */
-}
+/* .complex-composition {
+  width: 140%; 
+} */
 
 @media (min-width: 1920px) {
   .complex-composition {
