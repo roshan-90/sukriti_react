@@ -33,8 +33,10 @@ import {
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import Select from 'react-select'; // Importing react-select
 
 const CreateNewTicket = () => {
+  const complexSelectTree = useRef();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const complexStore = useSelector((state) => state.complexStore);
@@ -47,6 +49,39 @@ const CreateNewTicket = () => {
   const [imageName, setImageName] = useState([]);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const formDetails = {};
+  const [ticketCondition, setTicketCondition] = useState(null);
+  const selectTicketCondition = [
+    { label: 'Normal: A non-critical malfunction', value: 'Normal' },
+    { label: 'Urgent: A critical malfunction', value: 'Urgent' },
+    { label: 'Possible Fault: Possible Malfunction', value: 'Possible' }
+  ];
+  const [formDataTicket,  setFormDataTicket] = React.useState({
+   assigned_by: "",
+    assignemt_type: "",
+    assignment_comment: "",
+    city_code: "",
+    city_name: "",
+    client_name: "",
+    complex_name: "",
+    creator_id: "",
+    creator_role: "",
+    criticality: "",
+    description: "",
+    district_code: "",
+    district_name: "",
+    fileList: [],
+    lead_id: "",
+    lead_role: "",
+    short_thing_name: "",
+    state_code: "",
+    state_name: "",
+    thing_name: "",
+    ticket_id: "",
+    ticket_status: "",
+    timestamp: 0,
+    title: "",
+    yearMonthCode: ""
+  })
 
   useEffect(() => {
     if (
@@ -106,6 +141,7 @@ const CreateNewTicket = () => {
     setButtonOne((prevButtonOne) => !prevButtonOne);
   };
 
+  
   const selectFiles = (event) => {
     let images = [];
     let imageName = [];
@@ -130,7 +166,38 @@ const CreateNewTicket = () => {
     setPreviewImages(images);
   };
 
-  const initCreateTicketRequest = async (createUserRequest) => {
+  const initCreateTicketRequest = async () => {
+    let createUserRequest  = {
+        assigned_by: "",
+        assignemt_type: "",
+        assignment_comment: "",
+        city_code: complexSelectTree.current?.complex?.hierarchy?.cityCode,
+        city_name: complexSelectTree.current?.complex?.hierarchy?.city,
+        client_name: complexSelectTree.current?.complex?.complexDetails?.client,
+        complex_name: complexSelectTree.current?.complex?.complexDetails?.name,
+        creator_id: user.userName,
+        creator_role: user.userRole,
+        criticality: formDataTicket.criticality,
+        description: formDataTicket.description,
+        district_code: complexSelectTree.current?.complex?.hierarchy?.districtCode,
+        district_name: complexSelectTree.current?.complex?.hierarchy?.district,
+        fileList: [],
+        lead_id: "",
+        lead_role: "",
+        short_thing_name: "",
+        state_code: complexSelectTree.current?.complex?.hierarchy?.stateCode,
+        state_name: complexSelectTree.current?.complex?.hierarchy?.state,
+        thing_name: "",
+        ticket_id: "",
+        ticket_status: "",
+        timestamp: 0,
+        title: formDataTicket.title,
+        yearMonthCode: complexSelectTree.current?.yearMonthCode
+    }
+    console.log('complexSelectTree.current?',complexSelectTree.current);
+    console.log('createUserRequest',createUserRequest);
+    console.log('imageName', imageName);
+
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var requestCopy = { ...createUserRequest };
@@ -167,7 +234,9 @@ const CreateNewTicket = () => {
   };
 
   const onSubmit = () => {
-    if (formDetails.title === "") {
+    console.log("formDataTicket", formDataTicket);
+    console.log('formticket', complexSelectTree.current);
+    if (formDataTicket.title == "") {
       setDialogData({
         title: "Validation Error",
         message: "Please enter a title.",
@@ -176,7 +245,7 @@ const CreateNewTicket = () => {
           console.error("onSubmit Error");
         },
       });
-    } else if (formDetails.description === "") {
+    } else if (formDataTicket.description == "") {
       setDialogData({
         title: "Validation Error",
         message: "Please enter a valid description",
@@ -185,7 +254,7 @@ const CreateNewTicket = () => {
           console.error("onSubmit Error");
         },
       });
-    } else if (formDetails.complex_name === "") {
+    } else if (complexSelectTree.current?.complex?.complexDetails?.name == "" || complexSelectTree.current?.complex == undefined) {
       setDialogData({
         title: "Validation Error",
         message: "Please enter a valid complex_name.",
@@ -196,9 +265,11 @@ const CreateNewTicket = () => {
       });
     } else {
       console.log("formDetails", formDetails);
+      console.log("formDataTicket22", formDataTicket);
       initCreateTicketRequest(formDetails);
     }
   };
+
 
   const ComponentSelector = () => {
     var complex = undefined;
@@ -262,6 +333,8 @@ const CreateNewTicket = () => {
     formDetails.title = "";
     formDetails.yearMonthCode = yearMonthCode;
 
+    complexSelectTree.current = {yearMonthCode, complex}
+    console.log('222')    
     return (
       <div style={{ width: "-webkit-fill-available" }}>
         <Form>
@@ -303,6 +376,35 @@ const CreateNewTicket = () => {
       </div>
     );
   };
+
+  const handleUpdateCritical = (selection) => {
+    console.log('selection', selection);
+    formDetails.criticality = selection.value
+    setTicketCondition(selection)
+    setFormDataTicket( prevFormData => ({
+      ...prevFormData,
+      criticality: selection.value,
+    }));
+  }
+
+  const handleUpdateTitle = (e) => {
+    console.log('handleUpdateTitle', e.target.value);
+    formDetails.title = e.target.value;
+    setFormDataTicket( prevFormData => ({
+      ...prevFormData,
+      title: e.target.value,
+    }));
+  }
+
+  const handleUpdateDes = (e) => {
+    console.log('handleUpdateDes', e.target.value);
+    formDetails.description = e.target.value;
+    setFormDataTicket( prevFormData => ({
+      ...prevFormData,
+      description: e.target.value,
+    }));
+  }
+
 
   return (
     <div className="col-md-12">
@@ -357,27 +459,24 @@ const CreateNewTicket = () => {
               <CardBody>
                 <Form>
                   <p className="text-muted">Ticket Details</p>
-                  <InputGroup className="mb-4">
+                  <InputGroup className="mb-3">
                     <InputGroupText>
                       <LockOutlinedIcon />{" "}
                     </InputGroupText>
-                    <Input
-                      type="select"
-                      onChange={(event) =>
-                        (formDetails.criticality = event.target.value)
-                      }
-                    >
-                      <option value="">Select</option>
-                      <option value="Normal">
-                        Normal: A non-critical malfunction
-                      </option>
-                      <option value="Urgent">
-                        Urgent: A critical malfunction
-                      </option>
-                      <option value="Possible Fault">
-                        Possible Fault: Possible Malfunction
-                      </option>
-                    </Input>
+                    <div style={{ width: "70%" }}>
+                      <Select 
+                        options={selectTicketCondition} 
+                        value={ticketCondition} 
+                        onChange={handleUpdateCritical} 
+                        placeholder="Select" 
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            width: "100%",
+                          }),
+                        }}
+                      />
+                    </div>
                   </InputGroup>
 
                   <InputGroup className="mb-3">
@@ -387,9 +486,7 @@ const CreateNewTicket = () => {
                     <Input
                       type="text"
                       placeholder="Title"
-                      onChange={(event) =>
-                        (formDetails.title = event.target.value)
-                      }
+                      onChange={(e) => handleUpdateTitle(e)}
                     />
                   </InputGroup>
 
@@ -400,9 +497,7 @@ const CreateNewTicket = () => {
                     <Input
                       type="textarea"
                       placeholder="Description"
-                      onChange={(event) =>
-                        (formDetails.description = event.target.value)
-                      }
+                      onChange={(e) => handleUpdateDes(e)}
                     />
                   </InputGroup>
                 </Form>
@@ -453,7 +548,7 @@ const CreateNewTicket = () => {
           </Col>
         </Row>
 
-        <div className={"row justiy-content-center"} style={{ width: "100%" }}>
+        <div className={"row justiy-content-center"} style={{ marginLeft: "30%", width: "40%" }}>
           <Button
             style={{ margin: "auto" }}
             color="primary"
