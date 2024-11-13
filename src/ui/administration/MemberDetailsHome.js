@@ -38,7 +38,6 @@ const MemberDetailsHome = (props) => {
   const authStated = useSelector(authState);
 
   const handleError = (err, Custommessage, onclick = null) => {
-    console.log("error -->", err);
     let text = err.message.includes("expired");
     if (text) {
       setDialogData({
@@ -68,7 +67,6 @@ const MemberDetailsHome = (props) => {
         user?.username,
         user?.credentials
       );
-      console.log("result--->", result);
       dispatch(setTeamList(result.teamDetails));
     } catch (err) {
       handleError(err, "fetchAndInitTeam");
@@ -76,38 +74,42 @@ const MemberDetailsHome = (props) => {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
+
   const initFetchCompletedUserAccessTreeAction = async () => {
-    console.log('id :->',id);
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const result = await executeFetchCompletedUserAccessTree(
         id,
         user?.credentials
       );
-      console.log(
-        "MemberDetail Home initFetchCompletedUserAccessTreeAction-->",
-        result
-      );
       dispatch(setAccessTree(result));
+      console.log('result',result);
     } catch (err) {
-      handleError(err, "initFetchCompletedUserAccessTreeAction");
+      console.log('err',err);
+      console.log('errorMessage', err.errorMessage)
+      if(err.errorMessage == "Cannot read properties of undefined (reading 'userRole')") {
+        setDialogData({
+          title: "Error",
+          message: "You do not have access defined for yourself. Please contact your admin to define your access, before you define access for your team member.",
+          onClickAction: () => {
+            // Handle the action when the user clicks OK
+          },
+        });
+      } else {
+        handleError(err, "initFetchCompletedUserAccessTreeAction");
+      }
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
   };
 
   useEffect(() => {
-    // props.removeComponentProps(UiAdminDestinations.MemberAccess);
-    // props.removeComponentProps(UiAdminDestinations.MemberDetails);
     fetchAndInitTeam();
     initFetchCompletedUserAccessTreeAction();
   }, []);
 
-  console.log("found data", data);
-
   let user_data = data.filter((data) => data.userName == id);
 
-  console.log("props", user_data[0]);
   const toggle = (tabPane, tab) => {
     const newArray = activeTab.slice();
     newArray[tabPane] = tab;
@@ -118,9 +120,7 @@ const MemberDetailsHome = (props) => {
     if (user_data.length == 0) {
       return null;
     }
-    // if (!props.location || !props.location.data) {
-    //   return null; // Render nothing if data is not available
-    // }
+
     return (
       <>
         <TabPane tabId="2">

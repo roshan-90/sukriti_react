@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, CardBody, CardHeader, Col, Row, Button } from "reactstrap";
 import List from "../../components/lists/userLists/Lists";
-// import { removeComponentProps } from "../../store/actions/history-actions";
 import { executelistTeamLambda } from "../../awsClients/administrationLambdas";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
 import NoDataComponent from "../../components/NoDataComponent";
-import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 import { useNavigate } from "react-router-dom";
 import { selectUser } from "../../features/authenticationSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,10 +11,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog"; // Adjust the path based on your project structure
 
-const AdministrationHome = (props) => {
-  //   const mDataSummaryComponent = useRef();
-  //   const messageDialog = useRef();
-  //   const loadingDialog = useRef();
+const AdministrationHome = () => {
+
   const navigate = useNavigate(); // Access the navigate function
   const user = useSelector(selectUser);
   const teamList = useSelector((state) => state.adminstration.teamList);
@@ -26,10 +20,7 @@ const AdministrationHome = (props) => {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const [dialogData, setDialogData] = useState(null);
 
-  console.log("sdf-->", user?.username);
-
   const handleError = (err, Custommessage, onclick = null) => {
-    console.log("error -->", err);
     let text = err.message.includes("expired");
     if (text) {
       setDialogData({
@@ -37,7 +28,6 @@ const AdministrationHome = (props) => {
         message: err.message,
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log(`${Custommessage} -->`, err);
         },
       });
     } else {
@@ -46,7 +36,6 @@ const AdministrationHome = (props) => {
         message: err.message,
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log(`${Custommessage} -->`, err);
         },
       });
     }
@@ -59,7 +48,6 @@ const AdministrationHome = (props) => {
         user?.username,
         user?.credentials
       );
-      console.log("result--->", result);
       dispatch(setTeamList(result.teamDetails));
     } catch (err) {
       handleError(err, "fetchAndInitTeam");
@@ -69,12 +57,9 @@ const AdministrationHome = (props) => {
   };
 
   useEffect(() => {
-    // props.removeComponentProps(UiAdminDestinations.MemberAccess);
-    // props.removeComponentProps(UiAdminDestinations.MemberDetails);
     fetchAndInitTeam();
   }, []);
 
-  console.log("teamList---->", teamList);
   const Greeting = ({ teamList }) => {
     if (teamList.length === 0) {
       return <NoDataComponent />;
@@ -83,7 +68,6 @@ const AdministrationHome = (props) => {
   };
 
   const FooterComponent = ({ teamSize }) => {
-    console.log("_footer", teamSize);
     return (
       <div className={"row"} style={{ margin: "0px", width: "100%" }}>
         <div

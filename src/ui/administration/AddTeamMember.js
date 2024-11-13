@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 // import { connect } from "react-redux";
+
 import {
   getCreateUserRoleList,
   isClientSpecificRole,
@@ -10,12 +11,6 @@ import { UserRoles } from "../../nomenclature/nomenclature";
 import Dropdown from "../../components/DropDown";
 import RxInputText from "../../components/RxInputText";
 import * as Styles from "../../jsStyles/Style";
-// import {
-//   addTeamMember,
-//   setClientList,
-// } from "../../store/actions/administration-actions";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
 import { useNavigate } from "react-router-dom";
 import { setClientList } from "../../features/adminstrationSlice";
 import {
@@ -60,8 +55,6 @@ const AddTeamMember = () => {
   });
   const [selectUserRole, setSelectedUserRole] = useState(null);
 
-  // const messageDialog = useRef();
-  // const loadingDialog = useRef();
   const organisationNameRef = useRef();
 
   useEffect(() => {
@@ -69,7 +62,6 @@ const AddTeamMember = () => {
   }, []);
 
   const handleError = (err, Custommessage, onclick = null) => {
-    console.log("error -->", err);
     let text = err.message.includes("expired");
     if (text) {
       setDialogData({
@@ -77,7 +69,6 @@ const AddTeamMember = () => {
         message: err.message,
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log(`${Custommessage} -->`, err);
         },
       });
     } else {
@@ -86,7 +77,6 @@ const AddTeamMember = () => {
         message: err.message,
         onClickAction: () => {
           // Handle the action when the user clicks OK
-          console.log(`${Custommessage} -->`, err);
         },
       });
     }
@@ -96,7 +86,6 @@ const AddTeamMember = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       var result = await executelistClientsLambda(user?.credentials);
-      console.log("AddTeamMember fetchAndInitClientList", result);
       dispatch(setClientList(result.clientList));
     } catch (err) {
       handleError(err, "fetchAndInitClientList");
@@ -115,15 +104,12 @@ const AddTeamMember = () => {
         user?.user,
         user?.credentials
       );
-      console.log("initcreateuserRequest respone", result);
       if (result.status == "-1") {
         setDialogData({
           title: "Error",
           message: result.result.message,
           onClickAction: () => {
             navigate("/administration");
-            // Handle the action when the user clicks OK
-            console.error(" AddTeamMember initCreateVendorRequest");
           },
         });
       } else {
@@ -132,36 +118,11 @@ const AddTeamMember = () => {
           message: "User added successfully",
           onClickAction: () => {
             navigate("/administration");
-            // Handle the action when the user clicks OK
-            console.error(" AddTeamMember initCreateVendorRequest");
           },
         });
       }
     } catch (err) {
-      console.log("check ---->", err);
-      let text = err?.message?.result?.message?.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err?.message?.result?.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log(
-              "AddVendorMemeber fetchAndInitClientList Error:->",
-              err
-            );
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: err?.message?.result?.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error(" AddVendorMember fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "initCreateUserRequest");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -175,23 +136,14 @@ const AddTeamMember = () => {
   };
 
   const onClientSelected = (index, value) => {
-    console.log("onClientSelected", index, value);
     const selectedRole = formDetails.current.userRole;
     const selectedClient = isClientSpecificRole(selectedRole)
       ? clientList[index]
       : Client.getSSF();
 
-    console.log("selectedClient", selectedClient);
-    console.log("selectedClient organization", selectedClient.organisation);
-
     // Update formDetails.current with the selected client data
     formDetails.current.clientName = selectedClient.name;
     formDetails.current.organisationName = selectedClient.organisation;
-
-    // Check if organisationNameRef.current is defined before accessing setText
-    // if (organisationNameRef.current) {
-    //   organisationNameRef.current.setText(formDetails.current.organisationName);
-    // }
   };
 
   const populateClientList = () => {
@@ -221,7 +173,6 @@ const AddTeamMember = () => {
   };
 
   const onSubmit = () => {
-    console.log("formDetails", formDetails);
     if (formDetails.current.userName === "") {
       setDialogData({
         title: "Validation Error",

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { connect } from "react-redux";
 import { Button } from "reactstrap";
 import { NameValueList } from "../../components/DisplayLabels";
 import NameValue from "../../Entity/NameValue";
@@ -14,7 +13,6 @@ import {
 import CircularProgress from "@mui/material/CircularProgress";
 import { startLoading, stopLoading } from "../../features/loadingSlice";
 import MessageDialog from "../../dialogs/MessageDialog";
-import { UiAdminDestinations } from "../../nomenclature/nomenclature";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectUser } from "../../features/authenticationSlice";
@@ -37,6 +35,29 @@ const MemberDetails = (props) => {
 
   const confirmationDialog = useRef();
 
+  const handleError = (err, Custommessage, onclick = null) => {
+    let text = err.message.includes("expired");
+    if (text) {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    } else {
+      setDialogData({
+        title: "Error",
+        message: err.message,
+        onClickAction: () => {
+          // Handle the action when the user clicks OK
+          console.log(`${Custommessage} -->`, err);
+        },
+      });
+    }
+  };
+
   const initAdminDisableAction = async () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
@@ -44,29 +65,9 @@ const MemberDetails = (props) => {
         props.user.userName,
         user?.credentials
       );
-      console.log("result --> executeDisableUserLambda", result);
       setUserStatus("disabled");
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+        handleError(err, "initAdminDisableAction");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -79,29 +80,9 @@ const MemberDetails = (props) => {
         props.user.userName,
         user?.credentials
       );
-      console.log("result --> executeEnableUserLambda", result);
       setUserStatus("enabled");
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "initAdminEnableAction");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -133,26 +114,7 @@ const MemberDetails = (props) => {
         },
       });
     } catch (err) {
-      let text = err.message.includes("expired");
-      if (text) {
-        setDialogData({
-          title: "Error",
-          message: err.message,
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.log("fetchDashboardData Error:->", err);
-          },
-        });
-      } else {
-        setDialogData({
-          title: "Error",
-          message: "SomeThing Went Wrong",
-          onClickAction: () => {
-            // Handle the action when the user clicks OK
-            console.error("fetchAndInitClientList Error", err);
-          },
-        });
-      }
+      handleError(err, "initAdminDeleteAction");
     } finally {
       dispatch(stopLoading()); // Dispatch the stopLoading action
     }
@@ -161,7 +123,6 @@ const MemberDetails = (props) => {
   useEffect(() => {
     return () => {
       console.log("_memberDetails", "_restoreProps-saved", props);
-      // props.pushComponentProps(UiAdminDestinations.MemberDetails, props);
     };
   }, []);
 

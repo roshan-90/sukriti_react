@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-// import { connect } from "react-redux";
 import { UserRoles } from "../../nomenclature/nomenclature";
 import * as Styles from "../../jsStyles/Style";
 import {
@@ -9,14 +8,6 @@ import {
   complexCompositionStyle,
   whiteSurfaceCircularBorder,
 } from "../../jsStyles/Style";
-// import {
-//   addTeamMember,
-//   setClientList,
-//   setUiList,
-//   setUiReset,
-// } from "../../store/actions/administration-actions";
-// import MessageDialog from "../../dialogs/MessageDialog";
-// import LoadingDialog from "../../dialogs/LoadingDialog";
 import {
   executelistClientsLambda,
   executePermissionUiLambda,
@@ -48,9 +39,6 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 const GrantPermissions = () => {
   const [selectedRole, setSelectedRole] = useState(UserRoles.Undefined);
   const uiDetails = useRef({});
-  const selectedClient = useRef({});
-  const messageDialog = useRef(null);
-  const loadingDialog = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -116,9 +104,7 @@ const GrantPermissions = () => {
     }));
   };
 
-
   const handleError = (err, Custommessage, onclick = null) => {
-    console.log("error -->", err);
     let text = err.message.includes("expired");
     if (text) {
       setDialogData({
@@ -171,7 +157,6 @@ const GrantPermissions = () => {
     dispatch(startLoading()); // Dispatch the startLoading action
     try {
       const requestCopy = { ...createUserRequest };
-      console.log("check for request copy-->", requestCopy);
       await executePermissionUiLambda(requestCopy, user?.credentials);
       dispatch(setResetData());
       setDialogData({
@@ -180,7 +165,6 @@ const GrantPermissions = () => {
         onClickAction: () => {
           navigate("/administration");
           // Handle the action when the user clicks OK
-          console.error(" AddTeamMember initCreateVendorRequest");
         },
       });
     } catch (err) {
@@ -259,8 +243,6 @@ const GrantPermissions = () => {
         </div>
         <div className="row">
           <div className="col-md-4">
-            {/* <MessageDialog ref={this.messageDialog} />
-            <LoadingDialog ref={this.loadingDialog} /> */}
             <div
               style={{
                 width: "100%",
