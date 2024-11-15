@@ -27,6 +27,20 @@ const Stats = (props) => {
   };
 
   const StatsItem = (props) => {
+    let object = {
+      fwc: 0,
+      mwc: 0,
+      mur: 0,
+      pwc: 0,
+    }
+
+    props?.data?.map((item, index) => {
+        object.fwc = object.fwc + item.fwc
+        object.mwc = object.mwc + item.mwc
+        object.mur = object.mur + item.mur
+        object.pwc = object.pwc + item.pwc
+    })
+
     // Check if props and its required properties exist
     if (!props) {
       return null;
@@ -55,7 +69,7 @@ const Stats = (props) => {
                 ...whiteSurface,
                 background: "white",
                 width: "100%",
-                height: "220px",
+                height: "225px",
                 padding: "10px",
                 display: "flexbox",
                 alignItems: "center",
@@ -66,7 +80,7 @@ const Stats = (props) => {
                   height: "180px",
                   width: "100%",
                   display: "flex",
-                  alignItems: "center",
+                  alignItems: "center", 
                   justifyContent: "center",
                 }}
               >
@@ -83,7 +97,7 @@ const Stats = (props) => {
                   justifyContent: "center",
                   marginTop: "-30px",
                 }}
-              >
+                >
                 {props.total}
               </div>
 
@@ -94,9 +108,14 @@ const Stats = (props) => {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-              >
+                >
                 {props.name}
               </div>
+              {props.name =="Feedback Stats" ? <>
+                <p style={{marginLeft: "20%"}}><b>Mwc: {'5'} Fwc: {'5'} Mur: {'5'} Pwc: {'5'}</b></p>
+                  </> : <>
+                <p style={{marginLeft: "15%"}}><b>Mwc: {object.mwc} Fwc: {object.fwc} Mur: {object.mur} Pwc: {object.pwc}</b></p>
+              </>}
             </div>
           </div>
 
