@@ -30,9 +30,11 @@ import { updateIncidenceSelectedCabin } from "../../features/incidenceSlice";
 import { whiteSurface } from "../../jsStyles/Style";
 import { cabinDetailsStyle } from "../../jsStyles/Style";
 import Dropdown from "../../components/DropDown";
+import Select from 'react-select'; // Importing react-select
+import DashboardCarousel from "./DashboardCarousel";
 
 const Home = ({ isOnline }) => {
-  const {
+  const { 
     handleOnlineState,
     setLocalStorageItem,
     getLocalStorageItem,
@@ -48,10 +50,13 @@ const Home = ({ isOnline }) => {
   console.log("user", user);
   const reportParms = { complex: "all", duration: "15" };
   const [dialogData, setDialogData] = useState(null);
-  const [selectView, setSelectView] = useState('')
+  const [selectView, setSelectView] = useState({
+    "label": "Summary View",
+    "value": "Summary View"
+})
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
-  const viewOptions = ["Summary View", "Recycle View"];
+  const viewOptions = [{ label: "Summary View" , value: "Summary View" }, {label: "Recycle View", value: "Recycle View"}];
 
   useEffect(() => {
     // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
@@ -528,6 +533,8 @@ const Home = ({ isOnline }) => {
     setSelectView(data);
   }
 
+  let value = JSON.parse(localStorage.getItem("report_dashboard"));
+  console.log("check dashboard data", value);
   console.log('selectView', selectView);
 
   return (
@@ -543,19 +550,15 @@ const Home = ({ isOnline }) => {
       <MessageDialog data={dialogData} />
         <div style={{display: "flex" , justifyContent: "center"}}>
           <h3>Welcome, {user?.user?.name}&nbsp;&nbsp;</h3>
-          <div style={{ width: "20%", float: "right" }}>
-            <DropDownLabel
-              label={"Duration"}
-              handleUpdate={handleUpdate}
-              options={actionOptions}
-            />
-          </div>
-          <div style={{ width: "30%", float: "right" }}>
-            <DropDownLabel
-              label={"view selector"}
-              handleUpdate={handleUpdateView}
-              options={viewOptions}
-            />
+            <div style={{ width: "20%", float: "right" }}>
+              <DropDownLabel
+                label={"Duration"}
+                handleUpdate={handleUpdate}
+                options={actionOptions}
+              />
+            </div>
+          <div style={{ width: "15%", float: "right" }}>
+              <Select options={viewOptions || []} value={selectView} onChange={handleUpdateView} />         
           </div>
       </div>
       <br />
@@ -570,8 +573,9 @@ const Home = ({ isOnline }) => {
           alignItems: "center",
         }}
       > 
-      
-      {dashboard_data?.data ? (
+      {selectView?.value == "Summary View" ? 
+        <> 
+        {dashboard_data?.data ? (
         <div>
             <h3>Dashboard Summary view</h3>
           <Summary
@@ -602,6 +606,48 @@ const Home = ({ isOnline }) => {
       ) : (
         <div>No data available</div>
       )}
+        </> 
+        :
+        <> 
+        {dashboard_data?.data ? (
+          <> 
+            <h3>Dashboard Recycle view</h3>
+            
+            <DashboardCarousel
+              dashboardData={value}            />
+          </>
+        // <div>
+        //   <Summary
+        //     chartData={dashboard_data.data.dashboardChartData}
+        //     bwtChartData={dashboard_data.data.bwtdashboardChartData}
+        //     dataSummary={dashboard_data.data.dataSummary}
+        //     bwtDataSummary={dashboard_data.data.bwtdataSummary}
+        //     uiResult={dashboard_data.data.uiResult}
+        //   />
+        //   <Stats
+        //     setDurationSelection={setDurationSelection}
+        //     chartData={dashboard_data.data?.dashboardChartData}
+        //     pieChartData={dashboard_data.data?.pieChartData}
+        //     bwtChartData={dashboard_data.data?.bwtdashboardChartData}
+        //     bwtPieChartData={dashboard_data.data?.bwtpieChartData}
+        //     bwtDataSummary={dashboard_data.data?.bwtdataSummary}
+        //     dashboardUpiChartData={dashboard_data.data?.dashboardUpiChartData}
+        //     pieChartUpiData={dashboard_data.data?.pieChartUpiData}
+        //     dataSummary={dashboard_data.data?.dataSummary}
+        //     uiResult={dashboard_data.data?.uiResult?.data}
+        //   />
+        //   <ActiveTickets data={dashboard_data?.data?.activeTickets} />
+        //   <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
+        //   <LiveStatus data={dashboard_data?.data?.connectionStatus} />
+        //   <WaterLevelStatus data={dashboard_data?.data?.lowWaterComplexes} />
+        //   <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
+        // </div>
+      ) : (
+        <div>No data available</div>
+      )}
+        </>
+      }
+      
     </div>
     </>
   );
