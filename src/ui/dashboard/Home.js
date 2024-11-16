@@ -25,6 +25,11 @@ import QuickConfig from "./QuickConfig";
 import LiveStatus from "./LiveStatus";
 import { clearUser } from "../../features/authenticationSlice";
 import useOnlineStatus from "../../services/useOnlineStatus";
+// import { DropDownLabel } from "../../components/DisplayLabels";
+import { updateIncidenceSelectedCabin } from "../../features/incidenceSlice";
+import { whiteSurface } from "../../jsStyles/Style";
+import { cabinDetailsStyle } from "../../jsStyles/Style";
+import Dropdown from "../../components/DropDown";
 
 const Home = ({ isOnline }) => {
   const {
@@ -43,6 +48,10 @@ const Home = ({ isOnline }) => {
   console.log("user", user);
   const reportParms = { complex: "all", duration: "15" };
   const [dialogData, setDialogData] = useState(null);
+  const [selectView, setSelectView] = useState('')
+  const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
+  const actionValues = [15, 30, 45, 60, 90];
+  const viewOptions = ["Summary View", "Recycle View"];
 
   useEffect(() => {
     // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
@@ -508,6 +517,19 @@ const Home = ({ isOnline }) => {
     // setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
   };
 
+  const handleUpdate = (configName, configValue) => {
+    console.log("_updateCommand", configName, configValue);
+    const index = actionOptions.indexOf(configValue);
+    setDurationSelection(actionValues[index]);
+  };
+
+  const handleUpdateView = (data) => {
+    console.log('handleUpdateView', data);
+    setSelectView(data);
+  }
+
+  console.log('selectView', selectView);
+
   return (
     <>
       {isLoading && (
@@ -519,9 +541,39 @@ const Home = ({ isOnline }) => {
         </div>
       )}
       <MessageDialog data={dialogData} />
+        <div style={{display: "flex" , justifyContent: "center"}}>
+          <h3>Welcome, {user?.user?.name}&nbsp;&nbsp;</h3>
+          <div style={{ width: "20%", float: "right" }}>
+            <DropDownLabel
+              label={"Duration"}
+              handleUpdate={handleUpdate}
+              options={actionOptions}
+            />
+          </div>
+          <div style={{ width: "30%", float: "right" }}>
+            <DropDownLabel
+              label={"view selector"}
+              handleUpdate={handleUpdateView}
+              options={viewOptions}
+            />
+          </div>
+      </div>
+      <br />
+       <div
+        className="row"
+        style={{
+          ...whiteSurface,
+          background: "white",
+          width: "100%",
+          padding: "10px",
+          display: "flexbox",
+          alignItems: "center",
+        }}
+      > 
+      
       {dashboard_data?.data ? (
         <div>
-          <h1>Welcome, {user?.user?.name}</h1>
+            <h3>Dashboard Summary view</h3>
           <Summary
             chartData={dashboard_data.data.dashboardChartData}
             bwtChartData={dashboard_data.data.bwtdashboardChartData}
@@ -550,8 +602,65 @@ const Home = ({ isOnline }) => {
       ) : (
         <div>No data available</div>
       )}
+    </div>
     </>
   );
 };
+
+export function DropDownLabel(props) {
+  const [paymentMode, setPaymentMode] = useState(0);
+
+  return (
+    <div
+      className="row"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "0",
+        margin: "0px 0px 30px 0px",
+      }}
+    >
+      <div
+        className="col-md-2"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          padding: "0",
+        }}
+      >
+        <div
+          style={{
+            ...cabinDetailsStyle.cabinHealth.itemTitle,
+            textAlign: "end",
+          }}
+        >
+          {props.label}
+        </div>
+      </div>
+
+      <div
+        className="col-md-1"
+        style={{
+          marginLeft: "12px",
+        }}
+      ></div>
+      <div
+        className="col-md-6"
+        style={{
+          marginLeft: "8px",
+        }}
+      >
+        <Dropdown
+          options={props.options}
+          onSelection={(index, value) => {
+            setPaymentMode(value);
+            props.handleUpdate(props.label, value);
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default Home;
