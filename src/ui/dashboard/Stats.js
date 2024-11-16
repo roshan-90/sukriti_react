@@ -245,13 +245,14 @@ const Stats = (props) => {
         alignItems: "center",
       }}
     >
-      <div style={{ width: "30%", float: "right" }}>
+      {/* comment in dropdown in child component  */}
+      {/* <div style={{ width: "30%", float: "right" }}>
         <DropDownLabel
           label={"Duration"}
           handleUpdate={handleUpdate}
           options={actionOptions}
         />
-      </div>
+      </div> */}
 
       <StatsItem
         name="Usage Stats"
