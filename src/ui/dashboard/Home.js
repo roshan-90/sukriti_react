@@ -53,10 +53,30 @@ const Home = ({ isOnline }) => {
   const [selectView, setSelectView] = useState({
     "label": "Summary View",
     "value": "Summary View"
-})
+  })
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
   const viewOptions = [{ label: "Summary View" , value: "Summary View" }, {label: "Recycle View", value: "Recycle View"}];
+  const parentFrequency =
+   [
+    { label: "20 Sec" , value: 20000 },
+    { label: "40 Sec" , value: 40000 },
+    { label: "1 Min" , value: 60000 },
+    { label: "1 Min 20 Sec" , value: 80000 },
+    { label: "1 Min 40 Sec" , value: 100000 },
+    { label: "2 Min" , value: 120000 },
+   ];
+   const [selectParentFrequency, setSelectParentFrequency] = useState({ label: "20 Sec" , value: 20000 })
+
+   const childFrequency =
+   [
+    { label: "5 Sec" , value: 5000 },
+    { label: "10 Sec" , value: 10000 },
+    { label: "15 Sec" , value: 15000 },
+    { label: "20 Sec" , value: 20000 },
+   ];
+   const [selectChildFrequency, setSelectChildFrequency] = useState({ label: "5 Sec" , value: 5000 })
+
 
   useEffect(() => {
     // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
@@ -532,10 +552,21 @@ const Home = ({ isOnline }) => {
     console.log('handleUpdateView', data);
     setSelectView(data);
   }
+  
+  const handleUpdateParentFrequency = (data) => {
+    console.log('handleUpdateParentFrequency', data);
+    setSelectParentFrequency(data);
+  }
+
+  const handleUpdateChildFrequency = (data) => {
+    console.log('handleUpdateChildFrequency', data);
+    setSelectParentFrequency(data);
+  }
 
   let value = JSON.parse(localStorage.getItem("report_dashboard"));
   console.log("check dashboard data", value);
   console.log('selectView', selectView);
+  
 
   return (
     <>
@@ -558,9 +589,16 @@ const Home = ({ isOnline }) => {
               />
             </div>
           <div style={{ width: "15%", float: "right" }}>
-              <Select options={viewOptions || []} value={selectView} onChange={handleUpdateView} />         
+              <Select options={viewOptions || []} value={selectView} onChange={handleUpdateView} />       
           </div>
-      </div>
+            <p  style={{ marginLeft: "10px", marginRight: "10px", fontWeight: "bold"}}>Parent Frequency</p>
+              <Select options={parentFrequency || []} value={selectParentFrequency} onChange={handleUpdateParentFrequency}  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      width: "100%",
+                    }),
+                  }} />     
+       </div>
       <br />
        <div
         className="row"
@@ -614,7 +652,9 @@ const Home = ({ isOnline }) => {
             <h3>Dashboard Recycle view</h3>
             
             <DashboardCarousel
-              dashboardData={value}            />
+              dashboardData={value}
+              parentFrequency={selectParentFrequency}
+              />
           </>
         // <div>
         //   <Summary

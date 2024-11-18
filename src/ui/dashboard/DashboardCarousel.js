@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/authenticationSlice";
 
 
-const DashboardCarousel = ({ dashboardData , setDurationSelection }) => {
+const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
   const user = useSelector(selectUser);
 
   if (!dashboardData || dashboardData.length === 0) {
@@ -30,7 +30,7 @@ const DashboardCarousel = ({ dashboardData , setDurationSelection }) => {
   return (
     <Carousel
     autoPlay
-    interval={5000}
+    interval={parentFrequency.value ?? 10000}
     infiniteLoop
     showThumbs={false}
     showStatus={false}
