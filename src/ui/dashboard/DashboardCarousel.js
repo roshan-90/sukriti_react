@@ -18,7 +18,7 @@ import {
 } from "../dashboard/component/ReportChart";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/authenticationSlice";
-
+import "./DashboardComponent.css";
 
 const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
   const user = useSelector(selectUser);
@@ -41,7 +41,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
         <div key={`${index}-${itemIndex}`}>
           <div>
             {/* Single Stats Item per Slide */}
-            <h4>Slide {itemIndex}</h4>
+            <h4>{item.complexName} Complex</h4>
             {/* <StatsItem
               name="Usage Stats"
               total={item?.dataSummary?.usage}

@@ -1,0 +1,4 @@
+/* Active dot */
+.carousel .control-dots .dot.selected {
+  background-color: #007bff; /* Active dot color */
+}
