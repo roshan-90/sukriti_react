@@ -50,6 +50,7 @@ const Home = ({ isOnline }) => {
   console.log("user", user);
   const reportParms = { complex: "all", duration: "15" };
   const [dialogData, setDialogData] = useState(null);
+  const [recycleViewData, setRecycleViewData] = useState(null);
   const [selectView, setSelectView] = useState({
     "label": "Summary View",
     "value": "Summary View"
@@ -95,6 +96,8 @@ const Home = ({ isOnline }) => {
     } else {
       let getuser =  localStorage.getItem('set_user');  
       let dashboard_15 = getLocalStorageItem("dashboard_15");
+      let value = JSON.parse(localStorage.getItem("report_dashboard"));
+      setRecycleViewData(value)
       // console.log('getuser',getuser);
       // console.log('user?.username', getuser !== user?.username);   
       // console.log('condition change :-> 2',dashboard_15 == undefined);
@@ -227,15 +230,29 @@ const Home = ({ isOnline }) => {
     }
   };
 
+  const filter_complex = (all_report_data, duration) => {
+    setRecycleViewData(null)
+    let array_data = [];
+    for (let i = 0; i < all_report_data.length; i++) {
+      const response = all_report_data[i];
+        for (let j = 0; j < response.length; j++) {
+          const obj = response[j];
+            filter_date(obj, duration, array_data);
+          } 
+    }
+
+    setRecycleViewData([array_data])
+  };
+
   const setDurationSelection = async (duration) => {
     console.log("duration", duration);
     reportParms.duration = duration;
     // if (isOnline == false) {
-      console.log("reportParms.duration", typeof reportParms.duration);
-      console.log("reportParms.duration", reportParms.duration);
+      let value = localStorage.getItem("report_dashboard");
       switch (true) {
         case duration === 15:
           let dashboard_15 = getLocalStorageItem("dashboard_15");
+          filter_complex(JSON.parse(value), 15);
           console.log("this is reportParms is 15 is selected", dashboard_15);
           if(dashboard_15 == undefined || dashboard_15 == null) {
             
@@ -245,6 +262,7 @@ const Home = ({ isOnline }) => {
           break;
         case duration === 30:
           let dashboard_30 = getLocalStorageItem("dashboard_30");
+          filter_complex(JSON.parse(value), 30);
           console.log("this is reportparms is 30 selected", dashboard_30);
           if(dashboard_30 == undefined || dashboard_30 == null) {
             
@@ -254,6 +272,7 @@ const Home = ({ isOnline }) => {
           break;
         case duration === 45:
           let dashboard_45 = getLocalStorageItem("dashboard_45");
+          filter_complex(JSON.parse(value), 45);
           console.log("this is reportParms is 45 selected", dashboard_45);
           if(dashboard_45 == undefined || dashboard_45 == null) {
             
@@ -263,6 +282,7 @@ const Home = ({ isOnline }) => {
           break;
         case duration === 60:
           let dashboard_60 = getLocalStorageItem("dashboard_60");
+          filter_complex(JSON.parse(value), 60);
           console.log("this is reportparms is 60 selected", dashboard_60);
           if(dashboard_60 == undefined || dashboard_60 == null) {
             
@@ -272,6 +292,7 @@ const Home = ({ isOnline }) => {
           break;
         case duration === 90:
           let dashboard_90 = getLocalStorageItem("dashboard_90");
+          filter_complex(JSON.parse(value), 90);
           console.log("this is reportparms is 90 selected", dashboard_90);
           if(dashboard_90 == undefined || dashboard_90 == null) {
             
@@ -323,7 +344,7 @@ const Home = ({ isOnline }) => {
     waterRecycled: 0,
   };
 
-  const filter_date = (data, duration) => {
+  const filter_date = (data, duration, array_data) => {
     // Define start and end dates
     const startDateString = "2023-12-10"; // Example start date string
     const endDateString = "2024-01-30"; // Example end date string
@@ -357,9 +378,7 @@ const Home = ({ isOnline }) => {
     };
 
     const bwtSummary = (data) => {
-      console.log("bwt summary", data);
       for (let i = 0; i < data.length; i++) {
-        console.log("checking bwt summary", data[i]);
         if (data[i].all !== 0) {
           databwtsummary.all += Number(data[i].all);
           databwtsummary.bwt += Number(data[i].bwt);
@@ -368,13 +387,10 @@ const Home = ({ isOnline }) => {
     };
 
     const summaryFunction = (key, data) => {
-      console.log("summaryFunction :-->", data);
       for (let i = 0; i < data.length; i++) {
         if (data[i].all !== 0) {
           if (key in dataSummary) {
             if (key === "feedback") {
-              console.log("check key feedback :-->", key);
-              console.log("total feedback", data.length);
               totalCount = data.length;
               dataSummary[key] += Number(data[i].all);
               if (data[i].fwc !== 0) {
@@ -390,28 +406,20 @@ const Home = ({ isOnline }) => {
                 feedback_summary[2].value += Number(data[i].pwc);
               }
             } else {
-              console.log("check key :-->", key);
-              console.log("check vlaue of key :-->", data[i].all);
               dataSummary[key] += Number(data[i].all);
               if (key === "usage") {
                 if (data[i].fwc !== 0) {
-                  console.log("ussage summary-->fwc", data[i].fwc);
                   usage_summary[1].value += Number(data[i].fwc);
                 }
                 if (data[i].mur !== 0) {
-                  console.log("ussage summary-->mur", data[i].mur);
                   usage_summary[3].value += Number(data[i].mur);
                 }
                 if (data[i].mwc !== 0) {
-                  console.log("ussage summary-->mwc", data[i].mwc);
                   usage_summary[0].value += Number(data[i].mwc);
                 }
                 if (data[i].pwc !== 0) {
-                  console.log("ussage summary-->pwc", data[i].pwc);
                   usage_summary[2].value += Number(data[i].pwc);
                 }
-                console.log("usage_summary", usage_summary);
-                console.log("usage_summary--1", usage_summary[0].name);
               } else if (key === "upiCollection") {
                 if (data[i].fwc !== 0) {
                   upiCollection_summary[1].value += Number(data[i].fwc);
@@ -441,8 +449,6 @@ const Home = ({ isOnline }) => {
               }
             }
           }
-          console.log("i :-->", data[i].all);
-          console.log("value :->", key in dataSummary);
         }
       }
     };
@@ -454,13 +460,12 @@ const Home = ({ isOnline }) => {
         startDateString,
         endDateString
       );
-      console.log("key", key);
-      console.log("filteredData", filteredData[key]);
       summaryFunction(key, filteredData[key]);
     });
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
     dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
+    dataSummary.feedback = dataSummary.feedback == 'NaN' ? 0 : dataSummary.feedback;
     Object.assign(data.dataSummary, dataSummary);
     Object.assign(data.pieChartData, {
       collection: collection_summary,
@@ -469,19 +474,11 @@ const Home = ({ isOnline }) => {
       usage: usage_summary,
     });
     filteredData = {};
-    console.log("dashboard convert 30", data);
-    // dispatch(setReportData(data));
-
-    console.log("data.dashboardChartData :-->", data);
-    console.log("data.dashboard summary", dataSummary);
-    console.log("data totalCount", totalCount);
-
     filteredData = filterDataByDateRange(
       data.bwtdashboardChartData?.waterRecycled,
       startDateString,
       endDateString
     );
-    console.log("filteredData 22:-> ", filteredData);
 
     Object.assign(data.bwtdashboardChartData, { waterRecycled: filteredData });
     bwtSummary(filteredData);
@@ -497,8 +494,7 @@ const Home = ({ isOnline }) => {
     });
 
     console.log("filter data -->", data);
-    setLocalStorageItem(`dashboard_${duration}`, JSON.stringify(data));
-    // dispatch(setDashboardData(data));
+    array_data.push(data);
   };
 
   const fetch_dashboard = async () => {
@@ -563,10 +559,7 @@ const Home = ({ isOnline }) => {
     setSelectParentFrequency(data);
   }
 
-  let value = JSON.parse(localStorage.getItem("report_dashboard"));
-  console.log("check dashboard data", value);
-  console.log('selectView', selectView);
-  
+  console.log('recycleViewData', recycleViewData);
 
   return (
     <>
@@ -652,9 +645,11 @@ const Home = ({ isOnline }) => {
             <h3>Dashboard Recycle view</h3>
             
             <DashboardCarousel
-              dashboardData={value}
+              dashboardData={recycleViewData}
               parentFrequency={selectParentFrequency}
               />
+              <br />
+              <br />
           </>
         // <div>
         //   <Summary

@@ -36,8 +36,8 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
     showStatus={false}
     swipeable
   >
-    {dashboardData.flatMap((slideData, index) =>
-      slideData.map((item, itemIndex) => (
+    {dashboardData?.flatMap((slideData, index) =>
+      slideData?.map((item, itemIndex) => (
         <div key={`${index}-${itemIndex}`}>
           <div>
             {/* Single Stats Item per Slide */}
@@ -82,7 +82,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
              {/* Child Carousel */}
              <Carousel
                 autoPlay
-                interval={1000} // Child carousel interval (1 second)
+                interval={2000} // Child carousel interval (1 second)
                 infiniteLoop
                 showThumbs={false}
                 showStatus={false}
