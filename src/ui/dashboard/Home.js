@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectUser,
   selectIsAuthenticated,
-  setLoadingPdf
+  setLoadingPdf,
 } from "../../features/authenticationSlice";
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,11 +30,11 @@ import { updateIncidenceSelectedCabin } from "../../features/incidenceSlice";
 import { whiteSurface } from "../../jsStyles/Style";
 import { cabinDetailsStyle } from "../../jsStyles/Style";
 import Dropdown from "../../components/DropDown";
-import Select from 'react-select'; // Importing react-select
+import Select from "react-select"; // Importing react-select
 import DashboardCarousel from "./DashboardCarousel";
 
 const Home = ({ isOnline }) => {
-  const { 
+  const {
     handleOnlineState,
     setLocalStorageItem,
     getLocalStorageItem,
@@ -47,37 +47,42 @@ const Home = ({ isOnline }) => {
   const dashboard_data = useSelector(dashboard);
   const isLoading = useSelector((state) => state.loading.isLoading);
   const navigate = useNavigate();
-  console.log("user", user);
   const reportParms = { complex: "all", duration: "15" };
   const [dialogData, setDialogData] = useState(null);
   const [recycleViewData, setRecycleViewData] = useState(null);
   const [selectView, setSelectView] = useState({
-    "label": "Summary View",
-    "value": "Summary View"
-  })
+    label: "Summary View",
+    value: "Summary View",
+  });
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
-  const viewOptions = [{ label: "Summary View" , value: "Summary View" }, {label: "Recycle View", value: "Recycle View"}];
-  const parentFrequency =
-   [
-    { label: "20 Sec" , value: 20000 },
-    { label: "40 Sec" , value: 40000 },
-    { label: "1 Min" , value: 60000 },
-    { label: "1 Min 20 Sec" , value: 80000 },
-    { label: "1 Min 40 Sec" , value: 100000 },
-    { label: "2 Min" , value: 120000 },
-   ];
-   const [selectParentFrequency, setSelectParentFrequency] = useState({ label: "20 Sec" , value: 20000 })
+  const viewOptions = [
+    { label: "Summary View", value: "Summary View" },
+    { label: "Recycle View", value: "Recycle View" },
+  ];
+  const parentFrequency = [
+    { label: "20 Sec", value: 20000 },
+    { label: "40 Sec", value: 40000 },
+    { label: "1 Min", value: 60000 },
+    { label: "1 Min 20 Sec", value: 80000 },
+    { label: "1 Min 40 Sec", value: 100000 },
+    { label: "2 Min", value: 120000 },
+  ];
+  const [selectParentFrequency, setSelectParentFrequency] = useState({
+    label: "20 Sec",
+    value: 20000,
+  });
 
-   const childFrequency =
-   [
-    { label: "5 Sec" , value: 5000 },
-    { label: "10 Sec" , value: 10000 },
-    { label: "15 Sec" , value: 15000 },
-    { label: "20 Sec" , value: 20000 },
-   ];
-   const [selectChildFrequency, setSelectChildFrequency] = useState({ label: "5 Sec" , value: 5000 })
-
+  const childFrequency = [
+    { label: "5 Sec", value: 5000 },
+    { label: "10 Sec", value: 10000 },
+    { label: "15 Sec", value: 15000 },
+    { label: "20 Sec", value: 20000 },
+  ];
+  const [selectChildFrequency, setSelectChildFrequency] = useState({
+    label: "5 Sec",
+    value: 5000,
+  });
 
   useEffect(() => {
     // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
@@ -94,28 +99,30 @@ const Home = ({ isOnline }) => {
     if (!isAuthenticated) {
       navigate("/login");
     } else {
-      let getuser =  localStorage.getItem('set_user');  
+      let getuser = localStorage.getItem("set_user");
       let dashboard_15 = getLocalStorageItem("dashboard_15");
       let value = JSON.parse(localStorage.getItem("report_dashboard"));
-      setRecycleViewData(value)
+      setRecycleViewData(value);
       // console.log('getuser',getuser);
-      // console.log('user?.username', getuser !== user?.username);   
+      // console.log('user?.username', getuser !== user?.username);
       // console.log('condition change :-> 2',dashboard_15 == undefined);
       // console.log('condition change : -> 3',(getuser !== null && getuser !== user?.username ));
       // console.log('dashboard_15',dashboard_15);
-      if((getuser !== null && getuser !== user?.username ) || dashboard_15 == undefined){
-        console.log('1:-->')
+      if (
+        (getuser !== null && getuser !== user?.username) ||
+        dashboard_15 == undefined
+      ) {
+        console.log("1:-->");
         fetchDashboardData(15);
         localStorage.setItem("settrigger", "1");
       } else {
-        console.log('2:-->')
+        console.log("2:-->");
         dispatch(setDashboardData(dashboard_15));
         dispatch(stopLoading()); // Dispatch the stopLoading action
       }
       localStorage.setItem("selection_key", "15 Days");
-      if(getuser){
+      if (getuser) {
         localStorage.removeItem("set_user");
-        
       }
     }
   }, [isAuthenticated, navigate]);
@@ -151,10 +158,9 @@ const Home = ({ isOnline }) => {
 
   // Function to check if it's been 24 hours since the last function call
   const checkAndUpdateFunction = async (name) => {
-    console.log("hour check", name);
     let hours = new Date().getHours();
 
-    if(hours > 10) {
+    if (hours > 10) {
       var lastRunTime = getCookie(`lastRunTime${name}`);
       var currentTime = new Date().getTime();
       if (
@@ -231,78 +237,68 @@ const Home = ({ isOnline }) => {
   };
 
   const filter_complex = (all_report_data, duration) => {
-    setRecycleViewData(null)
+    setRecycleViewData(null);
     let array_data = [];
     for (let i = 0; i < all_report_data.length; i++) {
       const response = all_report_data[i];
-        for (let j = 0; j < response.length; j++) {
-          const obj = response[j];
-            filter_date(obj, duration, array_data);
-          } 
+      for (let j = 0; j < response.length; j++) {
+        const obj = response[j];
+        filter_date(obj, duration, array_data);
+      }
     }
 
-    setRecycleViewData([array_data])
+    setRecycleViewData([array_data]);
   };
 
   const setDurationSelection = async (duration) => {
     console.log("duration", duration);
     reportParms.duration = duration;
     // if (isOnline == false) {
-      let value = localStorage.getItem("report_dashboard");
-      switch (true) {
-        case duration === 15:
-          let dashboard_15 = getLocalStorageItem("dashboard_15");
-          filter_complex(JSON.parse(value), 15);
-          console.log("this is reportParms is 15 is selected", dashboard_15);
-          if(dashboard_15 == undefined || dashboard_15 == null) {
-            
-          } else {
-            dispatch(setDashboardData(dashboard_15));
-          }
-          break;
-        case duration === 30:
-          let dashboard_30 = getLocalStorageItem("dashboard_30");
-          filter_complex(JSON.parse(value), 30);
-          console.log("this is reportparms is 30 selected", dashboard_30);
-          if(dashboard_30 == undefined || dashboard_30 == null) {
-            
-          } else {
-            dispatch(setDashboardData(dashboard_30));
-          }
-          break;
-        case duration === 45:
-          let dashboard_45 = getLocalStorageItem("dashboard_45");
-          filter_complex(JSON.parse(value), 45);
-          console.log("this is reportParms is 45 selected", dashboard_45);
-          if(dashboard_45 == undefined || dashboard_45 == null) {
-            
-          } else {
-            dispatch(setDashboardData(dashboard_45));
-          }
-          break;
-        case duration === 60:
-          let dashboard_60 = getLocalStorageItem("dashboard_60");
-          filter_complex(JSON.parse(value), 60);
-          console.log("this is reportparms is 60 selected", dashboard_60);
-          if(dashboard_60 == undefined || dashboard_60 == null) {
-            
-          } else {
-            dispatch(setDashboardData(dashboard_60));
-          }
-          break;
-        case duration === 90:
-          let dashboard_90 = getLocalStorageItem("dashboard_90");
-          filter_complex(JSON.parse(value), 90);
-          console.log("this is reportparms is 90 selected", dashboard_90);
-          if(dashboard_90 == undefined || dashboard_90 == null) {
-            
-          } else {
-            dispatch(setDashboardData(dashboard_90));
-          }
-          break;
-        default:
-          console.log("default switch working");
-      }
+    let value = localStorage.getItem("report_dashboard");
+    switch (true) {
+      case duration === 15:
+        let dashboard_15 = getLocalStorageItem("dashboard_15");
+        filter_complex(JSON.parse(value), 15);
+        if (dashboard_15 == undefined || dashboard_15 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_15));
+        }
+        break;
+      case duration === 30:
+        let dashboard_30 = getLocalStorageItem("dashboard_30");
+        filter_complex(JSON.parse(value), 30);
+        if (dashboard_30 == undefined || dashboard_30 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_30));
+        }
+        break;
+      case duration === 45:
+        let dashboard_45 = getLocalStorageItem("dashboard_45");
+        filter_complex(JSON.parse(value), 45);
+        if (dashboard_45 == undefined || dashboard_45 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_45));
+        }
+        break;
+      case duration === 60:
+        let dashboard_60 = getLocalStorageItem("dashboard_60");
+        filter_complex(JSON.parse(value), 60);
+        if (dashboard_60 == undefined || dashboard_60 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_60));
+        }
+        break;
+      case duration === 90:
+        let dashboard_90 = getLocalStorageItem("dashboard_90");
+        filter_complex(JSON.parse(value), 90);
+        if (dashboard_90 == undefined || dashboard_90 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_90));
+        }
+        break;
+      default:
+        console.log("default switch working");
+    }
     // } else {
     //   await fetchDashboardData();
     // }
@@ -312,7 +308,6 @@ const Home = ({ isOnline }) => {
   if (!dashboard_data?.data) {
     return null;
   }
-  console.log("dashboard_data", dashboard_data?.data);
 
   let totalCount = 0;
   let usage_summary = [
@@ -465,7 +460,8 @@ const Home = ({ isOnline }) => {
     // Update data.dashboardChartData with filteredData
     Object.assign(data.dashboardChartData, filteredData);
     dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
-    dataSummary.feedback = dataSummary.feedback == 'NaN' ? 0 : dataSummary.feedback;
+    dataSummary.feedback =
+      dataSummary.feedback == "NaN" ? 0 : dataSummary.feedback;
     Object.assign(data.dataSummary, dataSummary);
     Object.assign(data.pieChartData, {
       collection: collection_summary,
@@ -493,14 +489,13 @@ const Home = ({ isOnline }) => {
       ],
     });
 
-    console.log("filter data -->", data);
     array_data.push(data);
   };
 
   const fetch_dashboard = async () => {
     console.log(" after fetch_dashboard");
     let dashboard_90 = getLocalStorageItem("dashboard_90");
-    let array = [60,45,30,15];
+    let array = [60, 45, 30, 15];
     array.forEach((duration) => {
       filter_date(dashboard_90, duration);
     });
@@ -545,22 +540,24 @@ const Home = ({ isOnline }) => {
   };
 
   const handleUpdateView = (data) => {
-    console.log('handleUpdateView', data);
+    console.log("handleUpdateView", data);
     setSelectView(data);
-  }
-  
+  };
+
   const handleUpdateParentFrequency = (data) => {
-    console.log('handleUpdateParentFrequency', data);
+    console.log("handleUpdateParentFrequency", data);
     setSelectParentFrequency(data);
-  }
+  };
 
   const handleUpdateChildFrequency = (data) => {
-    console.log('handleUpdateChildFrequency', data);
+    console.log("handleUpdateChildFrequency", data);
     setSelectParentFrequency(data);
-  }
+  };
 
-  console.log('recycleViewData', recycleViewData);
+  
 
+  console.log("recycleViewData", recycleViewData);
+ 
   return (
     <>
       {isLoading && (
@@ -572,118 +569,135 @@ const Home = ({ isOnline }) => {
         </div>
       )}
       <MessageDialog data={dialogData} />
-        <div style={{display: "flex" , justifyContent: "center"}}>
-          <h3>Welcome, {user?.user?.name}&nbsp;&nbsp;</h3>
-            <div style={{ width: "20%", float: "right" }}>
-              <DropDownLabel
-                label={"Duration"}
-                handleUpdate={handleUpdate}
-                options={actionOptions}
-              />
-            </div>
-          <div style={{ width: "15%", float: "right" }}>
-              <Select options={viewOptions || []} value={selectView} onChange={handleUpdateView} />       
-          </div>
-            <p  style={{ marginLeft: "10px", marginRight: "10px", fontWeight: "bold"}}>Parent Frequency</p>
-              <Select options={parentFrequency || []} value={selectParentFrequency} onChange={handleUpdateParentFrequency}  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      width: "100%",
-                    }),
-                  }} />     
-       </div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <h5>Welcome, {user?.user?.name}&nbsp;&nbsp;</h5>
+        <div style={{ width: "20%", float: "right" }}>
+          <DropDownLabel
+            label={"Duration"}
+            handleUpdate={handleUpdate}
+            options={actionOptions}
+          />
+        </div>
+        <div style={{ width: "15%", float: "right" }}>
+          <Select
+            options={viewOptions || []}
+            value={selectView}
+            onChange={handleUpdateView}
+          />
+        </div>
+        <p
+          style={{
+            marginLeft: "10px",
+            marginRight: "10px",
+            fontWeight: "bold",
+          }}
+        >
+          Parent Frequency
+        </p>
+        <Select
+          options={parentFrequency || []}
+          value={selectParentFrequency}
+          onChange={handleUpdateParentFrequency}
+          styles={{
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              width: "100%",
+            }),
+          }}
+        />
+      </div>
       <br />
-       <div
+      <div
         className="row"
         style={{
           ...whiteSurface,
           background: "white",
           width: "100%",
-          padding: "10px",
+          padding: "0px",
           display: "flexbox",
           alignItems: "center",
         }}
-      > 
-      {selectView?.value == "Summary View" ? 
-        <> 
-        {dashboard_data?.data ? (
-        <div>
-            <h3>Dashboard Summary view</h3>
-          <Summary
-            chartData={dashboard_data.data.dashboardChartData}
-            bwtChartData={dashboard_data.data.bwtdashboardChartData}
-            dataSummary={dashboard_data.data.dataSummary}
-            bwtDataSummary={dashboard_data.data.bwtdataSummary}
-            uiResult={dashboard_data.data.uiResult}
-          />
-          <Stats
-            setDurationSelection={setDurationSelection}
-            chartData={dashboard_data.data?.dashboardChartData}
-            pieChartData={dashboard_data.data?.pieChartData}
-            bwtChartData={dashboard_data.data?.bwtdashboardChartData}
-            bwtPieChartData={dashboard_data.data?.bwtpieChartData}
-            bwtDataSummary={dashboard_data.data?.bwtdataSummary}
-            dashboardUpiChartData={dashboard_data.data?.dashboardUpiChartData}
-            pieChartUpiData={dashboard_data.data?.pieChartUpiData}
-            dataSummary={dashboard_data.data?.dataSummary}
-            uiResult={dashboard_data.data?.uiResult?.data}
-          />
-          <ActiveTickets data={dashboard_data?.data?.activeTickets} />
-          <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
-          <LiveStatus data={dashboard_data?.data?.connectionStatus} />
-          <WaterLevelStatus data={dashboard_data?.data?.lowWaterComplexes} />
-          <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
-        </div>
-      ) : (
-        <div>No data available</div>
-      )}
-        </> 
-        :
-        <> 
-        {dashboard_data?.data ? (
-          <> 
-            <h3>Dashboard Recycle view</h3>
-            
-            <DashboardCarousel
-              dashboardData={recycleViewData}
-              parentFrequency={selectParentFrequency}
-              />
-              <br />
-              <br />
+      >
+        {selectView?.value == "Summary View" ? (
+          <>
+            {dashboard_data?.data ? (
+              <div>
+                <Summary
+                  chartData={dashboard_data.data.dashboardChartData}
+                  bwtChartData={dashboard_data.data.bwtdashboardChartData}
+                  dataSummary={dashboard_data.data.dataSummary}
+                  bwtDataSummary={dashboard_data.data.bwtdataSummary}
+                  uiResult={dashboard_data.data.uiResult}
+                />
+                <Stats
+                  setDurationSelection={setDurationSelection}
+                  chartData={dashboard_data.data?.dashboardChartData}
+                  pieChartData={dashboard_data.data?.pieChartData}
+                  bwtChartData={dashboard_data.data?.bwtdashboardChartData}
+                  bwtPieChartData={dashboard_data.data?.bwtpieChartData}
+                  bwtDataSummary={dashboard_data.data?.bwtdataSummary}
+                  dashboardUpiChartData={
+                    dashboard_data.data?.dashboardUpiChartData
+                  }
+                  pieChartUpiData={dashboard_data.data?.pieChartUpiData}
+                  dataSummary={dashboard_data.data?.dataSummary}
+                  uiResult={dashboard_data.data?.uiResult?.data}
+                />
+                <ActiveTickets data={dashboard_data?.data?.activeTickets} />
+                <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
+                <LiveStatus data={dashboard_data?.data?.connectionStatus} />
+                <WaterLevelStatus
+                  data={dashboard_data?.data?.lowWaterComplexes}
+                />
+                <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
+              </div>
+            ) : (
+              <div>No data available</div>
+            )}
           </>
-        // <div>
-        //   <Summary
-        //     chartData={dashboard_data.data.dashboardChartData}
-        //     bwtChartData={dashboard_data.data.bwtdashboardChartData}
-        //     dataSummary={dashboard_data.data.dataSummary}
-        //     bwtDataSummary={dashboard_data.data.bwtdataSummary}
-        //     uiResult={dashboard_data.data.uiResult}
-        //   />
-        //   <Stats
-        //     setDurationSelection={setDurationSelection}
-        //     chartData={dashboard_data.data?.dashboardChartData}
-        //     pieChartData={dashboard_data.data?.pieChartData}
-        //     bwtChartData={dashboard_data.data?.bwtdashboardChartData}
-        //     bwtPieChartData={dashboard_data.data?.bwtpieChartData}
-        //     bwtDataSummary={dashboard_data.data?.bwtdataSummary}
-        //     dashboardUpiChartData={dashboard_data.data?.dashboardUpiChartData}
-        //     pieChartUpiData={dashboard_data.data?.pieChartUpiData}
-        //     dataSummary={dashboard_data.data?.dataSummary}
-        //     uiResult={dashboard_data.data?.uiResult?.data}
-        //   />
-        //   <ActiveTickets data={dashboard_data?.data?.activeTickets} />
-        //   <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
-        //   <LiveStatus data={dashboard_data?.data?.connectionStatus} />
-        //   <WaterLevelStatus data={dashboard_data?.data?.lowWaterComplexes} />
-        //   <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
-        // </div>
-      ) : (
-        <div>No data available</div>
-      )}
-        </>
-      }
-      
-    </div>
+        ) : (
+          <>
+            {dashboard_data?.data ? (
+              <div className="carousel">
+                <DashboardCarousel
+                  dashboardData={recycleViewData}
+                  parentFrequency={selectParentFrequency}
+                />
+                <br />
+                <br />
+              </div>
+            ) : (
+              // <div>
+              //   <Summary
+              //     chartData={dashboard_data.data.dashboardChartData}
+              //     bwtChartData={dashboard_data.data.bwtdashboardChartData}
+              //     dataSummary={dashboard_data.data.dataSummary}
+              //     bwtDataSummary={dashboard_data.data.bwtdataSummary}
+              //     uiResult={dashboard_data.data.uiResult}
+              //   />
+              //   <Stats
+              //     setDurationSelection={setDurationSelection}
+              //     chartData={dashboard_data.data?.dashboardChartData}
+              //     pieChartData={dashboard_data.data?.pieChartData}
+              //     bwtChartData={dashboard_data.data?.bwtdashboardChartData}
+              //     bwtPieChartData={dashboard_data.data?.bwtpieChartData}
+              //     bwtDataSummary={dashboard_data.data?.bwtdataSummary}
+              //     dashboardUpiChartData={dashboard_data.data?.dashboardUpiChartData}
+              //     pieChartUpiData={dashboard_data.data?.pieChartUpiData}
+              //     dataSummary={dashboard_data.data?.dataSummary}
+              //     uiResult={dashboard_data.data?.uiResult?.data}
+              //   />
+              //   <ActiveTickets data={dashboard_data?.data?.activeTickets} />
+              //   <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
+              //   <LiveStatus data={dashboard_data?.data?.connectionStatus} />
+              //   <WaterLevelStatus data={dashboard_data?.data?.lowWaterComplexes} />
+              //   <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
+              // </div>
+              <div>No data available</div>
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 };

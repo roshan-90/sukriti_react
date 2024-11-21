@@ -100,6 +100,29 @@ const CabinDetails = (props, ref) => {
     }
   };
 
+  const dateTimeFormat =  (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: 'numeric', 
+      minute: 'numeric', 
+      second: 'numeric', 
+      hour12: true 
+    };
+
+    // Format the date
+    let formattedDate = date.toLocaleString('en-US', options);
+
+    // Add the correct ordinal suffix for the day
+    const day = date.getDate();
+    const dayWithSuffix = day + (['th', 'st', 'nd', 'rd'][(day % 10 > 3 || Math.floor(day % 100 / 10) === 1) ? 0 : day % 10]);
+
+    formattedDate = formattedDate.replace(day.toString(), dayWithSuffix);
+    return formattedDate;
+  }
+
   console.log("checking detail  :-> ", cabinDetails);
   console.log("checking detail 2 :-> ", complex_store?.cabinDetail);
   const ComponenetSelector = () => {
@@ -138,6 +161,10 @@ const CabinDetails = (props, ref) => {
               cabinDetails.resetProfile
             )}
           />
+          <div style={{ display: "flex"}}>
+            <div style={{ textAlign: "left"}}><b>Last Sync : </b> {dateTimeFormat(cabinDetails.liveStatusResult.data.timestamp)}</div>
+            <div style={{ textAlign: "right"}}><b>Disconnect Reason : </b> {cabinDetails.liveStatusResult.data.DISCONNECT_REASON}</div>
+          </div>
         </div>
       );
     } else {
@@ -177,6 +204,10 @@ const CabinDetails = (props, ref) => {
           <ResetProfile
             resetProfile={getResetProfileDisplayData(cabinDetails.resetProfile)}
           />
+          <div style={{ display: "flex"}}>
+            <div style={{ textAlign: "left"}}><b>Last Sync : </b> {dateTimeFormat(cabinDetails.liveStatusResult.data.timestamp)}</div>
+            <div style={{ textAlign: "right"}}><b>Disconnect Reason : </b> {cabinDetails.liveStatusResult.data.DISCONNECT_REASON}</div>
+          </div>
         </div>
       );
     }

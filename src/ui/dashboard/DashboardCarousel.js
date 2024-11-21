@@ -27,6 +27,108 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
     return <div>No data available</div>;
   }
 
+  // usage calculation
+
+  function CalculateMwc(item) {
+    let sum = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum += item[i].mwc;
+    }
+    return sum;
+  }
+
+  function CalculateFwc(item) {
+    let sum1 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum1 += item[i].fwc;
+    }
+    return sum1;
+  }
+
+  function CalculatePwc(item) {
+    let sum2 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum2 += item[i].pwc;
+    }
+    return sum2;
+  }
+
+  function CalculateMur(item) {
+    let sum3 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum3 += item[i].mur;
+    }
+    return sum3;
+  }
+
+  // Collection 
+  function CalculateCollectionMwc(item) {
+    let sum = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum += item[i].mwc;
+    }
+    console.log('sumss',sum);
+    return sum;
+  }
+
+  function CalculateCollectionFwc(item) {
+    let sum1 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum1 += item[i].fwc;
+    }
+    return sum1;
+  }
+
+  function CalculateCollectionPwc(item) {
+    let sum2 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum2 += item[i].pwc;
+    }
+    return sum2;
+  }
+
+  function CalculateCollectionMur(item) {
+    let sum3 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum3 += item[i].mur;
+    }
+    return sum3;
+  }
+
+   // Upi Collection 
+   function CalculateUpiMwc(item) {
+    let sum = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum += item[i].mwc;
+    }
+    console.log('sumss',sum);
+    return sum;
+  }
+
+  function CalculateUpiFwc(item) {
+    let sum1 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum1 += item[i].fwc;
+    }
+    return sum1;
+  }
+
+  function CalculateUpiPwc(item) {
+    let sum2 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum2 += item[i].pwc;
+    }
+    return sum2;
+  }
+
+  function CalculateUpiMur(item) {
+    let sum3 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum3 += item[i].mur;
+    }
+    return sum3;
+  }
+
   return (
     <Carousel
     autoPlay
@@ -40,45 +142,6 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
       slideData?.map((item, itemIndex) => (
         <div key={`${index}-${itemIndex}`}>
           <div>
-            {/* Single Stats Item per Slide */}
-            <h4>{item.complexName} Complex</h4>
-            {/* <StatsItem
-              name="Usage Stats"
-              total={item?.dataSummary?.usage}
-              data={item?.dashboardChartData?.usage}
-              pieChartData={item?.pieChartData?.usage}
-            />
-            {user?.user?.userRole === "Super Admin" && (
-              <>
-                <StatsItem
-                  name="Collection Stats"
-                  total={item?.dataSummary?.collection}
-                  data={item?.dashboardChartData?.collection}
-                  pieChartData={item?.pieChartData?.collection}
-                />
-                <StatsItem
-                  name="UPI Stats"
-                  total={item?.dataSummary?.upiCollection}
-                  data={item?.dashboardChartData?.upiCollection}
-                  pieChartData={item?.pieChartData?.upiCollection}
-                />
-              </>
-            )}
-            {user?.user?.userRole === "Super Admin" ? (
-              <BWTStatsItem
-                name="Recycled Water"
-                total={item?.bwtdataSummary?.waterRecycled}
-                data={item?.bwtdashboardChartData?.waterRecycled}
-                pieChartData={item?.bwtpieChartData?.usage}
-              />
-            ) : null}
-            <StatsItem
-              name="Feedback Stats"
-              total={item?.dataSummary?.feedback}
-              data={item?.dashboardChartData?.feedback}
-              pieChartData={item?.pieChartData?.feedback}
-            /> */}
-
              {/* Child Carousel */}
              <Carousel
                 autoPlay
@@ -95,6 +158,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                     total={item?.dataSummary?.usage}
                     data={item?.dashboardChartData?.usage}
                     pieChartData={item?.pieChartData?.usage}
+                    complex = {item?.complexName}
                   />
                 </div>
                 {user?.user?.userRole === 'Super Admin' && (
@@ -104,6 +168,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                         total={item?.dataSummary?.collection}
                         data={item?.dashboardChartData?.collection}
                         pieChartData={item?.pieChartData?.collection}
+                        complex = {item?.complexName}
                       />
                     </div>
                 )}
@@ -114,6 +179,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                         total={item?.dataSummary?.upiCollection}
                         data={item?.dashboardChartData?.upiCollection}
                         pieChartData={item?.pieChartData?.upiCollection}
+                        complex = {item?.complexName}
                       />
                     </div>
                   )}
@@ -124,6 +190,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                       total={item?.bwtdataSummary?.waterRecycled}
                       data={item?.bwtdashboardChartData?.waterRecycled}
                       pieChartData={item?.bwtpieChartData?.usage}
+                      complex = {item?.complexName}
                     />
                   </div>
                 )}
@@ -133,6 +200,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                     total={item?.dataSummary?.feedback}
                     data={item?.dashboardChartData?.feedback}
                     pieChartData={item?.pieChartData?.feedback}
+                    complex = {item?.complexName}
                   />
                 </div>
               </Carousel>
@@ -140,7 +208,8 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
           </div>
           <br />
           <br />
-          {/* <table
+          {/* Table */}
+          <table
           style={{
             width: "100%",
             fontSize: "14px",
@@ -148,23 +217,23 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
           className="table table-bordered  pdf-section pagebreak"
         >
           <thead>
-            <tr></tr>
+            <tr>#</tr>
             <tr>
               <th colSpan="1" scope="colgroup"></th>
-              <th colSpan="5" scope="colgroup">
+              <th colSpan="1" scope="colgroup">
                 Usage
               </th>
               {(user?.user?.userRole == "Super Admin") && (
                 <>
-                  <th colSpan="5" scope="colgroup">
+                  <th colSpan="1" scope="colgroup">
                     Collection
                   </th>
-                  <th colSpan="5" scope="colgroup">
+                  <th colSpan="1" scope="colgroup">
                     Upi
                   </th>
                 </>
               )}
-              <th colSpan="5" scope="colgroup">
+              <th colSpan="1" scope="colgroup">
                 Feedback
               </th>
               {(user?.user?.userRole == "Super Admin") && (
@@ -172,192 +241,112 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                   Recycled
                 </th>
               )}
+              <th colSpan="1" scope="colgroup">
+                Health Flush
+              </th>
+              <th colSpan="1" scope="colgroup">
+                Health Floor Clean
+              </th>
+              <th colSpan="1" scope="colgroup">
+                Water Level Status
+              </th>
+              <th colSpan="1" scope="colgroup">
+                Live Status
+              </th>
+              <th colSpan="1" scope="colgroup">
+                Recycle Water Level
+              </th>
             </tr>
             <tr></tr>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">All</th>
-              <th scope="col">MWC</th>
-              <th scope="col">FWC</th>
-              <th scope="col">PWC</th>
-              <th scope="col">MUR</th>
-              {(user?.user?.userRole == "Super Admin") && (
-                <>
-                <th scope="col">All</th>
-                <th scope="col">MWC</th>
-                <th scope="col">FWC</th>
-                <th scope="col">PWC</th>
-                <th scope="col">MUR</th>
-                <th scope="col">All</th>
-                <th scope="col">MWC</th>
-                <th scope="col">FWC</th>
-                <th scope="col">PWC</th>
-                <th scope="col">MUR</th>
-                </>
-              )}
-              <th scope="col">All</th>
-              <th scope="col">MWC</th>
-              <th scope="col">FWC</th>
-              <th scope="col">PWC</th>
-              <th scope="col">MUR</th>
-              {(user?.user?.userRole == "Super Admin") && (
-                <th scope="col">BWT</th>
-              )}
-            </tr>
           </thead>
           <tbody>
-            {item?.dashboardChartData?.usage.map((usage, index) => {
-              const rowCount = index + 1; // Adding 1 to start the count from 1
-              const shouldBreakPage = rowCount % 15 === 0 && rowCount !== 0; // Break page after every 15 rows
-
-              return (
-                <React.Fragment key={index}>
-                  <tr key={index}>
-                    <td style={{ "font-weight": "bold" }}>{usage.date}</td>
-                    <td>{usage.all}</td>
-                    <td>{usage.mwc}</td>
-                    <td>{usage.fwc}</td>
-                    <td>{usage.pwc}</td>
-                    <td>{usage.mur}</td>
-                    {(user?.user?.userRole == "Super Admin") && (
-                      <>
-                      
-                    <td>
-                      {
-                        item?.dashboardChartData.collection[index]
-                          .all
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.collection[index]
-                          .mwc
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.collection[index]
-                          .fwc
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.collection[index]
-                          .pwc
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.collection[index]
-                          .mur
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.upiCollection[
-                          index
-                        ].all
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.upiCollection[
-                          index
-                        ].mwc
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.upiCollection[
-                          index
-                        ].fwc
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.upiCollection[
-                          index
-                        ].pwc
-                      }
-                    </td>
-                    <td>
-                      {
-                        item?.dashboardChartData.upiCollection[
-                          index
-                        ].mur
-                      }
-                    </td>
-                      </>
-                    )}
-                    <td>
-                      {typeof item?.dashboardChartData.feedback[
-                        index
-                      ].all === "number"
-                        ? item.dashboardChartData.feedback[
-                            index
-                          ].all.toFixed(1)
-                        : Number(
-                          item.dashboardChartData.feedback[index]
-                              .all
-                          ).toFixed(1)}
-                    </td>
-                    <td>
-                      {typeof item?.dashboardChartData.feedback[
-                        index
-                      ].mwc === "number"
-                        ? item.dashboardChartData.feedback[
-                            index
-                          ].mwc.toFixed(1)
-                        : Number(
-                          item.dashboardChartData.feedback[index]
-                              .mwc
-                          ).toFixed(1)}
-                    </td>
-                    <td>
-                      {typeof item?.dashboardChartData.feedback[
-                        index
-                      ].fwc === "number"
-                        ? item.dashboardChartData.feedback[
-                            index
-                          ].fwc.toFixed(0)
-                        : Number(
-                          item.dashboardChartData.feedback[index]
-                              .fwc
-                          ).toFixed(0)}
-                    </td>
-                    <td>
-                      {typeof item?.dashboardChartData.feedback[
-                        index
-                      ].pwc === "number"
-                        ? item.dashboardChartData.feedback[
-                            index
-                          ].pwc.toFixed(0)
-                        : Number(
-                          item.dashboardChartData.feedback[index]
-                              .pwc
-                          ).toFixed(0)}
-                    </td>
-                    <td>
-                      {typeof item?.dashboardChartData.feedback[
-                        index
-                      ].mur === "number"
-                        ? item.dashboardChartData.feedback[
-                            index
-                          ].mur.toFixed(0)
-                        : Number(
-                          item.dashboardChartData.feedback[index]
-                              .mur
-                          ).toFixed(0)}
-                    </td>
-                    {(user?.user?.userRole == "Super Admin") && (
-                      <td>NA</td>
-                    )}
-                  </tr>
-                </React.Fragment>
-              );
-            })}
+            <tr>
+            <th scope="row">Total</th>
+              <td>{item.dataSummary.usage}</td>
+              {user?.user?.userRole === "Super Admin" && (
+                <>
+                  <td>{item.dataSummary.collection}</td>
+                  <td>{item.dataSummary.upiCollection}</td>
+                </>
+              )}
+              <td>{item.dataSummary.feedback}</td>
+              {user?.user?.userRole === "Super Admin" && <td>{item.bwtdataSummary.waterRecycled}</td>}
+              <td>{item.HealthConnectionAggregatedData.mwc.flushHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mwc.connection_status} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+              </tr>
+              <tr>
+              <th scope="row">MWC</th>
+                <td>{CalculateMwc(item.dashboardChartData.usage)}</td>
+                {user?.user?.userRole === "Super Admin" && (
+                  <>
+                    <td>{CalculateCollectionMwc(item.dashboardChartData.collection)}</td>
+                    <td>{CalculateUpiMwc(item.dashboardChartData.upiCollection)}</td>
+                  </>
+                )}
+                <td>{item.dataSummary.feedback}</td>
+                {user?.user?.userRole === "Super Admin" && <td>{item.bwtdataSummary.waterRecycled}</td>}
+                <td>{item.HealthConnectionAggregatedData.mwc.flushHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.mwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.mwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.mwc.connection_status} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.mwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
+              </tr>
+              <tr>
+              <th scope="row">FWC</th>
+              <td>{CalculateFwc(item.dashboardChartData.usage)}</td>
+                {user?.user?.userRole === "Super Admin" && (
+                  <>
+                    <td>{CalculateCollectionFwc(item.dashboardChartData.collection)}</td>
+                    <td>{CalculateUpiFwc(item.dashboardChartData.upiCollection)}</td>
+                  </>
+                )}
+                <td>{item.dataSummary.feedback}</td>
+                {user?.user?.userRole === "Super Admin" && <td>{item.bwtdataSummary.waterRecycled}</td>}
+                <td>{item.HealthConnectionAggregatedData.fwc.flushHealth} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.fwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.fwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.fwc.connection_status} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
+                <td>{item.HealthConnectionAggregatedData.fwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
+            </tr>
+            <tr>
+            <th scope="row">PWC</th>
+            <td>{CalculatePwc(item.dashboardChartData.usage)}</td>
+              {user?.user?.userRole === "Super Admin" && (
+                <>
+                   <td>{CalculateCollectionPwc(item.dashboardChartData.collection)}</td>
+                   <td>{CalculateUpiPwc(item.dashboardChartData.upiCollection)}</td>
+                </>
+              )}
+              <td>{item.dataSummary.feedback}</td>
+              {user?.user?.userRole === "Super Admin" && <td> {item.bwtdataSummary.waterRecycled}</td>}
+              <td>{item.HealthConnectionAggregatedData.pwc.flushHealth} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.pwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.pwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.pwc.connection_status} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.pwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
+            </tr>
+            <tr>
+            <th scope="row">MUR</th>
+              <td>{CalculateMur(item.dashboardChartData.usage)}</td>
+              {user?.user?.userRole === "Super Admin" && (
+                <>
+                  <td>{CalculateCollectionPwc(item.dashboardChartData.collection)}</td>
+                  <td>{CalculateUpiPwc(item.dashboardChartData.upiCollection)}</td>
+                </>
+              )}
+              <td>{item.dataSummary.feedback}</td>
+              {user?.user?.userRole === "Super Admin" && <td> {item.bwtdataSummary.waterRecycled}</td>}
+              <td>{item.HealthConnectionAggregatedData.mur.flushHealth} / {item.HealthConnectionAggregatedData.mur.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mur.floorCleanHealth} / {item.HealthConnectionAggregatedData.mur.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mur.freshWaterLevel} / {item.HealthConnectionAggregatedData.mur.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mur.connection_status} / {item.HealthConnectionAggregatedData.mur.Total}</td>
+              <td>{item.HealthConnectionAggregatedData.mur.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mur.Total}</td> 
+            </tr>
           </tbody>
-          </table> */}
+          </table>
         </div>
       ))
     )}
@@ -384,7 +373,7 @@ const StatsItem = (props) => {
           background: colorTheme.primary,
         }}
       >
-        {props.name}
+        {props.name} {"For"}{props.complex}
       </div>
 
       <div className="row" style={{ width: "100%", margin: "auto" }}>
@@ -487,7 +476,7 @@ const BWTStatsItem = (props) => {
           background: colorTheme.primary,
         }}
       >
-        {props.name}
+        {props.name} {"For"}{props.complex}
       </div>
 
       <div className="row" style={{ width: "100%", margin: "auto" }}>
