@@ -45,14 +45,14 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
              {/* Child Carousel */}
              <Carousel
                 autoPlay
-                interval={2000} // Child carousel interval (1 second)
+                interval={10000} // Child carousel interval (1 second)
                 infiniteLoop
                 showThumbs={false}
                 showStatus={false}
                 swipeable
               >
                 {/* Render StatsItems in the child carousel */}
-                <div>
+                <div className="stats_class">
                   <StatsItem
                     name="Usage Stats"
                     total={item?.dataSummary?.usage}
@@ -62,7 +62,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                   />
                 </div>
                 {user?.user?.userRole === 'Super Admin' && (
-                    <div>
+                    <div className="collection_class">
                       <StatsItem
                         name="Collection Stats"
                         total={item?.dataSummary?.collection}
@@ -73,7 +73,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                     </div>
                 )}
                  {user?.user?.userRole === 'Super Admin' && (
-                    <div>
+                    <div className="upi_class">
                       <StatsItem
                         name="UPI Stats"
                         total={item?.dataSummary?.upiCollection}
@@ -84,7 +84,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                     </div>
                   )}
                 {user?.user?.userRole === 'Super Admin' && (
-                  <div>
+                  <div className="recycle_class">
                     <BWTStatsItem
                       name="Recycled Water"
                       total={item?.bwtdataSummary?.waterRecycled}
@@ -94,7 +94,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                     />
                   </div>
                 )}
-                <div>
+                <div className="feedback_class">
                   <StatsItem
                     name="Feedback Stats"
                     total={item?.dataSummary?.feedback}
@@ -369,10 +369,10 @@ const Table = (item) => {
             <th>No. of Uses</th>
             <th>Feedback (Out of 5.0)</th>
             <th colSpan="2">Payment Collection (INR)</th>
-            <th colSpan="2">Working Status (Not Working / Total)</th>
-            <th>Connectivity Status (OFFLINE | TOTAL)</th>
-            <th colSpan="2">Water Availability (Not Available | Total)</th>
-            <th colSpan="1">Amount of Water Recycled by REWATERTM (L)</th>
+            <th colSpan="2">Working Status<br/>(<span style={{ color: 'red' }}>Not Working </span>/ Total)</th>
+            <th>Connectivity Status<br/>(<span style={{ color: 'red' }}>OFFLINE</span> | TOTAL)</th>
+            <th colSpan="2">Water Availability<br/>(<span style={{ color: 'red' }}>Not Available</span> |Total)</th>
+            <th colSpan="1">Amount of Water<br/>Recycled by REWATER<sup>TM</sup>(L)</th>
           </tr>
           <tr>
             <th></th>
@@ -390,68 +390,68 @@ const Table = (item) => {
         </thead>
         <tbody className="table_body">
           <tr>
-            <td> <b>Male Toilets</b></td>
+            <td className="left-align"> <b>Male Toilets</b></td>
             <td>{CalculateMwc(item?.item?.dashboardChartData.usage)}</td>
             <td>{item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiMwc(item.item.dashboardChartData.upiCollection)}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.flushHealth} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.connection_status} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td>N/A</td>
           </tr>
           <tr>
-            <td> <b>Female Toilets</b></td>
+            <td className="left-align"> <b>Female Toilets</b></td>
             <td>{CalculateFwc(item?.item?.dashboardChartData.usage)}</td>
             <td>{item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiFwc(item.item.dashboardChartData.upiCollection)}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.flushHealth} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.connection_status} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.freshWaterLevel}</span>  / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td>N/A</td>
           </tr>
           <tr>
-            <td><b>Disabled Toilets</b></td>
+            <td className="left-align"><b>Disabled Toilets</b></td>
             <td>{CalculatePwc(item?.item?.dashboardChartData.usage)}</td>
             <td>{item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionPwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiPwc(item.item.dashboardChartData.upiCollection)}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.flushHealth} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.connection_status} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.flushHealth}</span>  / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td>N/A</td>
           </tr>
           <tr>
-            <td><b>Male Urinal</b></td>
+            <td className="left-align"><b>Male Urinal</b></td>
             <td>{CalculateMur(item?.item?.dashboardChartData.usage)}</td>
             <td>{item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionMur(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiMur(item.item.dashboardChartData.upiCollection)}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.flushHealth} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.connection_status} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td>N/A</td>
           </tr>
           <tr>
-            <td><b>Total</b></td>
+            <td className="left-align"><b>Total</b></td>
             <td>{item?.item?.dataSummary?.usage}</td>
             <td>{item?.item?.dataSummary?.feedback}</td>
             <td>{item?.item?.dataSummary?.collection}</td>
             <td>{item?.item?.dataSummary?.upiCollection}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.all?.flushHealth} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.all?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.all?.connection_status} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.all?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
-            <td>{item?.item?.HealthConnectionAggregatedData?.all?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td>{item?.item?.bwtdataSummary?.waterRecycled}</td>
           </tr>
           {/* Add more rows as needed */}
@@ -466,16 +466,17 @@ const StatsItem = (props) => {
     <div
       className={`stats-item`}
       style={{
-        marginTop: "20px",
+        marginTop: "10px",
       }}
     >
       <div
         className="row"
         style={{
-          ...statsStyle.elementTitle,
+          color: `white`,
           width: "98%",
           margin: "auto",
           padding: "10px",
+          fontSize: "15px", 
           background: colorTheme.primary,
         }}
       >

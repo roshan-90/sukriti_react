@@ -1,5 +1,5 @@
 .table-container {
-    margin: 20px;
+    margin: 2px;
     overflow-x: auto;
   }
   
@@ -8,12 +8,13 @@
     border-collapse: collapse;
     text-align: center;
     font-family: Arial, sans-serif;
+    font-size:smaller;
   }
   
   .custom-table th,
   .custom-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    /* border: 1px solid #ddd; */
+    padding: 2px;
   }
   
   .custom-table th {
@@ -41,10 +42,13 @@
 
   .custom-table tbody {
     background-color: #f9f9f9; /* Background color for table body */
-        border: 1px solid #ddd;
+        /* border: 1px solid #ddd; */
   }
   .custom-table td:last-child,
   .custom-table th:last-child {
     font-weight: bold;
   }
   
+  .left-align {
+    text-align: left !important;
+  }
