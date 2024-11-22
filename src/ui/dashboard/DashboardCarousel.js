@@ -19,6 +19,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/authenticationSlice";
 import "./DashboardComponent.css";
+import './TableStyles.css'; // Create a separate CSS file for styles
 
 const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
   const user = useSelector(selectUser);
@@ -27,107 +28,6 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
     return <div>No data available</div>;
   }
 
-  // usage calculation
-
-  function CalculateMwc(item) {
-    let sum = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum += item[i].mwc;
-    }
-    return sum;
-  }
-
-  function CalculateFwc(item) {
-    let sum1 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum1 += item[i].fwc;
-    }
-    return sum1;
-  }
-
-  function CalculatePwc(item) {
-    let sum2 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum2 += item[i].pwc;
-    }
-    return sum2;
-  }
-
-  function CalculateMur(item) {
-    let sum3 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum3 += item[i].mur;
-    }
-    return sum3;
-  }
-
-  // Collection 
-  function CalculateCollectionMwc(item) {
-    let sum = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum += item[i].mwc;
-    }
-    console.log('sumss',sum);
-    return sum;
-  }
-
-  function CalculateCollectionFwc(item) {
-    let sum1 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum1 += item[i].fwc;
-    }
-    return sum1;
-  }
-
-  function CalculateCollectionPwc(item) {
-    let sum2 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum2 += item[i].pwc;
-    }
-    return sum2;
-  }
-
-  function CalculateCollectionMur(item) {
-    let sum3 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum3 += item[i].mur;
-    }
-    return sum3;
-  }
-
-   // Upi Collection 
-   function CalculateUpiMwc(item) {
-    let sum = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum += item[i].mwc;
-    }
-    console.log('sumss',sum);
-    return sum;
-  }
-
-  function CalculateUpiFwc(item) {
-    let sum1 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum1 += item[i].fwc;
-    }
-    return sum1;
-  }
-
-  function CalculateUpiPwc(item) {
-    let sum2 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum2 += item[i].pwc;
-    }
-    return sum2;
-  }
-
-  function CalculateUpiMur(item) {
-    let sum3 = 0;
-    for (let i = 0; i < item.length; i++) {
-      sum3 += item[i].mur;
-    }
-    return sum3;
-  }
 
   return (
     <Carousel
@@ -209,7 +109,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
           <br />
           <br />
           {/* Table */}
-          <table
+          {/* <table
           style={{
             width: "100%",
             fontSize: "14px",
@@ -217,19 +117,18 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
           className="table table-bordered  pdf-section pagebreak"
         >
           <thead>
-            <tr>#</tr>
             <tr>
               <th colSpan="1" scope="colgroup"></th>
               <th colSpan="1" scope="colgroup">
-                Usage
+              No. of Uses
               </th>
               {(user?.user?.userRole == "Super Admin") && (
                 <>
                   <th colSpan="1" scope="colgroup">
-                    Collection
+                  Feedback (Out of 5.0)
                   </th>
                   <th colSpan="1" scope="colgroup">
-                    Upi
+                  Payment Collection (INR)
                   </th>
                 </>
               )}
@@ -346,12 +245,219 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
               <td>{item.HealthConnectionAggregatedData.mur.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mur.Total}</td> 
             </tr>
           </tbody>
-          </table>
+          </table> */}
+          <Table item={item}/>
         </div>
       ))
     )}
 
   </Carousel>
+  );
+};
+
+const Table = (item) => {
+  console.log('item', item?.item);
+  
+  // usage calculation
+
+  function CalculateMwc(item) {
+    let sum = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum += item[i].mwc;
+    }
+    return sum;
+  }
+
+  function CalculateFwc(item) {
+    let sum1 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum1 += item[i].fwc;
+    }
+    return sum1;
+  }
+
+  function CalculatePwc(item) {
+    let sum2 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum2 += item[i].pwc;
+    }
+    return sum2;
+  }
+
+  function CalculateMur(item) {
+    let sum3 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum3 += item[i].mur;
+    }
+    return sum3;
+  }
+
+  // Collection 
+  function CalculateCollectionMwc(item) {
+    let sum = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum += item[i].mwc;
+    }
+    console.log('sumss',sum);
+    return sum;
+  }
+
+  function CalculateCollectionFwc(item) {
+    let sum1 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum1 += item[i].fwc;
+    }
+    return sum1;
+  }
+
+  function CalculateCollectionPwc(item) {
+    let sum2 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum2 += item[i].pwc;
+    }
+    return sum2;
+  }
+
+  function CalculateCollectionMur(item) {
+    let sum3 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum3 += item[i].mur;
+    }
+    return sum3;
+  }
+
+   // Upi Collection 
+   function CalculateUpiMwc(item) {
+    let sum = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum += item[i].mwc;
+    }
+    console.log('sumss',sum);
+    return sum;
+  }
+
+  function CalculateUpiFwc(item) {
+    let sum1 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum1 += item[i].fwc;
+    }
+    return sum1;
+  }
+
+  function CalculateUpiPwc(item) {
+    let sum2 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum2 += item[i].pwc;
+    }
+    return sum2;
+  }
+
+  function CalculateUpiMur(item) {
+    let sum3 = 0;
+    for (let i = 0; i < item.length; i++) {
+      sum3 += item[i].mur;
+    }
+    return sum3;
+  }
+  
+  return (
+    <div className="table-container">
+      <table className="custom-table">
+        <thead>
+          <tr>
+             <th></th>
+            <th>No. of Uses</th>
+            <th>Feedback (Out of 5.0)</th>
+            <th colSpan="2">Payment Collection (INR)</th>
+            <th colSpan="2">Working Status (Not Working / Total)</th>
+            <th>Connectivity Status (OFFLINE | TOTAL)</th>
+            <th colSpan="2">Water Availability (Not Available | Total)</th>
+            <th colSpan="1">Amount of Water Recycled by REWATERTM (L)</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Coin</th>
+            <th>UPI</th>
+            <th>Flush</th>
+            <th>Floor</th>
+            <th></th>
+            <th>Fresh water</th>
+            <th>Recycled water</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody className="table_body">
+          <tr>
+            <td> <b>Male Toilets</b></td>
+            <td>{CalculateMwc(item?.item?.dashboardChartData.usage)}</td>
+            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
+            <td>{CalculateUpiMwc(item.item.dashboardChartData.upiCollection)}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.flushHealth} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.connection_status} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mwc?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td> <b>Female Toilets</b></td>
+            <td>{CalculateFwc(item?.item?.dashboardChartData.usage)}</td>
+            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
+            <td>{CalculateUpiFwc(item.item.dashboardChartData.upiCollection)}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.flushHealth} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.connection_status} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.fwc?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td><b>Disabled Toilets</b></td>
+            <td>{CalculatePwc(item?.item?.dashboardChartData.usage)}</td>
+            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{CalculateCollectionPwc(item.item.dashboardChartData.collection)}</td>
+            <td>{CalculateUpiPwc(item.item.dashboardChartData.upiCollection)}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.flushHealth} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.connection_status} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.pwc?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td><b>Male Urinal</b></td>
+            <td>{CalculateMur(item?.item?.dashboardChartData.usage)}</td>
+            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{CalculateCollectionMur(item.item.dashboardChartData.collection)}</td>
+            <td>{CalculateUpiMur(item.item.dashboardChartData.upiCollection)}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.flushHealth} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.connection_status} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.mur?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td><b>Total</b></td>
+            <td>{item?.item?.dataSummary?.usage}</td>
+            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{item?.item?.dataSummary?.collection}</td>
+            <td>{item?.item?.dataSummary?.upiCollection}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.all?.flushHealth} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.all?.floorCleanHealth} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.all?.connection_status} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.all?.freshWaterLevel} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td>{item?.item?.HealthConnectionAggregatedData?.all?.recycleWaterLevel} / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
+            <td>{item?.item?.bwtdataSummary?.waterRecycled}</td>
+          </tr>
+          {/* Add more rows as needed */}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
@@ -373,7 +479,7 @@ const StatsItem = (props) => {
           background: colorTheme.primary,
         }}
       >
-        {props.name} {"For"}{props.complex}
+        {props.name} {"For "}{props.complex}
       </div>
 
       <div className="row" style={{ width: "100%", margin: "auto" }}>
@@ -476,7 +582,7 @@ const BWTStatsItem = (props) => {
           background: colorTheme.primary,
         }}
       >
-        {props.name} {"For"}{props.complex}
+        {props.name} {"For "}{props.complex}
       </div>
 
       <div className="row" style={{ width: "100%", margin: "auto" }}>
