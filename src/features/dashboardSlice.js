@@ -4,6 +4,7 @@ const initialState = {
   hasData: false,
   data: {},
   configData: {},
+  selectionView: { label: "Summary View", value: "Summary View" }
 };
 
 const dashboardSlice = createSlice({
@@ -23,10 +24,14 @@ const dashboardSlice = createSlice({
       state.hasData = true;
       state.configData = action.payload;
     },
+    setDashboardView: (state, action) => {
+      console.log('action.payload', action.payload);
+      state.selectionView = action.payload;
+    },
   },
 });
 
-export const { setDashboardData, setDashboardConfig, setDashboardLive } =
+export const { setDashboardData, setDashboardConfig, setDashboardLive, setDashboardView } =
   dashboardSlice.actions;
 
 export const dashboard = (state) => state.dashboard;

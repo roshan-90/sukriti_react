@@ -45,7 +45,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
              {/* Child Carousel */}
              <Carousel
                 autoPlay
-                interval={10000} // Child carousel interval (1 second)
+                interval={30000} // Child carousel interval (1 second)
                 infiniteLoop
                 showThumbs={false}
                 showStatus={false}
@@ -106,146 +106,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
               </Carousel>
               
           </div>
-          <br />
-          <br />
           {/* Table */}
-          {/* <table
-          style={{
-            width: "100%",
-            fontSize: "14px",
-          }}
-          className="table table-bordered  pdf-section pagebreak"
-        >
-          <thead>
-            <tr>
-              <th colSpan="1" scope="colgroup"></th>
-              <th colSpan="1" scope="colgroup">
-              No. of Uses
-              </th>
-              {(user?.user?.userRole == "Super Admin") && (
-                <>
-                  <th colSpan="1" scope="colgroup">
-                  Feedback (Out of 5.0)
-                  </th>
-                  <th colSpan="1" scope="colgroup">
-                  Payment Collection (INR)
-                  </th>
-                </>
-              )}
-              <th colSpan="1" scope="colgroup">
-                Feedback
-              </th>
-              {(user?.user?.userRole == "Super Admin") && (
-                <th colSpan="1" scope="colgroup">
-                  Recycled
-                </th>
-              )}
-              <th colSpan="1" scope="colgroup">
-                Health Flush
-              </th>
-              <th colSpan="1" scope="colgroup">
-                Health Floor Clean
-              </th>
-              <th colSpan="1" scope="colgroup">
-                Water Level Status
-              </th>
-              <th colSpan="1" scope="colgroup">
-                Live Status
-              </th>
-              <th colSpan="1" scope="colgroup">
-                Recycle Water Level
-              </th>
-            </tr>
-            <tr></tr>
-          </thead>
-          <tbody>
-            <tr>
-            <th scope="row">Total</th>
-              <td>{item.dataSummary.usage}</td>
-              {user?.user?.userRole === "Super Admin" && (
-                <>
-                  <td>{item.dataSummary.collection}</td>
-                  <td>{item.dataSummary.upiCollection}</td>
-                </>
-              )}
-              <td>{item.dataSummary.feedback}</td>
-              {user?.user?.userRole === "Super Admin" && <td>{item.bwtdataSummary.waterRecycled}</td>}
-              <td>{item.HealthConnectionAggregatedData.mwc.flushHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mwc.connection_status} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-              </tr>
-              <tr>
-              <th scope="row">MWC</th>
-                <td>{CalculateMwc(item.dashboardChartData.usage)}</td>
-                {user?.user?.userRole === "Super Admin" && (
-                  <>
-                    <td>{CalculateCollectionMwc(item.dashboardChartData.collection)}</td>
-                    <td>{CalculateUpiMwc(item.dashboardChartData.upiCollection)}</td>
-                  </>
-                )}
-                <td>{item.dataSummary.feedback}</td>
-                {user?.user?.userRole === "Super Admin" && <td>{item.bwtdataSummary.waterRecycled}</td>}
-                <td>{item.HealthConnectionAggregatedData.mwc.flushHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.mwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.mwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.mwc.connection_status} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.mwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mwc.Total}</td>
-              </tr>
-              <tr>
-              <th scope="row">FWC</th>
-              <td>{CalculateFwc(item.dashboardChartData.usage)}</td>
-                {user?.user?.userRole === "Super Admin" && (
-                  <>
-                    <td>{CalculateCollectionFwc(item.dashboardChartData.collection)}</td>
-                    <td>{CalculateUpiFwc(item.dashboardChartData.upiCollection)}</td>
-                  </>
-                )}
-                <td>{item.dataSummary.feedback}</td>
-                {user?.user?.userRole === "Super Admin" && <td>{item.bwtdataSummary.waterRecycled}</td>}
-                <td>{item.HealthConnectionAggregatedData.fwc.flushHealth} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.fwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.fwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.fwc.connection_status} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
-                <td>{item.HealthConnectionAggregatedData.fwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.fwc.Total}</td>
-            </tr>
-            <tr>
-            <th scope="row">PWC</th>
-            <td>{CalculatePwc(item.dashboardChartData.usage)}</td>
-              {user?.user?.userRole === "Super Admin" && (
-                <>
-                   <td>{CalculateCollectionPwc(item.dashboardChartData.collection)}</td>
-                   <td>{CalculateUpiPwc(item.dashboardChartData.upiCollection)}</td>
-                </>
-              )}
-              <td>{item.dataSummary.feedback}</td>
-              {user?.user?.userRole === "Super Admin" && <td> {item.bwtdataSummary.waterRecycled}</td>}
-              <td>{item.HealthConnectionAggregatedData.pwc.flushHealth} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.pwc.floorCleanHealth} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.pwc.freshWaterLevel} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.pwc.connection_status} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.pwc.recycleWaterLevel} / {item.HealthConnectionAggregatedData.pwc.Total}</td>
-            </tr>
-            <tr>
-            <th scope="row">MUR</th>
-              <td>{CalculateMur(item.dashboardChartData.usage)}</td>
-              {user?.user?.userRole === "Super Admin" && (
-                <>
-                  <td>{CalculateCollectionPwc(item.dashboardChartData.collection)}</td>
-                  <td>{CalculateUpiPwc(item.dashboardChartData.upiCollection)}</td>
-                </>
-              )}
-              <td>{item.dataSummary.feedback}</td>
-              {user?.user?.userRole === "Super Admin" && <td> {item.bwtdataSummary.waterRecycled}</td>}
-              <td>{item.HealthConnectionAggregatedData.mur.flushHealth} / {item.HealthConnectionAggregatedData.mur.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mur.floorCleanHealth} / {item.HealthConnectionAggregatedData.mur.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mur.freshWaterLevel} / {item.HealthConnectionAggregatedData.mur.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mur.connection_status} / {item.HealthConnectionAggregatedData.mur.Total}</td>
-              <td>{item.HealthConnectionAggregatedData.mur.recycleWaterLevel} / {item.HealthConnectionAggregatedData.mur.Total}</td> 
-            </tr>
-          </tbody>
-          </table> */}
           <Table item={item}/>
         </div>
       ))

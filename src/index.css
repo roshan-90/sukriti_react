@@ -16,7 +16,8 @@ code {
 
 .app-body {
   flex-grow: 1;
-  margin-bottom: 70px;
+  margin-bottom: 30px;
+  margin-top: -20px;
 }
 
 .loader-container {

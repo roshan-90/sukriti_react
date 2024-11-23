@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
+import { Modal, Box, IconButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Collapse,
@@ -12,66 +13,118 @@ import {
 } from "reactstrap";
 import logo from "../assets/img/brand/logo.png";
 import { useNavigate } from "react-router-dom";
-import { clearUser, selectUser , setAccessTree, setLoadingPdf, setTriggerFunction} from "../features/authenticationSlice";
+import {
+  clearUser,
+  selectUser,
+  setAccessTree,
+  setLoadingPdf,
+  setTriggerFunction,
+} from "../features/authenticationSlice";
 import Badge from "@mui/material/Badge";
 import MessageDialog from "../dialogs/MessageDialog"; // Adjust the path based on your project structure
 import {
   executeFetchDashboardLambda,
   executeReportFetchDashboardLambda,
-  executeFetchCompletedUserAccessTree
+  executeFetchCompletedUserAccessTree,
 } from "../awsClients/administrationLambdas";
 import useOnlineStatus from "../services/useOnlineStatus";
 import Stack from "@mui/material/Stack";
 import LinearProgress from "@mui/material/LinearProgress";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Select from "react-select"; // Importing react-select
+import { setDashboardView, dashboard } from "../features/dashboardSlice";
+import { startLoading, stopLoading } from "../features/loadingSlice";
 
 const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const dashboard_data = useSelector(dashboard);
   const loadingPdf = useSelector((state) => state.authentication.loadingPdf);
-  const triggerFunction = useSelector((state) => state.authentication.triggerFunction);
+  const triggerFunction = useSelector(
+    (state) => state.authentication.triggerFunction
+  );
+  const viewOptions = [
+    { label: "Summary View", value: "Summary View" },
+    { label: "Recycle View", value: "Recycle View" },
+  ];
+  const [selectView, setSelectView] = useState({
+    label: "Summary View",
+    value: "Summary View",
+  });
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const [dialogData, setDialogData] = useState(null);
-  const {
-    setLocalStorageItem,
-    getLocalStorageItem,
-    chunkArray
-  } = useOnlineStatus();
+  const { setLocalStorageItem, getLocalStorageItem, chunkArray } =
+    useOnlineStatus();
   // const [loadingPdf, setLoadingPdf] = useState(false);
-
-  console.log('isOnline', isOnline);
+  const [open, setOpen] = useState(false);
+  const [modalStyle, setModalStyle] = useState({ top: 0, left: "1151px" });
+  const iconRef = useRef(null);
+  const handleClose = () => setOpen(false);
+  const handleOpen = () => {
+    if (iconRef.current) {
+      const rect = iconRef.current.getBoundingClientRect();
+      setModalStyle({
+        top: rect.top + window.scrollY + rect.height,
+        left: rect.left + window.scrollX,
+      });
+    }
+    setOpen(true);
+  };
+  console.log("isOnline", isOnline);
 
   const toggle = () => setIsOpen(!isOpen);
 
   const navLinkStyle = { cursor: "pointer", fontSize: "16px" };
 
-  const storageClear  = () => {
+  const handleUpdateView = (data) => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    console.log("handleUpdateView", data);
+    // setSelectView(data);
+    dispatch(setDashboardView(data));
+    handleClose();
+    setTimeout(() => {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }, 5000);
+  };
+
+
+  const storageClear = () => {
     // List of keys to remove
     const keys = Object.keys(localStorage);
     // Define the words you want to remove
-    const wordsToRemove = ['selection_key','userDetails','data','complex_name','adminstration','historyStore'
-   ,'extra','lastVisitedPage'];
+    const wordsToRemove = [
+      "selection_key",
+      "userDetails",
+      "data",
+      "complex_name",
+      "adminstration",
+      "historyStore",
+      "extra",
+      "lastVisitedPage",
+    ];
 
     // Loop through the keys and remove corresponding items from localStorage
-    keys.forEach(key => {
-      console.log('key',key);
-      if(key.includes('aws.cognito')) localStorage.removeItem(key);
-      else if (key.includes('CognitoIdentityServiceProvider')) localStorage.removeItem(key);
-      wordsToRemove.forEach(word => {
-          if (key.includes(word)) {
-              localStorage.removeItem(key);
-          }
+    keys.forEach((key) => {
+      console.log("key", key);
+      if (key.includes("aws.cognito")) localStorage.removeItem(key);
+      else if (key.includes("CognitoIdentityServiceProvider"))
+        localStorage.removeItem(key);
+      wordsToRemove.forEach((word) => {
+        if (key.includes(word)) {
+          localStorage.removeItem(key);
+        }
       });
     });
-  }
+  };
 
   const confirmSignOut = () => {
     localStorage.setItem("set_user", user?.username);
     window.location.reload();
     storageClear();
     dispatch(clearUser());
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   const handleError = (err, Custommessage, onclick = null) => {
@@ -131,16 +184,13 @@ const AppBar = ({ isOnline }) => {
 
   async function overloopData(dataArray) {
     try {
-        const chunks = chunkArray(dataArray, 15);
-        for (const chunk of chunks) {
-          await fetchDashboardReport(chunk);
-          console.log("chunck :->", chunk);
-        }
-        console.log("all_report_data", all_report_data);
-        localStorage.setItem(
-          "report_dashboard",
-          JSON.stringify(all_report_data)
-        );
+      const chunks = chunkArray(dataArray, 15);
+      for (const chunk of chunks) {
+        await fetchDashboardReport(chunk);
+        console.log("chunck :->", chunk);
+      }
+      console.log("all_report_data", all_report_data);
+      localStorage.setItem("report_dashboard", JSON.stringify(all_report_data));
     } catch (err) {
       // Catch an error here
       handleError(err, "overloopData");
@@ -363,18 +413,18 @@ const AppBar = ({ isOnline }) => {
   const fetch_dashboard = async () => {
     console.log(" after fetch_dashboard");
     let dashboard_90 = getLocalStorageItem("dashboard_90");
-    let array = [60,45,30,15];
+    let array = [60, 45, 30, 15];
     array.forEach((duration) => {
       filter_date(dashboard_90, duration);
     });
-  };  
+  };
 
   const syncFunction = async () => {
     dispatch(setLoadingPdf(true));
     console.log("syncFunction click");
-    if(isOnline == false) {
+    if (isOnline == false) {
       setDialogData({
-        title: 'No Network',
+        title: "No Network",
         message: "Please try again later",
         onClickAction: () => {
           // Handle the action when the user clicks OK
@@ -392,14 +442,14 @@ const AppBar = ({ isOnline }) => {
     console.log("result_90", result_90);
     setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
     await fetch_dashboard();
-    await initFetchCompletedUserAccessTreeAction()
+    await initFetchCompletedUserAccessTreeAction();
     console.log("syncFunction is Complete");
     dispatch(setLoadingPdf(false));
   };
 
-  console.log('triggerFunction',triggerFunction)
-  if(isOnline == true) {
-    if(triggerFunction == true) {
+  console.log("triggerFunction", triggerFunction);
+  if (isOnline == true) {
+    if (triggerFunction == true) {
       syncFunction();
       dispatch(setTriggerFunction(false));
     }
@@ -421,6 +471,8 @@ const AppBar = ({ isOnline }) => {
       };
     };
   };
+
+  console.log('dashboard_data',dashboard_data);
 
   return (
     <div>
@@ -525,23 +577,23 @@ const AppBar = ({ isOnline }) => {
                 </NavLink>
               </NavItem>
             ) : null}
-              {user?.user?.userRole === "Super Admin" ? (
-            <NavItem>
-              <NavLink
-                style={navLinkStyle}
-                onClick={() => {
-                  if (isOnline) {
-                    navigate("/android_management");
-                  } else {
-                    setOfflineMessage("Offline")(
-                      "Feature is not available in Offline Mode"
-                    )("Android Management");
-                  }
-                }}
-              >
-                Devices Management
-              </NavLink>
-            </NavItem>
+            {user?.user?.userRole === "Super Admin" ? (
+              <NavItem>
+                <NavLink
+                  style={navLinkStyle}
+                  onClick={() => {
+                    if (isOnline) {
+                      navigate("/android_management");
+                    } else {
+                      setOfflineMessage("Offline")(
+                        "Feature is not available in Offline Mode"
+                      )("Android Management");
+                    }
+                  }}
+                >
+                  Devices Management
+                </NavLink>
+              </NavItem>
             ) : null}
             <NavItem>
               <NavLink
@@ -565,44 +617,7 @@ const AppBar = ({ isOnline }) => {
               float: "right",
             }}
           >
-            {/* <Button
-              outline
-              color="primary"
-              // className="px-4"
-              style={{
-                float: "left",
-                height: "37px",
-                padding: "1px",
-                background: "blue",
-                margin: "1px",
-              }}
-            >
-              {isOnline ? (
-                <p style={{ color: "white" }}>Online</p>
-              ) : (
-                <p style={{ color: "red" }}>Offline</p>
-              )}
-            </Button> */}
-            <Button
-              outline
-              color="primary"
-              className="px-4"
-              style={{
-                float: "right",
-                marginLeft: "7px",
-              }}
-              onClick={syncFunction}
-            >
-            {loadingPdf ? "Syncing ..." : "Sync Data"}
-            {loadingPdf && (
-              <Stack
-                sx={{ width: "100%", color: "grey.500" }}
-                spacing={2}
-              >
-                <LinearProgress color="secondary" />
-              </Stack>
-            )}
-            </Button>
+             {user?.user?.name}
             <Badge
               color={isOnline ? "success" : "error"}
               anchorOrigin={{
@@ -617,23 +632,94 @@ const AppBar = ({ isOnline }) => {
                 )
               }
             >
-              <Button
-                outline
-                color="primary"
-                className="px-4"
-                style={{
-                  float: "right",
+             
+              <IconButton
+                ref={iconRef}
+                onClick={handleOpen}
+                sx={{
+                  position: "relative",
                 }}
-                onClick={confirmSignOut}
               >
-                <i className="fa fa-lock"></i> Logout
-              </Button>
+                <AccountCircleIcon fontSize="large" />
+              </IconButton>
             </Badge>
           </span>
         </Collapse>
       </Navbar>
+
+      <Modal open={open} onClose={handleClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: modalStyle.top,
+            left: "1130px",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 2,
+            borderRadius: 1,
+            textAlign: "left", // Ensures left alignment of text
+          }}
+        >
+         {/* User Name */}
+          <div style={{ marginBottom: "10px" }}>
+            {user?.user?.name}
+          </div>
+          {/* Select Dropdown */}
+          <Select
+              options={viewOptions || []}
+              value={dashboard_data.selectionView}
+              onChange={handleUpdateView}
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  textAlign: "left", // Ensures dropdown content aligns left
+                  marginBottom: "10px",
+                  width: "70%"
+                }),
+              }}
+            />
+            {/* Sync Data Button */}
+            <div style={{ marginBottom: "10px",  width: "100%"}}>
+            <Button
+              outline
+              color="primary"
+              className="px-4"
+              sx={{
+                display: "block",
+                marginBottom: "16px", // Space below
+                textAlign: "left",
+              }}
+              onClick={syncFunction}
+            >
+              {loadingPdf ? "Syncing ..." : "Sync Data"}
+              {loadingPdf && (
+                <Stack sx={{ width: "100%", color: "grey.500" }} spacing={2}>
+                  <LinearProgress color="secondary" />
+                </Stack>
+              )}
+            </Button>
+            </div>
+           {/* Logout Button */}
+           <div style={{ width: "100%"}}>
+            <Button
+              outline
+              color="primary"
+              className="px-4"
+              sx={{
+                display: "block",
+                textAlign: "left", // Align text in the button to the left
+                marginBottom: "10px"
+              }}
+              onClick={confirmSignOut}
+            >
+              <i className="fa fa-lock"></i>&nbsp;&nbsp;Logout
+            </Button>
+            </div>
+        </Box>
+      </Modal>
     </div>
   );
 };
+
 
 export default AppBar;

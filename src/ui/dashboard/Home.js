@@ -85,14 +85,9 @@ const Home = ({ isOnline }) => {
   });
 
   useEffect(() => {
-    // const lastVisitedPage = localStorage.getItem("lastVisitedPage");
-    // if (lastVisitedPage) {
-    //   navigate(lastVisitedPage);
-    // }
     if (isOnline == false) {
       handleOnlineState();
     }
-    // localStorage.removeItem("lastVisitedPage");
   }, []);
 
   useEffect(() => {
@@ -103,11 +98,6 @@ const Home = ({ isOnline }) => {
       let dashboard_15 = getLocalStorageItem("dashboard_15");
       let value = JSON.parse(localStorage.getItem("report_dashboard"));
       setRecycleViewData(value);
-      // console.log('getuser',getuser);
-      // console.log('user?.username', getuser !== user?.username);
-      // console.log('condition change :-> 2',dashboard_15 == undefined);
-      // console.log('condition change : -> 3',(getuser !== null && getuser !== user?.username ));
-      // console.log('dashboard_15',dashboard_15);
       if (
         (getuser !== null && getuser !== user?.username) ||
         dashboard_15 == undefined
@@ -534,9 +524,15 @@ const Home = ({ isOnline }) => {
   };
 
   const handleUpdate = (configName, configValue) => {
+    dispatch(stopLoading()); // Dispatch the stopLoading action
     console.log("_updateCommand", configName, configValue);
     const index = actionOptions.indexOf(configValue);
     setDurationSelection(actionValues[index]);
+    if(dashboard_data.selectionView?.value !== "Summary View") {
+      setTimeout(() => {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }, 7000);
+    }
   };
 
   const handleUpdateView = (data) => {
@@ -569,56 +565,39 @@ const Home = ({ isOnline }) => {
         </div>
       )}
       <MessageDialog data={dialogData} />
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <h5>Welcome, {user?.user?.name}&nbsp;&nbsp;</h5>
-        <div style={{ width: "20%", float: "right" }}>
-          <DropDownLabel
-            label={"Duration"}
-            handleUpdate={handleUpdate}
-            options={actionOptions}
-          />
-        </div>
-        <div style={{ width: "15%", float: "right" }}>
-          <Select
-            options={viewOptions || []}
-            value={selectView}
-            onChange={handleUpdateView}
-          />
-        </div>
-        <p
-          style={{
-            marginLeft: "10px",
-            marginRight: "10px",
-            fontWeight: "bold",
-          }}
-        >
-          Parent Frequency
-        </p>
-        <Select
-          options={parentFrequency || []}
-          value={selectParentFrequency}
-          onChange={handleUpdateParentFrequency}
-          styles={{
-            control: (baseStyles, state) => ({
-              ...baseStyles,
-              width: "100%",
-            }),
-          }}
-        />
-      </div>
       <br />
-      <div
-        className="row"
-        style={{
-          ...whiteSurface,
-          background: "white",
-          width: "100%",
-          padding: "0px",
-          display: "flexbox",
-          alignItems: "center",
-        }}
-      >
-        {selectView?.value == "Summary View" ? (
+      <div  class="container" style={{ width: "22%", marginLeft: "79%"}}>
+            <div class="row" > 
+              <div class="col" style={{  marginLeft: "60px", padding: "0px" , width: "auto"}}>
+                {"Duration".trim()}
+              </div>
+            <div class="col">
+              <Dropdown
+                options={actionOptions}
+                onSelection={(index, value) => {
+                  handleUpdate("Duration", value);
+                }}
+              />
+            </div>
+            </div>
+          </div>
+          <div
+            className="row"
+            style={{
+              boxShadow: "0 4px 8px 0 rgba(0,0,0,0.2)",
+              transition: "0.3s",
+              margin: "0px",
+              borderRadius: "5px",
+              padding: "0px",
+
+              background: "white",
+              width: "100%",
+              padding: "0px",
+              display: "flexbox",
+              alignItems: "center",
+            }}
+          >
+        {dashboard_data.selectionView?.value == "Summary View" ? (
           <>
             {dashboard_data?.data ? (
               <div>
@@ -667,32 +646,6 @@ const Home = ({ isOnline }) => {
                 <br />
               </div>
             ) : (
-              // <div>
-              //   <Summary
-              //     chartData={dashboard_data.data.dashboardChartData}
-              //     bwtChartData={dashboard_data.data.bwtdashboardChartData}
-              //     dataSummary={dashboard_data.data.dataSummary}
-              //     bwtDataSummary={dashboard_data.data.bwtdataSummary}
-              //     uiResult={dashboard_data.data.uiResult}
-              //   />
-              //   <Stats
-              //     setDurationSelection={setDurationSelection}
-              //     chartData={dashboard_data.data?.dashboardChartData}
-              //     pieChartData={dashboard_data.data?.pieChartData}
-              //     bwtChartData={dashboard_data.data?.bwtdashboardChartData}
-              //     bwtPieChartData={dashboard_data.data?.bwtpieChartData}
-              //     bwtDataSummary={dashboard_data.data?.bwtdataSummary}
-              //     dashboardUpiChartData={dashboard_data.data?.dashboardUpiChartData}
-              //     pieChartUpiData={dashboard_data.data?.pieChartUpiData}
-              //     dataSummary={dashboard_data.data?.dataSummary}
-              //     uiResult={dashboard_data.data?.uiResult?.data}
-              //   />
-              //   <ActiveTickets data={dashboard_data?.data?.activeTickets} />
-              //   <HealthStatus data={dashboard_data?.data?.faultyComplexes} />
-              //   <LiveStatus data={dashboard_data?.data?.connectionStatus} />
-              //   <WaterLevelStatus data={dashboard_data?.data?.lowWaterComplexes} />
-              //   <QuickConfig uiResult={dashboard_data?.data?.uiResult?.data} />
-              // </div>
               <div>No data available</div>
             )}
           </>
