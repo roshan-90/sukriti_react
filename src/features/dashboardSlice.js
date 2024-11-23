@@ -4,7 +4,8 @@ const initialState = {
   hasData: false,
   data: {},
   configData: {},
-  selectionView: { label: "Summary View", value: "Summary View" }
+  selectionView: { label: "Summary View", value: "Summary View" },
+  selectParentFrequency: { label: "20 Sec", value: 20000 }
 };
 
 const dashboardSlice = createSlice({
@@ -25,13 +26,15 @@ const dashboardSlice = createSlice({
       state.configData = action.payload;
     },
     setDashboardView: (state, action) => {
-      console.log('action.payload', action.payload);
       state.selectionView = action.payload;
     },
+    setSelectParentFrequency: (state, action) => {
+      state.selectParentFrequency = action.payload;
+    }
   },
 });
 
-export const { setDashboardData, setDashboardConfig, setDashboardLive, setDashboardView } =
+export const { setDashboardData, setDashboardConfig, setDashboardLive, setDashboardView, setSelectParentFrequency } =
   dashboardSlice.actions;
 
 export const dashboard = (state) => state.dashboard;

@@ -640,7 +640,7 @@ const Home = ({ isOnline }) => {
               <div className="carousel">
                 <DashboardCarousel
                   dashboardData={recycleViewData}
-                  parentFrequency={selectParentFrequency}
+                  parentFrequency={dashboard_data?.selectParentFrequency}
                 />
                 <br />
                 <br />

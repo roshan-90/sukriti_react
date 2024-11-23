@@ -32,7 +32,7 @@ import Stack from "@mui/material/Stack";
 import LinearProgress from "@mui/material/LinearProgress";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Select from "react-select"; // Importing react-select
-import { setDashboardView, dashboard } from "../features/dashboardSlice";
+import { setDashboardView, dashboard, setSelectParentFrequency } from "../features/dashboardSlice";
 import { startLoading, stopLoading } from "../features/loadingSlice";
 
 const AppBar = ({ isOnline }) => {
@@ -47,10 +47,14 @@ const AppBar = ({ isOnline }) => {
     { label: "Summary View", value: "Summary View" },
     { label: "Recycle View", value: "Recycle View" },
   ];
-  const [selectView, setSelectView] = useState({
-    label: "Summary View",
-    value: "Summary View",
-  });
+  const parentFrequency = [
+    { label: "20 Sec", value: 20000 },
+    { label: "40 Sec", value: 40000 },
+    { label: "1 Min", value: 60000 },
+    { label: "1 Min 20 Sec", value: 80000 },
+    { label: "1 Min 40 Sec", value: 100000 },
+    { label: "2 Min", value: 120000 },
+  ];
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const [dialogData, setDialogData] = useState(null);
@@ -448,6 +452,7 @@ const AppBar = ({ isOnline }) => {
   };
 
   console.log("triggerFunction", triggerFunction);
+
   if (isOnline == true) {
     if (triggerFunction == true) {
       syncFunction();
@@ -472,7 +477,15 @@ const AppBar = ({ isOnline }) => {
     };
   };
 
-  console.log('dashboard_data',dashboard_data);
+  const handleUpdateParentFrequency = (data) => {
+    dispatch(startLoading()); // Dispatch the startLoading action
+    dispatch(setSelectParentFrequency(data));
+    setTimeout(() => {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }, 5000);
+  };
+
+  // console.log('dashboard_data',dashboard_data);
 
   return (
     <div>
@@ -664,6 +677,18 @@ const AppBar = ({ isOnline }) => {
           <div style={{ marginBottom: "10px" }}>
             {user?.user?.name}
           </div>
+          <Select
+            options={parentFrequency || []}
+            value={dashboard_data.selectParentFrequency}
+            onChange={handleUpdateParentFrequency}
+            styles={{
+              control: (baseStyles, state) => ({
+                ...baseStyles,
+                marginBottom: "10px",
+                width: "70%",
+              }),
+            }}
+          />
           {/* Select Dropdown */}
           <Select
               options={viewOptions || []}

@@ -1,4 +1,4 @@
-import React from "react";
+import React , { useEffect, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Summary from "./Summary";
@@ -20,14 +20,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/authenticationSlice";
 import "./DashboardComponent.css";
 import './TableStyles.css'; // Create a separate CSS file for styles
+import { dashboard } from "../../features/dashboardSlice";
 
 const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
   const user = useSelector(selectUser);
-
+  const dashboard_data = useSelector(dashboard);
   if (!dashboardData || dashboardData.length === 0) {
     return <div>No data available</div>;
   }
-
+  console.log('dashboard_data', dashboard_data);
+  console.log('ui result', dashboard_data?.data?.uiResult?.data);
 
   return (
     <Carousel
@@ -45,23 +47,29 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
              {/* Child Carousel */}
              <Carousel
                 autoPlay
-                interval={30000} // Child carousel interval (1 second)
+                interval={2000} // Child carousel interval (1 second)
                 infiniteLoop
                 showThumbs={false}
                 showStatus={false}
                 swipeable
               >
-                {/* Render StatsItems in the child carousel */}
-                <div className="stats_class">
-                  <StatsItem
-                    name="Usage Stats"
-                    total={item?.dataSummary?.usage}
-                    data={item?.dashboardChartData?.usage}
-                    pieChartData={item?.pieChartData?.usage}
-                    complex = {item?.complexName}
-                  />
-                </div>
+                {dashboard_data?.data?.uiResult?.data.total_usage == 'true' && (
+                  <>
+                  {/* Render StatsItems in the child carousel */}
+                  <div className="stats_class">
+                    <StatsItem
+                      name="Usage Stats"
+                      total={item?.dataSummary?.usage}
+                      data={item?.dashboardChartData?.usage}
+                      pieChartData={item?.pieChartData?.usage}
+                      complex = {item?.complexName}
+                    />
+                  </div>
+                    </>
+                )}
                 {user?.user?.userRole === 'Super Admin' && (
+                  <>
+                   {dashboard_data?.data?.uiResult?.data.collection_stats == 'true' && (
                     <div className="collection_class">
                       <StatsItem
                         name="Collection Stats"
@@ -71,38 +79,52 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                         complex = {item?.complexName}
                       />
                     </div>
+                   )}
+                   </>
                 )}
                  {user?.user?.userRole === 'Super Admin' && (
-                    <div className="upi_class">
+                    <>
+                     {dashboard_data?.data?.uiResult?.data.collection_stats == 'true' && (
+                        <div className="upi_class">
+                          <StatsItem
+                            name="UPI Stats"
+                            total={item?.dataSummary?.upiCollection}
+                            data={item?.dashboardChartData?.upiCollection}
+                            pieChartData={item?.pieChartData?.upiCollection}
+                            complex = {item?.complexName}
+                          />
+                        </div>
+                     )}
+                    </>
+                  )}
+                {user?.user?.userRole === 'Super Admin' && (
+                  <>
+                    {dashboard_data?.data?.uiResult?.data.bwt_stats == 'true' && (
+                      <div className="recycle_class">
+                        <BWTStatsItem
+                          name="Recycled Water"
+                          total={item?.bwtdataSummary?.waterRecycled}
+                          data={item?.bwtdashboardChartData?.waterRecycled}
+                          pieChartData={item?.bwtpieChartData?.usage}
+                          complex = {item?.complexName}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+                {dashboard_data?.data?.uiResult?.data.average_feedback == 'true' && (
+                  <>
+                    <div className="feedback_class">
                       <StatsItem
-                        name="UPI Stats"
-                        total={item?.dataSummary?.upiCollection}
-                        data={item?.dashboardChartData?.upiCollection}
-                        pieChartData={item?.pieChartData?.upiCollection}
+                        name="Feedback Stats"
+                        total={item?.dataSummary?.feedback}
+                        data={item?.dashboardChartData?.feedback}
+                        pieChartData={item?.pieChartData?.feedback}
                         complex = {item?.complexName}
                       />
                     </div>
-                  )}
-                {user?.user?.userRole === 'Super Admin' && (
-                  <div className="recycle_class">
-                    <BWTStatsItem
-                      name="Recycled Water"
-                      total={item?.bwtdataSummary?.waterRecycled}
-                      data={item?.bwtdashboardChartData?.waterRecycled}
-                      pieChartData={item?.bwtpieChartData?.usage}
-                      complex = {item?.complexName}
-                    />
-                  </div>
+                  </>
                 )}
-                <div className="feedback_class">
-                  <StatsItem
-                    name="Feedback Stats"
-                    total={item?.dataSummary?.feedback}
-                    data={item?.dashboardChartData?.feedback}
-                    pieChartData={item?.pieChartData?.feedback}
-                    complex = {item?.complexName}
-                  />
-                </div>
               </Carousel>
               
           </div>
@@ -116,9 +138,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
   );
 };
 
-const Table = (item) => {
-  console.log('item', item?.item);
-  
+const Table = (item) => {  
   // usage calculation
 
   function CalculateMwc(item) {
@@ -159,7 +179,6 @@ const Table = (item) => {
     for (let i = 0; i < item.length; i++) {
       sum += item[i].mwc;
     }
-    console.log('sumss',sum);
     return sum;
   }
 
@@ -193,7 +212,6 @@ const Table = (item) => {
     for (let i = 0; i < item.length; i++) {
       sum += item[i].mwc;
     }
-    console.log('sumss',sum);
     return sum;
   }
 
@@ -233,7 +251,7 @@ const Table = (item) => {
             <th colSpan="2">Working Status<br/>(<span style={{ color: 'red' }}>Not Working </span>/ Total)</th>
             <th>Connectivity Status<br/>(<span style={{ color: 'red' }}>OFFLINE</span> | TOTAL)</th>
             <th colSpan="2">Water Availability<br/>(<span style={{ color: 'red' }}>Not Available</span> |Total)</th>
-            <th colSpan="1">Amount of Water<br/>Recycled by REWATER<sup>TM</sup>(L)</th>
+            {item?.item?.bwtAvalibility == true && <th colSpan="1">Amount of Water<br/>Recycled by REWATER<sup>TM</sup>(L)</th>}
           </tr>
           <tr>
             <th></th>
@@ -253,20 +271,20 @@ const Table = (item) => {
           <tr>
             <td className="left-align"> <b>Male Toilets</b></td>
             <td>{CalculateMwc(item?.item?.dashboardChartData.usage)}</td>
-            <td>{item?.item?.dataSummary?.feedback}</td>
-            <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
+            <td>{(CalculateMwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
+            <td>{CalculateCollectionMwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiMwc(item.item.dashboardChartData.upiCollection)}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
-            <td>N/A</td>
+            {item?.item?.bwtAvalibility == true && <td>N/A</td>}
           </tr>
           <tr>
             <td className="left-align"> <b>Female Toilets</b></td>
             <td>{CalculateFwc(item?.item?.dashboardChartData.usage)}</td>
-            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{(CalculateFwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiFwc(item.item.dashboardChartData.upiCollection)}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
@@ -274,12 +292,12 @@ const Table = (item) => {
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.freshWaterLevel}</span>  / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
-            <td>N/A</td>
+            {item?.item?.bwtAvalibility == true && <td>N/A</td>}
           </tr>
           <tr>
             <td className="left-align"><b>Disabled Toilets</b></td>
             <td>{CalculatePwc(item?.item?.dashboardChartData.usage)}</td>
-            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{(CalculatePwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionPwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiPwc(item.item.dashboardChartData.upiCollection)}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.flushHealth}</span>  / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
@@ -287,12 +305,12 @@ const Table = (item) => {
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
-            <td>N/A</td>
+            {item?.item?.bwtAvalibility == true &&  <td>N/A</td>}
           </tr>
           <tr>
             <td className="left-align"><b>Male Urinal</b></td>
             <td>{CalculateMur(item?.item?.dashboardChartData.usage)}</td>
-            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{(CalculateMur(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionMur(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiMur(item.item.dashboardChartData.upiCollection)}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
@@ -300,12 +318,12 @@ const Table = (item) => {
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
-            <td>N/A</td>
+            {item?.item?.bwtAvalibility == true && <td>N/A</td>}
           </tr>
           <tr>
             <td className="left-align"><b>Total</b></td>
             <td>{item?.item?.dataSummary?.usage}</td>
-            <td>{item?.item?.dataSummary?.feedback}</td>
+            <td>{item?.item?.dataSummary?.usage == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{item?.item?.dataSummary?.collection}</td>
             <td>{item?.item?.dataSummary?.upiCollection}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
@@ -313,7 +331,7 @@ const Table = (item) => {
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
-            <td>{item?.item?.bwtdataSummary?.waterRecycled}</td>
+            {item?.item?.bwtAvalibility == true && <td>{item?.item?.bwtdataSummary?.waterRecycled}</td>}
           </tr>
           {/* Add more rows as needed */}
         </tbody>
@@ -327,7 +345,7 @@ const StatsItem = (props) => {
     <div
       className={`stats-item`}
       style={{
-        marginTop: "10px",
+        marginTop: "3px",
       }}
     >
       <div
