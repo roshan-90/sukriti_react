@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Modal, Box, IconButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -85,6 +85,17 @@ const AppBar = ({ isOnline }) => {
   const toggle = () => setIsOpen(!isOpen);
 
   const navLinkStyle = { cursor: "pointer", fontSize: "16px" };
+
+  useEffect(() => {
+    // Call the sync function every 3 hours
+    const interval = setInterval(() => {
+      console.log('interval is trigger')
+      syncFunction();
+    }, 3 * 60 * 60 * 1000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array ensures this runs once on mount
 
   const handleUpdateView = (data) => {
     dispatch(startLoading()); // Dispatch the startLoading action
@@ -792,6 +803,7 @@ const AppBar = ({ isOnline }) => {
           <div style={{ marginBottom: "10px" }}>
             {user?.user?.name}
           </div>
+          <p><b>Select Frequency</b></p>
           <Select
             options={parentFrequency || []}
             value={dashboard_data.selectParentFrequency}
@@ -804,6 +816,7 @@ const AppBar = ({ isOnline }) => {
               }),
             }}
           />
+            <p><b>Select Duration</b></p>
             <div style={{ width: "70%" , marginBottom: "10px"}}>
               <Dropdown
                 options={actionOptions}
@@ -813,6 +826,7 @@ const AppBar = ({ isOnline }) => {
             />
             </div>
           {/* Select Dropdown */}
+          <p><b>View Type</b></p>
           <Select
               options={viewOptions || []}
               value={dashboard_data.selectionView}
@@ -821,7 +835,7 @@ const AppBar = ({ isOnline }) => {
                 control: (provided) => ({
                   ...provided,
                   textAlign: "left", // Ensures dropdown content aligns left
-                  marginBottom: "10px",
+                  marginBottom: "20px",
                   width: "70%"
                 }),
               }}

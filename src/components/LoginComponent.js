@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signIn } from "../services/authService";
-import { setUsername } from "../features/authenticationSlice";
+import { setUsername, setTriggerFunction } from "../features/authenticationSlice";
 import {
   Button,
   Card,
@@ -37,6 +37,9 @@ const LoginComponent = () => {
       .then((credentials) => {
         // The signIn function has completed successfully
         dispatch(setUsername(email));
+        setTimeout(() => {
+          dispatch(setTriggerFunction(true));
+        }, 2000);
         // Additional logic with the credentials if needed
       })
       .catch((error) => {
