@@ -499,19 +499,23 @@ const AppBar = ({ isOnline }) => {
   };
 
   const filter_complex = (all_report_data, duration) => {
-    dispatch(setRecycleViewData([]));
-    let array_data = [];
-    for (let i = 0; i < all_report_data.length; i++) {
-      const response = all_report_data[i];
-      for (let j = 0; j < response.length; j++) {
-        const obj = response[j];
-        filter_date_single(obj, duration, array_data);
+    console.log('all_report_data', all_report_data);
+    if(all_report_data == null || all_report_data == undefined) {
+    } else {
+      dispatch(setRecycleViewData([]));
+      let array_data = [];
+      for (let i = 0; i < all_report_data.length; i++) {
+        const response = all_report_data[i];
+        for (let j = 0; j < response.length; j++) {
+          const obj = response[j];
+          filter_date_single(obj, duration, array_data);
+        }
       }
+      dispatch(setRecycleViewData([array_data]));
+      setTimeout(() => {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }, 2000);
     }
-    dispatch(setRecycleViewData([array_data]));
-    setTimeout(() => {
-      dispatch(stopLoading()); // Dispatch the stopLoading action
-    }, 2000);
   };
 
   const setDurationSelection = async (duration) => {

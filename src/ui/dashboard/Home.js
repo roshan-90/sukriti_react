@@ -248,7 +248,7 @@ const Home = ({ isOnline }) => {
     switch (true) {
       case duration === 15:
         let dashboard_15 = getLocalStorageItem("dashboard_15");
-        filter_complex(JSON.parse(value), 15);
+        // filter_complex(JSON.parse(value), 15);
         if (dashboard_15 == undefined || dashboard_15 == null) {
         } else {
           dispatch(setDashboardData(dashboard_15));
@@ -256,7 +256,7 @@ const Home = ({ isOnline }) => {
         break;
       case duration === 30:
         let dashboard_30 = getLocalStorageItem("dashboard_30");
-        filter_complex(JSON.parse(value), 30);
+        // filter_complex(JSON.parse(value), 30);
         if (dashboard_30 == undefined || dashboard_30 == null) {
         } else {
           dispatch(setDashboardData(dashboard_30));
@@ -264,7 +264,7 @@ const Home = ({ isOnline }) => {
         break;
       case duration === 45:
         let dashboard_45 = getLocalStorageItem("dashboard_45");
-        filter_complex(JSON.parse(value), 45);
+        // filter_complex(JSON.parse(value), 45);
         if (dashboard_45 == undefined || dashboard_45 == null) {
         } else {
           dispatch(setDashboardData(dashboard_45));
@@ -272,7 +272,7 @@ const Home = ({ isOnline }) => {
         break;
       case duration === 60:
         let dashboard_60 = getLocalStorageItem("dashboard_60");
-        filter_complex(JSON.parse(value), 60);
+        // filter_complex(JSON.parse(value), 60);
         if (dashboard_60 == undefined || dashboard_60 == null) {
         } else {
           dispatch(setDashboardData(dashboard_60));
@@ -280,7 +280,7 @@ const Home = ({ isOnline }) => {
         break;
       case duration === 90:
         let dashboard_90 = getLocalStorageItem("dashboard_90");
-        filter_complex(JSON.parse(value), 90);
+        // filter_complex(JSON.parse(value), 90);
         if (dashboard_90 == undefined || dashboard_90 == null) {
         } else {
           dispatch(setDashboardData(dashboard_90));
@@ -329,7 +329,7 @@ const Home = ({ isOnline }) => {
     waterRecycled: 0,
   };
 
-  const filter_date = (data, duration, array_data) => {
+  const filter_date = (data, duration) => {
     // Define start and end dates
     const startDateString = "2023-12-10"; // Example start date string
     const endDateString = "2024-01-30"; // Example end date string
@@ -478,13 +478,14 @@ const Home = ({ isOnline }) => {
         },
       ],
     });
+    setLocalStorageItem(`dashboard_${duration}`, JSON.stringify(data));
 
-    array_data.push(data);
+    // array_data.push(data);
   };
 
   const fetch_dashboard = async () => {
-    console.log(" after fetch_dashboard");
     let dashboard_90 = getLocalStorageItem("dashboard_90");
+    console.log(" after fetch_dashboard",dashboard_90);
     let array = [60, 45, 30, 15];
     array.forEach((duration) => {
       filter_date(dashboard_90, duration);
