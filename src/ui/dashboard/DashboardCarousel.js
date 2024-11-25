@@ -56,20 +56,20 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                 {dashboard_data?.data?.uiResult?.data.total_usage == 'true' && (
                   <>
                   {/* Render StatsItems in the child carousel */}
-                  <div className="stats_class">
-                    <StatsItem
-                      name="Usage Stats"
-                      total={item?.dataSummary?.usage}
-                      data={item?.dashboardChartData?.usage}
-                      pieChartData={item?.pieChartData?.usage}
-                      complex = {item?.complexName}
-                    />
-                  </div>
+                    <div className="stats_class">
+                      <StatsItem
+                        name="Usage Stats"
+                        total={item?.dataSummary?.usage}
+                        data={item?.dashboardChartData?.usage}
+                        pieChartData={item?.pieChartData?.usage}
+                        complex = {item?.complexName}
+                      />
+                    </div> 
                     </>
                 )}
                 {user?.user?.userRole === 'Super Admin' && (
                   <>
-                   {dashboard_data?.data?.uiResult?.data.collection_stats == 'true' && (
+                   {dashboard_data?.data?.uiResult?.data.collection_stats == 'true' ? (
                     <div className="collection_class">
                       <StatsItem
                         name="Collection Stats"
@@ -79,7 +79,7 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
                         complex = {item?.complexName}
                       />
                     </div>
-                   )}
+                   ): null }
                    </>
                 )}
                  {user?.user?.userRole === 'Super Admin' && (
@@ -129,7 +129,8 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
               
           </div>
           {/* Table */}
-          <Table item={item}/>
+          <h3>{dashboard_data?.data?.uiResult?.data.average_feedback}</h3>
+          <Table item={item} dashboard_data={dashboard_data?.data?.uiResult?.data} />
         </div>
       ))
     )}
@@ -140,6 +141,8 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
 
 const Table = (item) => {  
   // usage calculation
+  console.log('dashboard_data check', item.dashboard_data);
+  console.log('check', item.dashboard_data?.total_usage);
 
   function CalculateMwc(item) {
     let sum = 0;
@@ -245,7 +248,7 @@ const Table = (item) => {
         <thead>
           <tr>
              <th></th>
-            <th>No. of Uses</th>
+             {item.dashboard_data?.total_usage == 'true' && (<th>No. of Uses</th>)}
             <th>Feedback (Out of 5.0)</th>
             <th colSpan="2">Payment Collection (INR)</th>
             <th colSpan="2">Working Status<br/>(<span style={{ color: 'red' }}>Not Working </span>/ Total)</th>
@@ -254,23 +257,23 @@ const Table = (item) => {
             {item?.item?.bwtAvalibility == true && <th colSpan="1">Amount of Water<br/>Recycled by REWATER<sup>TM</sup>(L)</th>}
           </tr>
           <tr>
-            <th></th>
-            <th></th>
-            <th></th>
+            <th>1</th>
+            {item.dashboard_data?.total_usage == 'true' && (<th>2</th>)}
+            <th>3</th>
             <th>Coin</th>
             <th>UPI</th>
             <th>Flush</th>
             <th>Floor</th>
-            <th></th>
+            <th>4</th>
             <th>Fresh water</th>
             <th>Recycled water</th>
-            <th></th>
+            <th>5</th>
           </tr>
         </thead>
         <tbody className="table_body">
           <tr>
             <td className="left-align"> <b>Male Toilets</b></td>
-            <td>{CalculateMwc(item?.item?.dashboardChartData.usage)}</td>
+            {item.dashboard_data?.total_usage == 'true' && (<td>{CalculateMwc(item?.item?.dashboardChartData.usage)}</td>)}
             <td>{(CalculateMwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionMwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiMwc(item.item.dashboardChartData.upiCollection)}</td>
@@ -283,7 +286,7 @@ const Table = (item) => {
           </tr>
           <tr>
             <td className="left-align"> <b>Female Toilets</b></td>
-            <td>{CalculateFwc(item?.item?.dashboardChartData.usage)}</td>
+            {item.dashboard_data?.total_usage == 'true' && (<td>{CalculateFwc(item?.item?.dashboardChartData.usage)}</td>)}
             <td>{(CalculateFwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiFwc(item.item.dashboardChartData.upiCollection)}</td>
@@ -296,7 +299,7 @@ const Table = (item) => {
           </tr>
           <tr>
             <td className="left-align"><b>Disabled Toilets</b></td>
-            <td>{CalculatePwc(item?.item?.dashboardChartData.usage)}</td>
+            {item.dashboard_data?.total_usage == 'true' && (<td>{CalculatePwc(item?.item?.dashboardChartData.usage)}</td>)}
             <td>{(CalculatePwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionPwc(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiPwc(item.item.dashboardChartData.upiCollection)}</td>
@@ -309,7 +312,7 @@ const Table = (item) => {
           </tr>
           <tr>
             <td className="left-align"><b>Male Urinal</b></td>
-            <td>{CalculateMur(item?.item?.dashboardChartData.usage)}</td>
+            {item.dashboard_data?.total_usage == 'true' && (<td>{CalculateMur(item?.item?.dashboardChartData.usage)}</td>)}
             <td>{(CalculateMur(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{CalculateCollectionMur(item.item.dashboardChartData.collection)}</td>
             <td>{CalculateUpiMur(item.item.dashboardChartData.upiCollection)}</td>
@@ -322,7 +325,7 @@ const Table = (item) => {
           </tr>
           <tr>
             <td className="left-align"><b>Total</b></td>
-            <td>{item?.item?.dataSummary?.usage}</td>
+            {item.dashboard_data?.total_usage == 'true' && (<td>{item?.item?.dataSummary?.usage}</td>)}
             <td>{item?.item?.dataSummary?.usage == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
             <td>{item?.item?.dataSummary?.collection}</td>
             <td>{item?.item?.dataSummary?.upiCollection}</td>
