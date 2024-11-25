@@ -566,7 +566,7 @@ const Home = ({ isOnline }) => {
       )}
       <MessageDialog data={dialogData} />
       <br />
-      <div  class="container" style={{ width: "22%", marginLeft: "79%"}}>
+      {/* <div  class="container" style={{ width: "22%", marginLeft: "79%"}}>
             <div class="row" > 
               <div class="col" style={{  marginLeft: "60px", padding: "0px" , width: "auto"}}>
                 {"Duration".trim()}
@@ -580,7 +580,7 @@ const Home = ({ isOnline }) => {
               />
             </div>
             </div>
-          </div>
+          </div> */}
           <div
             className="row"
             style={{

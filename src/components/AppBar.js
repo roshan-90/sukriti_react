@@ -32,8 +32,9 @@ import Stack from "@mui/material/Stack";
 import LinearProgress from "@mui/material/LinearProgress";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Select from "react-select"; // Importing react-select
-import { setDashboardView, dashboard, setSelectParentFrequency } from "../features/dashboardSlice";
+import { setDashboardView, dashboard, setSelectParentFrequency, setDashboardData } from "../features/dashboardSlice";
 import { startLoading, stopLoading } from "../features/loadingSlice";
+import Dropdown from "../components/DropDown";
 
 const AppBar = ({ isOnline }) => {
   const dispatch = useDispatch();
@@ -55,6 +56,10 @@ const AppBar = ({ isOnline }) => {
     { label: "1 Min 40 Sec", value: 100000 },
     { label: "2 Min", value: 120000 },
   ];
+  const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
+  const actionValues = [15, 30, 45, 60, 90];
+  const reportParms = { complex: "all", duration: "15" };
+  const [recycleViewData, setRecycleViewData] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const [dialogData, setDialogData] = useState(null);
@@ -84,7 +89,17 @@ const AppBar = ({ isOnline }) => {
   const handleUpdateView = (data) => {
     dispatch(startLoading()); // Dispatch the startLoading action
     console.log("handleUpdateView", data);
-    // setSelectView(data);
+    console.log('reportParms.duration',reportParms.duration);
+    let value = localStorage.getItem("report_dashboard");
+    filter_complex(JSON.parse(value), 15);
+    // if(reportParms.duration == 15) {
+    // } else if (reportParms.duration == 30) {
+    //   filter_complex(JSON.parse(value), 30)
+    // } else if (reportParms.duration == 60) {
+    //   filter_complex(JSON.parse(value), 60)
+    // } else if (reportParms.duration == 90) {
+    //   filter_complex(JSON.parse(value), 90)
+    // }
     dispatch(setDashboardView(data));
     handleClose();
     setTimeout(() => {
@@ -485,6 +500,96 @@ const AppBar = ({ isOnline }) => {
     }, 5000);
   };
 
+  const filter_complex = (all_report_data, duration) => {
+    setRecycleViewData(null);
+    let array_data = [];
+    for (let i = 0; i < all_report_data.length; i++) {
+      const response = all_report_data[i];
+      for (let j = 0; j < response.length; j++) {
+        const obj = response[j];
+        filter_date_single(obj, duration, array_data);
+      }
+    }
+
+    setRecycleViewData([array_data]);
+  };
+
+  const setDurationSelection = async (duration) => {
+    console.log("duration", duration);
+    reportParms.duration = duration;
+    // if (isOnline == false) {
+    let value = localStorage.getItem("report_dashboard");
+    switch (true) {
+      case duration === 15:
+        let dashboard_15 = getLocalStorageItem("dashboard_15");
+        if(dashboard_data.selectionView?.value !== "Summary View") {
+          filter_complex(JSON.parse(value), 15);
+        }
+        if (dashboard_15 == undefined || dashboard_15 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_15));
+        }
+        break;
+      case duration === 30:
+        let dashboard_30 = getLocalStorageItem("dashboard_30");
+        if(dashboard_data.selectionView?.value !== "Summary View") {
+          filter_complex(JSON.parse(value), 30);
+        }
+        if (dashboard_30 == undefined || dashboard_30 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_30));
+        }
+        break;
+      case duration === 45:
+        let dashboard_45 = getLocalStorageItem("dashboard_45");
+        if(dashboard_data.selectionView?.value !== "Summary View") {
+          filter_complex(JSON.parse(value), 45);
+        }
+        if (dashboard_45 == undefined || dashboard_45 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_45));
+        }
+        break;
+      case duration === 60:
+        let dashboard_60 = getLocalStorageItem("dashboard_60");
+        if(dashboard_data.selectionView?.value !== "Summary View") {
+          filter_complex(JSON.parse(value), 60);
+        }
+        if (dashboard_60 == undefined || dashboard_60 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_60));
+        }
+        break;
+      case duration === 90:
+        let dashboard_90 = getLocalStorageItem("dashboard_90");
+        if(dashboard_data.selectionView?.value !== "Summary View") {
+          filter_complex(JSON.parse(value), 90);
+        }
+        if (dashboard_90 == undefined || dashboard_90 == null) {
+        } else {
+          dispatch(setDashboardData(dashboard_90));
+        }
+        break;
+      default:
+        console.log("default switch working");
+    }
+    // } else {
+    //   await fetchDashboardData();
+    // }
+  };
+
+  const handleUpdate = (configName, configValue) => {
+    dispatch(stopLoading()); // Dispatch the stopLoading action
+    console.log("_updateCommand", configName, configValue);
+    const index = actionOptions.indexOf(configValue);
+    setDurationSelection(actionValues[index]);
+    if(dashboard_data.selectionView?.value !== "Summary View") {
+      setTimeout(() => {
+        dispatch(stopLoading()); // Dispatch the stopLoading action
+      }, 7000);
+    }
+  };
+
   // console.log('dashboard_data',dashboard_data);
 
   return (
@@ -665,12 +770,13 @@ const AppBar = ({ isOnline }) => {
           sx={{
             position: "absolute",
             top: modalStyle.top,
-            left: "1130px",
+            left: "1050px",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 2,
             borderRadius: 1,
             textAlign: "left", // Ensures left alignment of text
+            width: "20%"
           }}
         >
          {/* User Name */}
@@ -689,6 +795,14 @@ const AppBar = ({ isOnline }) => {
               }),
             }}
           />
+            <div style={{ width: "70%" , marginBottom: "10px"}}>
+              <Dropdown
+                options={actionOptions}
+                onSelection={(index, value) => {
+                  handleUpdate("Duration", value);
+                }}
+            />
+            </div>
           {/* Select Dropdown */}
           <Select
               options={viewOptions || []}
@@ -705,24 +819,24 @@ const AppBar = ({ isOnline }) => {
             />
             {/* Sync Data Button */}
             <div style={{ marginBottom: "10px",  width: "100%"}}>
-            <Button
-              outline
-              color="primary"
-              className="px-4"
-              sx={{
-                display: "block",
-                marginBottom: "16px", // Space below
-                textAlign: "left",
-              }}
-              onClick={syncFunction}
-            >
-              {loadingPdf ? "Syncing ..." : "Sync Data"}
-              {loadingPdf && (
-                <Stack sx={{ width: "100%", color: "grey.500" }} spacing={2}>
-                  <LinearProgress color="secondary" />
-                </Stack>
-              )}
-            </Button>
+              <Button
+                outline
+                color="primary"
+                className="px-4"
+                sx={{
+                  display: "block",
+                  marginBottom: "16px", // Space below
+                  textAlign: "left",
+                }}
+                onClick={syncFunction}
+              >
+                {loadingPdf ? "Syncing ..." : "Sync Data"}
+                {loadingPdf && (
+                  <Stack sx={{ width: "100%", color: "grey.500" }} spacing={2}>
+                    <LinearProgress color="secondary" />
+                  </Stack>
+                )}
+              </Button>
             </div>
            {/* Logout Button */}
            <div style={{ width: "100%"}}>
@@ -746,5 +860,188 @@ const AppBar = ({ isOnline }) => {
   );
 };
 
+function  filter_date_single(data, duration, array_data) {
+
+  let totalCount = 0;
+  let usage_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+  let collection_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+  let upiCollection_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+  let feedback_summary = [
+    { name: "MWC", value: 0 },
+    { name: "FWC", value: 0 },
+    { name: "PWC", value: 0 },
+    { name: "MUR", value: 0 },
+  ];
+
+  let bwtdata_summary = {
+    waterRecycled: 0,
+  };
+
+    // Define start and end dates
+    const startDateString = "2023-12-10"; // Example start date string
+    const endDateString = "2024-01-30"; // Example end date string
+
+    // Function to filter data based on date range
+    function filterDataByDateRange(data, startDateString, endDateString) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - duration); // Set start date to 15 days ago
+      const endDate = new Date(); // End date is today
+      // const startDate = new Date(startDateString);
+      // const endDate = new Date(endDateString);
+      return data.filter((entry) => {
+        const [day, month, year] = entry.date.split("/");
+        const entryDate = new Date(`${year}-${month}-${day}`);
+        return entryDate >= startDate && entryDate <= endDate;
+      });
+    }
+
+    // Create a new object to store filtered data for all keys
+    let filteredData = {};
+    const dataSummary = {
+      collection: 0,
+      feedback: 0,
+      upiCollection: 0,
+      usage: 0,
+    };
+
+    const databwtsummary = {
+      all: 0,
+      bwt: 0,
+    };
+
+    const bwtSummary = (data) => {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].all !== 0) {
+          databwtsummary.all += Number(data[i].all);
+          databwtsummary.bwt += Number(data[i].bwt);
+        }
+      }
+    };
+
+    const summaryFunction = (key, data) => {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].all !== 0) {
+          if (key in dataSummary) {
+            if (key === "feedback") {
+              totalCount = data.length;
+              dataSummary[key] += Number(data[i].all);
+              if (data[i].fwc !== 0) {
+                feedback_summary[1].value += Number(data[i].fwc);
+              }
+              if (data[i].mur !== 0) {
+                feedback_summary[3].value += Number(data[i].mur);
+              }
+              if (data[i].mwc !== 0) {
+                feedback_summary[0].value += Number(data[i].mwc);
+              }
+              if (data[i].pwc !== 0) {
+                feedback_summary[2].value += Number(data[i].pwc);
+              }
+            } else {
+              dataSummary[key] += Number(data[i].all);
+              if (key === "usage") {
+                if (data[i].fwc !== 0) {
+                  usage_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  usage_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  usage_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  usage_summary[2].value += Number(data[i].pwc);
+                }
+              } else if (key === "upiCollection") {
+                if (data[i].fwc !== 0) {
+                  upiCollection_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  upiCollection_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  upiCollection_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  upiCollection_summary[2].value += Number(data[i].pwc);
+                }
+              } else if (key === "collection") {
+                if (data[i].fwc !== 0) {
+                  collection_summary[1].value += Number(data[i].fwc);
+                }
+                if (data[i].mur !== 0) {
+                  collection_summary[3].value += Number(data[i].mur);
+                }
+                if (data[i].mwc !== 0) {
+                  collection_summary[0].value += Number(data[i].mwc);
+                }
+                if (data[i].pwc !== 0) {
+                  collection_summary[2].value += Number(data[i].pwc);
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+    // Loop through each key in data.dashboardChartData
+    Object.keys(data.dashboardChartData).forEach((key) => {
+      // Filter data based on date range for each key
+      filteredData[key] = filterDataByDateRange(
+        data.dashboardChartData[key],
+        startDateString,
+        endDateString
+      );
+      summaryFunction(key, filteredData[key]);
+    });
+    // Update data.dashboardChartData with filteredData
+    Object.assign(data.dashboardChartData, filteredData);
+    dataSummary.feedback = (dataSummary.feedback / totalCount).toFixed(1);
+    dataSummary.feedback =
+      dataSummary.feedback == "NaN" ? 0 : dataSummary.feedback;
+    Object.assign(data.dataSummary, dataSummary);
+    Object.assign(data.pieChartData, {
+      collection: collection_summary,
+      feedback: feedback_summary,
+      upiCollection: upiCollection_summary,
+      usage: usage_summary,
+    });
+    filteredData = {};
+    filteredData = filterDataByDateRange(
+      data.bwtdashboardChartData?.waterRecycled,
+      startDateString,
+      endDateString
+    );
+
+    Object.assign(data.bwtdashboardChartData, { waterRecycled: filteredData });
+    bwtSummary(filteredData);
+    Object.assign(data.bwtdataSummary, { waterRecycled: databwtsummary?.all });
+
+    Object.assign(data.bwtpieChartData, {
+      usage: [
+        {
+          name: "BWT",
+          value: databwtsummary?.bwt,
+        },
+      ],
+    });
+
+    array_data.push(data);
+};
 
 export default AppBar;
