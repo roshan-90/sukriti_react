@@ -97,7 +97,7 @@ const Home = ({ isOnline }) => {
       let getuser = localStorage.getItem("set_user");
       let dashboard_15 = getLocalStorageItem("dashboard_15");
       let value = JSON.parse(localStorage.getItem("report_dashboard"));
-      setRecycleViewData(value);
+      // setRecycleViewData(value);
       if (
         (getuser !== null && getuser !== user?.username) ||
         dashboard_15 == undefined
@@ -227,7 +227,7 @@ const Home = ({ isOnline }) => {
   };
 
   const filter_complex = (all_report_data, duration) => {
-    setRecycleViewData(null);
+    // setRecycleViewData(null);
     let array_data = [];
     for (let i = 0; i < all_report_data.length; i++) {
       const response = all_report_data[i];
@@ -237,7 +237,7 @@ const Home = ({ isOnline }) => {
       }
     }
 
-    setRecycleViewData([array_data]);
+    // setRecycleViewData([array_data]);
   };
 
   const setDurationSelection = async (duration) => {
@@ -523,17 +523,17 @@ const Home = ({ isOnline }) => {
     // setLocalStorageItem("dashboard_90", JSON.stringify(result_90));
   };
 
-  const handleUpdate = (configName, configValue) => {
-    dispatch(stopLoading()); // Dispatch the stopLoading action
-    console.log("_updateCommand", configName, configValue);
-    const index = actionOptions.indexOf(configValue);
-    setDurationSelection(actionValues[index]);
-    if(dashboard_data.selectionView?.value !== "Summary View") {
-      setTimeout(() => {
-        dispatch(stopLoading()); // Dispatch the stopLoading action
-      }, 7000);
-    }
-  };
+  // const handleUpdate = (configName, configValue) => {
+  //   dispatch(stopLoading()); // Dispatch the stopLoading action
+  //   console.log("_updateCommand", configName, configValue);
+  //   const index = actionOptions.indexOf(configValue);
+  //   setDurationSelection(actionValues[index]);
+  //   if(dashboard_data.selectionView?.value !== "Summary View") {
+  //     setTimeout(() => {
+  //       dispatch(stopLoading()); // Dispatch the stopLoading action
+  //     }, 7000);
+  //   }
+  // };
 
   const handleUpdateView = (data) => {
     console.log("handleUpdateView", data);
@@ -639,7 +639,7 @@ const Home = ({ isOnline }) => {
             {dashboard_data?.data ? (
               <div className="carousel">
                 <DashboardCarousel
-                  dashboardData={recycleViewData}
+                  dashboardData={dashboard_data?.RecycleViewData}
                   parentFrequency={dashboard_data?.selectParentFrequency}
                 />
                 <br />

@@ -32,7 +32,7 @@ import Stack from "@mui/material/Stack";
 import LinearProgress from "@mui/material/LinearProgress";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Select from "react-select"; // Importing react-select
-import { setDashboardView, dashboard, setSelectParentFrequency, setDashboardData } from "../features/dashboardSlice";
+import { setDashboardView, dashboard, setSelectParentFrequency, setDashboardData, setRecycleViewData } from "../features/dashboardSlice";
 import { startLoading, stopLoading } from "../features/loadingSlice";
 import Dropdown from "../components/DropDown";
 
@@ -59,7 +59,7 @@ const AppBar = ({ isOnline }) => {
   const actionOptions = ["15 Days", "30 Days", "45 Days", "60 Days", "90 Days"];
   const actionValues = [15, 30, 45, 60, 90];
   const reportParms = { complex: "all", duration: "15" };
-  const [recycleViewData, setRecycleViewData] = useState(null);
+  // const [recycleViewData, setRecycleViewData] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const [dialogData, setDialogData] = useState(null);
@@ -88,18 +88,16 @@ const AppBar = ({ isOnline }) => {
 
   const handleUpdateView = (data) => {
     dispatch(startLoading()); // Dispatch the startLoading action
-    console.log("handleUpdateView", data);
-    console.log('reportParms.duration',reportParms.duration);
     let value = localStorage.getItem("report_dashboard");
-    filter_complex(JSON.parse(value), 15);
-    // if(reportParms.duration == 15) {
-    // } else if (reportParms.duration == 30) {
-    //   filter_complex(JSON.parse(value), 30)
-    // } else if (reportParms.duration == 60) {
-    //   filter_complex(JSON.parse(value), 60)
-    // } else if (reportParms.duration == 90) {
-    //   filter_complex(JSON.parse(value), 90)
-    // }
+    if(reportParms.duration == 15) {
+      filter_complex(JSON.parse(value), 15);
+    } else if (reportParms.duration == 30) {
+      filter_complex(JSON.parse(value), 30)
+    } else if (reportParms.duration == 60) {
+      filter_complex(JSON.parse(value), 60)
+    } else if (reportParms.duration == 90) {
+      filter_complex(JSON.parse(value), 90)
+    }
     dispatch(setDashboardView(data));
     handleClose();
     setTimeout(() => {
@@ -501,7 +499,7 @@ const AppBar = ({ isOnline }) => {
   };
 
   const filter_complex = (all_report_data, duration) => {
-    setRecycleViewData(null);
+    dispatch(setRecycleViewData([]));
     let array_data = [];
     for (let i = 0; i < all_report_data.length; i++) {
       const response = all_report_data[i];
@@ -510,8 +508,10 @@ const AppBar = ({ isOnline }) => {
         filter_date_single(obj, duration, array_data);
       }
     }
-
-    setRecycleViewData([array_data]);
+    dispatch(setRecycleViewData([array_data]));
+    setTimeout(() => {
+      dispatch(stopLoading()); // Dispatch the stopLoading action
+    }, 2000);
   };
 
   const setDurationSelection = async (duration) => {
@@ -523,6 +523,7 @@ const AppBar = ({ isOnline }) => {
       case duration === 15:
         let dashboard_15 = getLocalStorageItem("dashboard_15");
         if(dashboard_data.selectionView?.value !== "Summary View") {
+          dispatch(startLoading());
           filter_complex(JSON.parse(value), 15);
         }
         if (dashboard_15 == undefined || dashboard_15 == null) {
@@ -533,6 +534,7 @@ const AppBar = ({ isOnline }) => {
       case duration === 30:
         let dashboard_30 = getLocalStorageItem("dashboard_30");
         if(dashboard_data.selectionView?.value !== "Summary View") {
+          dispatch(startLoading());
           filter_complex(JSON.parse(value), 30);
         }
         if (dashboard_30 == undefined || dashboard_30 == null) {
@@ -543,6 +545,7 @@ const AppBar = ({ isOnline }) => {
       case duration === 45:
         let dashboard_45 = getLocalStorageItem("dashboard_45");
         if(dashboard_data.selectionView?.value !== "Summary View") {
+          dispatch(startLoading());
           filter_complex(JSON.parse(value), 45);
         }
         if (dashboard_45 == undefined || dashboard_45 == null) {
@@ -553,6 +556,7 @@ const AppBar = ({ isOnline }) => {
       case duration === 60:
         let dashboard_60 = getLocalStorageItem("dashboard_60");
         if(dashboard_data.selectionView?.value !== "Summary View") {
+          dispatch(startLoading());
           filter_complex(JSON.parse(value), 60);
         }
         if (dashboard_60 == undefined || dashboard_60 == null) {
@@ -563,6 +567,7 @@ const AppBar = ({ isOnline }) => {
       case duration === 90:
         let dashboard_90 = getLocalStorageItem("dashboard_90");
         if(dashboard_data.selectionView?.value !== "Summary View") {
+          dispatch(startLoading());
           filter_complex(JSON.parse(value), 90);
         }
         if (dashboard_90 == undefined || dashboard_90 == null) {
