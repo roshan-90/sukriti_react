@@ -249,92 +249,92 @@ const Table = (item) => {
           <tr>
              <th></th>
              {item.dashboard_data?.total_usage == 'true' && (<th>No. of Uses</th>)}
-            <th>Feedback (Out of 5.0)</th>
-            <th colSpan="2">Payment Collection (INR)</th>
+             {item.dashboard_data?.average_feedback == 'true' && (<th>Feedback (Out of 5.0)</th>)}
+             {item.dashboard_data?.collection_stats == 'true' && (<th colSpan="2">Payment Collection (INR)</th>)}
             <th colSpan="2">Working Status<br/>(<span style={{ color: 'red' }}>Not Working </span>/ Total)</th>
             <th>Connectivity Status<br/>(<span style={{ color: 'red' }}>OFFLINE</span> | TOTAL)</th>
             <th colSpan="2">Water Availability<br/>(<span style={{ color: 'red' }}>Not Available</span> |Total)</th>
-            {item?.item?.bwtAvalibility == true && <th colSpan="1">Amount of Water<br/>Recycled by REWATER<sup>TM</sup>(L)</th>}
+            {item.dashboard_data?.bwt_stats == 'true' && (<th colSpan="1">Amount of Water<br/>Recycled by REWATER<sup>TM</sup>(L)</th>)}
           </tr>
           <tr>
-            <th>1</th>
-            {item.dashboard_data?.total_usage == 'true' && (<th>2</th>)}
-            <th>3</th>
-            <th>Coin</th>
-            <th>UPI</th>
+            <th></th>
+            {item.dashboard_data?.total_usage == 'true' && (<th></th>)}
+            {item.dashboard_data?.average_feedback == 'true' && (<th></th>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<th>Coin</th>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<th>UPI</th>)}
             <th>Flush</th>
             <th>Floor</th>
-            <th>4</th>
+            <th></th>
             <th>Fresh water</th>
             <th>Recycled water</th>
-            <th>5</th>
+            {item.dashboard_data?.bwt_stats == 'true' && (<th></th>)}
           </tr>
         </thead>
         <tbody className="table_body">
           <tr>
             <td className="left-align"> <b>Male Toilets</b></td>
             {item.dashboard_data?.total_usage == 'true' && (<td>{CalculateMwc(item?.item?.dashboardChartData.usage)}</td>)}
-            <td>{(CalculateMwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
-            <td>{CalculateCollectionMwc(item.item.dashboardChartData.collection)}</td>
-            <td>{CalculateUpiMwc(item.item.dashboardChartData.upiCollection)}</td>
+            {item.dashboard_data?.average_feedback == 'true' && (<td>{(CalculateMwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateCollectionMwc(item.item.dashboardChartData.collection)}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateUpiMwc(item.item.dashboardChartData.upiCollection)}</td>)}
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mwc?.Total}</td>
-            {item?.item?.bwtAvalibility == true && <td>N/A</td>}
+            {item.dashboard_data?.bwt_stats == 'true' && (<td>N/A</td>)}
           </tr>
           <tr>
             <td className="left-align"> <b>Female Toilets</b></td>
             {item.dashboard_data?.total_usage == 'true' && (<td>{CalculateFwc(item?.item?.dashboardChartData.usage)}</td>)}
-            <td>{(CalculateFwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
-            <td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>
-            <td>{CalculateUpiFwc(item.item.dashboardChartData.upiCollection)}</td>
+            {item.dashboard_data?.average_feedback == 'true' && (<td>{(CalculateFwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateCollectionFwc(item.item.dashboardChartData.collection)}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateUpiFwc(item.item.dashboardChartData.upiCollection)}</td>)}
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.freshWaterLevel}</span>  / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.fwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.fwc?.Total}</td>
-            {item?.item?.bwtAvalibility == true && <td>N/A</td>}
+            {item.dashboard_data?.bwt_stats == 'true' && (<td>N/A</td>)}
           </tr>
           <tr>
             <td className="left-align"><b>Disabled Toilets</b></td>
             {item.dashboard_data?.total_usage == 'true' && (<td>{CalculatePwc(item?.item?.dashboardChartData.usage)}</td>)}
-            <td>{(CalculatePwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
-            <td>{CalculateCollectionPwc(item.item.dashboardChartData.collection)}</td>
-            <td>{CalculateUpiPwc(item.item.dashboardChartData.upiCollection)}</td>
+            {item.dashboard_data?.average_feedback == 'true' && (<td>{(CalculatePwc(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateCollectionPwc(item.item.dashboardChartData.collection)}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateUpiPwc(item.item.dashboardChartData.upiCollection)}</td>)}
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.flushHealth}</span>  / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.pwc?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.pwc?.Total}</td>
-            {item?.item?.bwtAvalibility == true &&  <td>N/A</td>}
+            {item.dashboard_data?.bwt_stats == 'true' && (<td>N/A</td>)}
           </tr>
           <tr>
             <td className="left-align"><b>Male Urinal</b></td>
             {item.dashboard_data?.total_usage == 'true' && (<td>{CalculateMur(item?.item?.dashboardChartData.usage)}</td>)}
-            <td>{(CalculateMur(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
-            <td>{CalculateCollectionMur(item.item.dashboardChartData.collection)}</td>
-            <td>{CalculateUpiMur(item.item.dashboardChartData.upiCollection)}</td>
+            {item.dashboard_data?.average_feedback == 'true' && (<td>{(CalculateMur(item?.item?.dashboardChartData.usage)) == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateCollectionMur(item.item.dashboardChartData.collection)}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{CalculateUpiMur(item.item.dashboardChartData.upiCollection)}</td>)}
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.mur?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.mur?.Total}</td>
-            {item?.item?.bwtAvalibility == true && <td>N/A</td>}
+            {item.dashboard_data?.bwt_stats == 'true' && (<td>N/A</td>)}
           </tr>
           <tr>
             <td className="left-align"><b>Total</b></td>
             {item.dashboard_data?.total_usage == 'true' && (<td>{item?.item?.dataSummary?.usage}</td>)}
-            <td>{item?.item?.dataSummary?.usage == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>
-            <td>{item?.item?.dataSummary?.collection}</td>
-            <td>{item?.item?.dataSummary?.upiCollection}</td>
+            {item.dashboard_data?.average_feedback == 'true' && (<td>{item?.item?.dataSummary?.usage == 0 ? 0 : item?.item?.dataSummary?.feedback}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{item?.item?.dataSummary?.collection}</td>)}
+            {item.dashboard_data?.collection_stats == 'true' && (<td>{item?.item?.dataSummary?.upiCollection}</td>)}
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.flushHealth}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.floorCleanHealth}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.connection_status}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.freshWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
             <td><span style={{ color: 'red' }}>{item?.item?.HealthConnectionAggregatedData?.all?.recycleWaterLevel}</span> / {item.item.HealthConnectionAggregatedData?.all?.Total}</td>
-            {item?.item?.bwtAvalibility == true && <td>{item?.item?.bwtdataSummary?.waterRecycled}</td>}
+            {item.dashboard_data?.bwt_stats == 'true' && (<td>{item?.item?.bwtdataSummary?.waterRecycled}</td>)}
           </tr>
           {/* Add more rows as needed */}
         </tbody>
