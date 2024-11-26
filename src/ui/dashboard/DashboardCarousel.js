@@ -129,7 +129,6 @@ const DashboardCarousel = ({ dashboardData , parentFrequency }) => {
               
           </div>
           {/* Table */}
-          <h3>{dashboard_data?.data?.uiResult?.data.average_feedback}</h3>
           <Table item={item} dashboard_data={dashboard_data?.data?.uiResult?.data} />
         </div>
       ))
