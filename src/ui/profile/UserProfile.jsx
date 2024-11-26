@@ -103,7 +103,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="animated fadeIn">
+    <div className="animated fadeIn" style={{ marginTop: "22px"}}>
       {isLoading && (
         <div className="loader-container">
           <CircularProgress
